@@ -577,7 +577,7 @@ checkPositiveValue(index: number) {
  
  goBack() {
   this.router.navigate(
-    ['/seed-rolling-planing-crop-wise?year= season'],
+    ['/seed-rolling-planing-crop-wise'],
     
   );
 }

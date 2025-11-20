@@ -43,5 +43,9 @@ export const environment = {
     baseUrl: 'http://seed.aeologic.in/',
     apiBaseUrl: 'http://seed.aeologic.in/ms-nb-006-production-center/api/',
     apiUrl: 'http://seed.aeologic.in/ms-nb-006-production-center/api/',
+  },  ms_nb_008_srp: {
+    baseUrl: 'http://localhost:3008/',
+    apiBaseUrl: 'http://localhost:3008/ms-nb-008-srp/api/',
+    apiUrl: 'http://localhost:3008/ms-nb-008-srp/api/',
   }
 };

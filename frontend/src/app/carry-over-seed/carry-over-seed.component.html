@@ -10,8 +10,8 @@
             color: #1C1C1C;">
                 {{tittle}}
             </div>
-            
-         
+
+
             <form [formGroup]="ngForm">
                 <br>
                 <div class="col-12">
@@ -23,8 +23,9 @@
                                         <!-- checked -->
                                         <!-- [checked]="ngForm.controls['willing_to_produce'].value=='yes'" -->
                                         <input class="radio-button form-check-input radio-btn" name="notifiedValue"
-                                            type="radio" (change)="productionTypeValue('NORMAL')" [ngClass]="isDisableNormal?'disableField':''" [disabled]="isDisableNormal" id="flexRadioDefault1"
-                                            value="non-notified" >
+                                            type="radio" (change)="productionTypeValue('NORMAL')"
+                                            [ngClass]="isDisableNormal?'disableField':''" [disabled]="isDisableNormal"
+                                            id="flexRadioDefault1" value="non-notified">
                                         <label class="form-check-label" for="flexRadioDefault1">
                                             Normal Varieties
                                         </label>
@@ -36,7 +37,9 @@
                                 <div class="col-md-2 col-sm-2 col-md-2 col-lg-3 pl-lg-5 pl-md-5 pl-sm-2 ">
                                     <div class="form-check">
                                         <input class="radio-button form-check-input radio-btn" name="notifiedValue"
-                                            type="radio" (change)="productionTypeValue('DELAY')"[ngClass]="isDisableDelay?'disableField':''" [disabled]="isDisableDelay" id="flexRadioDefault2" >
+                                            type="radio" (change)="productionTypeValue('DELAY')"
+                                            [ngClass]="isDisableDelay?'disableField':''" [disabled]="isDisableDelay"
+                                            id="flexRadioDefault2">
                                         <label class="form-check-label" for="flexRadioDefault2">
                                             Delayed Varieties
                                         </label>
@@ -45,7 +48,9 @@
                                 <div class="col-md-2 col-sm-2 col-md-2 col-lg-3 pl-lg-5 pl-md-5 pl-sm-2 ">
                                     <div class="form-check">
                                         <input class="radio-button form-check-input radio-btn" name="notifiedValue"
-                                            type="radio" (change)="productionTypeValue('REALLOCATION')"[ngClass]="isDisableNormalReallocate?'disableField':''" [disabled]="isDisableNormalReallocate" id="flexRadioDefault2">
+                                            type="radio" (change)="productionTypeValue('REALLOCATION')"
+                                            [ngClass]="isDisableNormalReallocate?'disableField':''"
+                                            [disabled]="isDisableNormalReallocate" id="flexRadioDefault2">
                                         <label class="form-check-label" for="flexRadioDefault2">
                                             Reallocated Varieties
                                         </label>
@@ -54,7 +59,9 @@
                                 <div class="col-md-1 col-sm-1 col-md-1 col-lg-1 ">
                                     <!-- form-button btn-inventory search d-inline-flex justify-content-center verticle-content-middle mb-3 -->
                                     <button (click)="resetRadioBtn()"
-                                        class="btn-reset w-50 search text-white inline-flex justify-content-center verticle-content-middle" title="Reset"><i class="fa fa-refresh" style="font-size:20px;color:rgb(255, 255, 255)"></i>
+                                        class="btn-reset w-50 search text-white inline-flex justify-content-center verticle-content-middle"
+                                        title="Reset"><i class="fa fa-refresh"
+                                            style="font-size:20px;color:rgb(255, 255, 255)"></i>
                                     </button>
                                     <!-- (click)="search()" -->
                                 </div>
@@ -251,10 +258,13 @@
 
 
                 <!--  Second Card ui   *ngIf="showDetsails && showSecondCard" *ngIf="showDetsails && showSecondCard"-->
-                <div class="col-12 pt-0" >
+                <!-- *ngIf="!showetailsPage && isSearch && (this.showparental ? this.showparental:Variety.length ) ||
+                editDataValue" -->
+
+                <div class="col-12 pt-0">
                     <div class="row card-inventory form-group">
                         <div class="col-xl-3 col-12   pt-3 pb-3"
-                            *ngIf="(!showetailsPage  && isSearch && Variety.length>0)||editDataValue">
+                            *ngIf="(!showetailsPage && isSearch && (showparental ? showparental : Variety.length)) || editDataValue">
                             <div class="row">
                                 <div class="col-12">
                                     <label for="year" class="label-inventory ">Variety</label>
@@ -436,7 +446,8 @@
                                     <div class="form-group">
                                         <label>
                                             <input type="radio" name="option" value="1" (click)="setmeettarget(1)"
-                                                [checked]="ngForm.controls['meet_target'].value==1" [disabled]="is_update" [ngClass]="(is_update) ? 'disableField':''">
+                                                [checked]="ngForm.controls['meet_target'].value==1"
+                                                [disabled]="is_update" [ngClass]="(is_update) ? 'disableField':''">
                                             <span class="label-inventory pl-2 radiotext">Only Carry-over seeds</span>
                                         </label>
                                     </div>
@@ -445,8 +456,10 @@
                                     <div class="form-group pl-xl-5">
                                         <label>
                                             <input type="radio" name="option" value="2" (click)="setmeettarget(2)"
-                                                [checked]="ngForm.controls['meet_target'].value==2" [disabled]="is_update">
-                                            <span class="label-inventory pl-2 radiotext">Partly Carry-over and partly Fresh
+                                                [checked]="ngForm.controls['meet_target'].value==2"
+                                                [disabled]="is_update">
+                                            <span class="label-inventory pl-2 radiotext">Partly Carry-over and partly
+                                                Fresh
                                                 Production</span>
                                         </label>
                                     </div>
@@ -455,7 +468,8 @@
                                     <div class="form-group pl-xl-5">
                                         <label>
                                             <input type="radio" name="option" value="3" (click)="setmeettarget(3)"
-                                                [checked]="ngForm.controls['meet_target'].value==3" [ngClass]="(is_update) ? 'disableField':''" [disabled]="is_update">
+                                                [checked]="ngForm.controls['meet_target'].value==3"
+                                                [ngClass]="(is_update) ? 'disableField':''" [disabled]="is_update">
                                             <span class="label-inventory pl-2 radiotext">Only Fresh Production</span>
                                         </label>
                                     </div>
@@ -483,27 +497,31 @@
                                     <ng-container>
                                         <tr *ngFor="let ele of employees().controls; let i = index" [formGroupName]="i">
 
-                                            <td *ngIf="ngForm.controls['carry_over']['controls'][i]['controls'].show_class.value==false">
-                                                <select  class=" form-control input-inventory secondpagetd"
+                                            <td
+                                                *ngIf="ngForm.controls['carry_over']['controls'][i]['controls'].show_class.value==false">
+                                                <select class=" form-control input-inventory secondpagetd"
                                                     formControlName="class_of_seed" (ngModelChange)="getStageList(i)">
                                                     <option value="">Please Select Class of Seed
                                                     </option>
-                                                    <option *ngFor="let data of classOfSeed" value="{{data && data.id ? data.id :''}}" >
+                                                    <option *ngFor="let data of classOfSeed"
+                                                        value="{{data && data.id ? data.id :''}}">
                                                         {{data && data.class_type ? data.class_type :''}}
                                                     </option>
                                                 </select>
-                                               
+
                                             </td>
-                                            <td  *ngIf="ngForm.controls['carry_over']['controls'][i]['controls'].show_class.value==true">
-                                                <input type="text" value="Breeder Seed" 
+                                            <td
+                                                *ngIf="ngForm.controls['carry_over']['controls'][i]['controls'].show_class.value==true">
+                                                <input type="text" value="Breeder Seed"
                                                     class="form-control disableField">
-                                                </td>
-                                            <td>                                              
+                                            </td>
+                                            <td>
                                                 <select class=" form-control input-inventory secondpagetd"
                                                     formControlName="stage" (ngModelChange)="getSeedInventoYear(i)">
                                                     <option value="">Please Select Stage
                                                     </option>
-                                                    <option *ngFor="let data of  ngForm.controls['carry_over']['controls'][i]['controls'].stage.stageList"
+                                                    <option
+                                                        *ngFor="let data of  ngForm.controls['carry_over']['controls'][i]['controls'].stage.stageList"
                                                         value="{{data && data.value ? data.value :''}}">
                                                         {{data
                                                         && data.display_text ?
@@ -569,18 +587,16 @@
                                                     class="form-control disableField">
                                             </td>
                                             <td>
-                                                <input type="number" formControlName="qty_recieved"
-                                                    class="form-control" (ngModelChange)="gettotalValue(i)"
-                                                    [ngClass]="ngForm.controls['carry_over']['controls'][i]['controls'].enableqty_recieved.value==true ? 'disableField':''"
-                                                    >
+                                                <input type="number" formControlName="qty_recieved" class="form-control"
+                                                    (ngModelChange)="gettotalValue(i)"
+                                                    [ngClass]="ngForm.controls['carry_over']['controls'][i]['controls'].enableqty_recieved.value==true ? 'disableField':''">
                                             </td>
                                             <td>
                                                 <button (click)="remove(i)" class="list-action-buttons-second"
                                                     *ngIf="employees().controls.length!=1 ">
                                                     <img src="assets/images/delete.png">
                                                 </button>
-                                                <button (click)="addMore(i)"
-                                                    *ngIf="employees().controls.length ==i+1"
+                                                <button (click)="addMore(i)" *ngIf="employees().controls.length ==i+1"
                                                     class="list-action-buttons-second ml-xl-2">
                                                     <img src="assets/images/Add.png">
                                                 </button>
@@ -733,45 +749,63 @@
                                             <ng-container
                                                 *ngFor="let item of data.seed_class_details; let varietyIndex = index">
                                                 <tr>
-                                            <td  *ngIf="varietyIndex==0" [attr.rowspan]="data.seed_class_details.length">{{dataIndex+1}}</td>
-                                            <td style="text-align:left"  *ngIf="varietyIndex==0" [attr.rowspan]="data.seed_class_details.length">
-                                                <span>Variety Name: <b class="font-weight-bold">{{data
-                                                       &&
-                                                        data.variety_name ?
-                                                        data.variety_name :'NA'}}</b></span><br>
-                                                <span>Parental Line: <b class="font-weight-bold">{{data &&
-                                                        
-                                                        data.line_variety_name ?
-                                                        (data.line_variety_name)
-                                                        :'NA'}}</b></span><br>
-                                            </td>
-                                            <td  *ngIf="varietyIndex==0" [attr.rowspan]="data.seed_class_details.length">
-                                                {{data && data.total_targeted_qty ? (data.total_targeted_qty.toFixed(2)):'NA'}}
-                                                </td>
-                                            <td style="text-align:left">
-                                                <span>Class: <b class="font-weight-bold">{{data && data.meet_target!=3 ? 'Breeder':'NA'}}</b></span><br>
-                                                <span>Stage: <b class="font-weight-bold">{{item &&
-                                                    item.stage ? getStage(item.stage) :'NA'}}</b></span><br>
-                                                <span>Year: <b class="font-weight-bold">{{data &&
-                                                    item.year ? getYearData(item.year) :'NA'}}</b></span><br>
-                                                <span>Season: <b class="font-weight-bold">{{data &&
-                                                    item.season ? getSeasonData(item.season) :'NA'}}</b></span><br>
+                                                    <td *ngIf="varietyIndex==0"
+                                                        [attr.rowspan]="data.seed_class_details.length">{{dataIndex+1}}
+                                                    </td>
+                                                    <td style="text-align:left" *ngIf="varietyIndex==0"
+                                                        [attr.rowspan]="data.seed_class_details.length">
+                                                        <span>Variety Name: <b class="font-weight-bold">{{data
+                                                                &&
+                                                                data.variety_name ?
+                                                                data.variety_name :'NA'}}</b></span><br>
+                                                        <span>Parental Line: <b class="font-weight-bold">{{data &&
 
-                                            </td>
-                                            <td>
-                                                <span>{{item && item.lot_no ? getLotNoData(item.lot_no):'NA'}}</span>
-                                            </td>
-                                            <td>
-                                                <span>{{item && item.tag_no ? getTagNoData(item.tag_no):'NA'}}</span>
-                                            </td>
-                                            <td >
-                                                <span>{{item && item.quantity_recieved ? convertToQty(item.quantity_recieved):'NA'}}</span>
-                                            </td>
-                                            <td *ngIf="varietyIndex==0" [attr.rowspan]="data.seed_class_details.length">
-                                                <span>{{data && data.total_qty ? convertToQty(data.total_qty):'NA'}}</span>
-                                            </td>
-                                           
-                                            <td class="datalist" *ngIf="varietyIndex==0" [attr.rowspan]="data.seed_class_details.length">
+                                                                data.line_variety_name ?
+                                                                (data.line_variety_name)
+                                                                :'NA'}}</b></span><br>
+                                                    </td>
+                                                    <!--  -->
+                                                    <td *ngIf="data && data.line_variety_name">
+                                                        {{data && data.quantity ? (data.quantity.toFixed(2)):'NA'}}
+                                                    </td>
+                                                    <td *ngIf="varietyIndex==0 && !data.line_variety_name"
+                                                        [attr.rowspan]="data.seed_class_details.length">
+                                                        {{data && data.total_targeted_qty ?
+                                                        (data.total_targeted_qty.toFixed(2)):'NA'}}
+                                                    </td>
+                                                    <td style="text-align:left">
+                                                        <span>Class: <b class="font-weight-bold">{{data &&
+                                                                data.meet_target!=3 ? 'Breeder':'NA'}}</b></span><br>
+                                                        <span>Stage: <b class="font-weight-bold">{{item &&
+                                                                item.stage ? getStage(item.stage) :'NA'}}</b></span><br>
+                                                        <span>Year: <b class="font-weight-bold">{{data &&
+                                                                item.year ? getYearData(item.year)
+                                                                :'NA'}}</b></span><br>
+                                                        <span>Season: <b class="font-weight-bold">{{data &&
+                                                                item.season ? getSeasonData(item.season)
+                                                                :'NA'}}</b></span><br>
+
+                                                    </td>
+                                                    <td>
+                                                        <span>{{item && item.lot_no ?
+                                                            getLotNoData(item.lot_no):'NA'}}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>{{item && item.tag_no ?
+                                                            getTagNoData(item.tag_no):'NA'}}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span>{{item && item.quantity_recieved ?
+                                                            convertToQty(item.quantity_recieved):'NA'}}</span>
+                                                    </td>
+                                                    <td *ngIf="varietyIndex==0"
+                                                        [attr.rowspan]="data.seed_class_details.length">
+                                                        <span>{{data && data.total_qty ?
+                                                            convertToQty(data.total_qty):'NA'}}</span>
+                                                    </td>
+
+                                                    <td class="datalist" *ngIf="varietyIndex==0"
+                                                        [attr.rowspan]="data.seed_class_details.length">
                                                         <button class="list-action-buttons-second"
                                                             [ngStyle]="{'opacity':(data.is_freezed==1|| is_update ) ? '0.4':''}"
                                                             (click)="editData(data && data.id ? data.id :'')"
@@ -784,15 +818,14 @@
                                                             (click)="delete(data && data.id ? data.id :'',data.meet_target)"
                                                             [disabled]="data.is_freezed==1 || is_update "
                                                             style="cursor: pointer;"
-                                                            [ngStyle]="{'opacity':(data.is_freezed==1|| is_update )? '0.4':''}"
-                                                            >
+                                                            [ngStyle]="{'opacity':(data.is_freezed==1|| is_update )? '0.4':''}">
                                                             <img src="assets/images/Vector_delete.svg">
                                                         </button>
                                                     </td>
 
                                                 </tr>
 
-                                        </ng-container>
+                                            </ng-container>
                                         </ng-container>
                                     </tbody>
                                     <tbody *ngIf="dummyData && dummyData.length<1">
@@ -814,7 +847,8 @@
 
                             <div class="col-12 pt-4 pl-0">
                                 <button [disabled]="(Variety.length!=0 && !freezeData )"
-                                    [ngClass]="(Variety.length==0 && !freezeData) ?'text-white form-button btn-inventory search d-inline-flex justify-content-center verticle-content-middle mb-3':'disableBtn'" (click)="finalizeData()">Submit</button>
+                                    [ngClass]="(Variety.length==0 && !freezeData) ?'text-white form-button btn-inventory search d-inline-flex justify-content-center verticle-content-middle mb-3':'disableBtn'"
+                                    (click)="finalizeData()">Submit</button>
                                 <!-- (click)="search()" -->
                             </div>
                         </div>

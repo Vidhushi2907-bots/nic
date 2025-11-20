@@ -1378,7 +1378,7 @@ class UserController {
             },
             {
               user_type:
-              req.body && req.body.user_type ?  req.body.user_type:'BPC'
+                req.body && req.body.user_type ? req.body.user_type : 'BPC'
             }
           ]
         },
@@ -1809,8 +1809,8 @@ class UserController {
         is_notified: req.body.notified,
         not_date: req.body.notification_date,
         not_number: req.body.notified_number,
-        meeting_number: req.body.meeting_number ? req.body.meeting_number:null,
-        release_date: req.body.year_of_release ? req.body.year_of_release:null,
+        meeting_number: req.body.meeting_number ? req.body.meeting_number : null,
+        release_date: req.body.year_of_release ? req.body.year_of_release : null,
         type: req.body.select_type,
         introduce_year: req.body.year_of_introduction,
         developed_by: req.body.developed_by,
@@ -1818,13 +1818,13 @@ class UserController {
       }
       let meetingnumber;
       let releaseDate;
-      if(req.body && req.body.meeting_number){
+      if (req.body && req.body.meeting_number) {
         meetingnumber = {
           meeting_number: req.body.meeting_number,
         }
       }
-      if(req.body && req.body.year_of_release){
-        releaseDate={
+      if (req.body && req.body.year_of_release) {
+        releaseDate = {
           release_date: req.body.year_of_release
         }
       }
@@ -1869,7 +1869,6 @@ class UserController {
         let subscriberResponse = {};
         await cropVerietyModel.create(subscriberInsertData).then(function (item) {
           subscriberResponse = item['_previousDataValues'];
-          console.log('subscriberResponse==========>', subscriberResponse);
         }).catch(function (err) {
           console.log(err);
           errorMessage = {
@@ -2166,8 +2165,8 @@ class UserController {
         is_notified: req.body.notified,
         not_date: req.body.notification_date,
         not_number: req.body.notified_number,
-        meeting_number: req.body.meeting_number ? req.body.meeting_number:null,
-        release_date: req.body.year_of_release?req.body.year_of_release:null,
+        meeting_number: req.body.meeting_number ? req.body.meeting_number : null,
+        release_date: req.body.year_of_release ? req.body.year_of_release : null,
         introduce_year: req.body.introduce_year,
         type: req.body.select_type,
         developed_by: req.body.developed_by,
@@ -2814,7 +2813,6 @@ class UserController {
   // }
 
   static getCropVerietyData = async (req, res) => {
-    let returnResponse = {};
     try {
       let condition = {}
       if (req.body.search.view) {
@@ -2828,21 +2826,16 @@ class UserController {
             // },
             {
               model: cropModel,
-
-              include: [{
-                model: cropGroupModel,
-                left: true,
-                attribute: ['group_name', 'group_code'],
-                order: [['group_name']],
-
-              }],
+              include: [
+                {
+                  model: cropGroupModel,
+                  left: true,
+                  attribute: ['group_name', 'group_code'],
+                  order: [['group_name']],
+              }
+            ],
               left: true,
               attribute: ['crop_name'],
-              // where:{
-              //   is_active:1
-
-              // },             
-
             },
             {
               model: varietyLinesModel,
@@ -2874,29 +2867,21 @@ class UserController {
             // },
             {
               model: cropModel,
-
-              include: [{
-                model: cropGroupModel,
-                left: true,
-                attribute: ['group_name', 'group_code'],
-                order: [['group_name']],
-
-              }],
+              include: [
+                {
+                  model: cropGroupModel,
+                  left: true,
+                  attribute: ['group_name', 'group_code'],
+                  order: [['group_name']],
+                }
+             ],
               left: true,
               attribute: ['crop_name'],
-              // where:{
-              //   is_active:1
-
-              // },             
-
             },
           ],
           left: true,
-
         };
-      }
-
-      else {
+      } else {
         condition = {
           include: [
             // {
@@ -2905,34 +2890,26 @@ class UserController {
             //   attribute: ['group_name', 'group_code'],
             //   order: [['group_name']]
             // },
-
             {
               model: cropModel,
-              include: [{
-                model: cropGroupModel,
-                left: true,
-                attribute: ['group_name', 'group_code'],
-                order: [['group_name']],
-              }],
+              include: [
+                {
+                  model: cropGroupModel,
+                  left: true,
+                  attribute: ['group_name', 'group_code'],
+                  order: [['group_name']],
+                }
+              ],
               left: true,
               attribute: ['crop_name'],
-              // where:{
-              //   is_active:1
-              // }
             },
             {
               model: cropCharactersticsModel,
               attribute: ['id'],
               left: true
-              // required:true
             }
           ],
           left: true,
-          // where:{
-          //   status:{
-          //     [Op.ne]:'other'
-          //   }
-          // }
         };
       }
       let { page, pageSize, search } = req.body;
@@ -2946,14 +2923,6 @@ class UserController {
           condition.offset = (page * pageSize) - pageSize;
         }
       }
-
-      const sortOrder = req.body.sort ? req.body.sort : 'id';
-      const sortDirection = req.body.order ? req.body.order : 'DESC';
-
-
-      // condition.order = [[sortOrder, sortDirection]];
-      // condition.order = [['crop_group','ASC'],['crop_name','ASC']];
-      // condition.order = [(sequelize.col('m_crop.crop_group', 'ASC')), (sequelize.col('m_crop.crop_name', 'ASC'))];
       condition.order = [[sequelize.col('m_crop->m_crop_group.group_name'), 'ASC'], [sequelize.col('m_crop.crop_name'), 'ASC'], ['variety_name', 'ASC']];
 
       if (search) {
@@ -2962,14 +2931,9 @@ class UserController {
           condition.where.id = (req.body.search.id);
         }
 
-        // if (req.body.search.cropGroup) {
-        //   condition.where.crop_group_code = (req.body.search.cropGroup);
-        // }
-
         if (req.body.search.cropGroup) {
           condition.include[0].where = {};
           condition.include[0].where.group_code = (req.body.search.cropGroup);
-          // condition.include[0].where.is_active = 1;
         }
         if (!req.body.search.view) {
           condition.where.status = { [Op.notIn]: ['other'] }
@@ -2979,12 +2943,9 @@ class UserController {
                 [Op.in]: ['hybrid', 'variety']
 
               },
-
               {
                 [Op.eq]: null
-
               },
-
             ]
           };
         }
@@ -3013,9 +2974,6 @@ class UserController {
         if (req.body.search.crop_code) {
           condition.where.crop_code = (req.body.search.crop_code);
         }
-        // if (req.body.search.user_id) {
-        //   condition.where.user_id = (req.body.search.user_id);
-        // }
         if (req.body.search.variety_code) {
           condition.where.variety_code = (req.body.search.variety_code);
         }
@@ -3039,45 +2997,11 @@ class UserController {
         if (req.body.search.is_status_active) {
           condition.where.is_status_active = req.body.search.is_status_active;
         }
-        // if (req.body.search.sort_value) {
-        //   if(req.body.search.sort_value == 'ASC')
-        //   {
-        //     const sortOrder = req.body.sort ? req.body.sort : 'variety_name';
-        //     const sortDirection = req.body.order ? req.body.order : 'ASC';
 
-        //     condition.order = [[sequelize.col('m_crop_varieties.variety_name'), 'ASC']];
-        //   }
-        //   else
-        //   {
-        //     const sortOrder = req.body.sort ? req.body.sort : 'variety_name';
-        //     const sortDirection = req.body.order ? req.body.order : 'DESC';
-
-        //     condition.order = [[sequelize.col('m_crop_varieties.variety_name'), 'DESC']];
-        //   }          
-        // }
-
-        // if (req.body.search.sort_value) {
-        //   const sortOrder = req.body.sort || 'variety_name';
-        //   const sortDirection = req.body.order || 'ASC';
-
-        //   const order = req.body.search.sort_value === 'ASC' ? 'ASC' : 'DESC';
-        // }
-        // if (req.body.search.not_sort_value) {
-        //   const sortOrder = req.body.sort || 'not_date';
-        //   const sortDirection = req.body.order || 'ASC';
-
-        //   const order = req.body.search.not_sort_value === 'ASC' ? 'ASC' : 'DESC';
-
-        // }
         let varietySortOrder = req.body.search && req.body.search.sort_value && req.body.search.sort_value ? 'variety_name' : '';
         let varietyOrder = req.body.search && req.body.search.sort_value && req.body.search.sort_value === 'ASC' ? 'ASC' : 'DESC';
         console.log(" varietyOrder", varietyOrder)
         if (req.body.search.sort_value && req.body.search.sort_value != '') {
-          // const sortOrder = req.body.sort || 'variety_name';
-          // const sortDirection = req.body.order || 'ASC';
-          // const order = req.body.search.sort_value === 'ASC' ? 'ASC' : 'DESC';
-
-          //          condition.order = [sequelize.col(`m_crop_varieties.${varietySortOrder}`), varietyOrder];
           condition.order = [[varietySortOrder, varietyOrder]];
         }
 
@@ -3085,35 +3009,23 @@ class UserController {
           const sortOrder = req.body.sort || 'not_date';
           const order = req.body.search.not_sort_value === 'ASC' ? 'ASC' : 'DESC';
           if (req.body.search.sort_value && req.body.search.sort_value != '') {
-            //            condition.order = [ [sequelize.col(`m_crop_varieties.${varietySortOrder}`), varietyOrder], [sequelize.col(`m_crop_varieties.${sortOrder}`), order]];
             condition.order = [['not_date', varietyOrder], ['variety_name', order]];
-
-          }
-          else
+          } else
             condition.order = [[sortOrder, order]];
-
         }
-
       }
-
-      // condition.order = [ (sequelize.col('m_crop.crop_group','ASC')),(sequelize.col('m_crop.crop_name','ASC'))];
 
       let data = await cropVerietyModel.findAndCountAll(condition);
-      // returnResponse = await paginateResponse(data, page, pageSize);     
       if (data) {
         response(res, status.DATA_AVAILABLE, 200, data);
-      }
-      else {
+      } else {
         return response(res, status.DATA_NOT_AVAILABLE, 404)
       }
-
     }
     catch (error) {
       console.log(error);
       return response(res, status.DATA_NOT_SAVE, 500, error);
     }
-
-
   }
 
   static mergeDataVarietLine = async (data) => {
@@ -3351,6 +3263,13 @@ class UserController {
         where: {
         }
       };
+        // ✅ Apply user_type restriction
+    if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+      condition.where.crop_code = { [Op.like]: "A04%" };
+    }
+    if (req.body.loginedUserid.user_type === "PULSESSEEDADMIN") {
+      condition.where.crop_code = { [Op.like]: "A03%" };
+    }
 
       let { page, pageSize, search } = req.body;
       if (req.body.page) {
@@ -3415,7 +3334,6 @@ class UserController {
       }
 
       // condition.order = [ (sequelize.col('m_crop.crop_group','ASC')),(sequelize.col('m_crop.crop_name','ASC'))];
-
       let data = await cropVerietyModel.findAndCountAll(condition);
       // console.log(data.state_data,'data')
 
@@ -3739,7 +3657,7 @@ class UserController {
           {
             model: cropCharactersticsModel,
             left: true,
-            attributes:[]
+            attributes: []
           }
 
         ],
@@ -3836,13 +3754,13 @@ class UserController {
           //     }
           //   }
           // ]  
-          [Op.and]:[
+          [Op.and]: [
             {
-              notification_year:{
-                [Op.not]:null
+              notification_year: {
+                [Op.not]: null
               }
             },
-          ]  
+          ]
         },
         attributes: [
           [sequelize.fn('DISTINCT', sequelize.col('m_variety_characteristics.notification_year')), 'notification_date'],
@@ -3866,7 +3784,7 @@ class UserController {
     }
   }
   static getMastersInstituteList = async (req, res) => {
-    try{
+    try {
       let data = await db.mInstitutesModel.findAll()
       if (data) {
         response(res, status.DATA_AVAILABLE, 200, data);
@@ -3874,13 +3792,13 @@ class UserController {
       else {
         return response(res, status.DATA_NOT_AVAILABLE, 200)
       }
-    }catch(error){
+    } catch (error) {
       console.log(error);
       return response(res, status.DATA_NOT_SAVE, 500, error);
     }
-    
+
   }
-  
+
   static getAllIndentorsList = async (req, res) => {
     try {
       let { page, pageSize } = req.body;
@@ -3989,15 +3907,38 @@ class UserController {
         //   condition.include.where.state_id = parseInt(req.body.search.state_code);
         // }
       }
-      if (req.body.page) {
-        if (page === undefined) page = 1;
-        if (pageSize === undefined) pageSize = 10;
+      
+      //Old Pagination Condition
 
-        if (page > 0 && pageSize > 0) {
-          condition.limit = pageSize;
-          condition.offset = (page * pageSize) - pageSize;
+      // if (req.body.page) {
+      //   if (page === undefined) page = 1;
+      //   if (pageSize === undefined) pageSize = 10;
+
+      //   if (page > 0 && pageSize > 0) {
+      //     condition.limit = pageSize;
+      //     condition.offset = (page * pageSize) - pageSize;
+      //   }
+      // }
+
+      if (req.body.page) {
+
+        if (!req.body.search.isReport)
+        {
+          if (page === undefined) page = 1;
+          if (pageSize === undefined) pageSize = 10;
+  
+          if (page > 0 && pageSize > 0) {
+            condition.limit = pageSize;
+            condition.offset = (page * pageSize) - pageSize;
+          }
+        }
+        else
+        {
+        
         }
       }
+
+      
 
 
       // const sortOrder = req.body.sort ? req.body.sort : 'id';
@@ -4070,7 +4011,7 @@ class UserController {
         table_id: req.body.table_id,
         user_id: req.body && req.body.user_id ? req.body.user_id : null,
         user_action: req.body && req.body.user_action ? req.body.user_action : null,
-        user_type : req.body && req.body.user_type ? req.body.user_type : null ,
+        user_type: req.body && req.body.user_type ? req.body.user_type : null,
         updated_at: Date.now()
       };
       // console.log('data========', data);
@@ -4377,6 +4318,8 @@ class UserController {
     }
   }
 
+
+
   static getCropNamecharacterData = async (req, res) => {
     let returnResponse = {};
     try {
@@ -4437,7 +4380,7 @@ class UserController {
       }
 
 
-      let data = await cropCharactersticsModel.findAndCountAll(condition);
+      let data = await cropVerietyModel.findAndCountAll(condition);
       let newData = data && data.rows ? data.rows : ''
       var clean = newData.filter((arr, index, self) =>
         index === self.findIndex((t) => (t.m_crop.crop_name === arr.m_crop.crop_name)))
@@ -4597,11 +4540,15 @@ class UserController {
     let data = {};
     try {
       let condition = {}
+      let cropGroup;
+      if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+        cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+      }
       if (req.body.search.view) {
         condition = {
           where: {
             // is_active:1
-
+            // ...cropGroup
           },
           raw: false,
           attributes: [
@@ -4616,7 +4563,8 @@ class UserController {
       } else {
         condition = {
           where: {
-            is_active: 1
+            is_active: 1,
+            ...cropGroup
 
           },
           raw: false,
@@ -4648,6 +4596,10 @@ class UserController {
   }
   static getdistinctVariettyNameIncharacterstics = async (req, res) => {
     try {
+      // let cropGroup;
+      // if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+      //   cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+      // }
       let condition = {}
       if (req.body.search.view) {
         condition = {
@@ -4668,7 +4620,7 @@ class UserController {
             // "variety_code"
           ],
           where: {
-
+            // ...cropGroup,
             crop_code: req.body.search.crop_code,
             status: {
               [Op.or]: [
@@ -4766,10 +4718,13 @@ class UserController {
   static distinctCropNamegrid = async (req, res) => {
     let data = {};
     try {
+      let cropGroup;
+      if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+        cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+      }
       let condition = {
         where: {
-
-
+          ...cropGroup
         },
         raw: false,
         attributes: [
@@ -4799,8 +4754,11 @@ class UserController {
   }
   static getdistinctVariettyNameIncharactersticsfromCharacterstics = async (req, res) => {
     try {
+      // let cropGroup;
+      // if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+      //   cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+      // }
       let condition = {}
-
       condition = {
         // include: [
         //   {
@@ -4819,6 +4777,7 @@ class UserController {
         ],
         where: {
           // is_active: 1,
+          // ...cropGroup,
           crop_code: req.body.search.crop_code
 
         }
@@ -4851,7 +4810,7 @@ class UserController {
         include: [
           {
             model: cropGroupModel
-          }
+          },
         ]
       };
       let { page, pageSize, search } = req.body;
@@ -4911,6 +4870,10 @@ class UserController {
   static viewCropGroupReport = async (req, res) => {
 
     let returnResponse = {};
+    let cropGroup;
+    if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+      cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+    }
     try {
       let condition = {
         include: [
@@ -4920,7 +4883,7 @@ class UserController {
           },
         ],
         where: {
-
+          ...cropGroup
         },
         attributes: [
           [sequelize.fn('DISTINCT', sequelize.col('m_crop_group.group_code')), 'group_code'],
@@ -4984,13 +4947,25 @@ class UserController {
     let returnResponse = {};
     let data = {};
     try {
+      let cropGroupCondition = {};
+  
+      // 🔹 Restrict data based on user_type
+      if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+        cropGroupCondition = { group_code: { [Op.like]: 'A04%' } };
+      }
+      if (req.body.loginedUserid.user_type === "PULSESSEEDADMIN") {
+        cropGroupCondition = { group_code: { [Op.like]: 'A03%' } };
+      }
 
       let condition = {
         include: [
           {
             model: cropGroupModel
           }
-        ]
+        ],
+        where: {
+          ...cropGroupCondition
+        }
       };
       let { page, pageSize, search } = req.body;
       if (req.body.page) {
@@ -5015,7 +4990,7 @@ class UserController {
       condition.order = [[sequelize.col('m_crop_group.group_name'), 'ASC'], ['crop_name', 'ASC']
       ];
       if (req.body.search) {
-        condition.where = {}
+        condition.where = {...cropGroupCondition}
 
         if (req.body.search.group_code) {
           condition.where.group_code = (req.body.search.group_code);
@@ -5041,14 +5016,18 @@ class UserController {
               ]
             }
           }
-
+          if (search.user_type === "OILSEEDADMIN") {
+            condition.where.group_code = { [Op.like]: 'A04%' };
+          }
+          if (search.user_type === "PULSESSEEDADMIN") {
+            condition.where.group_code = { [Op.like]: 'A03%' };
+          }
           // condition.where.crop_group = (req.body.search.crop_name_data);
         }
         // if (req.body.search.user_id) {
         //   condition.where.user_id = (req.body.search.user_id);
         // }
       }
-
       data = await cropModel.findAndCountAll(condition);
       // returnResponse = await paginateResponse(data, page, pageSize);
 
@@ -5060,6 +5039,8 @@ class UserController {
       response(res, status.DATA_NOT_AVAILABLE, 500)
     }
   }
+
+  
 }
 
 module.exports = UserController

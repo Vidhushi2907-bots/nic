@@ -3,6 +3,53 @@
         <span class="title-inventory1 pt-3 ">
             BSP III Status Report
         </span>
+        <br>
+                <div class="col-12 mt-3">
+                    <div class="row px-2 pt-1 pb-1">
+                        <div class="col-lg-10 col-md-12 col-12">
+                            <div class="row">
+                                <div class="col-md-2 col-sm-2 col-lg-3  ">
+                                    <div class="form-check d-flex align-items-center ">
+                                        <input class="radio-button form-check-input radio-btn" name="notifiedValue"
+                                            type="radio" (change)="productionTypeValue('NORMAL')" [ngClass]="isDisableNormal?'disableField':''" [disabled]="isDisableNormal" id="flexRadioDefault1"
+                                            value="non-notified" >
+                                        <label class="form-check-label pl-4 m-0" for="flexRadioDefault1">
+                                            <b>Normal Varieties</b>
+                                        </label>
+                                    </div>
+                                </div>
+                                <!-- [(ngModel)]="notifiedValue" -->
+                                <!-- checked -->
+                                <!-- [checked]="ngForm.controls['willing_to_produce'].value=='no' && ngForm.controls['variety'].value" -->
+                                <div class="col-md-2 col-sm-2 col-md-2 col-lg-3   ">
+                                    <div class="form-check">
+                                        <input class="radio-button form-check-input radio-btn" name="notifiedValue"
+                                            type="radio" (change)="productionTypeValue('DELAY')"[ngClass]="isDisableDelay?'disableField':''" [disabled]="isDisableDelay" id="flexRadioDefault2" >
+                                        <label class="form-check-label pl-4" for="flexRadioDefault2">
+                                            <b>Delayed Varieties</b> 
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3 col-md-3 col-lg-4  ">
+                                    <div class="form-check">
+                                        <input class="radio-button form-check-input radio-btn" name="notifiedValue"
+                                            type="radio" (change)="productionTypeValue('REALLOCATION')"[ngClass]="isDisableNormalReallocate?'disableField':''" [disabled]="isDisableNormalReallocate" id="flexRadioDefault2">
+                                        <label class="form-check-label pl-4" for="flexRadioDefault2">
+                                            <b>Reallocated Varieties</b> 
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-1 col-sm-1 col-md-1 col-lg-1 ">
+                                    <!-- form-button btn-inventory search d-inline-flex justify-content-center verticle-content-middle mb-3 -->
+                                    <button (click)="resetRadioBtn()"
+                                        class="btn-reset w-50 search text-white inline-flex justify-content-center verticle-content-middle" title="Reset"><i class="fa fa-refresh" style="font-size:20px;color:rgb(255, 255, 255)"></i>
+                                    </button>
+                                    <!-- (click)="search()" -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
         <!-- first card ui -->
         <div class="col-12 col-sm-12 col-md-12 col-lg-12 pb-2 pt-2 pr-0">
             <div class="row  card-inventory form-group formargin">

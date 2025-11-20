@@ -1,14 +1,9 @@
-
-
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FilterPaginateSearch } from 'src/app/common/data/data-among-components/filter-paginate-search';
-// import { AddSeedTestingLaboratorySearchComponent } from 'src/app/common/add-seed-testing-laboratory-search/add-seed-testing-laboratory-search.component';
 import { PaginationUiComponent } from 'src/app/common/pagination-ui/pagination-ui.component';
 import { BreederService } from 'src/app/services/breeder/breeder.service';
-// import { IndentBreederSeedAllocationSearchComponent } from 'src/app/common/indent-breeder-seed-allocation-search/indent-breeder-seed-allocation-search.component';
-// import { PaginationUiComponent } from 'src/app/common/pagination-ui/pagination-ui.component';
 
 import { RestService } from 'src/app/services/rest.service';
 import { SeedServiceService } from 'src/app/services/seed-service.service';
@@ -17,9 +12,6 @@ import * as html2PDF from 'html2pdf.js';
 import Swal from 'sweetalert2';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
-
 @Component({
   selector: 'app-seed-multiplication-ratio-report',
   templateUrl: './seed-multiplication-ratio-report.component.html',
@@ -30,12 +22,17 @@ export class SeedMultiplicationRatioReportComponent implements OnInit {
   @ViewChild(PaginationUiComponent) paginationUiComponent: PaginationUiComponent | undefined = undefined;
   filterPaginateSearch: FilterPaginateSearch = new FilterPaginateSearch();
   cropGroupData;
+   ngForm!: FormGroup;
+  searchText: string = '';
+  allData: any[] = [];
+  totalIndenters: number = 0;
   statename = [];
   identor = [];
-  ngForm!: FormGroup;
   seasonList: any = [];
   response_crop_group: any = [];
   data: any;
+  filteredData: any[] = [];
+  showFilter: boolean = false;
   data1: any;
   custom_array: any[];
   finalData: any[];
@@ -49,13 +46,15 @@ export class SeedMultiplicationRatioReportComponent implements OnInit {
   isSearch: boolean = false;
   todayData = new Date();
   tableId: any[];
-  allData: any;
+  // allData: any;
   exportdata: any[];
   crop_groups: any;
   disabledfieldcropName=true;
   crop_names: any;
   seasonListSecond: any;
   response_crop_group_second: any;
+  masterData: any[];
+  completeData: any[];
   constructor(private breederService: BreederService, private fb: FormBuilder, private service: SeedServiceService, private router: Router) { this.createEnrollForm(); }
   createEnrollForm() {
     this.ngForm = this.fb.group({
@@ -65,38 +64,71 @@ export class SeedMultiplicationRatioReportComponent implements OnInit {
       crop_name_text: ['',],
       crop_text: ['',],      
     });
-    this.ngForm.controls['crop_text'].valueChanges.subscribe(newValue=>{
-      if(newValue){
-        this.seasonList =this.seasonListSecond
-        let response= this.seasonList.filter(x=>x.group_name.toLowerCase().startsWith(newValue.toLowerCase()))
+    // this.ngForm.controls['crop_text'].valueChanges.subscribe(newValue=>{
+    //   if(newValue){
+    //     this.seasonList =this.seasonListSecond
+    //     let response= this.seasonList.filter(x=>x.group_name.toLowerCase().startsWith(newValue.toLowerCase()))
       
-        this.seasonList=response
-      
-       
-      }
-    
-    else{
-      this.getSeasonData()
-    }
-
-
-    })
-    this.ngForm.controls['crop_name_text'].valueChanges.subscribe(newValue=>{
-      if(newValue){
-        this.response_crop_group =this.response_crop_group_second
-        let response= this.response_crop_group.filter(x=>x['m_crop.crop_name'].toLowerCase().startsWith(newValue.toLowerCase()))
-      
-        this.response_crop_group=response
+    //     this.seasonList=response
       
        
-      }
+    //   }
     
-    else{
-      this.onChangeCropGroup(this.ngForm.controls['season'].value)
-    }
+    // else{
+    //   this.getSeasonData()
+    // }
 
 
-    })
+    // })
+    // this.ngForm.controls['crop_name_text'].valueChanges.subscribe(newValue=>{
+    //   if(newValue){
+    //     this.response_crop_group =this.response_crop_group_second
+    //     let response= this.response_crop_group.filter(x=>x['m_crop.crop_name'].toLowerCase().startsWith(newValue.toLowerCase()))
+      
+    //     this.response_crop_group=response
+      
+       
+    //   }
+    
+    // else{
+    //   this.onChangeCropGroup(this.ngForm.controls['season'].value)
+    // }
+
+
+    // })
+    this.ngForm.controls['crop_text'].valueChanges.subscribe(newValue => {
+  if (newValue) {
+    this.seasonList = this.seasonListSecond;
+
+    // split input into words
+    const terms = newValue.toLowerCase().split(/\s+/).filter(t => t);
+
+    let response = this.seasonList.filter(x =>
+      terms.every(term => x.group_name.toLowerCase().includes(term))  // <-- all words must match
+    );
+
+    this.seasonList = response;
+  } else {
+    this.getSeasonData();
+  }
+});
+
+this.ngForm.controls['crop_name_text'].valueChanges.subscribe(newValue => {
+  if (newValue) {
+    this.response_crop_group = this.response_crop_group_second;
+
+    const terms = newValue.toLowerCase().split(/\s+/).filter(t => t);
+
+    let response = this.response_crop_group.filter(x =>
+      terms.every(term => x['m_crop.crop_name'].toLowerCase().includes(term))
+    );
+
+    this.response_crop_group = response;
+  } else {
+    this.onChangeCropGroup(this.ngForm.controls['season'].value);
+  }
+});
+
 
 
   }
@@ -115,33 +147,35 @@ export class SeedMultiplicationRatioReportComponent implements OnInit {
     this.getCroupCroupList();
     this.runExcelApi();
 
-    // this.shortStatename();
-    // this.submitindentor();
+    
   }
 
-  getPageData(loadPageNumberData: number = 1, searchData: any | undefined = undefined) {
-    this.service
-      .postRequestCreator("view-seed-multiplications", null, {
-        page: loadPageNumberData,
-        pageSize: this.filterPaginateSearch.itemListPageSize || 50,
-        search: searchData
-      })
-      .subscribe((apiResponse: any) => {
-        if (apiResponse !== undefined
-          && apiResponse.EncryptedResponse !== undefined
-          && apiResponse.EncryptedResponse.status_code == 200) {
-          this.filterPaginateSearch.itemListPageSize = 50;
-          this.allData = apiResponse.EncryptedResponse.data.rows;
-          if (this.allData === undefined) {
-            this.allData = [];
-          }
-          console.log(this.allData)
-          this.filterPaginateSearch.Init(this.allData, this, "getPageData", undefined, apiResponse.EncryptedResponse.data.count, true);
-          this.initSearchAndPagination();
-        }
-      });
+    getPageData(pageNumber: number = 1) {
+    this.service.postRequestCreator("view-seed-multiplications", null, {
+      page: pageNumber,
+      pageSize: this.filterPaginateSearch.itemListPageSize || 50,
+      isReport: true,
+    }).subscribe((apiResponse: any) => {
+      if (apiResponse?.EncryptedResponse?.status_code === 200) {
+        this.allData = apiResponse.EncryptedResponse.data.rows || [];
+        this.totalIndenters = apiResponse.EncryptedResponse.data.count || this.allData.length;
+        this.masterData = [...apiResponse.EncryptedResponse.data.rows];
+        this.completeData = [...apiResponse.EncryptedResponse.data.rows];
+
+        console.log("---All Complete 11111111111111111111111111111111111111111*****", this.completeData)
+        this.filterPaginateSearch.Init(this.allData, this, "getPageData", undefined, this.totalIndenters, true);
+        this.initPagination();
+      }
+    });
   }
 
+    initPagination() {
+    if (!this.paginationUiComponent) {
+      setTimeout(() => this.initPagination(), 300);
+      return;
+    }
+    this.paginationUiComponent.Init(this.filterPaginateSearch);
+  }
   initSearchAndPagination() {
     if (this.paginationUiComponent === undefined) {
       setTimeout(() => {
@@ -163,6 +197,7 @@ export class SeedMultiplicationRatioReportComponent implements OnInit {
 
       var object = {
         isSearch: true,
+        isReport: true
       }
       this.ngForm.controls['season'].value ? (object['crop_group_code'] = this.ngForm.controls['season'].value) : '';
       this.ngForm.controls['crop'].value ? (object['crop_code'] = this.ngForm.controls['crop'].value) : '';
@@ -179,10 +214,11 @@ export class SeedMultiplicationRatioReportComponent implements OnInit {
             && apiResponse.EncryptedResponse.status_code == 200) {
             this.filterPaginateSearch.itemListPageSize = 50;
             this.allData = apiResponse.EncryptedResponse.data.rows;
+            this.masterData = [...apiResponse.EncryptedResponse.data.rows];
+            this.completeData = [...apiResponse.EncryptedResponse.data.rows];
             if (this.allData === undefined) {
               this.allData = [];
             }
-            console.log(this.allData)
             this.filterPaginateSearch.Init(this.allData, this, "getPageData", undefined, apiResponse.EncryptedResponse.data.count, true);
             this.initSearchAndPagination();
             this.runExcelApi();
@@ -213,124 +249,6 @@ export class SeedMultiplicationRatioReportComponent implements OnInit {
     this.initSearchAndPagination();
   }
 
-  // cropGroup(data: string) { { } }
-  // async shortStatename() {
-  //   const route = 'get-state-list';
-  //   const result = await this.breederService.getRequestCreatorNew(route).subscribe((data: any) => {
-  //     this.statename = data && data['EncryptedResponse'] && data['EncryptedResponse'].data ? data['EncryptedResponse'].data : '';
-
-  //   })
-  // }
-
-  // async submitindentor(loadPageNumberData: number = 1, searchData: any | undefined = undefined) {
-
-  //   const route = 'submit-indents-breeder-seeds-list';
-  //   const result = await this.breederService.postRequestCreator(route, null, {
-  //     page: loadPageNumberData,
-  //     pageSize: this.filterPaginateSearch.itemListPageSize || 10,
-  //     search: searchData
-  //   }).subscribe((apiResponse: any) => {
-  //     if (apiResponse !== undefined
-  //       && apiResponse.EncryptedResponse !== undefined
-  //       && apiResponse.EncryptedResponse.status_code == 200) {
-  //       this.identor = apiResponse.EncryptedResponse.data.data;
-  //       this.data1 = apiResponse.EncryptedResponse.data;
-  //       this.custom_array = [];
-  //       // arr = arr.data
-  //       let varietyId = []
-  //       for (let value of this.identor) {
-  //         varietyId.push(value.m_crop_variety.variety_name)
-  //       }
-  //       varietyId = [...new Set(varietyId)]
-  //       let newObj = [];
-
-  //       for (let value of varietyId) {
-  //         let keyArr = [];
-  //         for (let val of this.identor) {
-  //           if (val.m_crop_variety.variety_name == value) {
-  //             let state = val.user.agency_detail.m_state.state_short_name;
-  //             keyArr.push({ "state": state, 'value': val.indent_quantity });
-  //           }
-  //         }
-  //         let variety_id = (value).toString();
-  //         newObj.push({ "variety_id": value, 'data': keyArr })
-  //       }
-
-  //       this.finalData = newObj;
-  //       console.log('this.idfinalDatantor', this.finalData);
-
-  //       this.tableId = [];
-  //       for (let id of this.identor) {
-  //         this.tableId.push(id.id);
-  //       }
-  //       // console.log('this.identorthis.identor', this.tableId);
-
-  //       const results = this.identor.filter(element => {
-  //         if (Object.keys(element).length !== 0) {
-  //           return true;
-  //         }
-
-  //         return false;
-  //       });
-  //       // console.log(results, 'resultssssssss');
-  //       if (this.identor === undefined) {
-  //         this.identor = [];
-  //       }
-  //       // let data =[];
-  //       const removeEmpty = (obj) => {
-  //         Object.entries(obj).forEach(([key, val]) =>
-  //           (val && typeof val === 'object') && removeEmpty(val) ||
-  //           (val === null || val === "") && delete obj[key]
-  //         );
-  //         return obj;
-  //       };
-  //       removeEmpty(this.identor)
-  //       this.filterPaginateSearch.Init(results, this, "getPageData", undefined, apiResponse.EncryptedResponse.data.count);
-  //       this.initSearchAndPagination();
-  //     }
-
-  //   });
-  // }
-
-  // freeze() {
-  //   const searchFilters = {
-  //     "search": {
-  //       "id": this.tableId
-  //     }
-  //   };
-  //   const route = "freeze-indent-breeder-seed-data";
-  //   this.service.postRequestCreator(route, null, searchFilters).subscribe((apiResponse: any) => {
-  //     if (apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.status_code
-  //       && apiResponse.EncryptedResponse.status_code == 200) {
-  //       Swal.fire({
-  //         toast: true,
-  //         icon: "success",
-  //         title: "Data Has Been Successfully Updated",
-  //         position: "center",
-  //         showConfirmButton: false,
-  //         showCancelButton: false,
-  //         timer: 2000
-  //       }).then(x => {
-
-  //         this.router.navigate(['/submit-indents-breeder-seeds']);
-  //       })
-  //     }
-  //     else {
-
-  //       Swal.fire({
-  //         toast: true,
-  //         icon: "error",
-  //         title: "An error occured",
-  //         position: "center",
-  //         showConfirmButton: false,
-  //         showCancelButton: false,
-  //         timer: 2000
-  //       })
-  //     }
-
-  //   });
-  // }
-
   getSeasonData() {
     this.service.postRequestCreator("get-croup-Group-details", null).subscribe(data => {
       this.seasonList = data && data.EncryptedResponse && data.EncryptedResponse.data ? data.EncryptedResponse.data : [];
@@ -356,7 +274,6 @@ export class SeedMultiplicationRatioReportComponent implements OnInit {
       else {
         this.response_crop_group = [];
       }
-      console.log(this.response_crop_group)
     })
 
   }
@@ -375,9 +292,7 @@ export class SeedMultiplicationRatioReportComponent implements OnInit {
     var i;
     for (i = 0; i < dropdowns.length; i++) {
       var openDropdown = dropdowns[i];
-      // if (openDropdown.classList.contains('show')) {
         openDropdown.classList.remove('show');
-      // }
     }
   }
   
@@ -396,13 +311,13 @@ export class SeedMultiplicationRatioReportComponent implements OnInit {
   runExcelApi(loadPageNumberData: number = 1, searchData: any | undefined = undefined){
     var object = {
       isSearch: this.isSearch,
+      isReport : true
     }
     this.ngForm.controls['season'].value ? (object['crop_group_code'] = this.ngForm.controls['season'].value) : '';
     this.ngForm.controls['crop'].value ? (object['crop_code'] = this.ngForm.controls['crop'].value) : '';
 
     this.service
     .postRequestCreator("view-seed-multiplications", null, {
-      // pageSize: this.filterPaginateSearch.itemListPageSize || 10,
       search: object
     })
     
@@ -415,7 +330,6 @@ export class SeedMultiplicationRatioReportComponent implements OnInit {
         if (this.exportdata === undefined) {
           this.exportdata = [];
         }
-        console.log(this.exportdata)
         this.filterPaginateSearch.Init(this.exportdata, this, "getPageData", undefined, apiResponse.EncryptedResponse.data.count, true);
         this.initSearchAndPagination();
         }
@@ -423,35 +337,14 @@ export class SeedMultiplicationRatioReportComponent implements OnInit {
   }
 
   exportexcel(): void {
-       /* pass here the table id */
     let element = document.getElementById('excel-table');
     const ws: XLSX.WorkSheet = XLSX.utils.table_to_sheet(element);
-
-    /* generate workbook and add the worksheet */
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'sheed_multiplication_reports');
-
-    /* save to file */
     XLSX.writeFile(wb, this.fileName);
   }
 
-  // download() {
-  //   console.log("working")
-  //   const name = 'seed-multiplication-ratio-report';
-  //   const element = document.getElementById('excel-table');
-  //   const options = {
-  //     filename: `${name}.pdf`,
-  //     image: { type: 'jpeg', quality: 1 },
-  //     html2canvas: {
-  //       dpi: 192,
-  //       scale: 4,
-  //       letterRendering: true,
-  //       useCORS: true
-  //     },
-  //     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  //   };
-  //   html2PDF().set(options).from(element).toPdf().save();
-  // }
+  
   download() {  
     let reportDataHeader = [
       { text: 'S/N', bold: true },
@@ -465,7 +358,7 @@ export class SeedMultiplicationRatioReportComponent implements OnInit {
     
                           ]
 
-    let reportData = this.exportdata.map((element, index) => {   
+    let reportData = this.completeData.map((element, index) => {   
  
     let reportData =  [
             index+1,                 
@@ -496,7 +389,11 @@ export class SeedMultiplicationRatioReportComponent implements OnInit {
 
       content: [
         { text: 'Seed Multiplication Ratio', style: 'header' },
-        { text: `Crop Group : ${this.crop_groups}   Crop Name : ${this.crop_names}`,  },
+        // { text: `Crop Group : ${this.crop_groups}   Crop Name : ${this.crop_names}`,  },
+        { 
+  text: `Crop Group : ${this.crop_groups ? this.crop_groups : 'NA'}   Crop Name : ${this.crop_names ? this.crop_names : 'NA'}`,  
+},
+
         {
           style: 'indenterTable',
           table: {
@@ -527,24 +424,175 @@ export class SeedMultiplicationRatioReportComponent implements OnInit {
     };
     pdfMake.createPdf(docDefinition).download('seed-multiplication-ratio-report.pdf');
   }
-  cropGroup(data){
-    console.log(data)
-    this.crop_groups = data && data.group_name ?  data.group_name  :'';
-    this.ngForm.controls['season'].setValue(data && data.group_code ? data.group_code :'')
-    this.onChangeCropGroup(this.ngForm.controls['season'].value)
-    this.ngForm.controls['crop_text'].setValue('')
-
-  }
   cgClick() {
     document.getElementById('crop_group').click();
-  }
-  cropNames(data){
-    this.ngForm.controls['crop_name_text'].setValue('')
-    this.crop_names= data && data['m_crop.crop_name'] ? data['m_crop.crop_name'] :'';
-    this.ngForm.controls['crop'].setValue(data && data['m_crop.crop_code'] ? data['m_crop.crop_code'] :'')
-
   }
   cnClick() {
     document.getElementById('crop_name').click();
   }
+
+    toggleFilter() {
+  this.showFilter = !this.showFilter;
+}
+  clearSearch() {
+    this.searchText = '';
+    this.filterPaginateSearch.itemList = [...this.allData];
+  }
+
+cropNames(data) {
+  if(data === 'all') {
+    this.crop_names = 'All';
+    this.ngForm.controls['crop'].setValue(''); 
+  } else {
+    this.crop_names = data['m_crop.crop_name'] || '';
+    this.ngForm.controls['crop'].setValue(data['m_crop.crop_code']); 
+  }
+
+  this.applyFilterBackend(); 
+}
+cropGroup(data) {
+  if(data === 'all') {
+    this.crop_groups = 'All';
+    this.ngForm.controls['season'].setValue('');
+    this.disabledfieldcropName = true;
+    this.ngForm.controls['crop'].setValue('');
+    // this.getPageData();
+  } else {
+    this.crop_groups = data.group_name;
+    this.ngForm.controls['season'].setValue(data.group_code);
+    this.disabledfieldcropName = false;
+    this.ngForm.controls['crop'].setValue(''); 
+    this.onChangeCropGroup(data.group_code); 
+  }
+
+  this.applyFilterBackend(); 
+}
+
+applyFilterBackend1(pageNumber: number = 1) {
+  const cropGroup = this.ngForm.controls['season'].value; 
+  const cropCode = this.ngForm.controls['crop'].value;
+
+  const searchObj: any = {};
+  if(cropGroup) searchObj['crop_group_code'] = cropGroup;
+  if(cropCode) searchObj['crop_code'] = cropCode;
+
+  this.service.postRequestCreator("view-seed-multiplications-by-cropcode", null, {
+    page: pageNumber,
+    pageSize: this.filterPaginateSearch.itemListPageSize || 50,
+    search: searchObj,
+    isReport: true
+  }).subscribe((res: any) => {
+    if(res?.EncryptedResponse?.status_code === 200) {
+      this.allData = res.EncryptedResponse.data.rows || [];
+      this.totalIndenters = res.EncryptedResponse.data.count || this.allData.length;
+      this.masterData = [...res.EncryptedResponse.data.rows];
+      this.completeData = [...res.EncryptedResponse.data.rows];
+      this.filterPaginateSearch.Init(this.allData, this, "getPageData", undefined, this.totalIndenters, true);
+      this.initSearchAndPagination();
+      this.runExcelApi();
+    } else {
+      this.allData = [];
+      this.totalIndenters = 0;
+      this.filterPaginateSearch.Init([], this, "getPageData", undefined, 0, true);
+      this.initSearchAndPagination();
+    }
+  });
+}
+
+applyFilterBackend(loadPageNumberData: number = 1) {
+
+  
+    this.season = this.ngForm.controls['season'].value;
+    this.crop = this.ngForm.controls['crop'].value;
+    this.isSearch=true;
+
+    var object = {
+      isSearch: true,
+    }
+    this.ngForm.controls['season'].value ? (object['crop_group_code'] = this.ngForm.controls['season'].value) : '';
+    this.ngForm.controls['crop'].value ? (object['crop_code'] = this.ngForm.controls['crop'].value) : '';
+
+    this.service
+      .postRequestCreator("view-seed-multiplications-by-cropcode", null, {
+        page: loadPageNumberData,
+        pageSize: this.filterPaginateSearch.itemListPageSize || 50,
+        isReport: true,
+        search: object,
+      })
+      .subscribe((apiResponse: any) => {
+        if (apiResponse !== undefined
+          && apiResponse.EncryptedResponse !== undefined
+          && apiResponse.EncryptedResponse.status_code == 200) {
+          this.filterPaginateSearch.itemListPageSize = 50;
+          this.allData = apiResponse.EncryptedResponse.data.rows;
+          this.masterData = [...apiResponse.EncryptedResponse.data.rows];
+          this.completeData = [...apiResponse.EncryptedResponse.data.rows];
+          this.totalIndenters = apiResponse.EncryptedResponse.data.rows.length
+          console.log("this.completeData2222222222222222222222222222222", this.completeData)
+          if (this.allData === undefined) {
+            this.allData = [];
+          }
+          this.filterPaginateSearch.Init(this.allData, this, "getPageData", undefined, apiResponse.EncryptedResponse.data.count, true);
+          // this.initSearchAndPagination();
+          // this.runExcelApi();
+        }
+      });
+}
+
+onSearch1() {
+  const searchLower = this.searchText.toLowerCase().trim();
+
+  if (searchLower === '') {
+ 
+    this.filterPaginateSearch.itemList = [...this.exportdata];
+    this.totalIndenters = this.exportdata.length;
+    this.filterPaginateSearch.itemListCurrentPage = 1;
+    this.initSearchAndPagination();
+    return;
+  }
+
+
+  this.filterPaginateSearch.itemList = this.exportdata.filter(item =>
+    (item.m_crop?.m_crop_group?.group_name && item.m_crop.m_crop_group.group_name.toLowerCase().includes(searchLower)) ||
+    (item.m_crop?.crop_name && item.m_crop.crop_name.toLowerCase().includes(searchLower)) ||
+    (item.nucleus_to_breeder && item.nucleus_to_breeder.toString().toLowerCase().includes(searchLower)) ||
+    (item.breeder_to_foundation && item.breeder_to_foundation.toString().toLowerCase().includes(searchLower)) ||
+    (item.foundation_1_to_2 && item.foundation_1_to_2.toString().toLowerCase().includes(searchLower)) ||
+    (item.foundation_2_to_cert && item.foundation_2_to_cert.toString().toLowerCase().includes(searchLower))
+  );
+
+
+  this.totalIndenters = this.filterPaginateSearch.itemList.length;
+  this.filterPaginateSearch.itemListCurrentPage = 1;
+  this.initSearchAndPagination();
+}
+
+onSearch(): void {
+  if (!this.searchText || this.searchText.trim() === '') {
+    // ✅ Reset data if search is empty
+    this.completeData = [...this.masterData];
+    console.log("---Complete Data", this.completeData);
+  } else {
+    const lower = this.searchText.toLowerCase();
+
+    this.completeData = this.masterData.filter(item => {
+      const agency = item.agency_detail || {};
+
+      return (
+
+        (item.m_crop?.m_crop_group?.group_name && item.m_crop.m_crop_group.group_name.toLowerCase().includes(lower)) ||
+    (item.m_crop?.crop_name && item.m_crop.crop_name.toLowerCase().includes(lower)) ||
+    (item.nucleus_to_breeder && item.nucleus_to_breeder.toString().toLowerCase().includes(lower)) ||
+    (item.breeder_to_foundation && item.breeder_to_foundation.toString().toLowerCase().includes(lower)) ||
+    (item.foundation_1_to_2 && item.foundation_1_to_2.toString().toLowerCase().includes(lower)) ||
+    (item.foundation_2_to_cert && item.foundation_2_to_cert.toString().toLowerCase().includes(lower))
+
+      );
+    });
+  }
+}
+
+
+
+
 }

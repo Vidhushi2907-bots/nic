@@ -1,7 +1,7 @@
 <form [formGroup]="ngForm" class="pt-2">
     <div class="main-inventory my-2 w-90 pt-2">
         <span class="title-inventory pt-3">
-            Grow Out Test Sowing Details and Report
+            Grow Out Test Sowing Details
         </span>
 
         <!-- First Card UI -->
@@ -253,9 +253,14 @@
                                         <div class="col-12">
                                             <label for="dateOfSowing" class="required">Date of Sowing</label>
                                         </div>
-                                        <div class="col-12">
-                                            <input id="dateOfSowing" formControlName="dateOfSowing" type="date"
-                                                class="form-control" placeholder="DD/MM/YYYY">
+                                        <div class="col-12 col-md-12 col-lg-12 ml-lg-2">
+                                            <input (keydown)="preventKeyPress($event)"
+                                                class="form-control input-format input-border not_dates input-inventory"
+                                                formControlName="dateOfSowing" angular-mydatepicker
+                                                [options]="myDpOptions" #dp3="angular-mydatepicker"
+                                                (dateChanged)="onDateChangedStart($event)"
+                                                (click)="dp3.toggleCalendar()" [defaultMonth]="defaultMonth"
+                                                placeholder="DD-MM-YYYY" autocomplete="off"/>
                                         </div>
                                     </div>
                                 </div>
@@ -330,7 +335,7 @@
                                         <th scope="col" class="col-md-2 py-2 text-white verticle-content-middle heading datalist font-weight-bold">Test No.</th>
                                         <th scope="col" class="col-md-3 py-2 text-white verticle-content-middle heading datalist font-weight-bold">Sowing Location</th>
                                         <th scope="col" class="col-md-3 py-2 text-white verticle-content-middle heading datalist font-weight-bold">Sowing Details</th>
-                                        <th scope="col" class="col-md-2 py-2 text-white verticle-content-middle heading datalist font-weight-bold">Test Report</th>
+                                        <!-- <th scope="col" class="col-md-2 py-2 text-white verticle-content-middle heading datalist font-weight-bold">Test Report</th> -->
                                         <th scope="col" style="min-width:8em;" class="col-md-2 py-2 text-white verticle-content-middle heading datalist font-weight-bold">Action</th>
                                     </tr>
                                 </thead>
@@ -356,13 +361,13 @@
                                                 <td scope="col-12" class="col-md-3 py-2 verticle-content-middle" style="text-align:left">
                                                     <span>Area Sown (Ha):&nbsp;</span><span><b class="font-weight-bold">{{data.area_shown}}</b></span><br>
                                                     <span>Date of Sowing:&nbsp;</span><span><b class="font-weight-bold">{{formatDate(data.date_of_showing)}}</b></span><br>
-                                                    <span>Expected Date of sowing:&nbsp;</span><span><b class="font-weight-bold">{{formatDate(data.expected_start_date)}}- {{formatDate(data.expected_end_date)}}</b></span><br>
+                                                    <span>Expected Date of Inspection:&nbsp;</span><span><b class="font-weight-bold">{{formatDate(data.expected_start_date)}}- {{formatDate(data.expected_end_date)}}</b></span><br>
                                                 </td>
-                                                <td>
+                                                <!-- <td>
                                                     <button class="btn btn-light">
                                                         view
                                                     </button>
-                                                </td>
+                                                </td> -->
                                                 <!-- Action Buttons -->
                                                 <td class="datalist">
                                                     <button class="list-action-buttons-second" (click)="editGotShowingDetail(data)">

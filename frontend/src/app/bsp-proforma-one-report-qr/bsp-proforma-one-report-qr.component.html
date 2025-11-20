@@ -1,0 +1,60 @@
+<div class="container mt-4" *ngIf="reportData; else noData">
+
+  <!-- Header -->
+  <div class="card shadow p-3 mb-4">
+    <!-- <h3 class="text-center mb-3">Seed Testing Laboratory Report</h3>
+    <div class="row">
+      <div class="col-md-4"><b>Year:</b> {{ reportData.year }}</div>
+      <div class="col-md-4"><b>Season:</b> {{ reportData.season }}</div>
+      <div class="col-md-4"><b>Crop:</b> {{ reportData.crop }}</div>
+    </div>
+    <div class="row mt-2">
+      <div class="col-md-6"><b>Ref No:</b> {{ reportData.refNumber }}</div>
+      <div class="col-md-6"><b>Total Samples:</b> {{ reportData.samples?.length }}</div>
+    </div> -->
+  </div>
+
+  <!-- Table -->
+  <div class="card shadow p-3">
+    <h5 class="mb-3">Sample Details</h5>
+    <div class="table-responsive">
+      <table class="table table-bordered table-sm table-striped">
+        <thead class="table-dark">
+          <tr>
+            <th>Sample No</th>
+            <th>Lot No</th>
+            <th>Variety</th>
+            <th>Pure Seed %</th>
+            <th>Germination %</th>
+            <th>Inert Matter %</th>
+            <th>Other Crop Seed</th>
+            <th>Weed Seed</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- <tr *ngFor="let s of reportData.samples"> -->
+            <tr *ngFor="let s of reportData">
+            <td>{{ s.sample_no }}</td>
+            <td>{{ s.lot_no }}</td>
+            <td>{{ s.m_crop_variety?.variety_name || s.variety_code }}</td>
+            <td>{{ s.pure_seed }}</td>
+            <td>{{ s.germination }}</td>
+            <td>{{ s.inert_matter }}</td>
+            <td>{{ s.other_crop_seed }}</td>
+            <td>{{ s.weed_seed }}</td>
+            <td>{{ s.status }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- If no data -->
+<ng-template #noData>
+  <div class="alert alert-warning text-center mt-4">
+    ⚠ No report data found. Please scan a valid QR code.
+  </div>
+</ng-template>

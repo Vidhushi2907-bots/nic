@@ -7,6 +7,7 @@ import { RestService } from 'src/app/services/rest.service';
 import Swal from 'sweetalert2';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { MaximumLotSizeSearchComponent } from 'src/app/common/maximum-lot-size-search/maximum-lot-size-search.component';
+import { MasterService } from 'src/app/services/master/master.service';
 
 @Component({
   selector: 'app-seed-multiplication-ratio-list',
@@ -31,53 +32,58 @@ export class SeedMultiplicationRatioListComponent implements OnInit {
   crop_groups: any;
   cropDataSecond: any;
   crop_names: any;
-  disabledfieldcropName=true
+  disabledfieldcropName = true
   cropNameSecond: any;
+  userType: any;
+  isActionBtnDisable: boolean;
   constructor(private restService: RestService,
     private seedDivisionService: SeedDivisionService,
-    private fb: FormBuilder,
+    private fb: FormBuilder, private _master: MasterService
   ) {
     this.createEnrollForm();
+    this.userType = this._master?.userBasicData?.user_type ?? 'NA';
+    this.isActionBtnDisable = this.userType === 'SUPERADMIN';
+
   }
   createEnrollForm() {
     this.ngForm = this.fb.group({
       group_id: new FormControl(''),
       crop_name: new FormControl(''),
-      crop_text:new FormControl('',),
-      crop_name_text:new FormControl('',),
+      crop_text: new FormControl('',),
+      crop_name_text: new FormControl('',),
     });
     this.ngForm.controls['group_id'].valueChanges.subscribe(newValue => {
       if (newValue) {
         this.ngForm.controls['crop_name'].setValue('')
-        this.crop_names ='';
-        this.disabledfieldcropName=false
+        this.crop_names = '';
+        this.disabledfieldcropName = false
 
         this.getCropNameList(newValue);
       }
     });
     this.ngForm.controls['crop_text'].valueChanges.subscribe(newValue => {
-      if (newValue ) {
-       
-        this.cropData =this.cropDataSecond
-        let response= this.cropData.filter(x=>x.group_name.toLowerCase().includes(newValue.toLowerCase()))
-      
-        this.cropData=response
-      
-       
+      if (newValue) {
+
+        this.cropData = this.cropDataSecond
+        let response = this.cropData.filter(x => x.group_name.toLowerCase().includes(newValue.toLowerCase()))
+
+        this.cropData = response
+
+
       }
-      else{
+      else {
         this.getCropData()
       }
     });
     this.ngForm.controls['crop_name_text'].valueChanges.subscribe(newValue => {
-      if (newValue &&   this.cropName &&  this.cropName.length) {
-       
-        this.cropName =this.cropNameSecond
-        let response= this.cropName.filter(x=>x.m_crop.crop_name.toLowerCase().includes(newValue.toLowerCase()))      
-        this.cropName=response     
+      if (newValue && this.cropName && this.cropName.length) {
+
+        this.cropName = this.cropNameSecond
+        let response = this.cropName.filter(x => x.m_crop.crop_name.toLowerCase().includes(newValue.toLowerCase()))
+        this.cropName = response
       }
-      else{
-      
+      else {
+
         this.getCropNameList(this.ngForm.controls['group_id'].value)
       }
     });
@@ -106,7 +112,7 @@ export class SeedMultiplicationRatioListComponent implements OnInit {
         if (apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.status_code
           && apiResponse.EncryptedResponse.status_code == 200) {
           this.cropData = apiResponse.EncryptedResponse.data;
-          this.cropDataSecond =this.cropData
+          this.cropDataSecond = this.cropData
         }
       });
 
@@ -125,7 +131,7 @@ export class SeedMultiplicationRatioListComponent implements OnInit {
           && apiResponse.EncryptedResponse.status_code == 200) {
           this.cropName = apiResponse.EncryptedResponse.data;
           this.cropName = this.cropName.sort((a, b) => a.m_crop.crop_name.localeCompare(b.m_crop.crop_name))
-          this.cropNameSecond= this.cropName
+          this.cropNameSecond = this.cropName
         }
       });
 
@@ -174,9 +180,9 @@ export class SeedMultiplicationRatioListComponent implements OnInit {
   clear() {
     this.ngForm.controls['group_id'].setValue('');
     this.ngForm.controls['crop_name'].setValue('');
-    this.crop_names='';
-    this.crop_groups='';
-    this.disabledfieldcropName=true;
+    this.crop_names = '';
+    this.crop_groups = '';
+    this.disabledfieldcropName = true;
     this.ngForm.controls["crop_name"].disable();
     this.getPageData();
     this.filterPaginateSearch.itemListCurrentPage = 1;
@@ -218,8 +224,8 @@ export class SeedMultiplicationRatioListComponent implements OnInit {
           icon: 'success',
           confirmButtonText:
             'OK',
-            showCancelButton: false,
-            confirmButtonColor: '#E97E15'
+          showCancelButton: false,
+          confirmButtonColor: '#E97E15'
         })
       }
     })
@@ -239,7 +245,7 @@ export class SeedMultiplicationRatioListComponent implements OnInit {
         icon: 'error',
         confirmButtonText:
           'OK',
-      confirmButtonColor: '#E97E15'
+        confirmButtonColor: '#E97E15'
       })
 
       return;
@@ -256,22 +262,22 @@ export class SeedMultiplicationRatioListComponent implements OnInit {
       this.getPageData();
     }
   }
-  cropGroup(data){
-    this.crop_groups = data && data.group_name ?  data.group_name  :'';
-    this.ngForm.controls['group_id'].setValue(data && data.group_code ? data.group_code :'')
-    this.cropData =this.cropDataSecond
-    this.ngForm.controls['crop_text'].setValue('',{ emitEvent: false })
+  cropGroup(data) {
+    this.crop_groups = data && data.group_name ? data.group_name : '';
+    this.ngForm.controls['group_id'].setValue(data && data.group_code ? data.group_code : '')
+    this.cropData = this.cropDataSecond
+    this.ngForm.controls['crop_text'].setValue('', { emitEvent: false })
 
   }
   cgClick() {
     document.getElementById('crop_group').click();
   }
-  cropNames(data){
+  cropNames(data) {
 
-    this.crop_names= data && data.m_crop && data.m_crop.crop_name ? data.m_crop.crop_name :'';
+    this.crop_names = data && data.m_crop && data.m_crop.crop_name ? data.m_crop.crop_name : '';
     this.ngForm.controls['crop_name'].setValue(data && data.m_crop && data.m_crop.crop_code ? data.m_crop.crop_code : '')
-    this.cropName =this.cropNameSecond
-    this.ngForm.controls['crop_name_text'].setValue('',{ emitEvent: false })
+    this.cropName = this.cropNameSecond
+    this.ngForm.controls['crop_name_text'].setValue('', { emitEvent: false })
   }
   cnClick() {
     document.getElementById('crop_name').click();

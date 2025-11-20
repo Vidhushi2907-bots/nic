@@ -154,81 +154,109 @@
                             </div>
                         </div>
                     </div>
-                    </div>
-                        <div class="row data-row pt-2 w-100">
-                            <table class="table border-top-0 pt-2 col-12 col-sm-6 col-md-12 col-lg-12 col-xl-12 pl-0 pr-0 m-0 ">
-                                <thead class=" w-100 pl-0 table-bordered ">
-                                    <tr class="data-row-header">
-                                        <th scope="col"  class="col-md-1 py-2 text-white verticle-content-middle heading bill">S.No</th>
-                                        <th scope="col"  class="col-md-2 py-2 text-white text-start verticle-content-middle heading variety">Variety</th>
-                                        <th scope="col" class="col-md-1 py-2 text-white  verticle-content-middle heading">Indenter</th> 
-                                        <th scope="col" class="col-md-2 py-2 text-white  verticle-content-middle heading SPA">SPA</th>
-                                        <th scope="col" class="col-md-2 py-2 text-white  verticle-content-middle heading   details">Details of Breeder Seed lifted</th>
-                                        <th scope="col" class="col-md-1 py-2 text-white  verticle-content-middle heading bill">Bill Amount (INR)</th>
-                                        <th scope="col" class="col-md-1 py-2 text-white  verticle-content-middle heading SPA">Bill No.</th>
-                                        <th scope="col" class="col-md-1 py-2 text-white  verticle-content-middle heading" style="min-width: 12em;">Action</th> 
-                                    </tr>
-                                </thead>
-                                <tbody  class="border-top-0 table-bordered col-md-1 py-2 text-white  verticle-content-middle heading data-row"> 
-                                    <ng-container *ngFor="let data of dataToDisplay; let dataIndex = index">
-                                        <ng-container *ngFor="let item of data.indentor; let varietyIndex = index">
-                                            <ng-container *ngFor="let val of item.spa; let spaIndex = index">
-                                                <tr>
-                                                    <td *ngIf="varietyIndex==0 &&  spaIndex==0"
-                                                    [attr.rowspan]="data.spaData.length" >{{dataIndex +1}}</td>
-                                                    <td *ngIf="varietyIndex==0 &&  spaIndex==0"
-                                                    [attr.rowspan]="data.spaData.length" >{{data && data.variety_name ?
-                                                        data.variety_name :'' }} 
-                                                         <!-- {{ data.variety_code }} -->
-                                                        </td>
-                                                 
-                                                    <td *ngIf="spaIndex==0" [attr.rowspan]="item.spa.length">{{item &&
-                                                        item.agency_name ? item.agency_name :'' }}</td>
-                                                    <td>{{val && val.spa_agency_name ? val.spa_agency_name :'' }}</td>
-                                                    <td style="text-align:left" >
-                                                        <span >
-                                                            <p >Total No of Bags (Bag Size):</p>
-                                                            <b class="font-weight-bold">                                                        
-                                                                {{val && val.spas ? val.spas.length :'NA'}}
-                                                                ( {{val &&
-                                                                    val.bag_weight ? val.bag_weight :''}} Kg)
-                                                            </b></span><br>
-                                                            <span>
-                                                               Total Quantity: 
-                                                                <b class="font-weight-bold"> {{ (val && val.spas && val.bag_weight)  ? (val.cropCode && val.cropCode.slice(0, 1) === 'A'  ? (val.spas.length * val.bag_weight) / 100 + ' Qt' : val.spas.length * val.bag_weight + ' Kg')  : 'NA' }}
-                                                                </b>
-                                                              </span>
-                                                              
-                                                   
-                                                        
-                                                    </td>
-                                                    <td>
-                                                        {{val && val.total_price ? (val.total_price | number : '1.2-2') :''}}
-                                                    </td>
-                                                    <td>
-                                                        {{val && val.lifting_bill_no ? val.lifting_bill_no :''}}
-    
-                                                    </td>
-                                                    <!-- [ngClass]="val && val.lifting_id ?'w-100 py-2 mt-2 generatebtn btn-inventory1 bspc_text d-inline-flex justify-content-center verticle-content-middle mb-3 mt-1':'w-100 py-2 mt-2 text-white btn-inventory1 bspc_text d-inline-flex justify-content-center verticle-content-middle mb-3 mt-1'" -->
-                                                    <td>
-                                                        <button
-                                                        class="w-100 py-2 mt-2 text-white btn-inventory1 bspc_text d-inline-flex justify-content-center verticle-content-middle mb-3 mt-1"
-                                                        (click)="openBillReceiptDialog(data,item,val,val.id)">
-                                                        {{val && val.lifting_id ? 'View Certificate':' Generate
-                                                        Certificate'}}
+                </div>
+                <div class="row data-row pt-2 w-100">
+                    <table class="table border-top-0 pt-2 col-12 col-sm-6 col-md-12 col-lg-12 col-xl-12 pl-0 pr-0 m-0 ">
+                        <thead class=" w-100 pl-0 table-bordered ">
+                            <tr class="data-row-header">
+                                <th scope="col" class="col-md-1 py-2 text-white verticle-content-middle heading bill">
+                                    S.No</th>
+                                <th scope="col"
+                                    class="col-md-2 py-2 text-white text-start verticle-content-middle heading variety">
+                                    Variety</th>
+                                <th scope="col" class="col-md-1 py-2 text-white  verticle-content-middle heading">
+                                    Indenter</th>
+                                <th scope="col" class="col-md-2 py-2 text-white  verticle-content-middle heading SPA">
+                                    SPA</th>
+                                <th scope="col"
+                                    class="col-md-2 py-2 text-white  verticle-content-middle heading   details">Details
+                                    of Breeder Seed lifted</th>
+                                <th scope="col" class="col-md-1 py-2 text-white  verticle-content-middle heading bill">
+                                    Bill Amount (INR)</th>
+                                <th scope="col" class="col-md-1 py-2 text-white  verticle-content-middle heading SPA">
+                                    Bill No.</th>
+                                <th scope="col" class="col-md-1 py-2 text-white  verticle-content-middle heading"
+                                    style="min-width: 12em;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody
+                            class="border-top-0 table-bordered col-md-1 py-2 text-white  verticle-content-middle heading data-row">
+                            <ng-container *ngFor="let data of dataToDisplay; let dataIndex = index">
+                                <ng-container *ngFor="let item of data.indentor; let varietyIndex = index">
+                                    <ng-container *ngFor="let val of item.spa; let spaIndex = index">
+                                        <tr>
+                                            <td *ngIf="varietyIndex==0 &&  spaIndex==0"
+                                                [attr.rowspan]="data.spaData.length">{{dataIndex +1}}</td>
+                                            <td *ngIf="varietyIndex==0 &&  spaIndex==0"
+                                                [attr.rowspan]="data.spaData.length">{{data && data.variety_name ?
+                                                data.variety_name :'' }}
+                                                <!-- {{ data.variety_code }} -->
+                                            </td>
 
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        </ng-container>
+                                            <td *ngIf="spaIndex==0" [attr.rowspan]="item.spa.length">{{item &&
+                                                item.agency_name ? item.agency_name :'' }}</td>
+                                            <td>{{val && val.spa_agency_name ? val.spa_agency_name :'' }}</td>
+                                            <td style="text-align:left">
+                                                <span>
+                                                    <p>Total No of Bags (Bag Size):</p>
+                                                    <b class="font-weight-bold">
+                                                        {{val && val.no_of_bag ? val.no_of_bag :'NA'}}
+                                                        ( {{val &&
+                                                        val.bag_weight ? val.bag_weight :''}} Kg)
+                                                    </b>
+                                                </span><br>
+                                                <span>
+                                                    Total Quantity:
+                                                    <b class="font-weight-bold"> {{ (val && val.no_of_bag && val.no_of_bag)
+                                                        ? (val.cropCode && val.cropCode.slice(0, 1) === 'A' ?
+                                                        (val.no_of_bag * val.bag_weight) / 100 + ' Qt' :
+                                                        val.no_of_bag * val.bag_weight + ' Kg') : 'NA' }}
+                                                    </b>
+                                                </span>
+                                                <!-- <span>
+                                                    <p>Total No of Bags (Bag Size):</p>
+                                                    <b class="font-weight-bold">
+                                                        {{val && val.spas ? val.spas.length :'NA'}}
+                                                        ( {{val &&
+                                                        val.bag_weight ? val.bag_weight :''}} Kg)
+                                                    </b>
+                                                </span><br>
+                                                <span>
+                                                    Total Quantity:
+                                                    <b class="font-weight-bold"> {{ (val && val.spas && val.bag_weight)
+                                                        ? (val.cropCode && val.cropCode.slice(0, 1) === 'A' ?
+                                                        (val.spas.length * val.bag_weight) / 100 + ' Qt' :
+                                                        val.spas.length * val.bag_weight + ' Kg') : 'NA' }}
+                                                    </b>
+                                                </span> -->
+                                            </td>
+                                            <td>
+                                                {{val && val.total_price ? (val.total_price | number : '1.2-2') :''}}
+                                            </td>
+                                            <td>
+                                                {{val && val.lifting_bill_no ? val.lifting_bill_no :''}}
+
+                                            </td>
+                                            <!-- [ngClass]="val && val.lifting_id ?'w-100 py-2 mt-2 generatebtn btn-inventory1 bspc_text d-inline-flex justify-content-center verticle-content-middle mb-3 mt-1':'w-100 py-2 mt-2 text-white btn-inventory1 bspc_text d-inline-flex justify-content-center verticle-content-middle mb-3 mt-1'" -->
+                                            <td>
+                                                <button
+                                                    class="w-100 py-2 mt-2 text-white btn-inventory1 bspc_text d-inline-flex justify-content-center verticle-content-middle mb-3 mt-1"
+                                                    (click)="openBillReceiptDialog(data,item,val,val.id)">
+                                                    {{val && val.lifting_id ? 'View Certificate':' Generate
+                                                    Certificate'}}
+
+                                                </button>
+                                            </td>
+                                        </tr>
                                     </ng-container>
                                 </ng-container>
-                            </tbody>
+                            </ng-container>
+                        </tbody>
 
-                        </table>
-                    </div>
+                    </table>
                 </div>
             </div>
+        </div>
         <!-- </div> -->
     </div>
 

@@ -584,7 +584,7 @@ export class CompositionOfMonitoringTeamDirectDetailsComponent implements OnInit
       if (apiResponse !== undefined
         && apiResponse.EncryptedResponse !== undefined
         && apiResponse.EncryptedResponse.status_code == 200) {
-        this.filterPaginateSearch.itemListPageSize = 4;
+        // this.filterPaginateSearch.itemListPageSize = 4;
         this.allData = apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.data ? apiResponse.EncryptedResponse.data : '';
         if (this.allData === undefined) {
           this.allData = [];
@@ -621,11 +621,12 @@ export class CompositionOfMonitoringTeamDirectDetailsComponent implements OnInit
     this.isDirectFormShow = false;
   }
   resetForm() {
+    this.bspc.clear();
     this.is_update = false;
     this.isCrop = false;
     this.ngForm.controls['id'].setValue('');
     this.teamName = '';
-    this.bspc.clear();
+    this.isHidden = false;
   }
 
   editFunctinality(data) {
@@ -725,6 +726,19 @@ export class CompositionOfMonitoringTeamDirectDetailsComponent implements OnInit
       })
       return
     }
+    if (this.ngForm.controls["plots"].value.length == 0) {
+      Swal.fire({
+        toast: false,
+        icon: "warning",
+        title: "Please Select Plots",
+        position: "center",
+        showConfirmButton: true,
+        showCancelButton: false,
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+      })
+      return;
+    }
     let param = {
       year: this.filterPaginateSearchSecond['year'],
       season: this.filterPaginateSearchSecond['season'],
@@ -751,7 +765,11 @@ export class CompositionOfMonitoringTeamDirectDetailsComponent implements OnInit
             confirmButtonColor: '#E97E15'
           });
           this.ngForm.controls['plots'].setValue('');
+          this.bspc.clear();
           this.getPageData();
+          this.isCrop = false;
+          this.is_update = false;
+          this.getMonitoringTeampLotsData(null,null)
           this.resetForm();
         } else {
           Swal.fire({
@@ -775,7 +793,11 @@ export class CompositionOfMonitoringTeamDirectDetailsComponent implements OnInit
           });
           this.ngForm.controls['plots'].setValue('');
           this.getPageData();
+          this.bspc.clear();
+          this.isCrop = false;
+          this.is_update = false;
           this.resetForm();
+          this.getMonitoringTeampLotsData(null,null)
         } else if (res.EncryptedResponse.status_code === 201) {
           Swal.fire({
             title: '<p style="font-size:25px;">Data Already Exits.</p>',
@@ -932,9 +954,10 @@ export class CompositionOfMonitoringTeamDirectDetailsComponent implements OnInit
           this.isExits = false;
           this.is_update = false;
           this.ngForm.controls['plots'].setValue('');
-          this.addMore(0);
           this.getPageData();
-          // this.resetForm();
+          this.addMore(0);
+          this.getMonitoringTeampLotsData(null,null)
+          this.resetForm();
         });
       }
     });

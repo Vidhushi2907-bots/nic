@@ -1,4 +1,4 @@
-  import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { formatDate } from '@angular/common';
 import { SectionFieldType } from 'src/app/common/types/sectionFieldType';
 import { FormGroup, FormControl, FormArray, FormBuilder } from '@angular/forms'
@@ -266,7 +266,7 @@ export class AllocationBreederSeedIndentorLiftingFormComponent implements OnInit
   reportHeader: any = {};
 
 
-  isCropSubmitted: boolean = false;
+  isCropSubmitted: boolean = true;
   submittedbtnData = false;
   varietyDropdownDatasecond: any[];
 
@@ -279,6 +279,8 @@ export class AllocationBreederSeedIndentorLiftingFormComponent implements OnInit
   unit: string;
   VarietyName1: any;
   tableshow: any;
+  isCropSubmittedNew: boolean = false;
+  showgrid1: boolean = false;
 
   exportexcel(): void {
     /* pass here the table id */
@@ -466,7 +468,8 @@ export class AllocationBreederSeedIndentorLiftingFormComponent implements OnInit
           this.unit = "Kg";
         }
       }
-      this.getLineData();
+      // this.getCropVerieties();
+      // this.getLineData();
       // this.onSelectVariety(null);
       // this.onSelectVarietyLine(null);
       this.dataToDisplay = [];
@@ -508,10 +511,13 @@ export class AllocationBreederSeedIndentorLiftingFormComponent implements OnInit
       if (isSearched)
         this.filterPaginateSearch.search(performSearch);
     });
+    // this.getLineData();
 
   }
 
   search() {
+     this.showgrid1 = true;
+    this.dataToDisplay = [];
     let searchParams1 = { "Year of Indent": null, "Season": null, "Crop Name": null, };
     let reportParam = { "year": null, "season": null, "crop_code": null, };
 
@@ -520,9 +526,9 @@ export class AllocationBreederSeedIndentorLiftingFormComponent implements OnInit
     let cropVariety: null;
     this.searhedData = true;
     let season: null;
-     
-    
-     
+
+
+
     if (this.IstPartFormGroupControls["yearofIndent"] && this.IstPartFormGroupControls["yearofIndent"].value) {
       searchParams1['Year of Indent'] = this.IstPartFormGroupControls["yearofIndent"].value["value"]
       // allData = allData.filter(x => (x.year == yearofIndent))
@@ -562,9 +568,10 @@ export class AllocationBreederSeedIndentorLiftingFormComponent implements OnInit
       return;
     } else {
       this.upperRowDisplay = true;
-      this.isCropSubmitted = false;
+      this.isCropSubmitted = true;
+      this.isCropSubmittedNew = false;
       this.isEditingVariety = false;
-      this.dataToDisplay = null
+      this.dataToDisplay = [];
       this.submittedData = [];
       this.dataToShow = [];
 
@@ -578,6 +585,7 @@ export class AllocationBreederSeedIndentorLiftingFormComponent implements OnInit
       this.varietyForm.controls['variety_id'].reset();
 
       this.getCropVerieties();
+      this.getLineData();
     }
     this.reportHeader = reportParam;
 
@@ -631,6 +639,7 @@ export class AllocationBreederSeedIndentorLiftingFormComponent implements OnInit
     this.dataToDisplay = []
 
     this.isCropSubmitted = false;
+    this.isCropSubmittedNew = false;
 
     this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
       this.router.navigate(['seed-division/breeder-seed-allocation-lifting/new']);
@@ -676,9 +685,10 @@ export class AllocationBreederSeedIndentorLiftingFormComponent implements OnInit
 
             data.EncryptedResponse.data.forEach(element => {
               if (element.is_active == 1) {
-                this.isCropSubmitted = true;
+                this.isCropSubmittedNew = true;
               }
             });
+            this.isCropSubmitted = true;
             this.getFilledVarietyData(data.EncryptedResponse.data);
           }
 
@@ -1092,58 +1102,6 @@ export class AllocationBreederSeedIndentorLiftingFormComponent implements OnInit
 
   submitData(indenter?: any, selectVariety?: any) {
     const restQuantity = this.getPercentage(indenter.indent_quantity);
-    let bspcArrayFirst = [];
-    let bspcAllocatedValue = 0;
-    // selectVariety.productionCenters.forEach(item => {
-    //   indenter.productions.forEach((ele => {
-    //     // if (ele.id == item.production_center_id) {
-    //       bspcAllocatedValue += ele.quantity
-    //     // }
-    //   }))
-    //   bspcArrayFirst.push({
-    //     "bspc_id": item.production_center_id,
-    //     "allocated_total_qnt": bspcAllocatedValue
-    //   })
-    // })
-    // indenter.productions.forEach(ele => {
-    //   selectVariety.productionCenters.forEach((item => {
-    //     if (ele.id == item.production_center_id) {
-    //       bspcAllocatedValue += ele.quantity
-    //     }
-    //   }))
-    //   bspcArrayFirst.push({
-    //     "bspc_id": ele.production_center_id,
-    //     "allocated_total_qnt": bspcAllocatedValue
-    //   })
-    // })
-    // let isAlloacted = false
-    // console.log(' this.selectedVerietyDetail.productionCenters===',indenter);
-    // console.log('bspcArrayFirst====',bspcArrayFirst);
-    // this.selectedVerietyDetail.productionCenters.forEach((ele => {
-    //   bspcArrayFirst.forEach(async(item) => {
-    //     if (ele.production_center_id == item.bspc_id) {
-    //       if (parseFloat(ele.quantityProduced) < parseFloat(item.allocated_total_qnt)) {
-    //         isAlloacted = true
-    //         Swal.fire({
-    //           title: '<p style="font-size:25px;">Allocated Quantity Should be equal or less to Quantity Produced.</p>',
-    //           icon: 'error',
-    //           confirmButtonText:
-    //             'OK',
-    //           confirmButtonColor: '#E97E15'
-    //         })
-    //         return;
-    //       }else{
-    //         // isAlloacted = false
-    //       }
-    //     }
-    //   })
-    // }))
-    // if(isAlloacted){
-    //   return;
-    // }
-    // // return;
-    // console.log('indenter====',indenter)
-    // console.log('restQuantity===',restQuantity);
     if (indenter.allocated_quantity > restQuantity) {
       Swal.fire({
         title: '<p style="font-size:25px;">Allocated Quantity Should be Proportional to Total Indent Quantity.</p>',
@@ -1152,7 +1110,6 @@ export class AllocationBreederSeedIndentorLiftingFormComponent implements OnInit
           'OK',
         confirmButtonColor: '#E97E15'
       })
-
       return
     }
 
@@ -1278,6 +1235,7 @@ export class AllocationBreederSeedIndentorLiftingFormComponent implements OnInit
               }
 
             }
+            // this.submitData();
             this.isTableVisible = true;
             this.dataToDisplay = [];
 
@@ -1321,7 +1279,12 @@ export class AllocationBreederSeedIndentorLiftingFormComponent implements OnInit
           // }
 
         }
+        this.tempForm.patchValue([]);
+        this.inputForm.reset();
+        this.tempForm.controls['selectedIndentorModel'].patchValue(null)
+        this.selectedIndentor = {}
         this.tempForm.reset();
+
         // this.varietyForm.reset();
         return
       }, (error: any) => {
@@ -1331,30 +1294,20 @@ export class AllocationBreederSeedIndentorLiftingFormComponent implements OnInit
     } else {
       return
     }
-
   }
 
   getVarietyName(id: any) {
-    // console.log("id...",id);
-
     let variety_name;
     this.verietyListDetails.varieties = this.verietyListDetails.varieties && this.verietyListDetails.varieties.length > 0 ? this.verietyListDetails.varieties : this.verietyListDetails.varietyforedit;
-    // if(this.verietyListDetails && this.verietyListDetails.varieties && this.verietyListDetails.varieties)
     this.verietyListDetails.varieties.forEach(x => {
       if (x && x.m_crop_variety && x.m_crop_variety.id == id) {
         variety_name = x;
       }
     });
-    // console.log("variety_name",variety_name);
-    // console.log("variety_name.m_crop_variety.variety_name....",variety_name && variety_name.m_crop_variety && variety_name.m_crop_variety.variety_name);
     if (variety_name && variety_name.m_crop_variety && variety_name.m_crop_variety.variety_name) {
-
       let VarietyName1 = variety_name && variety_name.m_crop_variety && variety_name.m_crop_variety.variety_name
       return VarietyName1
-
-
     }
-
     return 'NA'
   }
 
@@ -1368,10 +1321,7 @@ export class AllocationBreederSeedIndentorLiftingFormComponent implements OnInit
     if (variety_name && variety_name.m_crop_variety && variety_name.m_crop_variety.variety_name) {
       return variety_name.m_crop_variety.variety_name
     }
-
     return 'NA'
-
-
   }
 
 
@@ -1385,15 +1335,12 @@ export class AllocationBreederSeedIndentorLiftingFormComponent implements OnInit
     variety.forEach((varietyElement: any) => {
       this.editVariety = varietyElement;
       if (varietyElement.variety_line_code) {
-
         this.breederService.getRequestCreatorNew("allocation-to-indentor-variety?user_id=" + this.currentUser.id + "&year=" + year.value + "&season=" + season.value + "&cropCode=" + cropName.value + "&cropVariety=" + varietyElement.variety_id + "&line_code=" + varietyElement.variety_line_code).subscribe((data: any) => {
           if (data && data.EncryptedResponse && data.EncryptedResponse.status_code == 200) {
             const variety = data.EncryptedResponse.data;
-
             const producionCentersList = []
             const tempProd = []
             const tempProducionCentersList = []
-
             variety.productionCenters.forEach(element => {
               let temp = {
                 agency_name: element.agency_detail ? element.agency_detail.agency_name : 'NA',
@@ -1401,16 +1348,15 @@ export class AllocationBreederSeedIndentorLiftingFormComponent implements OnInit
                 value: element.production_center_id,
                 id: element.production_center_id,
                 quantity: 0,
-
               }
-              producionCentersList.push(JSON.parse(JSON.stringify(temp)));
 
+              producionCentersList.push(JSON.parse(JSON.stringify(temp)));
               if (element && element.quantityProduced && element.quantityProduced > 0) {
                 tempProd.push(element)
                 tempProducionCentersList.push(JSON.parse(JSON.stringify(temp)));
-
               }
             })
+
             const object = {
               id: varietyElement.id,
               variety_id: varietyElement.variety_id,
@@ -1962,9 +1908,9 @@ export class AllocationBreederSeedIndentorLiftingFormComponent implements OnInit
 
             if (this.isCropSubmitted) {
               // this.dataToDisplay = this.dataToShow;
-              for (let item of this.dataToDisplay) {
+              // for (let item of this.dataToDisplay) {
 
-              }
+              // }
               for (let data of this.dataToDisplay) {
                 let sum = 0;
                 for (let value of data.indentors) {
@@ -2641,7 +2587,7 @@ export class AllocationBreederSeedIndentorLiftingFormComponent implements OnInit
             confirmButtonColor: '#E97E15'
           })
           this.editVarietyForm.controls['variety_id'].reset();
-          this.varietyForm.controls['variety_id'].reset(); 
+          this.varietyForm.controls['variety_id'].reset();
           this.varietyDropdownDatasecond = []
           this.selectedVerietyDetail = null
           this.isEditingVariety = false;
@@ -2654,8 +2600,8 @@ export class AllocationBreederSeedIndentorLiftingFormComponent implements OnInit
 
           // this.varietyForm.reset();
           // this.editVarietyForm.reset();
-          
-          
+
+
           if (this.varietyDropdownData.length == 0) {
             this.cropButtonEnable = true;
           }
@@ -2769,6 +2715,7 @@ export class AllocationBreederSeedIndentorLiftingFormComponent implements OnInit
 
 
   cropWiseSubmission() {
+    this.showgrid1 = true;
     const year = this.formSuperGroup.value.IstPartFormGroup.yearofIndent.value;
     const season = this.formSuperGroup.value.IstPartFormGroup.season.value;
     const crop_code = this.formSuperGroup.value.IstPartFormGroup.cropName.value;
@@ -2913,7 +2860,7 @@ export class AllocationBreederSeedIndentorLiftingFormComponent implements OnInit
     // this.varietyForm.controls['variety_id'].value
     let variety;
     if (this.verietyListDetails && this.verietyListDetails.varieties && this.verietyListDetails.varieties.length > 0) {
-      variety = this.verietyListDetails.varieties.filter(x => x.m_crop_variety.id == this.varietyForm.controls['variety_id'].value[0].value)
+      variety = this.verietyListDetails.varieties.filter(x => x.m_crop_variety.id == (this.varietyForm.controls['variety_id'].value && this.varietyForm.controls['variety_id'].value[0].value ? this.varietyForm.controls['variety_id'].value[0].value : ''))
     }
     const param = {
       year: year.value,

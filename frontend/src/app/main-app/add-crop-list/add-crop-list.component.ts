@@ -12,6 +12,7 @@ import { RestService } from 'src/app/services/rest.service';
 import { SeedServiceService } from 'src/app/services/seed-service.service';
 import { MatSelect } from "@angular/material/select";
 import { ngbDropdownEvents } from 'src/app/_helpers/ngbDropdownEvents';
+import { MasterService } from 'src/app/services/master/master.service';
 
 @Component({
   selector: 'app-add-crop-list',
@@ -55,10 +56,12 @@ export class AddCropListComponent extends ngbDropdownEvents implements OnInit {
   cropGroups;
   mymodel;
   firstSelect: any;
-  crop_text_check='crop_group';
-  crop_name_check='cropName';
- 
-  constructor(private restService: RestService, private router: Router, private fb: FormBuilder, private service: SeedServiceService) {
+  crop_text_check = 'crop_group';
+  crop_name_check = 'cropName';
+  userType: any;
+  isActionBtnDisable: boolean;
+
+  constructor(private restService: RestService, private router: Router, private fb: FormBuilder, private service: SeedServiceService, private _master: MasterService) {
     super();
     if (this.router.url.includes('view')) {
       this.disablefield = true;
@@ -68,6 +71,8 @@ export class AddCropListComponent extends ngbDropdownEvents implements OnInit {
     }
     this.createEnrollForm();
 
+    this.userType = this._master?.userBasicData?.user_type ?? 'NA';
+    this.isActionBtnDisable = this.userType === 'SUPERADMIN';
 
   }
 
@@ -85,11 +90,11 @@ export class AddCropListComponent extends ngbDropdownEvents implements OnInit {
     // if (!currentUser) {
     //   this.router.navigate(['/web-login']);
     // }
-   
+
     this.getPageData();
     this.initProcess();
     this.getCroupCroupList();
-    
+
 
     // this.delete(this.deletedId)
   }
@@ -100,8 +105,8 @@ export class AddCropListComponent extends ngbDropdownEvents implements OnInit {
     this.ngForm = this.fb.group({
       crop_group: new FormControl(''),
       crop_name: new FormControl('',),
-      crop_text:new FormControl('',),
-      name_text:new FormControl('',)
+      crop_text: new FormControl('',),
+      name_text: new FormControl('',)
 
     });
     this.ngForm.controls["crop_group"].valueChanges.subscribe(newValue => {
@@ -111,29 +116,29 @@ export class AddCropListComponent extends ngbDropdownEvents implements OnInit {
       }
     })
     this.ngForm.controls['crop_text'].valueChanges.subscribe(newValue => {
-      if (newValue ) {
+      if (newValue) {
         console.log(newValue)
-        this.response_crop_group =this.response_crop_group_second
-        let response= this.response_crop_group.filter(x=>x.group_name.toLowerCase().includes(newValue.toLowerCase()))      
-        this.response_crop_group=response      
+        this.response_crop_group = this.response_crop_group_second
+        let response = this.response_crop_group.filter(x => x.group_name.toLowerCase().includes(newValue.toLowerCase()))
+        this.response_crop_group = response
       }
-      else{
-      this.getCroupCroupList()
+      else {
+        this.getCroupCroupList()
       }
     });
     this.ngForm.controls['name_text'].valueChanges.subscribe(newValue => {
-      if (newValue ) {
+      if (newValue) {
         console.log(newValue)
-        this.crop_name_list =this.crop_name_list_second
-        let response= this.crop_name_list.filter(x=>x.crop_name.toLowerCase().includes(newValue.toLowerCase()))
-      
-        this.crop_name_list=response
+        this.crop_name_list = this.crop_name_list_second
+        let response = this.crop_name_list.filter(x => x.crop_name.toLowerCase().includes(newValue.toLowerCase()))
+
+        this.crop_name_list = response
         // this.croupGroupListsecond=this.croupGroupList
         // console.log('this.cropNameDataSecond',this.category_agency_data,this.cropNameData)
-       
+
       }
-      else{
-      this.getCroupNameList(this.ngForm.controls['crop_group'].value)
+      else {
+        this.getCroupNameList(this.ngForm.controls['crop_group'].value)
       }
     });
 
@@ -149,7 +154,7 @@ export class AddCropListComponent extends ngbDropdownEvents implements OnInit {
       .postRequestCreator("getCropDataList", null, {
         page: loadPageNumberData,
         // pageSize: this.filterPaginateSearch.itemListPageSize || 10,
-        pageSize:  50,
+        pageSize: 50,
         search: {
           group_code: this.selectCrop_group_code ? this.selectCrop_group_code : null,
           crop_code: this.selectCrop_code ? this.selectCrop_code : null,
@@ -168,11 +173,11 @@ export class AddCropListComponent extends ngbDropdownEvents implements OnInit {
           if (this.allData === undefined) {
             this.allData = [];
           }
-          if(this.allData){
-            
-            this.allData =  this.allData.sort((a, b) => a.m_crop_group.group_name.localeCompare(b.m_crop_group.group_name)
-            || a.crop_name.localeCompare(b.crop_name) ||
-            a.botanic_name.localeCompare(b.botanic_name)
+          if (this.allData) {
+
+            this.allData = this.allData.sort((a, b) => a.m_crop_group.group_name.localeCompare(b.m_crop_group.group_name)
+              || a.crop_name.localeCompare(b.crop_name) ||
+              a.botanic_name.localeCompare(b.botanic_name)
             );
           }
 
@@ -185,8 +190,8 @@ export class AddCropListComponent extends ngbDropdownEvents implements OnInit {
     this.selectCrop_group = item.crop_name;
     console.log("item1", item)
     this.selectCrop_code = item.crop_code;
-    this.crop_name_check=''
-    
+    this.crop_name_check = ''
+
     this.ngForm.controls["name_text"].setValue("");
     this.ngForm.controls['crop_name'].setValue(item.crop_code)
   }
@@ -194,14 +199,14 @@ export class AddCropListComponent extends ngbDropdownEvents implements OnInit {
     // console.log('item====>', item.);
 
     this.selectCrop = item.group_name;
-    
+
     this.ngForm.controls["crop_text"].setValue("");
     this.ngForm.controls['crop_group'].setValue(item.group_code);
     this.selectCrop_group_code = item.group_code;
     this.crop_name_data = item.group_name;
     this.selectCrop_group = "";
     this.ngForm.controls['crop_name'].setValue('')
-    this.crop_text_check='crop_group'
+    this.crop_text_check = 'crop_group'
     this.getCroupNameList(item.group_code);
   }
 
@@ -253,8 +258,8 @@ export class AddCropListComponent extends ngbDropdownEvents implements OnInit {
           icon: 'success',
           confirmButtonText:
             'OK',
-            showCancelButton: false,
-            confirmButtonColor: '#E97E15'
+          showCancelButton: false,
+          confirmButtonColor: '#E97E15'
         })
       }
     })
@@ -265,7 +270,7 @@ export class AddCropListComponent extends ngbDropdownEvents implements OnInit {
     const route = "crop-group";
     const result = this.service.getPlansInfo(route).then((data: any) => {
       this.response_crop_group = data['EncryptedResponse'].data;
-      this.response_crop_group_second =this.response_crop_group
+      this.response_crop_group_second = this.response_crop_group
       console.log(data['EncryptedResponse'].data, 'ddddddddd', this.response_crop_group)
     })
   }
@@ -286,9 +291,9 @@ export class AddCropListComponent extends ngbDropdownEvents implements OnInit {
           && apiResponse.EncryptedResponse.status_code == 200) {
           this.isCropName = true;
           this.crop_name_list = apiResponse.EncryptedResponse.data;
-          this.crop_name_list_second=this.crop_name_list
-          this.crop_name_list =  this.crop_name_list.sort((a, b) => 
-           a.crop_name.localeCompare(b.crop_name) 
+          this.crop_name_list_second = this.crop_name_list
+          this.crop_name_list = this.crop_name_list.sort((a, b) =>
+            a.crop_name.localeCompare(b.crop_name)
           );
         }
       });
@@ -337,7 +342,7 @@ export class AddCropListComponent extends ngbDropdownEvents implements OnInit {
         icon: 'error',
         confirmButtonText:
           'OK',
-      confirmButtonColor: '#E97E15'
+        confirmButtonColor: '#E97E15'
       })
 
       return;
@@ -350,7 +355,7 @@ export class AddCropListComponent extends ngbDropdownEvents implements OnInit {
 
 
   }
-  valuechange(e){
+  valuechange(e) {
     console.log(e.target.value)
   }
   onKeyPressed(event: KeyboardEvent, mySelect: MatSelect) {
@@ -359,17 +364,17 @@ export class AddCropListComponent extends ngbDropdownEvents implements OnInit {
       mySelect.close();
     }
   }
- 
-cropdatatext(){
- 
-  this.crop_text_check='';
 
-}
-cropnametext(){
- 
-  this.crop_name_check='';
+  cropdatatext() {
 
-}
+    this.crop_text_check = '';
+
+  }
+  cropnametext() {
+
+    this.crop_name_check = '';
+
+  }
 
 
 }

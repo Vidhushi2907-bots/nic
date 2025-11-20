@@ -9,7 +9,7 @@
                         <div class="col-12 col-md-12 col-lg-11">
                             <div class="row">
                                 <!-- year of indent -->
-                                <div class="col-12 col-md-12 col-lg col-xl  col-sm-12 ">
+                                <div class="col-12 col-md-12 col-lg col-xl col-sm-12">
                                     <div class="row">
                                         <div class="col-12">
                                             <label for="year" class="left-heading required">Year of
@@ -146,7 +146,7 @@
                                     <div class="card">
                                         <div class="card">
                                             <div class="card-body">
-                                                <span class="card-title">Processed Seed Details </span><br>
+                                                <span class="card-title"><span *ngIf="!is_potato">Estimated</span> Processed Seed Details</span><br>
                                                 <div class="col-12" formArrayName="spp">
                                                     <ng-container *ngFor="let data of spp.controls  let i=index
                                                     trackBy: trackByFn" [formGroupName]="i">
@@ -156,7 +156,7 @@
                                                                 <div class="row">
                                                                     <div class="col-12">
                                                                         <label for="year" class="left-heading ">
-                                                                            No. of Bags</label>
+                                                                            <span *ngIf="!is_potato">Estimated</span>  No. of Bags</label>
                                                                     </div>
                                                                     <div class="col-12 ">
                                                                         <input type="text" formControlName="no_of_bags"
@@ -169,11 +169,11 @@
                                                                 <div class="row">
                                                                     <div class="col-12">
                                                                         <label for="year" class="left-heading ">
-                                                                            Bag Size (kg).</label>
+                                                                            <span *ngIf="!is_potato">Estimated</span>  Bag Size (kg).</label>
                                                                     </div>
                                                                     <div class="col-12 ">
                                                                         <input type="text" formControlName="bags"
-                                                                            class=" form-control input-inventory w-100"
+                                                                            class=" form-control input-inventory w-100" [ngClass]="is_potato ? '':'disableField'"
                                                                             (ngModelChange)="getQuantity(i)">
                                                                     </div>
                                                                 </div>
@@ -182,7 +182,7 @@
                                                                 <div class="row">
                                                                     <div class="col-12">
                                                                         <label for="year" class="left-heading ">
-                                                                            Quantity ({{unit}}).</label>
+                                                                            <span *ngIf="!is_potato">Estimated</span>  Quantity ({{unit}}).</label>
                                                                     </div>
                                                                     <div class="col-12 ">
                                                                         <input type="text" formControlName="qty"
@@ -191,15 +191,15 @@
                                                                     </div>
                                                                 </div>  
                                                             </div>
-                                                            <div class="col-xl-1 pt-4" *ngIf="spp.controls.length!=1 ">
-                                                                <button (click)="remove(i); getLossQty() "
-                                                                    class="list-action-buttons-second">
+                                                            <div class="col-xl-1 pt-4" *ngIf="spp.controls.length!=1 && is_potato">
+                                                                <button (click)="remove(i);"
+                                                                    class="list-action-buttons-second" >
                                                                     <img src="assets/images/delete.png">
                                                                 </button>
 
                                                             </div>
                                                             <div class="col-xl-1 pt-4 pl-0"
-                                                                *ngIf="spp.controls.length ==i+1 ">
+                                                                *ngIf="spp.controls.length ==i+1 && is_potato">
                                                                 <button (click)="addMore(i)"
                                                                     class="list-action-buttons-second ml-xl-3">
                                                                     <img src="assets/images/Add.png">
@@ -281,7 +281,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-3" *ngIf="!showLotPageDataSecond">
-                                    <div class="card">
+                                    <div class="card" *ngIf="is_potato">
                                         <div class="card-body">
                                             <span class="card-title">Rejection Details</span><br>
                                             <div class="col-12 pl-0">
@@ -295,9 +295,10 @@
                                                                     under_sizepercent.toFixed(2):''}}%)</span>
                                                             </div>
                                                             <div class="col-12">
+                                                                <!-- [ngClass]="is_potato ? '':'disableField'" -->
                                                                 <input type="text"   
-                                                                    class="form-control input-inventory w-100 "
-                                                                    formControlName="under_size"
+                                                                    class="form-control input-inventory w-100 "[ngClass]="is_potato ? '':'disableField'"
+                                                                    formControlName="under_size" 
                                                                     (ngModelChange)="getLossQty()">
 
                                                             </div>
@@ -446,10 +447,10 @@
                                     </td>
                                     <td class="btnaction tableheading d-flex ">
                                         <button (click)="remove2(i)" class="list-action-buttons-second pt-4"
-                                            *ngIf="stack.controls.length!=1 ">
+                                            *ngIf="stack.controls.length!=1 && is_potato">
                                             <img src="assets/images/delete.png">
                                         </button>
-                                        <button (click)="addMore2(i)" *ngIf="stack.controls.length ==i+1"
+                                        <button (click)="addMore2(i)" *ngIf="stack.controls.length ==i+1 && is_potato"
                                             class="list-action-buttons-second ml-xl-2 pt-4">
                                             <img src="assets/images/Add.png">
                                         </button>
@@ -519,7 +520,7 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="col-4">
+                                                <div class="col-4" *ngIf="is_potato">
                                                     <div class="form-check form-check-inline">
                                                         <input class="form-check-input" type="radio"
                                                             name="exampleRadios" id="exampleRadio3" value="2"
@@ -673,11 +674,12 @@
                                                             <button (click)="showLotPage(data,item,1,lot)"
                                                                 [disabled]="lot && (lot.action && lot.action!=2 && (lot.lot_id == lot.process_lot_id))"
                                                                 [ngClass]="lot && (lot.action && lot.action!=2 && (lot.lot_id == lot.process_lot_id)) ? 'form-button-second generateClass search w-100 d-inline-flex justify-content-center verticle-content-middle':'form-button text-white btn-inventory generateClass search w-100 d-inline-flex justify-content-center verticle-content-middle'">
-                                                                {{ngForm.controls['getRadio'].value==1 ?'Processing
-                                                                Seed':'Re-process'}}
+                                                                {{ngForm.controls['getRadio'].value==1 ? ( !is_potato ?'Estimated Processing
+                                                                Seed': 'Processing
+                                                                Seed'):'Re-process'}}
                                                             </button>
                                                             <br>
-                                                            <button (click)="showLotPageSecond(data,item,2,lot)"
+                                                            <button (click)="showLotPageSecond(data,item,2,lot)" *ngIf="is_potato"
                                                                 [disabled]="data && (lot.action) && (lot.lot_id == lot.process_lot_id)"
                                                                 [ngClass]="data && (lot.action && (lot.lot_id == lot.process_lot_id))? 'form-button-second mt-3 generateClass search w-100 d-inline-flex justify-content-center verticle-content-middle':'form-button mt-3 text-white btn-inventory generateClass search w-100 d-inline-flex justify-content-center verticle-content-middle'">
                                                                 Estimated Processed Seed </button>

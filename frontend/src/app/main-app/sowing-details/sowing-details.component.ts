@@ -349,6 +349,12 @@ export class SowingDetailsComponent implements OnInit {
     return `${year}-${month}-${day}`;
   }
 
+  convertDatatoShow(item) {
+    function pad(s) { return (s < 10) ? '0' + s : s; }
+    var d = new Date(item)
+    return [pad(d.getDate()), pad(d.getMonth() + 1), d.getFullYear()].join('/')
+  }
+
   async editGotShowingDetail(data: any) {
    await Promise.all([
     this.getConsignment(true,data && data.consignment_number),
@@ -363,13 +369,6 @@ export class SowingDetailsComponent implements OnInit {
    this.ngForm.controls['showDisableInspectionDate'].setValue(true);
    this.ngForm.controls['testno'].disable();
    this.ngForm.controls['consignment'].disable();
-   let dateOfSowing = null;
-   if (data.date_of_showing) {
-     const parsedDate = new Date(data.date_of_showing);
-      if (!isNaN(parsedDate.getTime())) {
-       dateOfSowing = parsedDate.toISOString().substring(0, 10);
-    }
-  }
   const expectedStartDate = new Date(data.expected_start_date);
   const expectedEndDate = new Date(data.expected_end_date);
     const expectedDateOfInspection: IMyDateModel = {
@@ -395,10 +394,19 @@ export class SowingDetailsComponent implements OnInit {
     testno: data.test_number,
     consignment: data.consignment_number,
     address: data.address,
-    dateOfSowing: dateOfSowing,
+    // dateOfSowing: dateOfSowing,
     expected_date_inspection: expectedDateOfInspection,
     areaSown: data.area_shown,
    });
+   this.ngForm.controls['dateOfSowing'].setValue(
+    {
+      isRange: false,
+      singleDate: {
+        formatted: data && data.date_of_showing ? this.convertDatatoShow(new Date(data && data.date_of_showing)) : '',
+        jsDate: data && data.date_of_showing ? new Date(data && data.date_of_showing) : ''
+      }
+    }
+  );
    this.selectState = data.state_name;
    this.selectDistrict = data.district_name;
    this.ngForm.controls['district_text'].enable();
@@ -427,7 +435,7 @@ export class SowingDetailsComponent implements OnInit {
         district_code: this.ngForm.controls['district_code'].value,
         address: this.ngForm.controls['address'].value,
         area_shown: this.ngForm.controls['areaSown'].value,
-        date_of_showing: this.ngForm.controls['dateOfSowing'].value,
+        date_of_showing : this.ngForm.controls['dateOfSowing'].value && this.ngForm.controls['dateOfSowing'].value.singleDate && this.ngForm.controls['dateOfSowing'].value.singleDate.formatted ? this.convertDates(this.ngForm.controls['dateOfSowing'].value.singleDate.formatted) : '',
         expected_start_date: formattedStartDate,
         expected_end_date: formattedEndDate,
         user_id: this.userId.id,
@@ -448,7 +456,6 @@ export class SowingDetailsComponent implements OnInit {
               if (result.isConfirmed) {
                 this.getSowingDetailsList('');
                 this.cancel();
-                this.getTestNumber(this.ngForm.controls['consignment'].value),
                 this.ngForm.controls['showDisableInspectionDate'].setValue(true);
                 this.getConsignment();
               }
@@ -489,7 +496,7 @@ export class SowingDetailsComponent implements OnInit {
       district_code: this.ngForm.controls['district_code'].value,
       address: this.ngForm.controls['address'].value,
       area_shown: this.ngForm.controls['areaSown'].value,
-      date_of_showing: this.ngForm.controls['dateOfSowing'].value,
+      date_of_showing : this.ngForm.controls['dateOfSowing'].value && this.ngForm.controls['dateOfSowing'].value.singleDate && this.ngForm.controls['dateOfSowing'].value.singleDate.formatted ? this.convertDates(this.ngForm.controls['dateOfSowing'].value.singleDate.formatted) : '',
       expected_start_date: formattedStartDate,
       expected_end_date: formattedEndDate,
       user_id: this.userId.id,
@@ -627,6 +634,8 @@ export class SowingDetailsComponent implements OnInit {
     this.selectState = '';
     this.selectDistrict = '';
     this.ngForm.controls['address'].setValue('');
+    this.getTestNumber(this.ngForm.controls['consignment'].value),
+    this.getTestNumberForTable();
     this.ngForm.controls['expected_date_inspection'].setValue('');
     this.ngForm.controls['areaSown'].setValue('');
     this.ngForm.controls['dateOfSowing'].setValue('');
@@ -779,6 +788,8 @@ export class SowingDetailsComponent implements OnInit {
     if (this.dp4) {
       this.dp4.toggleCalendar();
     }
+  }
+  onDateChangedStart(event: any): void {
   }
   // code end for Expected Date of Inspection
 }

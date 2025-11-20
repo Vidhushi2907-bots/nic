@@ -143,7 +143,7 @@ import { AddCropReportComponent } from './add-crop-report/add-crop-report.compon
 import { AddCropVarietyReportComponent } from './add-crop-variety-report/add-crop-variety-report.component';
 import { SubmissionForIndentsOfBreederSeedReportComponent } from './submission-for-indents-of-breeder-seed-report/submission-for-indents-of-breeder-seed-report.component';
 import { CropVarietyCharactersticReoprtComponent } from './crop-variety-characterstic-reoprt/crop-variety-characterstic-reoprt.component';
-
+// import { VarietyReportListViewComponent } from './variety-report-list-view/variety-report-list-view.component';
 
 import { CardComponent } from './card/card.component';
 import { QRCodeModule } from 'angularx-qrcode';
@@ -158,16 +158,16 @@ import { NgxBarcodeModule } from 'ngx-barcode';
 // import { IndenterReportComponent } from './indenter-report/indenter-report.component';
 
 
-import { MatButtonToggleModule } from 
-    '@angular/material/button-toggle';
-import { MatDatepickerModule } from 
-    '@angular/material/datepicker';
-import { MatInputModule } from 
-    '@angular/material/input';
-import { MatFormFieldModule } from 
-    '@angular/material/form-field';
-import { MatNativeDateModule } from 
-    '@angular/material/core';
+import { MatButtonToggleModule } from
+  '@angular/material/button-toggle';
+import { MatDatepickerModule } from
+  '@angular/material/datepicker';
+import { MatInputModule } from
+  '@angular/material/input';
+import { MatFormFieldModule } from
+  '@angular/material/form-field';
+import { MatNativeDateModule } from
+  '@angular/material/core';
 import { StatusOfLiftingNonLiftingSupplyPositionForCropsComponent } from './status-of-lifting-non-lifting-supply-position-for-crops/status-of-lifting-non-lifting-supply-position-for-crops.component';
 import { SpaLiftingComponent } from './spa-lifting/spa-lifting.component';
 import { SpaLiftingListComponent } from './spa-lifting-list/spa-lifting-list.component';
@@ -231,42 +231,54 @@ import { VarietyCharactersticViewFormComponent } from './reports/variety-charact
 import { GInvoiceTestComponent } from './g-invoice-test/g-invoice-test.component';
 import { ChatSupportComponent } from './chat-support/chat-support.component';
 import { GrowOutTestSampleReceptionComponent } from './grow-out-test-sample-reception/grow-out-test-sample-reception.component';
-import { SowingDetailsComponent } from './sowing-details/sowing-details.component'; 
+import { SowingDetailsComponent } from './sowing-details/sowing-details.component';
 import { BspIiStatusReportComponent } from './bsp-ii-status-report/bsp-ii-status-report.component';
 import { BspIIIStatusReportComponent } from './bsp-iii-status-report/bsp-iii-status-report.component';
 import { InabilityReallocateFormComponent } from './inability-reallocate-form/inability-reallocate-form.component';
 import { BspIStatusReportComponent } from './bsp-i-status-report/bsp-i-status-report.component';
 import { GotMonitoringTeamDetailsComponent } from './got-monitoring-team-details/got-monitoring-team-details.component';
 import { BspTwoSecondtComponent } from './bsp-two-second/bsp-two-second';
- 
+
 import { GrowOutTestReportBspvComponent } from './grow-out-test-report-bspv/grow-out-test-report-bspv.component';
 import { CropStatusReportComponent } from './crop-status-report/crop-status-report.component';
-import { ZsrmComponent } from './indenters/zsrm/zsrm.component';
-import { ZsrmCsFsAreaComponent } from './indenters/zsrm-cs-fs-area/zsrm-cs-fs-area.component';
-import { SrrComponent } from './indenters/srr/srr.component';
-import { ZsrmCsQsDistributionComponent } from './indenters/zsrm-cs-qs-distribution/zsrm-cs-qs-distribution.component';
-import { ZsrmReqQsComponent } from './indenters/zsrm-req-qs/zsrm-req-qs.component';
-import { VarietyWiseDistCsQsComponent } from './variety-wise-dist-cs-qs/variety-wise-dist-cs-qs.component';
-import { StateVarietyWiseCsqsDistReportComponent } from './state-variety-wise-csqs-dist-report/state-variety-wise-csqs-dist-report.component';
-import { CropWiseCsqsDistReportComponent } from './crop-wise-csqs-dist-report/crop-wise-csqs-dist-report.component';
-import { SrpIndenterCropWiseReportComponent } from './srp-indenter-crop-wise-report/srp-indenter-crop-wise-report.component';
-import { SrpIndenterCropWiseSummaryReportComponent } from './srp-indenter-crop-wise-summary-report/srp-indenter-crop-wise-summary-report.component';
-import { SrpIndenterMasterReportComponent } from './srp-indenter-master-report/srp-indenter-master-report.component';
-import { CropWiseSrpSdReportComponent } from './crop-wise-srp-sd-report/crop-wise-srp-sd-report.component';
-import { CropWiseSummarySrpSdReportComponent } from './crop-wise-summary-srp-sd-report/crop-wise-summary-srp-sd-report.component';
-import { CropVarietyWiseSrpSdReportComponent } from './crop-variety-wise-srp-sd-report/crop-variety-wise-srp-sd-report.component';
-import { SrpDashboardSdComponent } from './srp-dashboard-sd/srp-dashboard-sd.component';
-import { SrpStatusReportComponent } from './srp-status-report/srp-status-report.component';
-// import { AddZsrmFormComponent } from './indenters/add-zsrm-form/add-zsrm-form.component';
+import { SelfSurplusLiftingComponent } from './self-surplus-lifting/self-surplus-lifting.component';
+import { InspectionReportBspcvComponent } from './inspection-report-bspcv/inspection-report-bspcv.component';
+import { Bspc5TestResultReportComponent } from './bspc5-test-result-report/bspc5-test-result-report.component';
+import { DirectLiftingComponent } from './direct-lifting/direct-lifting.component';
+import { IntakeVerificationRegReportComponent } from './reports/intake-verification-reg-report/intake-verification-reg-report.component';
+import { DiscardLotComponent } from './discard-lot/discard-lot.component';
+import { OilsedLoginModuleComponent } from './oilsed-login-module/oilsed-login-module.component';
+import { NationalSelfLiftingComponent } from './national-self-lifting/national-self-lifting.component';
+import { ModifyBagSizeComponent } from './production-center-phase-2/modify-bag-size/modify-bag-size.component';
+import { DashboardPhaseSecondComponent } from './dashboard-phase-second/dashboard-phase-second.component';
+import { DashboardComponent } from "../dashboard/dashboard.component";
 // import { GenerateCardQrComponent } from '../generate-card-qr/generate-card-qr.component';
 // import { BillReceiptQrComponent } from '../bill-receipt-qr/bill-receipt-qr.component';
 // import { BreederSeedCertificateQrComponent } from '../breeder-seed-certificate-qr/breeder-seed-certificate-qr.component';
 
 // import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 // import { UnfreezeIndentComponent } from './unfreeze-indent/unfreeze-indent.component';
+import { CropGroupDetailComponent } from './crop-group-detail/crop-group-detail.component';
+import { StateWiseCropStatisticsComponent } from './state-wise-crop-statistics/state-wise-crop-statistics.component';
+import { CropWiseStatisticsComponent } from './crop-wise-statistics/crop-wise-statistics.component';
+import { ReportDashboardComponent } from './report-dashboard/report-dashboard.component';
+import { VarietyReportListComponent } from './variety-report-list/variety-report-list.component';
+import { SelfSurplusIndentComponent } from './self-surplus-indent/self-surplus-indent.component';
+import { PulsesseedLoginModuleComponent } from './pulsesseed-login-module/pulsesseed-login-module.component';
+import { VarietyReportListViewComponent } from './variety-report-list-view/variety-report-list-view.component';
+// import { SeedTestingLabReportComponent } from './seed-testing-lab-report/seed-testing-lab-report.component';
+import { SeedReport1Component } from './seed-report1/seed-report1.component';
+import { SeedReport2Component } from './seed-report2/seed-report2.component';
+import { ProfarmaOneQrComponent } from './profarma-one-qr/profarma-one-qr.component';
+import { SeedRollingPlaningCropWiseComponent } from './seed-rolling-planing/indentor-login/seed-rolling-planing-crop-wise/seed-rolling-planing-crop-wise.component';
+import { SeedRollingPlaningVarietyWiseComponent } from './seed-rolling-planing/indentor-login/seed-rolling-planing-variety-wise/seed-rolling-planing-variety-wise.component';
+import { StateLoginReplanningComponent } from './state-login-replanning/state-login-replanning.component';
+
+
 
 @NgModule({
   declarations: [
+    VarietyReportListViewComponent,
     MenuUiComponent,
     MainAppComponent,
     HeaderComponent,
@@ -368,7 +380,7 @@ import { SrpStatusReportComponent } from './srp-status-report/srp-status-report.
     NewReportComponent,
     AddFreezeTimelineComponent,
     AddPlantComponent,
-    AddPlantListComponent, 
+    AddPlantListComponent,
     BillGenerateFormComponent,
     BillGenerateListComponent,
     SelectionOfSpaForSubmissionIndentComponent,
@@ -448,33 +460,38 @@ import { SrpStatusReportComponent } from './srp-status-report/srp-status-report.
     GInvoiceTestComponent,
     ChatSupportComponent,
     GrowOutTestSampleReceptionComponent,
-    SowingDetailsComponent, 
+    SowingDetailsComponent,
     BspTwoSecondtComponent,
     BspIiStatusReportComponent,
     BspIIIStatusReportComponent,
-    InabilityReallocateFormComponent, 
+    InabilityReallocateFormComponent,
     BspIStatusReportComponent,
     GotMonitoringTeamDetailsComponent,
     GrowOutTestReportBspvComponent,
     CropStatusReportComponent,
-    ZsrmComponent,
-    ZsrmCsFsAreaComponent,
-    SrrComponent,
-    ZsrmCsQsDistributionComponent,
-    ZsrmReqQsComponent,
-    VarietyWiseDistCsQsComponent,
-    StateVarietyWiseCsqsDistReportComponent,
-    CropWiseCsqsDistReportComponent,
-    SrpIndenterCropWiseReportComponent,
-    SrpIndenterCropWiseSummaryReportComponent,
-    SrpIndenterMasterReportComponent,
-    CropWiseSrpSdReportComponent,
-    CropWiseSummarySrpSdReportComponent,
-    CropVarietyWiseSrpSdReportComponent,
-    SrpDashboardSdComponent,
-    SrpStatusReportComponent,
-    // AddZsrmFormComponent
-  
+    SelfSurplusLiftingComponent,
+    InspectionReportBspcvComponent,
+    Bspc5TestResultReportComponent,
+    DirectLiftingComponent,
+    IntakeVerificationRegReportComponent,
+    DiscardLotComponent,
+    OilsedLoginModuleComponent,
+    NationalSelfLiftingComponent,
+    ModifyBagSizeComponent,
+    CropGroupDetailComponent,
+    StateWiseCropStatisticsComponent,
+    CropWiseStatisticsComponent,
+    ReportDashboardComponent,
+    VarietyReportListComponent,
+    SelfSurplusIndentComponent,
+    PulsesseedLoginModuleComponent,
+    VarietyReportListViewComponent,
+    SeedReport1Component,
+    SeedReport2Component,
+    ProfarmaOneQrComponent,
+    SeedRollingPlaningCropWiseComponent,
+    SeedRollingPlaningVarietyWiseComponent,
+    StateLoginReplanningComponent
     // GenerateCardQrComponent
     // UnfreezeIndentComponent
     // IndenterReportComponent,
@@ -493,8 +510,8 @@ import { SrpStatusReportComponent } from './srp-status-report/srp-status-report.
     MainAppRoutingModule,
     // MatRadioModule,
     MatTableModule,
-    NgMultiSelectDropDownModule,  
-    QRCodeModule,   
+    NgMultiSelectDropDownModule,
+    QRCodeModule,
     BsDropdownModule.forRoot(),
     NgMultiSelectDropDownModule.forRoot(),
     ModalModule.forRoot(),
@@ -507,16 +524,16 @@ import { SrpStatusReportComponent } from './srp-status-report/srp-status-report.
     MatFormFieldModule,
     MatNativeDateModule,
     NgxBarcodeModule,
-    // NgxDaterangepickerMd
-    
+    DashboardComponent,
+    DashboardPhaseSecondComponent,
   ],
-  providers: [HttpClientModule, IcarService, DatePipe, SumPipeModule ],
-  exports: [DynamicFieldsComponent, PaginationUiComponent, SidebarComponent,BspTwoSecondtComponent,
-    HeaderComponent, SumPipeModule,AngularMyDatePickerModule,BspThirdComponent,
-    FooterComponent,SidebarIconComponent,MenuIconUiComponent, 
+  providers: [HttpClientModule, IcarService, DatePipe, SumPipeModule],
+  exports: [DynamicFieldsComponent, PaginationUiComponent, SidebarComponent, BspTwoSecondtComponent,
+    HeaderComponent, SumPipeModule, AngularMyDatePickerModule, BspThirdComponent,
+    FooterComponent, SidebarIconComponent, MenuIconUiComponent,
     // GenerateCardQrComponent
     // GenerateCardQrComponent
-    
+
   ],
 
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

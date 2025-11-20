@@ -101,13 +101,13 @@ export class HarvestingIntakeRegisterComponent implements OnInit {
       plot: ['', [Validators.required]],
       parental_line: [''],
       inspected_area: ['',],
-      estimated_production: ['',],
+      estimated_production: ['',[Validators.required]],
       tentative_harvest: ['',],
-      actual_harvest: ['',],
+      actual_harvest: ['',[Validators.required]],
       seed_produced: ['',],
-      bag_number: ['',],
-      bag_marka: ['',],
-      processing_plant: [''],
+      bag_number: ['',[Validators.required]],
+      bag_marka: ['',[Validators.required]],
+      processing_plant: ['',[Validators.required]],
       crop_text: [''],
       variety_text: [''],
       parental_line_text: [''],
@@ -407,6 +407,15 @@ export class HarvestingIntakeRegisterComponent implements OnInit {
   saveData(data: any) {
     this.submitted = true;
     if (this.ngForm.invalid) {
+      Swal.fire(
+        {
+          icon: 'warning',
+          title: 'Please Fill All Required Field',
+          showConfirmButton: true,
+          showCancelButton: false,
+          confirmButtonColor: '#B64B1D'
+        }
+      )
       return;
     }
     this.saveForm()

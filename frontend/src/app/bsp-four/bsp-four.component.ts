@@ -90,6 +90,8 @@ export class BspFourComponent implements OnInit {
   today = new Date();
   totalBreederAvailable: number;
   total_processed_qty_second_value: any;
+  is_potato: boolean = false;
+  colomtext: string;
   get generateDefaultMonth(): string {
     let date = { year: this.todayDate.getFullYear(), month: (this.todayDate.getMonth() + 1), day: this.todayDate.getDate() + 1 }
 
@@ -215,6 +217,12 @@ export class BspFourComponent implements OnInit {
     this.ngForm.controls['crop_text'].setValue('', { emitEvent: false })
     this.cropData = this.croplistSecond;
     this.ngForm.controls['crop'].setValue(item && item.crop_code ? item.crop_code : '')
+    if (this.ngForm.controls['crop'].value == "H1101") {
+      this.is_potato = false;
+      this.colomtext = "Estimated"
+    } else {
+      this.is_potato = true;
+    }
   }
   cClick() {
     document.getElementById('crop').click()
@@ -235,6 +243,16 @@ export class BspFourComponent implements OnInit {
       line_variety_name: [],
       line_variety_code: [''],
       breeder_seed_produced: [],
+      bsp2_qty: [],
+      bsp2_per_qty: [Validators.min(1),
+      Validators.max(100),],
+      bsp3_qty: [],
+      bsp3_per_qty: [Validators.min(1),
+      Validators.max(100),],
+      intake_vrfictn_qty: [],
+      intake_vrfictn__pr_qty: [Validators.min(1),
+      Validators.max(100),],
+      check_letest: [],
       total_nation_qty: [],
       total_direct_qty: [],
       allocate_qty: [''],
@@ -308,7 +326,7 @@ export class BspFourComponent implements OnInit {
     this.productionService.postRequestCreator('get-total-qty-of-bsp-four', param).subscribe(data => {
       if (data && data.EncryptedResponse && data.EncryptedResponse.status_code && data.EncryptedResponse.status_code == 200) {
         let response = data && data.EncryptedResponse && data.EncryptedResponse.data ? data.EncryptedResponse.data : 0;
-        this.totalVarities = response && response.counRegister ? response.counRegister : '';
+        // this.totalVarities = response && response.counRegister ? response.counRegister : '';
         this.totalQuanitynational = response && response.bspPerformaBspOne && response.bspPerformaBspOne[0] ? response.bspPerformaBspOne[0] : '';
         this.totalQuanitydirect = response && response.directIndent && response.directIndent[0] ? response.directIndent[0] : '';
         this.seedProcessingRegister = response && response.seedProcessingRegister && response.seedProcessingRegister[0] ? response.seedProcessingRegister[0] : '';
@@ -349,6 +367,8 @@ export class BspFourComponent implements OnInit {
           let generateSampleForwardingLetters2 = response && response.generateSampleForwardingLetters2 ? response.generateSampleForwardingLetters2 : '';
           let generateSampleForwardingLetters3 = response && response.generateSampleForwardingLetters3 ? response.generateSampleForwardingLetters3 : '';
           let generateSampleForwardingLetters4 = response && response.generateSampleForwardingLetters3 ? response.generateSampleForwardingLetters3 : '';
+          let finalArray = []
+
           if (seedProcess && seedProcess.length > 0) {
             if (seedProcessBreederSeedProuced && seedProcessBreederSeedProuced.length > 0) {
               const result = seedProcess.map(variety => {
@@ -529,8 +549,16 @@ export class BspFourComponent implements OnInit {
                 const saveAsDraft = quantityObj ? quantityObj.save_as_draft : 0;
                 const is_final_submit = quantityObj ? quantityObj.is_final_submit : 0;
                 const avialability_id = quantityObj ? quantityObj.avialability_id : 0;
-                return { ...variety, allocate_qty, saveAsDraft, is_final_submit, avialability_id };
+                const bsp2_qty = quantityObj ? quantityObj.bsp2_qty : 0;
+                const bsp2_per_qty = quantityObj ? quantityObj.bsp2_per_qty : 0;
+                const bsp3_qty = quantityObj ? quantityObj.bsp3_qty : 0;
+                const bsp3_per_qty = quantityObj ? quantityObj.bsp3_per_qty : 0;
+                const intake_vrfictn_qty = quantityObj ? quantityObj.intake_vrfictn_qty : 0;
+                const intake_vrfictn__pr_qty = quantityObj ? quantityObj.intake_vrfictn__pr_qty : 0;
+                const check_status = quantityObj ? quantityObj.check_status : 0;
+                return { ...variety, allocate_qty, saveAsDraft, is_final_submit, avialability_id, bsp2_qty, bsp2_per_qty, bsp3_qty, bsp3_per_qty, intake_vrfictn_qty, intake_vrfictn__pr_qty, check_status };
               });
+
               seedProcess = result
             }
           }
@@ -538,20 +566,47 @@ export class BspFourComponent implements OnInit {
             this.remove(0)
           }
           this.tableData = seedProcess;
-          if (this.tableData && this.tableData.length > 0) {
-            this.tableData.every(x => {
-              if (x.is_final_submit == 1) {
-                this.disableField = true;
-              } else {
-                this.disableField = false;
+          // if (this.tableData && this.tableData.length > 0) {
+          // this.tableData.forEach(x => {
+          //   if (x.is_final_submit == 1) {
+          //     this.disableField = false
+          //     return;
+          //   } else {
+          //     this.disableField = true
+          //   }
+          // })
+          this.disableField = this.tableData?.some(x => x.is_final_submit === 1) ?? false;
 
-              }
-            })
-          }
-          seedProcess.forEach((el) => {
-            this.bspc.push(this.bspcCreateForm())
+
+          // if (this.tableData?.length > 0) {
+          //   this.disableField = this.tableData.every(x => x.is_final_submit === 1);
+          // }
+          // if (this.tableData?.length > 0) {
+          //   this.disableField = !this.tableData.some(x => x.is_final_submit != 1);
+          // }
+          // this.tableData.(x => {
+          //   // console.log('is final submit 1',x)
+          //   // console.log('is final submit 2',x.is_final_submit)
+          //   if (x.is_final_submit != 1) {
+          //    this.disableField = false;
+          //   } else {
+          //       this.disableField = true;
+          //     return;
+          //   }
+          // })
+          // }
+          let varietyCount = 0;
+          // this.totalVarities = response && response.counRegister ? response.counRegister : '';
+          seedProcess.forEach((el, i) => {
+            if (el.target_quantity == 0) { }
+            else {
+              varietyCount += 1
+              this.bspc.push(this.bspcCreateForm())
+            }
+
           }
           )
+          this.totalVarities = varietyCount;
           let sum = 0
           let totalDirectindentQty = 0;
           let nationalQty = 0;
@@ -559,7 +614,21 @@ export class BspFourComponent implements OnInit {
           let total_processed_qty = 0;
           console.log(seedProcess, 'seedProcess')
           let total_processed_qty_second = 0;
+          // let finalArray = [];
           seedProcess.forEach((el, i) => {
+            if (el.target_quantity == 0) {
+              // alert("Hiii");
+              delete finalArray[i]
+            } else {
+              finalArray.push(el)
+            }
+          });
+
+          finalArray.forEach((el, i) => {
+            console.log('el.target_quantity====', el.target_quantity);
+            if (el.target_quantity == 0) {
+              seedProcess.splice(i, 1)
+            }
             el.total_processed_qty = el && el.total_processed_qty ? el.total_processed_qty : 0;
             el.recover_qty = el && el.recover_qty ? el.recover_qty : 0;
             el.total_processed_qty2 = el && el.total_processed_qty2 ? el.total_processed_qty2 : 0;
@@ -567,8 +636,18 @@ export class BspFourComponent implements OnInit {
             el.total_processed_qty_carry = el && el.total_processed_qty_carry ? el.total_processed_qty_carry : 0;
             el.total_processed_qty = el && el.total_processed_qty ? el.total_processed_qty : 0;
             el.total_processed_qty = el.total_processed_qty + el.total_processed_qty2 + el.recover_qty + el.total_processed_qty3
-            // if( el && el.total_processed_qty && el.recover_qty && el.total_processed_qty2 &&  el.total_processed_qty3){
-            // }
+
+            // new colomn add bsp2 , bsp3 ,intake verification  
+            // new code
+            this.ngForm.controls['bspc']['controls'][i].controls['bsp2_qty'].setValue(el && el.expected_production ? el.expected_production : null, { emitEvent: false })
+            this.ngForm.controls['bspc']['controls'][i].controls['bsp3_qty'].setValue(el && el.estimated_production ? el.estimated_production : null, { emitEvent: false })
+            this.ngForm.controls['bspc']['controls'][i].controls['intake_vrfictn_qty'].setValue(el && el.intake_qnt ? el.intake_qnt : null, { emitEvent: false })
+            this.ngForm.controls['bspc']['controls'][i].controls['check_letest'].setValue(el && el.letest ? el.letest : null, { emitEvent: false })
+            this.ngForm.controls['bspc']['controls'][i].controls['bsp2_per_qty'].setValue(100, { emitEvent: false })
+            this.ngForm.controls['bspc']['controls'][i].controls['bsp3_per_qty'].setValue(100, { emitEvent: false })
+            this.ngForm.controls['bspc']['controls'][i].controls['intake_vrfictn__pr_qty'].setValue(100, { emitEvent: false })
+
+
             if (this.ngForm.controls['bspc']['controls'][i].controls && this.ngForm.controls['bspc']['controls'][i].controls['variety_name']) {
               this.ngForm.controls['bspc']['controls'][i].controls['variety_name'].setValue(el && el.variety_name ? el.variety_name : '', { emitEvent: false });
             }
@@ -591,14 +670,34 @@ export class BspFourComponent implements OnInit {
 
             total_processed_qty_second += this.ngForm.controls['bspc']['controls'][i].controls['breeder_seed_produced'].value
             this.total_processed_qty_second_value = total_processed_qty_second;
-            // else if(el && el.recover_qty){
-            //   this.ngForm.controls['bspc']['controls'][i].controls['breeder_seed_produced'].setValue(el && el.recover_qty ? el.recover_qty : 0, { emitEvent: false }); 
-            // }else if(el.total_processed_qty3){
-            //   this.ngForm.controls['bspc']['controls'][i].controls['breeder_seed_produced'].setValue(el && el.total_processed_qty3 ? el.total_processed_qty3 : 0, { emitEvent: false });
-            // }
-            // else if(el.total_processed_qty2){
-            //   this.ngForm.controls['bspc']['controls'][i].controls['breeder_seed_produced'].setValue(el && el.total_processed_qty2 ? el.total_processed_qty2 : 0, { emitEvent: false });
-            // }
+
+            if (el && el.bsp2_qty) {
+              this.ngForm.controls['bspc']['controls'][i].controls['bsp2_qty'].setValue(el && el.bsp2_qty ? el.bsp2_qty : null, { emitEvent: false })
+            }
+            if (el && el.bsp2_per_qty) {
+              this.ngForm.controls['bspc']['controls'][i].controls['bsp2_per_qty'].setValue(el && el.bsp2_per_qty ? el.bsp2_per_qty : null, { emitEvent: false })
+              this.changePercentage1(el.bsp2_per_qty, i, el.bsp2_qty);
+            }
+            if (el && el.bsp3_qty) {
+              this.ngForm.controls['bspc']['controls'][i].controls['bsp3_qty'].setValue(el && el.bsp3_qty ? el.bsp3_qty : null, { emitEvent: false })
+            }
+            if (el && el.bsp3_per_qty) {
+              this.ngForm.controls['bspc']['controls'][i].controls['bsp3_per_qty'].setValue(el && el.bsp3_per_qty ? el.bsp3_per_qty : null, { emitEvent: false })
+              this.changePercentage1(el.bsp3_per_qty, i, el.bsp3_qty);
+            }
+            if (el && el.intake_vrfictn_qty) {
+              this.ngForm.controls['bspc']['controls'][i].controls['intake_vrfictn_qty'].setValue(el && el.intake_vrfictn_qty ? el.intake_vrfictn_qty : null, { emitEvent: false })
+            }
+            if (el && el.intake_vrfictn__pr_qty) {
+              this.ngForm.controls['bspc']['controls'][i].controls['intake_vrfictn__pr_qty'].setValue(el && el.intake_vrfictn__pr_qty ? el.intake_vrfictn__pr_qty : null, { emitEvent: false })
+              this.changePercentage1(el.intake_vrfictn__pr_qty, i, el.intake_vrfictn_qty);
+            }
+            console.log('el.check_status==', el.check_status);
+            if (el && el.check_status) {
+              this.ngForm.controls['bspc']['controls'][i].controls['check_letest'].setValue(el && el.check_status ? el.check_status : null, { emitEvent: false })
+              this.changePercentage1(el.intake_vrfictn__pr_qty, i, el.intake_vrfictn_qty);
+            }
+
             sum += el && el.total_processed_qty_carry ? (el.total_processed_qty_carry) : 0;
 
             this.totalCarryOver = sum;
@@ -611,13 +710,6 @@ export class BspFourComponent implements OnInit {
             }
             let sums = el.total_processed_qty + el.total_processed_qty2 + el.recover_qty + el.total_processed_qty3;
             total_processed_qty += el.total_processed_qty + el.total_processed_qty2 + el.total_processed_qty3 + el.total_processed_qty_carry;
-            console.log('sumssums', total_processed_qty)
-            // el.recover_qty +
-            // if (el && el.total_processed_qty &&  el.recover_qty) {
-            // }else{
-            //   total_processed_qty += el && el.total_processed_qty ? (el.total_processed_qty) :  el && el.recover_qty ? el.recover_qty:0;
-            // }
-            console.log('el.allocate_qty=====',el.allocate_qty);
             this.nationalQty = nationalQty;
             if (this.ngForm.controls['bspc']['controls'][i].controls['breeder_seed_produced'].value && this.ngForm.controls['bspc']['controls'][i].controls['total_carry_over_qty'].value) {
               totalBreederAvailable += ((this.ngForm.controls['bspc']['controls'][i].controls['breeder_seed_produced'].value) + (this.ngForm.controls['bspc']['controls'][i].controls['total_carry_over_qty'].value))
@@ -630,9 +722,9 @@ export class BspFourComponent implements OnInit {
               this.ngForm.controls['bspc']['controls'][i].controls['total_carry_over_qty'].setValue(el && el.total_processed_qty_carry ? (el.total_processed_qty_carry + el.recover_qty) : '', { emitEvent: false })
             }
             if (this.ngForm.controls['bspc']['controls'][i].controls && this.ngForm.controls['bspc']['controls'][i].controls['allocate_qty']) {
-              if(el.allocate_qty==0){
+              if (el.allocate_qty == 0) {
                 this.ngForm.controls['bspc']['controls'][i].controls['allocate_qty'].setValue(el && el.allocate_qty ? el.allocate_qty : '0', { emitEvent: false })
-              }else{
+              } else {
                 this.ngForm.controls['bspc']['controls'][i].controls['allocate_qty'].setValue(el && el.allocate_qty ? el.allocate_qty : '', { emitEvent: false })
               }
             }
@@ -664,8 +756,8 @@ export class BspFourComponent implements OnInit {
     let allocationAllocateErr = false;
     if (bspc && bspc.length > 0) {
       bspc.forEach((el) => {
-        if (el.allocate_qty == null || el.allocate_qty == '' || el.allocate_qty == undefined){
-          allocationAllocateErr=true;
+        if (el.allocate_qty == null || el.allocate_qty == '' || el.allocate_qty == undefined) {
+          allocationAllocateErr = true;
         }
         el.total_breeder_seed_available_over_qty = el && el.total_breeder_seed_available_over_qty ? el.total_breeder_seed_available_over_qty : 0;
         if (parseFloat(el.allocate_qty) > parseFloat((el && el.breeder_seed_produced ? el.breeder_seed_produced : 0) + (el && el.total_carry_over_qty ? el.total_carry_over_qty : 0))) {
@@ -1001,6 +1093,39 @@ export class BspFourComponent implements OnInit {
         // this.ngForm.controls
         this.ngForm.controls['bspc']['controls'][i].controls['allocate_qty'].setValue('', { emitEvent: false });
       })
+    }
+  }
+  changePercentage(event, i, value) {
+    let final_ammount = value * (event.target.value / 100);
+    if (final_ammount) {
+      this.ngForm.controls['bspc']['controls'][i].controls['breeder_seed_produced'].setValue(final_ammount)
+    }
+  }
+  changePercentage1(event, i, value) {
+    let final_ammount = value * (event / 100);
+    console.log('final_ammount=======', final_ammount);
+    if (final_ammount) {
+      this.ngForm.controls['bspc']['controls'][i].controls['breeder_seed_produced'].setValue(final_ammount)
+    }
+  }
+
+  validatePercentage(index: number) {
+    const control = this.ngForm.controls['bspc']['controls'][index].controls['bsp3_per_qty'];
+    if (control.value > 100) {
+      control.setValue(100);
+    }
+  }
+  validatePercentage1(index: number) {
+    const control = this.ngForm.controls['bspc']['controls'][index].controls['intake_vrfictn__pr_qty'];
+    if (control.value > 100) {
+      control.setValue(100);
+    }
+  }
+
+  validatePercentage2(index: number) {
+    const control = this.ngForm.controls['bspc']['controls'][index].controls['bsp2_per_qty'];
+    if (control.value > 100) {
+      control.setValue(100);
     }
   }
 

@@ -56,7 +56,7 @@ export class SelectionOfSpaForSubmissionIndentComponent implements OnInit {
     { 'name': 'NDDB', 'state_code': 209 },
     { 'name': 'NFL', 'state_code': 210 },
     { 'name': 'NHRDF', 'state_code': 211 },
-    { 'name': 'SOPA', 'state_code': 212 },
+    { 'name': 'SOPA PRIVATE', 'state_code': 212 },
     { 'name': 'NSAI', 'state_code': 213 },
     { 'name': 'PRIVATE', 'state_code': 213 },
     { 'name': 'Private Company', 'state_code': 213 },
@@ -65,7 +65,7 @@ export class SelectionOfSpaForSubmissionIndentComponent implements OnInit {
   ];
   stateList2: any[]
 
-  sectorsList = ['NSC', 'DADF', 'HIL', 'IFFDC', 'IFFCO', 'KRIBHCO', 'KVSSL', 'NAFED', 'NDDB', 'NFL', 'NHRDF', 'BBSSL', 'SOPA', 'NSAI', 'PRIVATE', 'Private Company']
+  sectorsList = ['NSC', 'DADF', 'HIL', 'IFFDC', 'IFFCO', 'KRIBHCO', 'KVSSL', 'NAFED', 'NDDB', 'NFL', 'NHRDF', 'BBSSL', 'SOPA PRIVATE', 'NSAI', 'PRIVATE', 'Private Company']
   sectorName: any;
   addEnabledBtn: boolean = false;
   state_code: any;

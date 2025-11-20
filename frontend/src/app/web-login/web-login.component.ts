@@ -8,6 +8,8 @@ import { CommonService } from "../services/common.service";
 import Swal from "sweetalert2";
 import { SeedServiceService } from '../services/seed-service.service';
 import { HttpClient } from '@angular/common/http';
+import { JsPrintManagerService } from '../jsprintmanager.service';
+import { LabelData } from '../label-data.model';  // Import the LabelData model
 
 @Component({
   selector: 'app-web-login',
@@ -38,6 +40,64 @@ export class WebLoginComponent implements OnInit {
   }
   sectorData: any = [85,99,201, 202, 203, 204, 205, 206, 207, 208209, 210, 211, 212, 213, 213]
 
+  labelData: LabelData[] = [{
+    companyName: 'SARDAR VALLABH BHAI PATEL SEED PRODUCTION CENTER',
+    location: 'AMRITSAR, PUNJAB',
+    seedClass: 'Breeder Seed',
+    qrCodeUrl: 'https://example.com/qrcode',
+    crop: 'MAIZE (MAKKA)',
+    testDate: '00:00:00',
+    variety: 'SSM-510',
+    pureSeedPercentage: 'NA',
+    parentalLine: 'NA',
+    inertSeedPercentage: 'NA',
+    germinationPercentage: 'NA',
+    lotNumber: 'OCT24-0052-017-1(1)',
+    tagNumber: 'B/24/0052/000012',
+    bagWeight: '50',
+    executiveDirector: 'Executive Director',
+    directorName: 'Rakesh Awasthi',
+    footer: 'This tag is system generated and does not require any signature.'
+  },
+  {
+    companyName: 'SARDAR VALLABH BHAI PATEL SEED PRODUCTION CENTER 2',
+    location: 'AMRITSAR, PUNJAB',
+    seedClass: 'Breeder Seed',
+    qrCodeUrl: 'https://example.com/qrcode',
+    crop: 'MAIZE (MAKKA)',
+    testDate: '00:00:00',
+    variety: 'SSM-510',
+    pureSeedPercentage: 'NA',
+    parentalLine: 'NA',
+    inertSeedPercentage: 'NA',
+    germinationPercentage: 'NA',
+    lotNumber: 'OCT24-0052-017-1(1)',
+    tagNumber: 'B/24/0052/000012',
+    bagWeight: '50',
+    executiveDirector: 'Executive Director',
+    directorName: 'Rakesh Awasthi',
+    footer: 'This tag is system generated and does not require any signature.'
+  },
+  {
+    companyName: 'SARDAR VALLABH BHAI PATEL SEED PRODUCTION CENTER 3',
+    location: 'AMRITSAR, PUNJAB',
+    seedClass: 'Breeder Seed',
+    qrCodeUrl: 'https://example.com/qrcode',
+    crop: 'MAIZE (MAKKA)',
+    testDate: '00:00:00',
+    variety: 'SSM-510',
+    pureSeedPercentage: 'NA',
+    parentalLine: 'NA',
+    inertSeedPercentage: 'NA',
+    germinationPercentage: 'NA',
+    lotNumber: 'OCT24-0052-017-1(1)',
+    tagNumber: 'B/24/0052/000012',
+    bagWeight: '50',
+    executiveDirector: 'Executive Director',
+    directorName: 'Rakesh Awasthi',
+    footer: 'This tag is system generated and does not require any signature.'
+  }];
+
   constructor(
     private formBuilder: FormBuilder,
     private route: ActivatedRoute,
@@ -48,7 +108,13 @@ export class WebLoginComponent implements OnInit {
     private service: SeedServiceService,
     private mastersService: MasterService,
     private http: HttpClient,
+    private jsPrintManagerService: JsPrintManagerService
   ) { }
+
+
+  onPrint(): void {
+    this.jsPrintManagerService.printLabels(this.labelData); // Pass the dynamic label data to print
+  }
 
   getIPAddress() {
     this.http.get("https://api.ipify.org/?format=json").subscribe((res: any) => {
@@ -98,6 +164,8 @@ export class WebLoginComponent implements OnInit {
     // }
 
     this.getStateList();
+    this.jsPrintManagerService.start(); // Start the JSPM connection
+
   }
 
   // convenience getter for easy access to form fields
@@ -159,6 +227,7 @@ export class WebLoginComponent implements OnInit {
         },
         error => this.handleError(error)
       );
+
   }
 
   handleError(errorData) {

@@ -38,9 +38,9 @@
                                     <div class="col-md-4 col-sm-4 col-md-4 col-lg-4 pl-1 pr-1">
                                         <div class="col-12 px-0 ">
                                             <label for="Crop Group" class="search_text">Notification No.</label>
-                                        </div>               
-                                        <input type="text" class="form-control form-input" formControlName="not_number"  
-                                        placeholder="Enter Notification No.">
+                                        </div>
+                                        <input type="text" class="form-control form-input" formControlName="not_number"
+                                            placeholder="Enter Notification No.">
                                         <div class="not_number errorMessage " *ngIf="
                                             ngForm.controls['not_number'].invalid &&
                                             (ngForm.controls['not_number'].dirty ||
@@ -50,7 +50,7 @@
                                                 Notification No. Should Be More Than 2 Character <br>
                                             </span>
                                         </div>
-                                                                        
+
                                     </div>
                                     <div class="col-md-4 col-sm-4 col-md-4 col-lg-4">
                                         <div class="col-12 px-0 ">
@@ -166,7 +166,7 @@
                                                 <button class="dropdown-item" *ngFor="let data of cropNameList"
                                                     (click)="cropNames(data)" #dropdownItem
                                                     [attr.data-parent-name]="'crop_name'">
-                                                    {{data  && data.crop_name ?
+                                                    {{data && data.crop_name ?
                                                     data.crop_name
                                                     :""}}
                                                     <!-- <input type="hidden" formControlName="crop_code"> -->
@@ -247,17 +247,21 @@
                                     </div>
 
                                 </div>
-                                
+
                                 <div _ngcontent-cvx-c131="" class="col-12 mt-0 pl-1 search-cancle-button buttons-phone">
-                                    <button class="form-button search ml-0 d-inline-flex justify-content-center verticle-content-middle mb-3 mx-0" (click)="search()">
+                                    <button
+                                        class="form-button search ml-0 d-inline-flex justify-content-center verticle-content-middle mb-3 mx-0"
+                                        (click)="search()">
                                         Search
                                     </button>
-                                    <button class="clear-form-button ml-3 d-inline-flex justify-content-center verticle-content-middle mb-3 mx-0"(click)="clear()">
+                                    <button
+                                        class="clear-form-button ml-3 d-inline-flex justify-content-center verticle-content-middle mb-3 mx-0"
+                                        (click)="clear()">
                                         Clear
                                     </button>
-                                                                        
+
                                 </div>
-                                
+
                             </div>
 
                         </div>
@@ -298,60 +302,62 @@
                             <th scope="col" class="col-md-2 py-3">Status</th>
                         </tr>
                     </thead>
-                    <tbody >
+                    <tbody>
                         <tr *ngFor="let data of exportdata; let dataIndex=index">
                             <td>{{ dataIndex + 1}}</td>
                             <td>
                                 <span style="cursor: pointer; word-break: break-word;"
-                                title="{{data && data.m_crop && data.m_crop.m_crop_group && data.m_crop.m_crop_group.group_name ? data.m_crop.m_crop_group.group_name :'NA'}}">{{(data
-                                && data.m_crop && data.m_crop.m_crop_group &&
-                                (data.m_crop.m_crop_group.group_name.length > 30) ?
-                                ((data.m_crop.m_crop_group.group_name.substring(0, 30)|uppercase)
-                                +
-                                "..."):(data.m_crop? data.m_crop.m_crop_group.group_name :"NA"))}}</span>
+                                    title="{{data && data.m_crop && data.m_crop.m_crop_group && data.m_crop.m_crop_group.group_name ? data.m_crop.m_crop_group.group_name :'NA'}}">{{(data
+                                    && data.m_crop && data.m_crop.m_crop_group &&
+                                    (data.m_crop.m_crop_group.group_name.length > 30) ?
+                                    ((data.m_crop.m_crop_group.group_name.substring(0, 30)|uppercase)
+                                    +
+                                    "..."):(data.m_crop? data.m_crop.m_crop_group.group_name :"NA"))}}</span>
                             </td>
                             <td>
                                 <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                data-placement="bottom" title="{{data.m_crop_group?data.m_crop_group.group_name:''}}">{{(data &&
-                                data.m_crop &&
-                                (data.m_crop.crop_name.length > 30) ? ((data.m_crop.crop_name.substring(0,
-                                30)|uppercase) +
-                                "..."):(data.m_crop? (data.m_crop.crop_name|uppercase) :"NA"))}}</span>
+                                    data-placement="bottom"
+                                    title="{{data.m_crop_group?data.m_crop_group.group_name:''}}">{{(data &&
+                                    data.m_crop &&
+                                    (data.m_crop.crop_name.length > 30) ? ((data.m_crop.crop_name.substring(0,
+                                    30)|uppercase) +
+                                    "..."):(data.m_crop? (data.m_crop.crop_name|uppercase) :"NA"))}}</span>
                             </td>
-                             <td>
+                            <td>
                                 <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                        
-                                data-placement="bottom" title="{{data.variety_name}}">{{(data &&
-                                data.variety_name &&
-                                (data.variety_name.length > 30) ? (data.variety_name.substring(0, 30) +
-                                "..."):(data.variety_name? data.variety_name:"NA"))}}</span>
+                                    data-placement="bottom" title="{{data.variety_name}}">{{(data &&
+                                    data.variety_name &&
+                                    (data.variety_name.length > 30) ? (data.variety_name.substring(0, 30) +
+                                    "..."):(data.variety_name? data.variety_name:"NA"))}}</span>
                             </td>
                             <td>
                                 <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
                                     data-placement="bottom" title="{{data.type}}">{{(data &&
-                                data.type &&
-                                (data.type.length > 30) ? (data.type.substring(0, 30) +
-                                "..."):(data.type? data.type:"NA"))}}</span>
+                                    data.type &&
+                                    (data.type.length > 30) ? (data.type.substring(0, 30) +
+                                    "..."):(data.type? data.type:"NA"))}}</span>
                             </td>
                             <td>NA</td>
                             <td>
                                 <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                data-placement="bottom" title="{{data && data.not_number ? data.not_number :'NA'}}">{{data &&
-                                data.not_number ? data.not_number:'NA'
-                                }}</span>
+                                    data-placement="bottom"
+                                    title="{{data && data.not_number ? data.not_number :'NA'}}">{{data &&
+                                    data.not_number ? data.not_number:'NA'
+                                    }}</span>
                             </td>
                             <td>
                                 <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                data-placement="bottom"  title="{{data && data.meeting_number ? data.meeting_number :'NA'}}">{{data &&
-                                data.meeting_number ? data.meeting_number:'NA'}}</span>
+                                    data-placement="bottom"
+                                    title="{{data && data.meeting_number ? data.meeting_number :'NA'}}">{{data &&
+                                    data.meeting_number ? data.meeting_number:'NA'}}</span>
                             </td>
                             <td>
                                 {{data &&
                                 (data.is_active==1)?'ACTIVE':'INACTIVE'}}
                             </td>
-                           
-                            
-        
+
+
+
                         </tr>
                     </tbody>
                 </table>
@@ -368,11 +374,16 @@
                             <div class="col-6 col-md-1  py-3 d-flex verticle-content-middle" style="padding-left:0px">
                                 Crop Name</div>
                             <div class="col-6 col-md-1  py-3 d-flex verticle-content-middle" style="padding-left:0px">
-                                Variety Name <img *ngIf="asc_icon" class="sort_icon" (click)="short_data('ASC')" src="assets/icons/sort-down.png"> <img *ngIf="desc_icon" class="sort_icon" (click)="short_data('DESC')" src="assets/icons/sort-up.png"></div>
+                                Variety Name <img *ngIf="asc_icon" class="sort_icon" (click)="short_data('ASC')"
+                                    src="assets/icons/sort-down.png"> <img *ngIf="desc_icon" class="sort_icon"
+                                    (click)="short_data('DESC')" src="assets/icons/sort-up.png"></div>
                             <div class="col-6 col-md-1  py-3 d-flex verticle-content-middle" style="padding-left:0px">
                                 Type</div>
                             <div class="col-6 col-md-1  py-3 d-flex verticle-content-middle" style="padding-left:0px">
-                                Notification Date <img *ngIf="not_asc_icon" class="sort_icon" (click)="not_short_data('ASC')" src="assets/icons/sort-down.png"> <img *ngIf="not_desc_icon" class="sort_icon" (click)="not_short_data('DESC')" src="assets/icons/sort-up.png"></div>
+                                Notification Date <img *ngIf="not_asc_icon" class="sort_icon"
+                                    (click)="not_short_data('ASC')" src="assets/icons/sort-down.png"> <img
+                                    *ngIf="not_desc_icon" class="sort_icon" (click)="not_short_data('DESC')"
+                                    src="assets/icons/sort-up.png"></div>
                             <div class="col-6 col-md-1  py-3 d-flex verticle-content-middle" style="padding-left:0px">
                                 Notification No.</div>
                             <div class="col-6 col-md-1  py-3 d-flex verticle-content-middle" style="padding-left:0px">
@@ -380,15 +391,16 @@
                             <!-- <div class="col-6 col-md-2 py- d-flex verticle-content-middle">Variety Code</div> -->
                             <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle" style="padding-left:0px">
                                 Status</div>
-                                <div class="col-6 col-md-1  py-3 d-flex verticle-content-middle" style="padding-left:0px">
-                            Pin</div>
+                            <div class="col-6 col-md-1  py-3 d-flex verticle-content-middle" style="padding-left:0px">
+                                Pin</div>
                             <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle justify-content-center">
                                 Action
                             </div>
                         </div>
                         <div class="row data-row " [hidden]="countData==0"
-                            *ngFor="let data of filterPaginateSearch.itemList; let dataIndex=index" [ngStyle]="{'background-color': data.is_status_active == 1 ? 'rgb(255 164 164 / 52%)' : ''}">
-                               
+                            *ngFor="let data of filterPaginateSearch.itemList; let dataIndex=index"
+                            [ngStyle]="{'background-color': data.is_status_active == 1 ? 'rgb(255 164 164 / 52%)' : ''}">
+
                             <div class="col-6 col-md-1 py-1 d-flex verticle-content-middle customize-width">
                                 <div class="w-fit-content">
                                     <label class="d-md-none" class="d-md-none"><b>S/N:</b>&nbsp;</label>
@@ -455,22 +467,22 @@
                                 <div class="w-fit-content">
                                     <label class="d-md-none"><b>Notification Date:</b>&nbsp;</label>
                                     <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                        data-placement="bottom"
-                                        >
+                                        data-placement="bottom">
                                         <!-- title="{{data
                                             && data.not_date && ((data.not_date == '00:00.0') ? 'NA':(data.not_date
                                             !='00:00.0' || (data.not_date !='') ||(data.not_date !='null') ? (data.not_date |
                                             date:'dd-MM-yyyy') :'NA' ))}}" -->
                                         {{data
                                         && data.not_date && ((data.not_date == '00:00.0') ? 'NA':(data.not_date
-                                        !='00:00.0' || (data.not_date !='') ||(data.not_date !='null') ? (data.not_date |
+                                        !='00:00.0' || (data.not_date !='') ||(data.not_date !='null') ? (data.not_date
+                                        |
                                         date:'dd-MM-yyyy') :'NA' ))}}
                                     </span>
                                     <!-- || (data.not_date !='' -->
-                                        <!-- title="{{data && ((data.not_date == '00:00.0') ? 'NA':(data.not_date !='00:00.0' ? (data.not_date | date:'dd-MM-yyyy') :'NA' )) }}" -->
+                                    <!-- title="{{data && ((data.not_date == '00:00.0') ? 'NA':(data.not_date !='00:00.0' ? (data.not_date | date:'dd-MM-yyyy') :'NA' )) }}" -->
                                     <!-- not_number -->
                                     <!-- | date: 'dd-MM-yyyy' -->
-<!-- {{data
+                                    <!-- {{data
                                         && data.not_date && ((data.not_date == '00:00.0') ? 'NA':(data.not_date
                                         !='00:00.0' || (data.not_date !='') ||(data.not_date !=null) ? (data.not_date |
                                         date:'dd-MM-yyyy') :'NA' ))}} -->
@@ -523,9 +535,9 @@
                                 </div>
                             </div>
 
-                            <div class="col-6 col-md-1 py-1 d-flex verticle-content-middle" style="padding-left:0px">                                    
+                            <div class="col-6 col-md-1 py-1 d-flex verticle-content-middle" style="padding-left:0px">
                                 <input type="checkbox" id="togle{{data.id}}" (change)="changeStatus(data)"
-                                [checked]="data.is_status_active" />
+                                    [checked]="data.is_status_active" />
                             </div>
                             <div
                                 class="col-12 col-md-1 py-1 d-flex verticle-content-middle justify-content-md-center phone_view_btn">
@@ -533,25 +545,26 @@
                                     style="padding-right:20px">
                                     <button class="list-action-buttons" style="cursor: pointer;">
                                         <a target="_blank"
-                                            [routerLink]="['/add-crop-notified-characterstics/view', (data && data.m_variety_characteristic && data.m_variety_characteristic.id ? data.m_variety_characteristic.id:null)]">
+                                            [routerLink]="['/add-crop-notified-characterstics/view', (data && data.variety_code ? data.variety_code :null)]">
                                             <img src="assets/images/view.svg" title="Characterstic view"></a>
                                     </button>
                                     <button class="list-action-buttons" style="cursor: pointer;">
-                                    <a target="_blank" [routerLink]="['/add-crop-notified/view', data.id]">
-                                        <img src="assets/images/view.svg" title="variety view"></a>
+                                        <a target="_blank" [routerLink]="['/add-crop-notified/view', data.id]">
+                                            <img src="assets/images/view.svg" title="variety view"></a>
                                     </button>
                                     <button class="list-action-buttons" style="cursor: pointer;"
                                         *ngIf="data && data.m_crop && data.m_crop.is_active && data.m_crop.is_active==1 ">
                                         <a target="_blank" [routerLink]="['/add-crop-notified/edit/', data.id]">
-                                        <img src="assets/images/edit.svg"></a>
+                                            <img src="assets/images/edit.svg"></a>
                                     </button>
-                                    <button class="list-action-buttons" (click)="delete(data.id)"
-                                        style="cursor: pointer;">
+                                    <button class="list-action-buttons" [disabled]="userType === 'SUPERADMIN'"
+                                        [ngClass]="{'btn-disabled': userType !== 'SUPERADMIN','btn-active': userType === 'SUPERADMIN'}"
+                                        (click)="delete(data.id)" style="cursor: pointer;">
                                         <img src="assets/images/delete.svg">
                                     </button>
                                 </div>
                             </div>
-                     
+
                         </div>
                     </div>
                     <div *ngIf="filterPaginateSearch && filterPaginateSearch.initialized &&(!filterPaginateSearch.itemList || filterPaginateSearch.itemList.length < 1)"

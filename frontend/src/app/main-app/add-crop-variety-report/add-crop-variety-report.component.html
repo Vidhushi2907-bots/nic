@@ -82,12 +82,17 @@
                                 </div>
                                 <div class="col-12 pr-md-0 pl-md-2">
                                     <div ngbDropdown class="d-inline-block w-100">
-                                        <button class="btn takeplacholder w-100 crop toggle-button" id="crop_group"
+                                        <!-- <button class="btn takeplacholder w-100 crop toggle-button" id="crop_group"
                                             ngbDropdownToggle style="text-align: left;" aria-disabled="true">
                                             {{crop_groups && (crop_groups.length>30) ?
                                             (crop_groups.substring(0,30)+'...'):crop_groups?crop_groups :'Select Crop
                                             Group'}}
-                                        </button>
+                                        </button> -->
+                                        <button class="btn takeplacholder w-100 crop toggle-button" id="crop_group"
+    ngbDropdownToggle style="text-align: left;" aria-disabled="true">
+    {{ ngForm.controls['crop_group'].value ? getCropGroupName(ngForm.controls['crop_group'].value) : 'Select Crop Group' }}
+</button>
+
                                         <div class="dropdown-menu w-100" ngbDropdownMenu="crop_group"
                                             aria-labelledby="sortMenu">
 
@@ -97,6 +102,8 @@
                                                 value="{{data.crop_group_code}}" (click)="cropGroupData(data)"
                                                 #dropdownItem [attr.data-parent-name]="'cropGroup'">
                                                 {{data && data.group_name ? data.group_name :''}}
+                                                 <!-- {{ ngForm.controls['crop_name'].value ? ngForm.controls['crop_name'].value : 'Select Crop Name' }} -->
+
                                             </button>
                                         </div>
 

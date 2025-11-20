@@ -1,0 +1,447 @@
+<form [formGroup]="ngForm" class="pt-2">
+    <div class="main-inventory my-2 w-90 pt-2">
+        <span class="title-inventory pt-3">
+            Grow Out Test Result (BSP V(a))
+        </span>
+        <div class="col-12 pb-2 pt-2 pr-0">
+            <div class="row card-inventory form-group formargin">
+
+                <!-- Section 1 -->
+                <div class="col-12 col-md-10 pt-1 pl-4 formargin">
+                    <div class="row">
+
+                        <!-- Year of Indent -->
+                        <div class="col-xl-4">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="year" class="label-inventory required">Year of Indent</label>
+                                </div>
+                                <div class="col-12">
+                                    <select formControlName="year"
+                                        [ngClass]="(is_update || showAddMoreInthisVariety) ? 'form-control input-inventory disableField' : 'form-control input-inventory'">
+                                        <option value="">Select Year of Indent</option>
+                                        <option *ngFor="let data of yearOfIndent" value="{{data && data.year ? data.year :''}}">
+                                            {{data && data.year ? data.year :''}}-{{data && data.year ?
+                                            (data.year-2000)+1 :''}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Season -->
+                        <div class="col-xl-4">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="season" class="label-inventory required">Season</label>
+                                </div>
+                                <div class="col-12">
+                                    <select formControlName="season"
+                                        [ngClass]="(is_update || showAddMoreInthisVariety) ? 'form-control input-inventory disableField' : 'form-control input-inventory'">
+                                        <option value="">Select Season</option>
+                                        <option *ngFor="let data of seasonlist" [value]="data?.season">
+                                            {{data.season_name}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Crop -->
+                        <div class="col-xl-4">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="crop_group" class="label-inventory required">Crop</label>
+                                </div>
+                                <div class="col-12">
+                                    <div ngbDropdown class="d-inline-block w-100">
+                                        <button
+                                            [disabled]="!ngForm.controls['year'].value || !ngForm.controls['season'].value"
+                                            class="btn takeplacholder w-100 crop toggle-button input-inventory form-control"
+                                            id="crop_group" ngbDropdownToggle>
+                                            {{ selectCrop && (selectCrop.length > 30) ? (selectCrop.substring(0, 30) +
+                                            '...') : selectCrop || 'Select Crop' }}
+                                        </button>
+                                        <div class="dropdown-menu w-100" ngbDropdownMenu="crop_group">
+                                            <input type="text" class="form-control px-4" formControlName="crop_text"
+                                                (click)="cropdatatext()">
+                                            <button class="dropdown-item" *ngFor="let data of cropName"
+                                                (click)="cropNameValue(data)">
+                                                {{ data?.crop_name || '' }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="toggle-button" ngbDropdown>
+                                        <i class="fa-solid fa-angle-down downicon" (click)="cgClick()"></i>
+                                    </div>
+                                    <div class="toggle-button" ngbDropdown>
+                                        <img src="assets/images/16.svg" alt="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Search Button -->
+                <div class="col-lg-2 col-md-2 col-sm-12 pt-4 mt-1 pr-4 formargin">
+                    <div class="row">
+                        <div class="col-12">
+                            <button
+                                class="w-100 py-2 mt-2 text-white btn-inventory1 bspc_text d-inline-flex justify-content-center verticle-content-middle mb-3 mt-1"
+                                (click)="toggleSearch()">
+                                Search
+                            </button>
+                        </div>
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+        <div class="col-12 pt-3" *ngIf="searchClicked">
+            <div class="row card-inventory form-group  pl-0">
+                <div class="col-12">
+                    <div class="col-12 pt-1 pb-1">
+
+                        <!-- Variety Selection -->
+                        <div class="row align-items-center">
+                            <!-- Consignment Dropdown -->
+                            <div class="col-xl-1 col-sm-12">
+                                <label>Filter By : </label>
+
+                            </div>
+                            <div class="col-xl-3 col-sm-12">
+                                <select class="form-control w-100" formControlName="varietyvalue" (change)="onVarietyChange($event)">
+                                    <option value="">Please Variety</option>
+                                    <option *ngFor="let data of varietyArray"
+                                        value="{{data && data.variety_code ? data.variety_code:(data && data.variety_name?data.variety_name:'')}}">
+                                        {{
+                                        data &&
+                                        data.variety_name ? data.variety_name:''}}</option>
+
+                                </select>
+                            </div>
+                            <hr>
+
+
+
+                        </div>
+
+
+                    </div>
+                    <hr>
+
+                    <div class="row data-row p-0">
+                        <table
+                            class="table border-top-0   col-12 col-sm-6 col-md-12 col-lg-12 col-xl-12 pl-0 pr-0 m-0 ">
+                            <thead class=" w-100 pl-0 table-bordered">
+                                <tr class="data-row-header">
+
+                                    <th scope="col" class="py-2 text-white verticle-content-middle heading datalist">
+                                        S.No.</th>
+                                    <th scope="col"
+                                        class="col-md-1 py-2 text-white verticle-content-middle heading datalist">
+                                        Variety</th>
+                                    <th scope="col"
+                                        class="col-md-3 py-2 text-white verticle-content-middle heading datalist">
+                                        Lot Details</th>
+                                    <th scope="col" style="text-align:left!important"
+                                        class="col-md-3 py-2 text-white verticle-content-middle heading datalist">
+                                        Sample Details</th>
+                                    <th scope="col" style="text-align:left!important"
+                                        class="col-md-3 py-2 text-white verticle-content-middle heading datalist">
+                                        Other Details</th>
+                                    <!-- after final submition show in this section -->
+                                    <th scope="col" style="text-align:left!important"
+                                        class="col-md-3 py-2 text-white verticle-content-middle heading datalist">
+                                        Test Report Summary</th>
+                                    <th scope="col" style="min-width:8em;"
+                                        class="col-md-2 py-2 text-white verticle-content-middle heading datalist">
+                                        Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-bordered">
+                            <tbody class="table-bordered">
+                                <ng-container *ngFor="let report of reports">
+                                    <tr>
+                                        <!-- SNo -->
+                                        <td>{{ report.id }}</td>
+
+
+                                        <!-- Variety Section -->
+                                        <td>
+                                            <b>{{ report.variety.name }}<br>
+                                            Parental Line: {{ report.variety.parentalLine }}</b>
+                                        </td>
+
+                                        <!-- Lot Details Section -->
+                                        <td>
+                                            Lot No: <b>{{ report.lotDetails.lotNo }}</b><br>
+                                            Class Of Seed: <b>{{ report.lotDetails.classOfSeed }}</b><br>
+                                            Godown No: {{ report.lotDetails.godownNo }}<br>
+                                            Stack No: <b>{{ report.lotDetails.stackNo }}</b><br>
+                                            No Of Bags: <b>{{ report.lotDetails.noOfBags }}</b>
+                                        </td>
+
+                                        <!-- Sample Details Section -->
+                                        <td>
+                                            Unique Code: <b>{{ report.sampleDetails.uniqueCode }}</b><br>
+                                            Sample No: <b>{{ report.sampleDetails.sampleNo }}</b><br>
+                                            Testing Centre: <b>{{ report.sampleDetails.testingCentre }}</b><br>
+                                            Test No: <b>{{ report.sampleDetails.testCentre }}</b><br>
+                                            Consignment No: <b>{{ report.sampleDetails.consignmentNo }}</b>
+                                        </td>
+
+                                        <!-- Other Details Section -->
+                                        <td>
+                                            Area under variety (Ha): <b>{{ report.otherDetails.areaUnderVariety }}</b><br>
+                                            <!-- No. of samples taken: <b>{{ report.otherDetails.noOfSamples }}</b><br>-->
+                                            Date of BSP I: <b>{{ report.otherDetails.dateOfBspI }}</b><br>
+                                            Date of BSP III: <b>{{ report.otherDetails.dateOfBspIII }}</b>
+                                        </td>
+
+                                        <!-- Test Report Summary -->
+                                        <td>
+                                            Total Plants Observed: <b>{{ report.totalPlantsObserved }}</b><br>
+                                            Total Self Plants: <b>{{ report.totalSelfPlants }}</b><br>
+                                            Total OffType Plants: <b>{{ report.totalOffTypePlants }}</b><br>
+                                            Total True Plants: <b>{{ report.totalTruePlants }}</b><br>
+                                            Genetic Purity %: <b>{{ report.geneticPurity }}</b>
+                                        </td>
+
+                                        <!-- Action Button -->
+                                        <td>
+                                            <button
+                                                class="w-100 py-3s text-white btn-inventory1 bspc_text d-inline-flex justify-content-center verticle-content-middle mb-3 mt-1"  (click)="getreportData(reports,true,report.genrate_id)">
+                                                Download Report
+                                            </button>
+
+                                            <!-- <button type="submit"
+                                            class="form-button search2 d-inline-flex justify-content-center verticle-content-middle mt-3"
+                                            (click)="getreportData(reports,true,report.genrate_id)">
+                                            Download Report
+                                        </button> -->
+
+                                        </td>
+                                    </tr>
+                                </ng-container>
+
+                            </tbody>
+
+
+                            <tbody>
+                                <!-- <tr>
+                                        <td colspan="8" style="text-align: center;">No Data Found</td>
+                                    </tr> -->
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+</form>
+
+<div class="row my-4 w-100 d-none">
+    <div class="col-12 d-flex justify-content-center verticle-content-middle" id="yourPdfContentId">
+        <div class="main-content-form-wrapper px-0 py-2">
+            <div class="row">
+                <div class="w-100">
+                    <form [formGroup]="ngForm">
+                        <div>
+                            <div class="px-3">
+
+                                <div class="container col-md-12 col-lg-12 col-xl-12 mt-5 ">
+                                    <div class="col-md-12 col-lg-12 col-xl-12 pb-3">
+                                        <div class="col-md-6 col-lg-6 col-xl-6 float-left">
+                                            <img src="assets/images/no_logo.png"
+                                            style="height:8rem;">
+                                        </div>
+                                        <div class="col-md-6 col-lg-6 col-xl-6 float-right ">
+                                            <div style="float: right;">
+                                                <qrcode [qrdata]="qrCodeUrl"
+                                                    [allowEmptyString]="true"
+                                                    [ariaLabel]="'QR Code image with the following content...'"
+                                                    [cssClass]="'top'" [colorDark]="'#000000ff'"
+                                                    [colorLight]="'#FFFFFF'" [elementType]="'canvas'"
+                                                    [errorCorrectionLevel]="'M'" [imageSrc]="" [imageHeight]="80"
+                                                    [imageWidth]="80" [margin]="2" [scale]="1"
+                                                    [title]="'A custom title attribute'" [width]="140">
+                                                </qrcode>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12 col-sm-12 d-flex justify-content-center ">
+                                                <span class="heading_notofied heading1"
+                                                    style="white-space: nowrap;">{{ downloadreportsData?.agency_name || 'Not Available' }}                           
+                                                          
+                                                     </span>
+                                            </div>
+
+                                            <div class="col-md-12 col-sm-12  d-flex justify-content-center addresshead">
+                                                <span class="heading_notofied heading1">{{district}} , {{state}}</span>
+                                            </div>
+
+                                            <div class="col-md-12 col-sm-12   d-flex justify-content-center pt-4">
+                                                <span class="heading_notofied heading1"
+                                                    style="white-space: nowrap;">GROW OUT TEST REPORT
+                                                     ( BSP-V(A))</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr style="border:1px solid #228B22" class="">
+                                <div class="row">
+                                    <div class="col-4 col-md-4 col-lg-6 py-3 d-flex verticle-content-middle pl-5 heading_notofied"
+                                        style="font-size: 15px!important;"><b>Year of Indent :
+                                        </b>&nbsp;{{ downloadreportsData?.year}} - {{(downloadreportsData?.year-2000)+1}} 
+                                    
+                                    <!-- {{ ngForm.controls['season'].value=="K"?"Kharif":"Rabi"}}, 
+                                        {{ (ngForm.controls['year'].value)}}-{{(ngForm.controls['year'].value-2000)+1}} -->
+                                    </div>
+                                    <div class="col-4 col-md-4 col-lg-6 py-3 text-right float-right heading_notofied dateClass pl-0"
+                                        style="font-size: 15px!important;margin-left:-1em;"><b>Reference Number :
+                                        </b>&nbsp;{{ downloadreportsData?.reference_no || 'Not Available' }}
+                                        <!-- {{getFormattedSeason(data &&
+                                        data.season ?
+                                        data.season
+                                        :'')}},{{data && data.year ? data.year + '-' + (data.year +
+                                        1).toString().slice(-2) : '--'}} -->
+                                    </div>
+                                </div>
+
+
+
+                                <div class="row">
+                                    <div class="col-4 col-lg-6 col-md-4  d-flex verticle-content-middle  heading_notofied pl-5 pl-xl-5"
+                                    style="font-size: 15px!important;"> <b>Season : </b> &nbsp;{{ downloadreportsData?.season =="K"?"Kharif":"Rabi"}}
+                                     
+                                </div>
+                                <div class="col-4 col-md-4 col-lg-6 py-3 text-right float-right heading_notofied dateClass pl-0"
+                                        style="font-size: 15px!important;margin-left:-1em;"><b>  Date of Monitoring :
+                                        </b>&nbsp;
+                                        {{ downloadreportsData?.sync_date | date: 'dd/MM/yyyy' }}  <!-- Outputs: 11/07/2024 -->
+                                        <!-- {{getFormattedSeason(data &&
+                                        data.season ?
+                                        data.season
+                                        :'')}},{{data && data.year ? data.year + '-' + (data.year +
+                                        1).toString().slice(-2) : '--'}} -->
+                                    </div>
+                                    
+                                   
+                                
+                               
+                                    
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-4 col-lg-6 col-md-4  d-flex verticle-content-middle  heading_notofied pl-5 pl-xl-5"
+                                    style="font-size: 15px!important;"> <b>Crop : </b> &nbsp;{{ downloadreportsData?.crop_name || 'Not Available' }}
+                                     
+                                </div>
+                                <div class="col-4 col-md-4 col-lg-6 py-3 text-right float-right heading_notofied dateClass pl-0"
+                                        style="font-size: 15px!important;margin-left:-1em;"><b>Date of Printing :
+                                        </b>&nbsp;
+                                      {{formattedDate}}
+                                        <!-- {{getFormattedSeason(data &&
+                                        data.season ?
+                                        data.season
+                                        :'')}},{{data && data.year ? data.year + '-' + (data.year +
+                                        1).toString().slice(-2) : '--'}} -->
+                                    </div>
+                                    
+                                   
+                                
+                               
+                                    
+                                </div>
+
+                                <div class="col-12 px-2">
+                                    <div class="list-wrapper px-2 py-3">
+                                        <div class="middle_line"></div>
+                                        <div class="row data-row" style="margin: 0px 8px 0px 18px;">
+                                            <table class="table table-bordered table-responsive" style="text-align: center;">
+                                                <thead>
+                                                    <tr class="headingofpdftable">
+                                                        <th scope="col" class="py-2 datalist" style="white-space: nowrap;">Variety/Parental line</th>
+                                                        <th scope="col" class="py-2 datalist" style="white-space: nowrap;">Name of Producing Institute</th>
+                                                        <th scope="col" class="py-2 datalist" style="white-space: nowrap;">Name of Testing Institute</th>
+                                                        <th scope="col" class="py-2 datalist" style="white-space: nowrap;">Area Under Variety (Ha)</th>
+                                                        <th scope="col" class="py-2 datalist" style="white-space: nowrap;">Lot No.</th>
+                                                        <th scope="col" class="py-2 datalist" style="white-space: nowrap;">No. of Sample Taken</th>
+                                                        <th scope="col" class="py-2 datalist" style="white-space: nowrap;">Date of <br> BSP I</th>
+                                                        <th scope="col" class="py-2 datalist" style="white-space: nowrap;">Date of <br> BSP-III</th>
+                                                        <th scope="col" class="py-2 datalist" style="white-space: nowrap;">Result of GOT (Genetic Purity %)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- Example Data Row -->
+                                                    <tr>
+                                                        <td>{{ downloadreportsData?.variety_name || 'NA' }} /  <br>
+                                                            {{ downloadreportsData?.variety_line_code || 'NA' }}
+                                                        </td>
+                                                        <td>{{downloadreportsData?.fromuser || 'NA'}}</td>
+                                                        <td>{{ downloadreportsData?.agency_name || 'NA' }}    </td>
+                                                        <td>{{ downloadreportsData?.area_shown || 'NA' }} </td>
+                                                        <td>{{downloadreportsData?.lot_num || "NA"}}</td>
+                                                        <td>{{downloadreportsData?.sample_no || "NA"}}</td>
+                                                        <td>{{downloadreportsData?.date_of_bsp_2 || "NA"}}</td>
+                                                        <td>{{downloadreportsData?.date_of_bsp_3 || "NA"}}</td>
+                                                       <td>{{downloadreportsData?.percentage_true_plant || "NA"}} % </td> 
+                                                    </tr>
+                                                   
+                                                    <!-- Add more rows here -->
+                                                </tbody>
+                                            </table>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                               
+                                <ng-container>
+                                    <div class="grid-container px-3">
+                                      <ng-container *ngFor="let item of moniteringData">
+                                        <div class="grid-item">
+                                          <ng-container>
+                                            <span class="d-flex justify-content-center">-SD-</span>
+                                            <p class="d-flex justify-content-center mb-0">({{ item.monitoringuser }})</p>
+                                            <p class="d-flex justify-content-center mb-0">{{ item.designation }}</p>
+                                            <!-- <p class="d-flex justify-content-center mb-0">{{ item.location }}</p> -->
+                                          </ng-container>
+                                        </div>
+                                      </ng-container>
+                                    </div>
+                                  </ng-container>
+                                  
+
+                                <br><br>
+                           
+                                <footer>
+                                    <p style="padding-bottom: 72px; font-size: 18px; padding-left: 1.5rem; padding-top:1rem">THIS REPORT IS DIGITALLY GENERATED AND DOES NOT REQUIRE ANY SIGNATURE .</p>
+                                </footer>
+                                <!-- <div  id="page-break1"
+                                    style="page-break-after: always;"></div> -->
+
+
+
+                              
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+                <div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

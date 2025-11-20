@@ -1,0 +1,436 @@
+.heading {
+    font: normal Poppins;
+    font-weight: bold;
+    font-size: 20px; 
+    text-align: left;
+    opacity: 1;
+    vertical-align: middle;
+}
+.view{
+    margin-bottom: -20px !important;
+}
+.heading12 {
+    font: normal Poppins;
+    font-weight: bold;
+    font-size: 18px; 
+    text-align: left;
+    opacity: 1;
+    vertical-align: middle;
+}
+.oval {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.green-oval {
+    background-color: rgb(146, 197, 146);
+    color: green;
+}
+
+.red-oval {
+    background-color: rgb(223, 113, 113);
+    color: pink;
+}
+.yellow-oval {
+    background-color: rgb(138, 197, 236);
+    color: rgb(24, 2, 216);
+}
+.random-oval {
+    background-color: rgb(235, 218, 164);
+    color: rgb(120, 122, 2);
+}
+.realised-by-oval {
+    background-color: rgb(215, 164, 235);
+    color: rgb(200, 55, 236);
+}
+.muturity-oval {
+    background-color: rgb(210, 235, 164);
+    color: rgb(82, 114, 9);
+}
+.climate-oval {
+    background-color: rgb(240, 189, 94);
+    color: rgb(197, 138, 29);
+}
+.vertical-content-middle {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center;    /* Center vertically */
+    text-align: center;     /* Center text inside the div */
+}
+.card {
+    overflow: hidden;
+}
+.custom-hr {
+    border: none !important;
+    height: 2px !important;
+    width: 100% !important;
+    vertical-align: middle !important;
+    background-color: rgb(223, 211, 211) !important; /* or any visible color */
+    margin: 20px 0 !important; /* adjust spacing as needed */
+    
+}
+.custom-hr1 {
+    border: none !important;
+    height: 1px !important;
+    width: 100% !important;
+    vertical-align: middle !important;
+    background-color: rgb(51, 48, 48) !important; /* or any visible color */
+    margin: 20px 0 !important; /* adjust spacing as needed */
+    
+}
+.protected{
+    margin-left: 40px !important;
+    align-items: center !important;
+    margin-top: 6px !important;
+
+}
+
+/* input[type='radio'] {
+    -webkit-appearance:none;
+    width: 17px;
+height: 17px;
+    border:1px solid darkgray;
+    border-radius:50%;
+    outline:none;
+}
+
+input[type='radio']:before {
+    content:'';
+    display:block;
+    width:60%;
+    height:60%;
+    margin: 20% auto;    
+    border-radius:50%;    
+}
+input[type='radio']:checked:before {
+    background:orange;
+    border: 1px solid orange;
+} */
+.left-heading,
+.left-headings {
+    text-align: left;
+    font: normal Poppins;
+    letter-spacing: 0px;
+    /* color:  #2329ff; */
+    color:#000000 !important;
+    opacity: 1;
+    font-weight: 600;
+}
+
+
+
+.left-heading1 {
+    text-align: left;
+    font: normal Poppins;
+    letter-spacing: 0px;
+    /* color:  #2329ff; */
+    color:#000000 !important;
+    opacity: 1;
+    font-weight: 600;
+}
+
+/* .left-heading::after {
+    color: red;
+    content: '*';
+} */
+
+.radio-button {
+    width: 25px;
+    height: 25px;
+}
+
+
+input[type='radio'] {
+    -webkit-appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    outline: none;
+    border: 1px solid gray;
+}
+
+input[type='radio']:before {
+    content: '';
+    display: block;
+    width: 73%;
+    height: 72%;
+    margin: 13%;
+    border-radius: 50%;
+}
+
+input[type="radio"]:checked:before {
+    background: #E97E15;
+
+}
+
+input[type="radio"]:checked {
+    border-color: #E97E15;
+}
+
+.role {
+    margin-right: 80px;
+    margin-left: 20px;
+    font-weight: normal;
+}
+
+.checkbox label {
+    margin-bottom: 20px !important;
+}
+
+.roles {
+    margin-bottom: 40px;
+}
+
+.invalid {
+    border: 1px solid red;
+}
+
+.radio-btn-class {
+    text-align: left;
+    font: normal Poppins 600 15px/23px;
+    letter-spacing: 0px;
+    color: #000000;
+    text-transform: capitalize;
+    opacity: 0.7;
+}
+
+input[type="date"]:before {
+    color: lightgray;
+    content: attr(placeholder);
+}
+
+input[type="date"]:not(.has-value):before {
+    color: black;
+    content: attr(placeholder);
+}
+
+input[type="date"]:not([value='']):before {
+    /* color: red; */
+    /* display: ;
+     */
+    /* content: attr(placeholder);
+    display: none; */
+}
+
+input[type=date]:required:invalid::-webkit-datetime-edit {
+    color: transparent;
+}
+
+input[type=date]:focus::-webkit-datetime-edit {
+    color: black !important;
+}
+
+/* input[type=date]::-webkit-datetime-edit-text {
+    -webkit-appearance: none;
+    display: none;
+}
+input[type=date]::-webkit-datetime-edit-month-field{
+    -webkit-appearance: none;
+    display: none;
+}
+input[type=date]::-webkit-datetime-edit-day-field {
+    -webkit-appearance: none;
+    display: none;
+}
+input[type=date]::-webkit-datetime-edit-year-field {
+    -webkit-appearance: none;
+    display: none;
+} */
+
+input[type="date"].full:before {
+    color: black;
+    content: "hii" !important;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    /* color: rgba(0, 0, 0, 0);
+    opacity: 1;
+    display: block;
+    background: url(https://mywildalberta.ca/images/GFX-MWA-Parks-Reservations.png) no-repeat;
+    width: 20px;
+    height: 20px;
+    border-width: thin; */
+}
+.pl-lg-4, .px-lg-4 {
+    padding-left: 1rem !important;
+}
+.padding-0 {
+    padding-right: 0;
+    padding-left: 0;
+}
+
+.notified {
+    text-align: left;
+    font: normal normal Poppins;
+    letter-spacing: 0px;
+    color: #1C1C1C;
+    text-transform: capitalize;
+    opacity: 1;
+}
+
+.form-control:focus {
+    /* box-shadow: none; */
+    /* border: 1px solid gray; */
+
+}
+
+
+input[type="date"]:not(.has-value):before {
+    color: lightgray;
+    content: attr(placeholder);
+
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    color: rgba(0, 0, 0, 0);
+    opacity: 1;
+    display: block;
+    /* ../../../../../assets/images/Layer 93.svg */
+    /* background: url("../../../assets/images/Layer 93.svg") no-repeat; */
+    width: 20px;
+    height: 20px;
+    border-width: thin;
+    cursor: pointer;
+}
+
+input[type="date"] {
+    cursor: pointer;
+}
+
+.form-crop {
+    -webkit-appearance: none;
+    /* display: none; */
+    pointer-events: none;
+}
+
+.points {
+    /* pointer-events: none; */
+    display: none;
+}
+
+.multiselect-dropdown .dropdown-btn {}
+
+
+:host::ng-deep.multiselect-item-checkbox input[type=checkbox]+div:before {
+    border: 2px solid orange !important;
+    color: orange !important;
+}
+
+:host::ng-deep.selected-item {
+    background: orange !important;
+    color: white !important;
+    border: none !important;
+    font-size: 12px;
+    box-shadow: none !important;
+}
+
+:host::ng-deep.multiselect-item-checkbox input[type=checkbox]:checked+div:before {
+    background: orange !important;
+}
+
+
+
+
+.upload_img_condition {
+    font-size: 14px;
+}
+.in_sel_box {
+    margin-left: -1em !important; 
+}
+@media screen and (min-width: 616px) {
+    .in_sel_box {
+        margin-left: -1em !important; 
+    }
+     
+}
+.disabledfield{
+    pointer-events: none;
+}
+
+/* 
+@media screen and (max-width:750px) {
+    .form-check-lebel{
+        margin-left: 10px !important;
+    }
+    
+} */
+
+@media screen and (max-width:500px) {
+   .for-margin{
+    margin-left: 0px !important;
+   } 
+    
+}
+
+.for-downicon-remove{
+    -webkit-appearance: none !important;
+}
+/* new css */
+.checkbox-container {
+    position: relative;
+    left: 0;
+}
+
+.checkbox-container input {
+    position: absolute;
+    opacity: 0;
+    height: 0;
+    width: 0; 
+}
+
+.checkbox-container .check {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    background: #ccc;
+    border-color: 2px solid #90EE90;
+    cursor: pointer;
+    border-radius: 2px;
+}
+
+.checkbox-container .check:hover {
+    background: #bbb;
+}
+
+.checkbox-container input:checked~.check {
+    background: #E97E15;
+}
+
+.checkbox-container .check::after {
+    position: absolute;
+    content: "";
+    left: 5.5px;
+    top: 2px;
+    width: 6px;
+    height: 10px;
+    border-color: #fff;
+    border-style: solid;
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg) scale(0.5);
+    opacity: 0;
+    transition: transform .1s linear;
+}
+
+.checkbox-container input:checked~.check::after {
+    transition: transform .1s linear;
+    opacity: 1;
+    transform: rotate(45deg) scale(1);
+}
+.pagination-btn{
+    margin: 5px;
+    padding: 10px 20px;
+    background: #d7720f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;   
+}
+.pagination-btn:disabled{
+    /* background: #95a5a6;
+    cursor: not-allowed; */
+}

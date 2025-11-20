@@ -36,3 +36,9 @@
 .show:hover + .title {
     display:block;
 }
+
+
+.side-menu-custom
+{
+    padding-right: 0px !important;
+}

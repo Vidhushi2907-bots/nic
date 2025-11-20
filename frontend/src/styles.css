@@ -1275,3 +1275,14 @@ input[type="radio"]:disabled+label {
   color: #aaa;
   /* Gray out the label when the radio button is disabled */
 }
+.btn-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
+   background-color: #d9534f; /* red shade */
+}
+
+.btn-active {
+  opacity: 1;
+  cursor: pointer;
+}

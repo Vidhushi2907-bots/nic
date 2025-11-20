@@ -49,7 +49,7 @@
                 <div class="row pt-5 px-3">
 
                     <div class="col-12 pl-4">
-                        Reference No.<span class=""style="font-weight: 900;"> {{dataToShow && dataToShow.year ? getFinancialYear(dataToShow.year):''}}/{{code ? code:''}}
+                        Reference No.<span class=""style="font-weight: 900;"> {{dataToShow && dataToShow.year ? getFinancialYear(dataToShow.year):''}}/{{code ? code:''}}/{{dataToShow && dataToShow.refrence_sequence ? (dataToShow.refrence_sequence) :''}}
                                     </span>
                     </div>
                     <div class=" col-md-12 pl-4">
@@ -107,7 +107,7 @@
                                                 <tr class="data-row-header">
                                                     <th scope="col"  class="col-md-1 py-2 text-white verticle-content-middle heading bill">S.No</th>
                                                     <th scope="col"  class="col-md-2 py-2 text-white text-start verticle-content-middle heading variety">Lot No.</th>
-                                                    <!-- <th scope="col" class="col-md-1 py-2 text-white  verticle-content-middle heading">Plot No.</th>  -->
+                                                    <th scope="col" class="col-md-1 py-2 text-white  verticle-content-middle heading">Plot No.</th> 
                                                     <th scope="col" class="col-md-2 py-2 text-white  verticle-content-middle heading SPA">Inspection Date</th>
                                                     <th scope="col" class="col-md-2 py-2 text-white  verticle-content-middle heading   details">Tag No.</th>
                                                     
@@ -118,7 +118,7 @@
                                                 <tr>
                                                     <td>{{index+1}}</td>
                                                     <td>{{data && data.lot_no ? data.lot_no :''}}</td>
-                                                    <!-- <td>{{data && data.lot_no ? data.lot_no :''}}</td> -->
+                                                    <td>{{data && data.pilot_no ? data.pilot_no :''}}</td>
                                                     <td>{{data && data.inspection_date ? (data.inspection_date | date:
                                                         'dd/MM/yyyy') :'NA'}}</td>
                                                     <td>

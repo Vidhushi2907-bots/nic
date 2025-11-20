@@ -61,7 +61,7 @@ const status = {
     BOOKING_SUCCESSFUL: "Booking Successful",
     UNAUTHORIZED_USER: "You are not authorized to access this resource",
     NOT_CAMPAIGN_USER: "You are not authorized/campaign user",
-    ALREADY_AVAILED: "You have already availed this offer",
+    ALREADY_AVAILED: "Already available",
     OFFER_HAS_EXPIRE: "This offer has expired or not available",
     COUPON_NOT_AVAILABLE: "Coupons for this offer has expired or not available",
     USER_ADDED: "User Successfully Added",

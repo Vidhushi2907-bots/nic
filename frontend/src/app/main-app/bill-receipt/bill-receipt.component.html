@@ -1,66 +1,152 @@
- 
 <form [formGroup]="ngForm" class="pt-2">
-    <div class="main-inventory my-4 w-90 ml-3 mr-3 pt-2" id="printSection">
-        <div class="col-12 " >
-            <div class="row">   
-                <div class="col-12 col-md-4 col-lg-4 pl-1 col-sm-12  verticle-content-middle align-items-start">
-                    <!-- <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGrSXLE492jGSSpvCh_LDYPv59Xi-7mmiEpw&s"> -->
-                    <img src="assets/images/logo-here.png">
-                </div> 
-                <div class="col-12 col-md-4 col-lg-4  col-sm-12 verticle-content-middle">
-                    <p class="title-inventory pt-5" >{{liftingbspcData && liftingbspcData.agency_name ? liftingbspcData.agency_name:'NA'}}</p>
-                    <p class="title-inventory1"><b>{{liftingbspcData && liftingbspcData.district_name ? liftingbspcData.district_name:'NA'}}, {{liftingbspcData && liftingbspcData.state_name ? liftingbspcData.state_name:'NA'}}</b> </p>
-                </div> 
-                <div class="col-12 col-md-4 col-lg-4 pr-1 col-sm-12 verticle-content-middle align-items-end">
-                    <qrcode [qrdata]="baseUrl+ 'verification-bill/'+ encryptedData"
-                    [allowEmptyString]="true"
-                    [ariaLabel]="'QR Code image with the following content...'"
-                    [cssClass]="'top'" [colorDark]="'#000000ff'" [colorLight]="'#FFFFFF'"
-                    [elementType]="'canvas'" [errorCorrectionLevel]="'M'" [imageSrc]=""
-                    [imageHeight]="80" [imageWidth]="80" [margin]="2" [scale]="1"
-                    [title]="'A custom title attribute'" [width]="140">
-                </qrcode>
-                    <!-- <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdNCA4htX69fRcs9zXxQNU0LFrqfvYpxTFqw&s"> -->
-                </div>  
-
-            </div>
-        </div>  <hr class="custom-line "> 
-        <div class="col-12 col-sm-12 col-md-12 col-lg-12  pt-3 pr-0" >
-            <div class="row card-inventory form-group pb-2 pl-0">
-                <div class="col-12 ">
-                    <div class="col-12 ">
-                        <div class="row">   
-                            <div class="col-12 col-md-6 col-lg-6 pl-1 col-sm-12   ">
-                                <p class=" ">Bill No:<b class="font-weight-bold" [innerText]="billNo"></b>     <br> Invoice No: 123abABC321</p>  
-                                <p class=" "><i class="buy">Buyer Details:</i> </p>  
-                                <p class=" ">SPA Name:<b class="font-weight-bold" [innerText]="spaDetails && spaDetails.agency_name ? spaDetails.agency_name:''"> </b> </p> 
-                                <p class=" ">SPA Address:<b class="font-weight-bold" [innerText]="spaDetails && spaDetails.address ? spaDetails.address:''"> </b> </p>  
-                                <p class=" ">SPA Contact No:<b class="font-weight-bold" [innerText]="spaDetails && spaDetails.contact_person_mobile ? spaDetails.contact_person_mobile:''"> </b> </p>  
-                            </div> 
-                            <div class="col-12 col-md-6 col-lg-6 pl-1 col-sm-12   ">
-                                <p class=" ">Date:<b class="font-weight-bold" [innerText]="Seller.value1"> </b>  </p>  <br>
-                                <p class=" "><i class="buy">Seller Details:</i> </p>  
-                                <p class=" ">Bspc Name:<b class="font-weight-bold" [innerText]="liftingbspcData && liftingbspcData.agency_name ? liftingbspcData.agency_name:''"> </b> </p> 
-                                <p class=" ">Bspc Address:<b class="font-weight-bold" [innerText]="liftingbspcData && liftingbspcData.address ? liftingbspcData.address:''"> </b> </p>  
-                                <p class=" ">Bspc Contact No:<b class="font-weight-bold" [innerText]="liftingbspcData && liftingbspcData.contact_person_mobile ? liftingbspcData.contact_person_mobile:''"> </b> </p>   
-                            </div>    
-                        </div> 
+    <div class="main-inventory my-4 w-90 ml-3 mr-3 pt-2">
+        <div class="main-inventory my-4 w-90 ml-3 mr-3 pt-2" id="printSection">
+            <div class="col-12 ">
+                <div class="row">
+                    <div class="col-12 col-md-4 col-lg-4 pl-1 col-sm-12  verticle-content-middle align-items-start">
+                        <!-- <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGrSXLE492jGSSpvCh_LDYPv59Xi-7mmiEpw&s"> -->
+                        <img src="assets/images/logo-here.png">
                     </div>
+                    <div class="col-12 col-md-4 col-lg-4  col-sm-12 verticle-content-middle">
+                        <p class="title-inventory pt-5">{{liftingbspcData && liftingbspcData.agency_name ?
+                            liftingbspcData.agency_name:'NA'}}</p>
+                        <p class="title-inventory1"><b>{{liftingbspcData && liftingbspcData.district_name ?
+                                liftingbspcData.district_name:'NA'}}, {{liftingbspcData && liftingbspcData.state_name ?
+                                liftingbspcData.state_name:'NA'}}</b> </p>
+                    </div>
+                    <div class="col-12 col-md-4 col-lg-4 pr-1 col-sm-12 verticle-content-middle align-items-end">
+                        <qrcode [qrdata]="baseUrl+ 'verification-bill/'+ encryptedData" [allowEmptyString]="true"
+                            [ariaLabel]="'QR Code image with the following content...'" [cssClass]="'top'"
+                            [colorDark]="'#000000ff'" [colorLight]="'#FFFFFF'" [elementType]="'canvas'"
+                            [errorCorrectionLevel]="'M'" [imageSrc]="" [imageHeight]="80" [imageWidth]="80" [margin]="2"
+                            [scale]="1" [title]="'A custom title attribute'" [width]="140">
+                        </qrcode>
+                        <!-- <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdNCA4htX69fRcs9zXxQNU0LFrqfvYpxTFqw&s"> -->
+                    </div>
+
+                </div>
+            </div>
+            <hr class="custom-line ">
+            <div class="col-12 col-sm-12 col-md-12 col-lg-12  pt-3 pr-0">
+                <div class="row card-inventory form-group pb-2 pl-0">
+                    <div class="col-12 ">
+                        <div class="col-12 ">
+                            <div class="row">
+                                <div class="col-12 col-md-6 col-lg-6 pl-1 col-sm-12   ">
+                                    <p class=" ">Bill No:<b class="font-weight-bold" [innerText]="billNo"></b><br>
+                                        Invoice No: 123abABC321</p>
+                                    <p class=" "><i class="buy">Buyer Details:</i> </p>
+                                    <p class=" ">SPA Name:<b class="font-weight-bold"
+                                            [innerText]="spaDetails && spaDetails.agency_name ? ' '+spaDetails.agency_name:''">
+                                        </b> </p>
+                                    <p class=" ">SPA Address:<b class="font-weight-bold"
+                                            [innerText]="spaDetails && spaDetails.address ? ' '+spaDetails.address:''">
+                                        </b> </p>
+                                    <p class=" ">SPA Contact No:<b class="font-weight-bold"
+                                            [innerText]="spaDetails && spaDetails.contact_person_mobile ? ' '+spaDetails.contact_person_mobile:''">
+                                        </b> </p>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-6 pl-1 col-sm-12   ">
+                                    <p class=" ">Date:<b class="font-weight-bold">&nbsp;{{formattedDate}}</b></p><br>
+                                    <p class=" "><i class="buy">Seller Details:</i> </p>
+                                    <p class=" ">Bspc Name:<b class="font-weight-bold"
+                                            [innerText]="liftingbspcData && liftingbspcData.agency_name ? ' '+liftingbspcData.agency_name:''">
+                                        </b> </p>
+                                    <p class=" ">Bspc Address:<b class="font-weight-bold"
+                                            [innerText]="liftingbspcData && liftingbspcData.address ? ' '+liftingbspcData.address:''">
+                                        </b> </p>
+                                    <p class=" ">Bspc Contact No:<b class="font-weight-bold"
+                                            [innerText]="liftingbspcData && liftingbspcData.contact_person_mobile ? ' '+liftingbspcData.contact_person_mobile:''">
+                                        </b> </p>
+                                </div>
+                            </div>
+                        </div>
                         <div class="row data-row p-0 ">
-                            <table class="table border-top-0 pt-2 col-12 col-sm-6 col-md-12 col-lg-12 col-xl-12 pl-0 pr-0 m-0 ">
-                                <thead class=" w-100 pl-0 table-bordered">
+                            <table class="table border-top-0 pt-2 col-12 col-sm-6 col-md-12 col-lg-12 col-xl-12 pl-0 pr-0 m-0">
+                                <thead class="w-100 pl-0 table-bordered">
                                     <tr class="data-row-header">
-                                        <th scope="col"  class="col-md-1 py-2 text-white verticle-content-middle heading bill">S.No</th>
-                                        <th scope="col"  class="col-md-2 py-2 text-white text-start verticle-content-middle heading variety">Crop</th>
-                                        <th scope="col" class="col-md-1 py-2 text-white  verticle-content-middle heading">Variety</th> 
-                                        <th scope="col" class="col-md-2 py-2 text-white  verticle-content-middle heading SPA">Class</th>
-                                        <th scope="col" class="col-md-2 py-2 text-white  verticle-content-middle heading seed">Bag Weight(Kg)</th>
-                                        <th scope="col" class="col-md-1 py-2 text-white  verticle-content-middle heading bill">No. Of Bags</th>
-                                        <th scope="col" class="col-md-1 py-2 text-white  verticle-content-middle heading SPA">Per Unit Price(INR)</th>
-                                        <th scope="col" class="col-md-1 py-2 text-white  verticle-content-middle heading">Total Price(INR)</th> 
+                                        <th scope="col" class="col-md-1 py-2 text-white verticle-content-middle heading bill">S.No</th>
+                                        <th scope="col" class="col-md-2 py-2 text-white text-start verticle-content-middle heading variety">Crop</th>
+                                        <th scope="col" class="col-md-1 py-2 text-white verticle-content-middle heading">Variety</th>
+                                        <th scope="col" class="col-md-2 py-2 text-white verticle-content-middle heading SPA">Class</th>
+                                        <th scope="col" class="col-md-2 py-2 text-white verticle-content-middle heading seed">Bag Weight (Kg)</th>
+                                        <th scope="col" class="col-md-1 py-2 text-white verticle-content-middle heading bill">No. of Bags</th>
+                                        <th scope="col" class="col-md-1 py-2 text-white verticle-content-middle heading SPA">Per Unit Price (INR)</th>
+                                        <th scope="col" class="col-md-1 py-2 text-white verticle-content-middle heading">Total Price (INR)</th>
                                     </tr>
                                 </thead>
-                                <tbody  class="border-top-0 table-bordered col-md-1 py-2 text-white  verticle-content-middle heading data-row"> 
+                                <tbody class="border-top-0 table-bordered col-md-1 py-2 text-white verticle-content-middle heading data-row">
+                                    <tr *ngFor="let data of liftingDataValue; let i=index">
+                                        <td scope="col" class="col-md-1 py-2">
+                                            <p class="verticle-content-middle">{{i+1}}</p>
+                                        </td>
+                                        <td scope="col" class="col-md-1 py-2 verticle-content-middle">
+                                            {{data?.m_crop?.crop_name || 'NA'}}
+                                        </td>
+                                        <td scope="col" class="col-md-1 py-2 verticle-content-middle">
+                                            {{data?.m_crop_variety?.variety_name || 'NA'}}
+                                        </td>
+                                        <td scope="col" class="col-md-2 py-2 verticle-content-middle">
+                                            {{data?.breeder_class || 'NA'}}
+                                        </td>
+                                        <!-- Loop through bag_data -->
+                                        <td colspan="4" class="p-0 m-0">
+                                            <table class="table border-0 m-0">
+                                                <tbody>
+                                                    <tr *ngFor="let bag of data.bag_data">
+                                                        <td scope="col" class="col-md-2  verticle-content-middle">
+                                                            {{bag.bag_weight || 'NA'}}
+                                                        </td>
+                                                        <td scope="col" class="col-md-1   verticle-content-middle">
+                                                            {{bag.no_of_bags || 'NA'}}
+                                                        </td>
+                                                        <td scope="col" class="col-md-1  verticle-content-middle">
+                                                            {{bag.per_unit_price || 'NA'}}
+                                                        </td>
+                                                        <td scope="col" class="col-md-1   verticle-content-middle">
+                                                            {{(bag.no_of_bags*bag.per_unit_price) | number:'1.2-2'}}
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            
+                            <!-- <table
+                                class="table border-top-0 pt-2 col-12 col-sm-6 col-md-12 col-lg-12 col-xl-12 pl-0 pr-0 m-0 ">
+                                <thead class=" w-100 pl-0 table-bordered">
+                                    <tr class="data-row-header">
+                                        <th scope="col"
+                                            class="col-md-1 py-2 text-white verticle-content-middle heading bill">S.No
+                                        </th>
+                                        <th scope="col"
+                                            class="col-md-2 py-2 text-white text-start verticle-content-middle heading variety">
+                                            Crop</th>
+                                        <th scope="col"
+                                            class="col-md-1 py-2 text-white  verticle-content-middle heading">Variety
+                                        </th>
+                                        <th scope="col"
+                                            class="col-md-2 py-2 text-white  verticle-content-middle heading SPA">Class
+                                        </th>
+                                        <th scope="col"
+                                            class="col-md-2 py-2 text-white  verticle-content-middle heading seed">Bag
+                                            Weight(Kg)</th>
+                                        <th scope="col"
+                                            class="col-md-1 py-2 text-white  verticle-content-middle heading bill">No.
+                                            Of Bags</th>
+                                        <th scope="col"
+                                            class="col-md-1 py-2 text-white  verticle-content-middle heading SPA">Per
+                                            Unit Price(INR)</th> 
+                                        <th scope="col"
+                                            class="col-md-1 py-2 text-white  verticle-content-middle heading">Total
+                                            Price(INR)</th>
+                                    </tr>
+                                </thead>
+                                <tbody
+                                    class="border-top-0 table-bordered col-md-1 py-2 text-white  verticle-content-middle heading data-row">
                                     <tr *ngFor="let data of liftingDataValue; let i=index">
                                         <td scope="col" class="col-md-1 py-2">
                                             <p class="verticle-content-middle">{{i+1}}</p>
@@ -71,28 +157,34 @@
                                         <td scope="col" class="col-md-2 py-2 verticle-content-middle">{{data.bag_weight ? data.bag_weight:'NA'}}</td>
                                         <td scope="col" class="col-md-2 py-2 verticle-content-middle">{{data.no_of_bag ? data.no_of_bag:'NA'}}</td>
                                         <td scope="col" class="col-md-2 py-2 verticle-content-middle">{{data.per_unit_price ? data.per_unit_price:'NA'}}</td>  
-                                        <td scope="col" class="col-md-2 py-2 verticle-content-middle">{{data.total_price ? data.total_price:'NA'}}</td>   
+                                         <td scope="col" class="col-md-2 py-2 verticle-content-middle"> {{ ( (data.total_price && totalAfterApplyGst !== undefined) ? (data.total_price - totalAfterApplyGst - GSt1)   : 'NA' ) | number:'1.2-2' }} </td>   
                                     </tr> 
                                 </tbody>  
-                            </table>
+                            </table> -->
                             <div class="col-12 w-100 pl-0 d-flex justify-content-between hn pt-0">
-                                <p class=" text-white data-row-header1 pt-2 pb-1"><span class="price1 text-white"> </span> <b class="text-white price">Grand Total:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{(liftingDataValue | sum:'total_price' | number:'1.2-2')}}</b> </p> 
+                                <!-- {{(liftingDataValue | sum:'total_price' | number:'1.2-2')}} -->
+                                <p class=" text-white data-row-header1 pt-2 pb-1"><span class="price1 text-white align-items-end"> </span> <b class="text-white price">Gst:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{( GSt1 | number:'1.2-2')}}</b>  <b class="text-white price">Grand Total:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{( grandTotal | number:'1.2-2')}}</b> </p> 
                             </div> 
                             <div class="col-12 pt-2">
-                                <div class="row">   
+                                <div class="row">
                                     <div class="col-12 col-md-6 col-lg-6 pl-1 col-sm-12   ">
                                         <!-- <p class=" ">Previous Payment made via:<b class="font-weight-bold" [innerText]="Payment.value1"></b> </p>   -->
-                                        <p class=" ">Final Balance Amount paid via:<b class="font-weight-bold" [innerText]="payment_method_no"> </b> </p> 
-                                    </div> 
+                                        <p class=" ">Final Balance Amount paid via:<b class="font-weight-bold"
+                                                [innerText]="payment_method_no?payment_method_no:'NA'"> </b> </p>
+                                    </div>
                                     <div class="col-12 col-md-6 col-lg-6 col-sm-12">
-                                         
-                                        <div class="col-12 col-md-11 col-lg-11  col-sm-12 align-items-end"> 
-                                            <div class="d-flex flex-column h-100 justify-content-end" *ngFor="let data of liftingAdditionalChargesValue">
-                                                
+
+                                        <div class="col-12 col-md-11 col-lg-11  col-sm-12 align-items-end">
+                                            <div class="d-flex flex-column h-100 justify-content-end"
+                                                *ngFor="let data of liftingAdditionalChargesValue">
+
                                                 <div class="d-flex justify-content-between mb-1 w-100">
                                                     <!-- getChargesName(data.additional_charge_id) -->
-                                                    <p class="text-end">{{data && data.additional_charges_id ? getChargesName(data.additional_charges_id):"NA"}}:&nbsp;&nbsp;&nbsp;&nbsp;</p>
-                                                    <b class="font-weight-bold" [innerText]="">{{data && data.after_apply_gst ? data.after_apply_gst:'NA'}}</b>
+                                                    <p class="text-end">{{data && data.additional_charges_id ?
+                                                        getChargesName(data.additional_charges_id):"NA"}}:&nbsp;&nbsp;&nbsp;&nbsp;
+                                                    </p>
+                                                    <b class="font-weight-bold" [innerText]="">{{data &&
+                                                        data.after_apply_gst ? data.after_apply_gst:'NA'}}</b>
                                                 </div>
                                             </div>
 
@@ -100,7 +192,10 @@
                                                 <hr class="custom-line w-100">
                                                 <div class="d-flex justify-content-between mb-1 w-100">
                                                     <p style="color: #B64B1D;">Total Bill Amount:&nbsp;&nbsp;&nbsp;&nbsp;</p>
-                                                    <b style="color: #B64B1D;" class="font-weight-bold" [innerText]="">{{calculateData(((liftingDataValue | sum:'total_price')),((liftingAdditionalChargesValue | sum:'after_apply_gst' ))) | number:'1.2-2'}}</b>
+                                                    <b style="color: #B64B1D;" class="font-weight-bold" [innerText]="">
+                                                        {{(liftingDataValue | sum:'total_price' | number:'1.2-2')}} 
+                                                        <!-- {{calculateData(((liftingDataValue | sum:'total_price')),((liftingAdditionalChargesValue | sum:'after_apply_gst' ))) | number:'1.2-2'}} -->
+                                                    </b>
                                                 </div>
                                                 <!-- <div class="d-flex justify-content-between mb-1 w-100">
                                                     <p class="">Previously Paid Amount:&nbsp;&nbsp;&nbsp;&nbsp;</p>
@@ -109,34 +204,42 @@
                                                 <hr class="custom-line1 w-100">
                                                 <div class="d-flex justify-content-between  mb-1 w-100">
                                                     <p style="color: #B64B1D;">Final Payable Amount(Balance): &nbsp;&nbsp;&nbsp;&nbsp;</p>
-                                                    <b style="color: #B64B1D;"  class="font-weight-bold" [innerText]="">{{calculateData(((liftingDataValue | sum:'total_price')),((liftingAdditionalChargesValue | sum:'after_apply_gst' ))) | number:'1.2-2'}}</b>
+                                                    <b style="color: #B64B1D;"  class="font-weight-bold" [innerText]="">
+                                                        {{(liftingDataValue | sum:'total_price' | number:'1.2-2')}} 
+                                                        <!-- {{calculateData(((liftingDataValue | sum:'total_price')),((liftingAdditionalChargesValue | sum:'after_apply_gst' ))) | number:'1.2-2'}} -->
+                                                    </b>
                                                 </div>
                                             </div>
-                                        </div> 
-                                    </div>   
-                                </div> 
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                        </div>
                     </div>
                 </div>
-            </div>  
+            </div>
         </div>
         <div class="col-lg-12   col-md-12 col-sm-12 col-12 " style="padding-top: -20px;">
-            <div class="row"> 
+            <div class="row">
+
                 <div class="col-lg-3 expa col-md-3 col-sm-12 col-12  pr-4 formargin">
                     <div class="row">
                         <div class="col-12 col-md-12 col-lg-12  ">
-                            <button class="w-100 py-2 mt-2 text-white btn-inventory1 bspc_text d-inline-flex justify-content-center verticle-content-middle mb-3 mt-1" (click)="openPrintBillDialog()">
-                               Cancel
+                            <button
+                                class="w-100 py-2 mt-2 text-white btn-inventory1 bspc_text d-inline-flex justify-content-center verticle-content-middle mb-3 mt-1"
+                                (click)="openPrintBillDialog()">
+                                Cancel
                             </button>
                         </div>
                     </div>
-                </div> 
+                </div>
                 <div class="col-lg-3 expa col-md-3 col-sm-12 col-12   pr-4 formargin">
                     <div class="row">
                         <div class="col-12 col-md-12 col-lg-12  ">
-                            <button (click)="download()"  class="w-100 py-2 mt-2 text-white btn-inventory1 bspc_text d-inline-flex justify-content-center verticle-content-middle mb-3 mt-1"  >
+                            <button (click)="download()"
+                                class="w-100 py-2 mt-2 text-white btn-inventory1 bspc_text d-inline-flex justify-content-center verticle-content-middle mb-3 mt-1">
                                 Download
-                            </button> 
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -152,12 +255,11 @@
                 <div class="col-lg-3 expa col-md-3 col-sm-12 col-12 pt-4 mt-2 pr-4 formargin">
                     <div class="row">
                         <div class="col-12 col-md-12 col-lg-12  ">
-                            
+
                         </div>
                     </div>
                 </div>
             </div>
-        </div>            
-    </div>    
-    
+        </div>
+    </div>
 </form>

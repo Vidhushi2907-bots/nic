@@ -2,16 +2,22 @@
     <div class="col-12 d-flex justify-content-center verticle-content-middle">
         <div class="main-content-form-wrapper px-0 py-2">
             <div class="row">
-                <div class="w-100">
+                                          <!-- <div class="col-md-12 col-sm-12 pl-2 pb-2 filting1">
+                                <span class="heading_notofied">List of Project Co-ordinators</span>
+                            </div> -->
+
+                                                <div class="col-12 d-flex justify-content-start mb-0 filting ">
+  <button class="filter-btn" (click)="toggleFilter()">
+    <i class="fa fa-filter"></i> Filter Options
+  </button>
+</div>
+                <div *ngIf="showFilter" class="w-100">
                 <form [formGroup]="ngForm">
                     <div class="col-12 px-4 mt-2">
                         <div class="row pl-3">
-                            <div class="col-md-12 col-sm-12 pl-2 pb-2">
-                                <span class="heading_notofied">List of Project Co-ordinators</span>
-                            </div>
 
                             <div class="col-md-4 mt-2 pl-2 pr-4 py-2 py-md-0 pr-md-0">
-                                <div class="col-md-12 px-0">
+                                <div  class="col-md-12 px-0">
                                     <label for="" class="left-heading">State</label>
                                 </div>
                                 <div ngbDropdown class="d-inline-block w-100 "
@@ -23,11 +29,18 @@
             
                                             <div class="dropdown-menu w-100" ngbDropdownMenu="state" aria-labelledby="sortMenu">
                                                 <input type="text" class="form-control px-4"  formControlName="state_text" >
-                                                <button class="dropdown-item" *ngFor="let state of state_data"
+                                                <!-- <button class="dropdown-item" *ngFor="let state of state_data"
                                                     (click)="state_select(state)" #dropdownItem [attr.data-parent-name]="'state'">
                                                     {{state && state.state_name ?  state.state_name :''}}
                                                  
-                                                </button>
+                                                </button> -->
+                                                <button class="dropdown-item" (click)="state_select('all')">All</button>
+<button class="dropdown-item" *ngFor="let state of state_data"
+    (click)="state_select(state)">
+  {{ state?.state_name }}
+</button>
+
+        
                                             </div>
                                             <div class="pl-0 toggle-button" ngbDropdown
                                             >
@@ -36,14 +49,6 @@
             
                                         </div>
                                        
-                                <!-- <div _ngcontent-cvx-c131="" class="col-md-12 pr-md-0">
-                                    <select class="form-control" formControlName="state">
-                                        <option value="">Select State</option>
-                                        <option *ngFor="let data of state_data" value="{{data.state_code}}">
-                                            {{data.state_name}}</option>
-                                    </select>
-
-                                </div> -->
                             </div>
                             <div class="col-md-4 pl-2 pl-md-0 mt-2 pr-2 py-2 py-md-0 pr-md-0">
                                 <div class="col-12 pl-md-3 pl-0">
@@ -60,10 +65,24 @@
         
                                         <div class="dropdown-menu w-100" ngbDropdownMenu="agency" aria-labelledby="sortMenu">
                                             <input type="text" class="form-control px-4"  formControlName="agency_text" >
-                                            <button class="dropdown-item" *ngFor="let data of project_coordinatorData"
+                                            <!-- <button class="dropdown-item" *ngFor="let data of project_coordinatorData"
                                                 (click)="agency_select(data)" #dropdownItem [attr.data-parent-name]="'agency'">
                                                 {{data && data.agency_name ? data.agency_name :''}}
-                                            </button>                                            
+                                            </button>   
+                                                                                     
+                                                              <select class="form-control" formControlName="breeder_category" [disabled]="disabledfieldAgency">
+                    <option value="">All</option>
+                    <option *ngFor="let pc of project_coordinatorData" [value]="pc.id">
+                      {{ pc.agency_name }}
+                    </option>
+                  </select> -->
+
+                  <button class="dropdown-item" (click)="agency_select('all')">All</button>
+<button class="dropdown-item" *ngFor="let data of project_coordinatorData"
+    (click)="agency_select(data)">
+  {{ data?.agency_name }}
+</button>
+
                                         </div>
         
                                     </div>
@@ -72,46 +91,7 @@
                                         <i class="fa-solid fa-angle-down downicon" (click)="caClick()"></i>
                                     </div>                                    
                                 </div>
-                                <!-- <div class="col-12 pr-md-0">
-                                    <select class="form-select form-control" aria-label="Default select example"
-                                        formControlName="breeder_category">
-                                        <option value="">Select Name of the Project Coordinator</option>
-                                        <option *ngFor="let data of project_coordinatorData"
-                                            value="{{data && data.id ? data.id :''}}">
-                                            {{data && data.agency_name ? data.agency_name :''}}</option>
-                                    </select>
-                                    <div class="pl-0 toggle-button" ngbDropdown>
-                                        <img src="assets/images/16.svg" alt="" srcset="">
-                                    </div>
-                                </div> -->
 
-                            </div>
-                            <div _ngcontent-cvx-c131="" class="col-12 pt-4  search-cancle-button buttons-phone">
-                                <button _ngcontent-cvx-c131=""
-                                    class="form-button search ml-0 d-inline-flex justify-content-center verticle-content-middle mb-3 mx-0 btn-aling"
-                                    (click)="submit()"> Search </button>
-                                <button _ngcontent-cvx-c131="" (click)="clear()"
-                                    class="clear-form-button ml-3 d-inline-flex justify-content-center verticle-content-middle mb-3">
-                                    Clear
-                                </button>
-
-                                <div class="dropdown float-right export_dropdown">
-                                    <button (click)="myFunction()"
-                                        class="form-button  search ml-1 d-inline-flex justify-content-center verticle-content-middle mb-2 mx-2"
-                                        style="font-size: 87%;">Export To &nbsp;<i class="fa fa-angle-down"
-                                            aria-hidden="true"> </i></button>
-                                    <div id="myDropdown" class="dropdown-content">
-                                        <a (click)="download()"> <img src="assets\icons\pdf-icon.png" alt=""
-                                                width="20px" height="20px"> PDF</a>
-                                        <a (click)="exportexcel()"> <img src="assets\icons\excel.jpg" alt=""
-                                                width="20px" alt=""> Excel</a>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            <div _ngcontent-cvx-c131="" class="col-12 px-4">
-                                <hr _ngcontent-cvx-c131="" class="separator m-0">
                             </div>
                         </div>
                     </div>
@@ -138,7 +118,7 @@
                     <thead>
                         <tr>
                             <th scope="col" class="col-md-1 py-3 sn-report">S/N</th>
-                            <th scope="col" class="col-md-6 py-3">Name of the Project Coordinator </th>
+                            <th scope="col" class="col-md-6 py-3">Name of the Project Coordinators </th>
                             <th scope="col" class="col-md-6 py-3">Short Name</th>
                             <th scope="col" class="col-md-6 py-3">Crop</th>
                             <th scope="col" class="col-md-6 py-3">State</th>
@@ -151,7 +131,7 @@
                             <th scope="col" class="col-md-6 py-3">Status </th>
                         </tr>
                     </thead>
-                    <tbody *ngFor="let data of exportdata; let dataIndex=index">
+                    <tbody *ngFor="let data of completeData; let dataIndex=index">
                         <!-- <tbody *ngFor="let data of filterPaginateSearch.itemList; let dataIndex=index"> -->
                             <tr>
                                 <td class="sn-td-report">
@@ -174,12 +154,18 @@
                                 </td>
                                 <td>
 
-                                    <span style="cursor: pointer;" data-toggle="tooltip"
+                                    <!-- <span style="cursor: pointer;" data-toggle="tooltip"
                                         data-placement="bottom" title="{{data && data.agency_detail  && data.agency_detail.crop_data ? getCropNamefrommlistExcel(data.agency_detail.crop_data) :'NA' }}">
                                             {{
                                                 data && data.agency_detail  && data.agency_detail.crop_data ? getCropNamefrommlistExcel(data.agency_detail.crop_data) :'NA'
                                             }}
-                                        </span>
+                                        </span> -->
+
+                                          <span data-toggle="tooltip"
+        data-placement="bottom"
+        title="{{ data?.agency_detail?.crop_data ? getCropNamefrommlist(data.agency_detail.crop_data) : 'NA' }}">
+    {{ data?.agency_detail?.crop_data ? getCropNamefrommlist(data.agency_detail.crop_data) : 'NA' }}
+  </span>
                                 </td>
                                 
                                 <td>
@@ -258,41 +244,46 @@
                 <!-- table for exel Download end -->
 
                 <div class="col-12 px-4">
-                    <!-- <app-dynamic-fields [fieldsList]="fieldsList" [formGroup]="formGroup"></app-dynamic-fields> -->
                     <div class="list-wrapper px-4 py-3">
-                        <div class="row d-md-flex data-row-header extra-header">
-                            <!-- <div class="col-6 col-md-2 py-3 d-flex verticle-content-middle">
-                            </div> -->
-                            <div class="col-12 col-md-12 py-3 d-flex justify-content-center">List of Project
-                                Co-ordinators</div>
-                            <!-- <div class="col-6 col-md-2 py-3 d-flex verticle-content-middle">
-                            </div> -->
-                        </div>
+                                               <div class="row d-md-flex data-row-header extra-header">
+  <div class="col-12 col-md-12 py-3 d-flex justify-content-between align-items-center text-white">
+    <div class="mx-auto">List of Project Co-ordinators</div>
+    <div>(Total: {{ totalIndenters }})</div>
+  </div>
+</div>
+
+
+                                                <div class="col-12 col-sm-12 col-md-12 col-lg-12  pt-3">
+
+<div class="search-export-container mb-2">
+  <input type="text"
+         class="form-control search-input input1"
+         placeholder="Search"
+                [(ngModel)]="searchText"
+       (input)="onSearch()" />
+
+     <div class="dropdown float-right export_dropdown drop1">
+                                        <button type="button" (click)="myFunction()"
+                                            class="form-button  search ml-1 d-inline-flex justify-content-center verticle-content-middle mb-2 mx-0"
+                                            style="font-size: 87%;">Export To &nbsp;<i class="fa fa-angle-down"
+                                                aria-hidden="true"> </i></button>
+                                        <div id="myDropdown" class="dropdown-content">
+                                            <a (click)="download()"> <img src="assets\icons\pdf-icon.png" alt=""
+                                                    width="20px" height="20px"> PDF</a>
+                                            <a (click)="exportexcel()"> <img src="assets\icons\excel.jpg" alt=""
+                                                    width="20px" alt=""> Excel</a>
+                                        </div>
+                                    </div>
+</div>
+</div>
                         <br>
-
-                        <!-- <div class="row d-md-flex data-row-header">
-                            <div class="col-2 col-md-2 py-3 d-flex verticle-content-middle">State :
-                                {{year?year:'2022'}}</div>
-                            <div class="col-4 col-md-4 py-3 d-flex verticle-content-middle">Project Co-ordinator Category
-                                :
-                                {{crop?crop:'BULBVEGETABLES'}}
-                            </div>
-                            <div class="col-4 col-md-4 py-3 d-flex verticle-content-middle">Project Co-ordinator Name :
-                                {{season?season:'Kharif'}}
-                            </div>
-
-                            <div class="col-2 col-md-2 py-3 d-flex justify-content-end">As on Date: {{todayData
-                                | date:"dd-MM-YYYY"}}</div>
-
-                        </div>
-                        <div class="middle_line"></div> -->
 
                         <div class="row data-row">
                             <table class="table table-bordered table-responsive">
-                                <thead>
+                                <!-- <thead>
                                     <tr class="data-row-header">
                                         <th scope="col" class="col-md-1 py-3 sn-report">S/N</th>
-                                        <th scope="col" class="col-md-6 py-3">Name of the Project Coordinator </th>
+                                        <th scope="col" class="col-md-6 py-3">Name of the Project Coordinator</th>
                                         <th scope="col" class="col-md-6 py-3">Short Name</th>
                                         <th scope="col" class="col-md-6 py-3">Crop Name</th>
                                         <th scope="col" class="col-md-6 py-3">State</th>
@@ -304,14 +295,35 @@
                                         <th scope="col" class="col-md-6 py-3">Email </th>
                                         <th scope="col" class="col-md-6 py-3">Status </th>
                                     </tr>
-                                </thead>
-                                <tbody *ngFor="let data of filterPaginateSearch.itemList; let dataIndex=index">
+
+                                
+                                </thead> -->
+                                  <thead class="height">
+      <tr class="data-row-header">
+        <th class="col-md-0 height sn-report">S/N</th>
+        <th class="col-md-1"><span class="now">Name of the Project Coordinator</span></th>
+        <th class="col-md-2">Short Name</th>
+        <th class="col-md-2">Crop Name</th>
+        <th class="col-md-1">State</th>
+        <th class="col-md-1">District</th>
+        <th class="col-md-1">Address</th>
+        <th class="col-md-1">Contact Officer Name</th>
+        <th class="col-md-1">Contact Officer Designation</th>
+        <th class="col-md-1">Mobile</th>
+        <th class="col-md-1">Email</th>
+        <th class="col-md-1">Status</th>
+      </tr>
+    </thead>
+                                    <tbody *ngFor="let data of completeData; let dataIndex=index">
+
+                                
                                     <tr>
-                                        <td class="sn-td-report">
-                                            <span>{{ (filterPaginateSearch.itemListCurrentPage - 1) *
-                                                filterPaginateSearch.itemListPageSize + dataIndex + 1}}.</span>
+                                        <td class="sn-td-report data1">
+                                            <span>
+                                                {{ dataIndex + 1}}.
+                                                </span>
                                         </td>
-                                        <td>
+                                        <td class="data1">
                                             <span style="cursor: pointer;" data-toggle="tooltip"
                                                 data-placement="bottom" title="{{data &&
                                                     data.agency_detail &&  data.agency_detail.agency_name || 'NA' }}">{{data
@@ -319,14 +331,14 @@
                                                 data.agency_detail.agency_name
                                                 || 'NA' }}</span>
                                         </td>
-                                        <td>
+                                        <td class="data1">
 
                                             <span style="cursor: pointer;" data-toggle="tooltip"
                                                 data-placement="bottom" title="{{data &&
                                                     data.agency_detail && data.agency_detail.short_name || 'NA' }}">{{data &&
                                                 data.agency_detail && data.agency_detail.short_name || 'NA' }}</span>
                                         </td>
-                                        <td>
+                                        <td class="data1">
 
                                             <span style="cursor: pointer;" data-toggle="tooltip"
                                                 data-placement="bottom" title="{{data && data.agency_detail  && data.agency_detail.crop_data ? getCropNamefrommlist(data.agency_detail.crop_data) :'NA' }}">
@@ -336,31 +348,30 @@
                                                 </span>
                                         </td>
                                         
-                                        <td>
+                                        <td class="data1">
 
                                             <span style="cursor: pointer;" data-toggle="tooltip"
                                                 data-placement="bottom" title="{{data &&
                                                     data.agency_detail && data.agency_detail.m_state && data.agency_detail.m_state.state_name || 'NA' }}">{{data &&
                                                 data.agency_detail && data.agency_detail.m_state && data.agency_detail.m_state.state_name || 'NA' }}</span>
                                         </td>
-                                        <td>
+                                        <td class="data1">
 
                                             <span style="cursor: pointer;" data-toggle="tooltip"
                                                 data-placement="bottom" title="{{data &&
                                                     data.agency_detail && data.agency_detail.m_district && data.agency_detail.m_district.district_name || 'NA' }}">{{data &&
                                                 data.agency_detail && data.agency_detail.m_district && data.agency_detail.m_district.district_name || 'NA' }}</span>
                                         </td>
-                                      
-                                        <td>
 
-                                            <span style="cursor: pointer;" data-toggle="tooltip"
-                                                data-placement="bottom" title="{{data &&
-                                                    data.agency_detail
-                                                    && data.agency_detail.address || 'NA' }}">{{data &&
-                                                data.agency_detail
-                                                && data.agency_detail.address || 'NA' }}</span>
-                                        </td>
-                                        <td>
+                                        <td class="data1 address-cell">
+  <span data-toggle="tooltip"
+        data-placement="bottom"
+        title="{{data && data.agency_detail && data.agency_detail.address || 'NA'}}">
+    {{data && data.agency_detail && data.agency_detail.address || 'NA'}}
+  </span>
+</td>
+
+                                        <td class="data1">
                                             <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
                                                 data-placement="bottom" title="{{data &&
                                                     data.agency_detail && data.agency_detail.contact_person_name || 'NA'
@@ -368,7 +379,7 @@
                                                 data.agency_detail && data.agency_detail.contact_person_name || 'NA'
                                                 }}</span>
                                         </td>
-                                        <td>
+                                        <td class="data1">
                                             <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
                                                 data-placement="bottom" title="{{data &&
                                                     data.agency_detail && data.agency_detail.m_designation
@@ -380,7 +391,7 @@
                                                 'NA'
                                                 }}</span>
                                         </td>
-                                        <td>
+                                        <td class="data1">
                                             <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
                                                 data-placement="bottom" title="{{data &&
                                                     data.mobile_number || 'NA'
@@ -388,7 +399,7 @@
                                                 data.mobile_number || 'NA'
                                                 }}</span>
                                         </td>
-                                        <td>
+                                        <td class="data1">
 
                                             <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
                                                 data-placement="bottom" title="{{data &&
@@ -397,7 +408,7 @@
                                                 data.email_id || 'NA'
                                                 }}</span>
                                         </td>
-                                        <td>
+                                        <td class="data1">
 
                                             <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
                                                 data-placement="bottom" title="{{data &&
@@ -410,64 +421,16 @@
                                 </tbody>
                             </table>
                         </div>
-
-                        <!-- <table class="table table-bordered border-primary table-responsive text-center">
-                                    <thead style="display:none;">
-                                        <tr style="background-color: #eb9777;">
-                                            <td>Year: {{year?year:'2022'}}</td>
-                                            <td>Season: {{season?season:'Kharif'}}</td>
-                                            <td>Crop Name: {{crop?crop:'BULB VEGETABLES'}}</td>
-                                            <td>As on Date: {{todayData | date:"dd-MM-YYYY"}}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Variety</td>
-                                            <td>Indent Needed</td>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <div *ngFor="let data of finalData; let dataIndex=index">
-                                            <tr class="v1">
-                                                <td rowspan="0" title="{{(data.variety_id?data.variety_id:'NA')}}"
-                                                    width="30%">{{(data && data.variety_id && (data.variety_id.length >
-                                                    30) ? (data.variety_id.substring(0, 30) +
-                                                    "..."):(data.variety_id?data.variety_id:'NA'))}}</td>
-                                                <td rowspan="0" title="{{(data.season?data.season:'NA')}}" width="30%">
-                                                    {{(data && data.season && (data.season.length>
-                                                    30) ? (data.season.substring(0, 30) +
-                                                    "..."):(data.season?data.season:'NA'))}}</td>
-                                                <td rowspan="0" title="{{(data.variety_id?data.variety_id:'NA')}}"
-                                                    width="80%">{{(data && data.variety_id && (data.variety_id.length >
-                                                    30) ? (data.variety_id.substring(0, 30) +
-                                                    "..."):(data.variety_id?data.variety_id:'NA'))}}</td>
-                                                <td rowspan="0" title="{{(data.variety_id?data.variety_id:'NA')}}"
-                                                    width="80%">{{(data && data.variety_id && (data.variety_id.length >
-                                                    30) ? (data.variety_id.substring(0, 30) +
-                                                    "..."):(data.variety_id?data.variety_id:'NA'))}}</td>
-                                                <td rowspan="0" title="{{(data.variety_id?data.variety_id:'NA')}}"
-                                                    width="30%">{{(data && data.variety_id && (data.variety_id.length >
-                                                    30) ? (data.variety_id.substring(0, 30) +
-                                                    "..."):(data.variety_id?data.variety_id:'NA'))}}</td>
-                                                <td rowspan="0" title="{{(data.variety_id?data.variety_id:'NA')}}"
-                                                    width="80%">{{(data && data.variety_id && (data.variety_id.length >
-                                                    30) ? (data.variety_id.substring(0, 30) +
-                                                    "..."):(data.variety_id?data.variety_id:'NA'))}}</td>
-                                               
-                                            </tr>
-                                        </div>
-                                    </tbody>
-                                </table> -->
-
-
                     </div>
                 </div>
 
+                
+
 
                 <div class="col-12 px-3   py-3">
-                    <app-pagination-ui></app-pagination-ui>
-                    <!-- <div _ngcontent-col-c109="" class="w-fit-content pr-2 d-block d-lg-inline-flex"><button _ngcontent-col-c109="" class="prev-paginate page-numbers d-inline-flex justify-content-center verticle-content-middle mx-2"><i _ngcontent-col-c109="" class="fal fa-less-than"></i></button><div _ngcontent-col-c109="" class="page-number-wrapper d-inline-flex py-2 py-lg-0"><button _ngcontent-col-c109="" class="page-numbers mx-2 active" ng-reflect-ng-class="active"> 1 </button><button _ngcontent-col-c109="" class="page-numbers mx-2" ng-reflect-ng-class=""> 2 </button>
-                    </div><div _ngcontent-col-c109="" class="enter-page-wrapper d-inline-flex mx-2"><input _ngcontent-col-c109="" placeholder="Enter Page No." formcontrolname="enterPage" class="px-2 ng-untouched ng-pristine ng-valid" ng-reflect-name="enterPage" ng-reflect-ng-class=""><button _ngcontent-col-c109="" class="page-numbers active">Go</button></div></div> -->
+                    <!-- <app-pagination-ui></app-pagination-ui> -->
                 </div>
-                <div *ngIf="filterPaginateSearch && filterPaginateSearch.initialized &&(!filterPaginateSearch.itemList || filterPaginateSearch.itemList.length < 1)"
+                <div *ngIf="completeData && completeData.length < 1"
                     class="px-2 py-3 w-100" style="height: 50px;">
                     <div class="d-flex verticle-content-middle justify-content-center w-100">
                         No Data Found.

@@ -221,7 +221,7 @@ import { LiftingOfBreederSeedComponent } from '../lifting-of-breeder-seed/liftin
 import { SampleSlipComponent } from './sample-slip/sample-slip.component';
 import { ForwardingLetterComponent } from './forwarding-letter/forwarding-letter.component';
 import { StlReportStatusComponent } from './stl-report-status/stl-report-status.component';
- import { GenerateBreederSeedCertificateComponent } from './generate-breeder-seed-certificate/generate-breeder-seed-certificate.component';
+import { GenerateBreederSeedCertificateComponent } from './generate-breeder-seed-certificate/generate-breeder-seed-certificate.component';
 import { BreederSeedCertificateDownloadComponent } from './breeder-seed-certificate-download/breeder-seed-certificate-download.component';
 import { GenerateForwardingLetterForLabTestingComponent } from './generate-forwarding-letter-for-lab-testing/generate-forwarding-letter-for-lab-testing.component';
 import { LiftingComponent } from './lifting/lifting.component';
@@ -233,7 +233,7 @@ import { BillReceiptQrComponent } from '../bill-receipt-qr/bill-receipt-qr.compo
 import { GenerateCardQrComponent } from '../generate-card-qr/generate-card-qr.component';
 import { ChatSupportComponent } from './chat-support/chat-support.component';
 import { GrowOutTestSampleReceptionComponent } from './grow-out-test-sample-reception/grow-out-test-sample-reception.component';
-import { SowingDetailsComponent } from './sowing-details/sowing-details.component'; 
+import { SowingDetailsComponent } from './sowing-details/sowing-details.component';
 import { BspIiStatusReportComponent } from './bsp-ii-status-report/bsp-ii-status-report.component';
 import { BspIIIStatusReportComponent } from './bsp-iii-status-report/bsp-iii-status-report.component';
 import { InabilityReallocateFormComponent } from './inability-reallocate-form/inability-reallocate-form.component';
@@ -241,29 +241,27 @@ import { BspIStatusReportComponent } from './bsp-i-status-report/bsp-i-status-re
 import { GotMonitoringTeamDetailsComponent } from './got-monitoring-team-details/got-monitoring-team-details.component';
 import { GrowOutTestReportBspvComponent } from './grow-out-test-report-bspv/grow-out-test-report-bspv.component';
 import { CropStatusReportComponent } from './crop-status-report/crop-status-report.component';
-import { ZsrmComponent } from './indenters/zsrm/zsrm.component';
-import { SrpComponent } from './indenters/srp/srp.component';
-import { ZsrmbstofsComponent } from './indenters/zsrmbstofs/zsrmbstofs.component';
-
-
-// import { ZsrmComponent } from './indenters/zsrm/zsrm.component';
-import { ZsrmCsFsAreaComponent } from './indenters/zsrm-cs-fs-area/zsrm-cs-fs-area.component';
-import { SrrComponent } from './indenters/srr/srr.component';
-import { ZsrmCsQsDistributionComponent } from './indenters/zsrm-cs-qs-distribution/zsrm-cs-qs-distribution.component';
-import { ZsrmReqQsComponent } from './indenters/zsrm-req-qs/zsrm-req-qs.component';
-import { VarietyWiseDistCsQsComponent } from './variety-wise-dist-cs-qs/variety-wise-dist-cs-qs.component';
-import { StateVarietyWiseCsqsDistReportComponent } from './state-variety-wise-csqs-dist-report/state-variety-wise-csqs-dist-report.component';
-import { CropWiseCsqsDistReportComponent } from './crop-wise-csqs-dist-report/crop-wise-csqs-dist-report.component';
-import { SrpIndenterCropWiseReportComponent } from './srp-indenter-crop-wise-report/srp-indenter-crop-wise-report.component';
-import { SrpIndenterCropWiseSummaryReportComponent } from './srp-indenter-crop-wise-summary-report/srp-indenter-crop-wise-summary-report.component';
-import { SrpIndenterMasterReportComponent } from './srp-indenter-master-report/srp-indenter-master-report.component';
-import { CropWiseSrpSdReportComponent } from './crop-wise-srp-sd-report/crop-wise-srp-sd-report.component';
-import { CropWiseSummarySrpSdReportComponent } from './crop-wise-summary-srp-sd-report/crop-wise-summary-srp-sd-report.component';
-import { CropVarietyWiseSrpSdReportComponent } from './crop-variety-wise-srp-sd-report/crop-variety-wise-srp-sd-report.component';
-import { SrpDashboardSdComponent } from './srp-dashboard-sd/srp-dashboard-sd.component';
-import { SrpStatusReportComponent } from './srp-status-report/srp-status-report.component';
-
-// import { ZsmrFoundationSeedComponent } from './indenters/zsmr-foundation-seed/zsmr-foundation-seed.component';
+import { SelfSurplusLiftingComponent } from './self-surplus-lifting/self-surplus-lifting.component';
+import { Bspc5TestResultReportComponent } from './bspc5-test-result-report/bspc5-test-result-report.component';
+import { DirectLiftingComponent } from './direct-lifting/direct-lifting.component';
+import { IntakeVerificationRegReportComponent } from './reports/intake-verification-reg-report/intake-verification-reg-report.component';
+import { DiscardLotComponent } from './discard-lot/discard-lot.component';
+import { OilsedLoginModuleComponent } from './oilsed-login-module/oilsed-login-module.component';
+import { ModifyBagSizeComponent } from './production-center-phase-2/modify-bag-size/modify-bag-size.component';
+import { DashboardPhaseSecondComponent } from './dashboard-phase-second/dashboard-phase-second.component';
+import { CropGroupDetailComponent } from './crop-group-detail/crop-group-detail.component';
+// import { CropReportComponent } from './crop-report/crop-report.component';
+import { StateWiseCropStatisticsComponent } from './state-wise-crop-statistics/state-wise-crop-statistics.component';
+import { CropWiseStatisticsComponent } from './crop-wise-statistics/crop-wise-statistics.component';
+import { ReportDashboardComponent } from './report-dashboard/report-dashboard.component';
+import { VarietyReportListComponent } from './variety-report-list/variety-report-list.component';
+import { PulsesseedLoginModuleComponent } from './pulsesseed-login-module/pulsesseed-login-module.component';
+import { SeedReport1Component } from './seed-report1/seed-report1.component';
+import { SeedReport2Component } from './seed-report2/seed-report2.component';
+import { SeedRollingPlaningCropWiseComponent } from './seed-rolling-planing/indentor-login/seed-rolling-planing-crop-wise/seed-rolling-planing-crop-wise.component';
+import { SeedRollingPlaningVarietyWiseComponent } from './seed-rolling-planing/indentor-login/seed-rolling-planing-variety-wise/seed-rolling-planing-variety-wise.component';
+import { StateLoginReplanningComponent } from './state-login-replanning/state-login-replanning.component';
+// import { ProfarmaOneQrComponent } from './profarma-one-qr/profarma-one-qr.component';
 const routes: Routes = [
   // {
   //   path: 'login',
@@ -277,10 +275,42 @@ const routes: Routes = [
       //   path: '',
       //   component: WebLoginComponent
       // },
-      { 
+      {
+        path: 'state-Report1',
+        component: SeedReport1Component,
+      },
+      // { path: 'report-data/:data', component: ProfarmaOneQrComponent },
+
+      {
+        path: 'state-Report2',
+        component: SeedReport2Component,
+      },
+      {
+        path: 'state-wise-crop-statistics',
+        component: ReportDashboardComponent,
+        canActivate: [SeedDivisionGuard]
+      },
+      {
         path: 'add-crop/submission/edit/:submissionid',
         component: AddCropComponent,
         canActivate: [SeedDivisionGuard]
+      },
+      {
+        path: 'crop-statistics',
+        component: CropGroupDetailComponent,
+        canActivate: [SeedDivisionGuard]
+      },
+      {
+        path: 'Crop-wise-statistics',
+        component: CropWiseStatisticsComponent,
+        // canActivate: [SeedDivisionGuard]
+      },
+
+
+      {
+        path: 'report2-state-wise',
+        component: StateWiseCropStatisticsComponent,
+        // canActivate: [SeedDivisionGuard]
       },
       {
         path: 'add-crop/submission/view/:submissionid',
@@ -637,8 +667,8 @@ const routes: Routes = [
         path: 'maximum-lot-size-list',
         component: MaximumLotSizeListComponent,
         canActivate: [SeedDivisionGuard]
-      }, 
-      
+      },
+
 
       {
         path: 'add-maximum-lot-size',
@@ -873,7 +903,7 @@ const routes: Routes = [
       {
         path: 'seed-division/breeder-seed-allocation-lifting/new',
         component: AllocationBreederSeedIndentorLiftingFormComponent,
-        canActivate: [SeedDivisionGuard]
+        // canActivate: [SeedDivisionGuard]
       },
       {
         path: 'seed-division/breeder-seed-allocation-lifting/edit/:submissionid',
@@ -1001,7 +1031,7 @@ const routes: Routes = [
         path: 'grow-out-test-sample-reception',
         component: GrowOutTestSampleReceptionComponent
       },
-      
+
 
       {
         path: 'lifting-utilization-of-breeder-seed-report',
@@ -1092,6 +1122,10 @@ const routes: Routes = [
         component: ProjectCoordinatorReportComponent
       },
       {
+        path: 'variety-report-list',
+        component: VarietyReportListComponent
+      },
+      {
         path: 'spp-report',
         component: PlantDetailReportComponent
       },
@@ -1144,7 +1178,7 @@ const routes: Routes = [
       {
         path: 'ProcessedRegisterOldStock',
         component: ProcessedRegisterOldStockComponent
-      }, 
+      },
       {
         path: 'indenter-report',
         component: IndenterReportComponent,
@@ -1164,35 +1198,6 @@ const routes: Routes = [
         path: 'list-of-indent-report',
         component: ListOfIndentReportComponent
       },
-    
-      {
-        path:'requirement-of-Foundation-Seed',
-        component: ZsrmComponent
-      },
-      {
-        path:'requirement-of-cs-qs-Seed',
-        component: ZsrmReqQsComponent
-      },
-      {
-          path: 'SeedRollingPlan',
-          component:SrpComponent
-      },
-      {
-         path: 'conversion-of-BStoFS',
-         component:ZsrmbstofsComponent
-     },{
-        path:'area-registered-for-certification',
-        component: ZsrmCsFsAreaComponent
-      },{
-        path:'target-Achievement-of-seed',
-        component: SrrComponent
-      },
-
-      {
-        path:'seed-distribution',
-        component: ZsrmCsQsDistributionComponent
-      },
-      
       {
         path: 'view-selection-of-spa-for-submission-indent/view',
         component: ViewSelectionOfSpaForSubmissionIndentComponent
@@ -1262,6 +1267,14 @@ const routes: Routes = [
         component: LiftingComponent
       },
       {
+        path: 'direct-lifting',
+        component: DirectLiftingComponent
+      },
+      {
+        path: 'self-surplus-lifting',
+        component: SelfSurplusLiftingComponent
+      },
+      {
         path: 'add-seed-producing-agency-spa-indentor',
         component: IndentorSpaComponent
       },
@@ -1300,51 +1313,6 @@ const routes: Routes = [
       {
         path: 'submit-indent-of-spa-wise',
         component: IndentBreederSeedSpaWiseReportComponent
-      },
-      {
-        path: 'variety-wise-dist-cs-qs',
-        component: VarietyWiseDistCsQsComponent
-      },
-      {
-        path:'state-variety-wise-cs-qs-dist-report',
-        component: StateVarietyWiseCsqsDistReportComponent
-      },
-      {
-        path:'crop-wise-srp-report',
-        component: SrpIndenterCropWiseReportComponent
-      },
-      {
-        path:'crop-wise-summary-srp-report',
-        component: SrpIndenterCropWiseSummaryReportComponent
-      },
-      {
-        path:'crop-wise-srp-sd-report',
-        component: CropWiseSrpSdReportComponent
-      },
-      {
-        path:'srp-dashboard-sd',
-        component: SrpDashboardSdComponent
-      },
-      {
-        path:'srp-status-report',
-        component: SrpStatusReportComponent
-      },
-      {
-        path:'crop-wise-summary-srp-sd-report',
-        component: CropWiseSummarySrpSdReportComponent
-      },
-      {
-        path:'master-srp-sd-report',
-        component: CropVarietyWiseSrpSdReportComponent
-      },
-
-      {
-        path:'master-srp-report',
-        component: SrpIndenterMasterReportComponent
-      },
-      {
-        path: 'crop-wise-cs-qs-dist-report',
-        component: CropWiseCsqsDistReportComponent
       },
       {
         path: 'allocated-quantity-seed-division',
@@ -1475,6 +1443,10 @@ const routes: Routes = [
         component: GrowOutTestReportBspvComponent
       },
       {
+        path: 'grow-of-testing-result',
+        component: Bspc5TestResultReportComponent
+      },
+      {
         path: 'bspc-inspection-monitoring-team-details',
         component: BspcInspectionMonitoringTeamComponent
       },
@@ -1515,7 +1487,7 @@ const routes: Routes = [
       },
 
       {
-        path: 'print-bill', 
+        path: 'print-bill',
         component: PrintBillComponent
       },
 
@@ -1550,22 +1522,22 @@ const routes: Routes = [
       },
       {
         path: 'invoice',
-        component:  InvoiceComponent
+        component: InvoiceComponent
       },
       {
         path: 'spp-dashboard',
-        component: SppDashboardSecondComponent    
+        component: SppDashboardSecondComponent
       },
       {
         path: 'submit-indents-breeder-report',
         component: RecievedIndentReportComponent,
-        canActivate: [SeedDivisionGuard]
+        // canActivate: [SeedDivisionGuard]
       },
       {
         path: 'carry-over-seed-production',
         component: CarryOverSeedComponent,
         // canActivate: [SeedDivisionGuard]
-      }, 
+      },
       {
         path: 'availability-of-breederseed',
         component: AvailabilityOfBreederseedComponent,
@@ -1664,7 +1636,12 @@ const routes: Routes = [
       {
         path: 'inability-reallocate-form',
         component: InabilityReallocateFormComponent
-      }
+      },
+      {
+        path: 'intake-verification-register-report',
+        component: IntakeVerificationRegReportComponent
+      },
+
       // {
       //   path: 'breeder-seed-cerficate-qr/:id',
       //   component: BreederSeedCertificateQrComponent
@@ -1677,13 +1654,51 @@ const routes: Routes = [
       //   path: 'variety-characterstic-reports/view/:submissionid',
       //   component: VarietyCharactersticReportsComponent
       // },
-      
+
       // {
       //     path: 'unfreeze-indent',
       //     component: UnfreezeIndentComponent
       // }
+      {
+        path: 'discard-lot',
+        component: DiscardLotComponent
+      },
+      {
+        path: 'recieved-indent-oil-seed',
+        component: OilsedLoginModuleComponent
+      },
+
+      {
+        path: 'recieved-indent-pulses-seed',
+        component: PulsesseedLoginModuleComponent
+      },
+      // modify bag size
+      {
+        path: 'update-tag-bag-size',
+        component: ModifyBagSizeComponent
+      },
+      {
+        path: 'dashboard-phase-second',
+        component: DashboardPhaseSecondComponent
+      },
+      {
+        path: 'seed-rolling-planing-crop-wise',
+        component: SeedRollingPlaningCropWiseComponent
+      },
+      {
+        path: 'seed-rolling-planing-variety-wise',
+        component: SeedRollingPlaningVarietyWiseComponent
+      },
+      {
+        path: 'seed-rolling-planing-variety-wise/:id/:crop_code',
+        component: SeedRollingPlaningVarietyWiseComponent
+      },
+      {
+        path: 'state-login-replanning',
+        component: StateLoginReplanningComponent
+      }
     ]
-  }
+  },
 ];
 
 @NgModule({

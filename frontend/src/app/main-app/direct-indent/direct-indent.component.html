@@ -76,7 +76,7 @@
                                                 aria-labelledby="sortMenu">
                                                 <input type="text" class="form-control px-4" formControlName="crop_text"
                                                     placeholder="Search Crop...">
-                                                    <button class="dropdown-item" *ngFor="let item of cropData"
+                                                <button class="dropdown-item" *ngFor="let item of cropData"
                                                     (click)="crop(item)" #dropdownItem [attr.data-parent-name]="'crop'">
                                                     {{ item && item.crop_name ? item.crop_name : '' }}
                                                 </button>
@@ -165,6 +165,60 @@
             </div>
             <!-- end sectio 1  -->
 
+            <!-- radio btn -->
+            <div class="col-12" *ngIf="isSearchRadio">
+                <div class="row px-2 pt-1 pb-1">
+                    <div class="col-lg-8 col-md-12 col-12">
+                        <div class="row">
+                            <div class="col-md-2 col-sm-2 col-md-2 col-lg-3 mb-2 mb-md-0">
+                                <div class="form-check">
+                                    <!-- checked -->
+                                    <!-- [checked]="ngForm.controls['willing_to_produce'].value=='yes'" -->
+                                    <!-- [ngClass]="isDisableNormal?'disableField':''" [disabled]="isDisableNormal" -->
+                                    <input class="radio-button form-check-input radio-btn" name="notifiedValue"
+                                        type="radio" (change)="productionTypeValue('direct')" id="flexRadioDefault1"
+                                        value="non-notified">
+                                    <label class="form-check-label" for="flexRadioDefault1">
+                                        Direct Indent <!-- Normal Varieties -->
+                                    </label>
+                                </div>
+                            </div>
+                            <!-- [(ngModel)]="notifiedValue" -->
+                            <!-- checked -->
+                            <!-- [checked]="ngForm.controls['willing_to_produce'].value=='no' && ngForm.controls['variety'].value" -->
+                            <!-- [ngClass]="isDisableDelay?'disableField':''" [disabled]="isDisableDelay" -->
+                            <div class="col-md-2 col-sm-2 col-md-2 col-lg-3 pl-lg-5 pl-md-5 pl-sm-2 ">
+                                <div class="form-check">
+                                    <input class="radio-button form-check-input radio-btn" name="notifiedValue"
+                                        type="radio" (change)="productionTypeValue('self')" id="flexRadioDefault2">
+                                    <label class="form-check-label" for="flexRadioDefault2">
+                                        Self/Surplus indent<!-- Delayed Varieties -->
+                                    </label>
+                                </div>
+                            </div>
+                            <!-- <div class="col-md-2 col-sm-2 col-md-2 col-lg-3 pl-lg-5 pl-md-5 pl-sm-2 ">
+                                <div class="form-check">
+                                    <input class="radio-button form-check-input radio-btn" name="notifiedValue"
+                                        type="radio" (change)="productionTypeValue('REALLOCATION')"[ngClass]="isDisableNormalReallocate?'disableField':''" [disabled]="isDisableNormalReallocate" id="flexRadioDefault2">
+                                    <label class="form-check-label" for="flexRadioDefault2">
+                                        Reallocated Varieties
+                                    </label>
+                                </div>
+                            </div> -->
+                            <div class="col-md-1 col-sm-1 col-md-1 col-lg-1 ">
+                                <!-- form-button btn-inventory search d-inline-flex justify-content-center verticle-content-middle mb-3 -->
+                                <!-- <button (click)="resetRadioBtn()"
+                                    class="btn-reset w-50 search text-white inline-flex justify-content-center verticle-content-middle"
+                                    title="Reset"><i class="fa fa-refresh"
+                                        style="font-size:20px;color:rgb(255, 255, 255)"></i>
+                                </button> -->
+                                <!-- (click)="search()" -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- start section 2 -->
             <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
                 <div class="row card-inventory form-group">
@@ -173,19 +227,20 @@
                             <div class="" class="col-12 col-md-12 col-lg-12 col-xl-12">
                                 <div class="row">
                                     <!-- State -->
-                                    <div class="col-12 col-md-4 col-lg-4 col-sm-6 col-xl-3 pt-1">
+                                    <div class="col-12 col-md-4 col-lg-4 col-sm-6 col-xl-3 pt-1" *ngIf="isDirect">
                                         <div class="row">
                                             <div class="col-12 col-md-12 col-lg-12">
-                                                <label for="state" class="left-heading required">Select State</label>
+                                                <label for="state" class="left-heading required">Select
+                                                    State</label>
                                             </div>
                                             <div class="col-12 col-md-12 col-lg-12">
                                                 <!-- <select type="text" class=" form-control input-inventory"
-                                                    formControlName="state">
-                                                    <option value="">Please Select State</option>
-                                                    <option *ngFor="let data of stateData" value="{{data.state_code}}">
-                                                        {{data && data.state_name ?
-                                                        data.state_name :""}}</option>
-                                                </select> -->
+                                                        formControlName="state">
+                                                        <option value="">Please Select State</option>
+                                                        <option *ngFor="let data of stateData" value="{{data.state_code}}">
+                                                            {{data && data.state_name ?
+                                                            data.state_name :""}}</option>
+                                                    </select> -->
                                                 <div ngbDropdown class="d-inline-block w-100">
                                                     <button
                                                         class="btn takeplacholder w-100 crop toggle-button input-inventory"
@@ -219,7 +274,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-12 col-md-4 col-lg-4 col-sm-6 col-xl-3 pt-1">
+                                    <div class="col-12 col-md-4 col-lg-4 col-sm-6 col-xl-3 pt-1" *ngIf="isDirect">
                                         <div class="row">
                                             <div class="col-12 col-md-12 col-lg-12 col-xl-12">
                                                 <label for="district" class="left-heading required">Select
@@ -243,7 +298,8 @@
                                                         <button class="dropdown-item" *ngFor="let item of districtData"
                                                             (click)="district(item)" #dropdownItem
                                                             [attr.data-parent-name]="'district'">
-                                                            {{ item && item.district_name ? item.district_name : '' }}
+                                                            {{ item && item.district_name ? item.district_name : ''
+                                                            }}
                                                         </button>
                                                     </div>
                                                 </div>
@@ -260,28 +316,28 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-12 col-md-4 col-lg-4 col-sm-6 col-xl-3 pt-1">
+                                    <div class="col-12 col-md-4 col-lg-4 col-sm-6 col-xl-3 pt-1" *ngIf="isDirect">
                                         <div class="row">
                                             <div class="col-12 col-md-12 col-lg-12 col-xl-12">
                                                 <label for="selectSpa" class="left-heading required">Select SPA
                                                     Name</label>
                                             </div>
                                             <!-- <div class="col-12 col-md-12 col-lg-12 col-xl-12">
-                                                <select type="text" class="form-control input-inventory"
-                                                    formControlName="selectSpa" placeholder="Select SPA Name"
-                                                    (change)="onSelectSPA()">
-                                                    <option value="">Select SPA Name</option>
-                                                    <option *ngFor="let spa of allSpaData" value="{{spa.spa_code}}">
-                                                        {{spa && spa.spa_name}}</option>
-                                                    <option value="Other">Other</option>
-                                                </select>
-                                                <div class=" errorMessage"
-                                                    *ngIf="submitted || ngForm.controls['selectSpa'].invalid && (ngForm.controls['selectSpa'].dirty || ngForm.controls['selectSpa'].touched)">
-                                                    <span *ngIf=" ngForm.controls['selectSpa'].errors?.['required']">
-                                                        Please Select SPA.
-                                                    </span>
-                                                </div>
-                                            </div> -->
+                                                    <select type="text" class="form-control input-inventory"
+                                                        formControlName="selectSpa" placeholder="Select SPA Name"
+                                                        (change)="onSelectSPA()">
+                                                        <option value="">Select SPA Name</option>
+                                                        <option *ngFor="let spa of allSpaData" value="{{spa.spa_code}}">
+                                                            {{spa && spa.spa_name}}</option>
+                                                        <option value="Other">Other</option>
+                                                    </select>
+                                                    <div class=" errorMessage"
+                                                        *ngIf="submitted || ngForm.controls['selectSpa'].invalid && (ngForm.controls['selectSpa'].dirty || ngForm.controls['selectSpa'].touched)">
+                                                        <span *ngIf=" ngForm.controls['selectSpa'].errors?.['required']">
+                                                            Please Select SPA.
+                                                        </span>
+                                                    </div>
+                                                </div> -->
                                             <div class="col-12 col-md-12 col-lg-12 col-xl-12">
                                                 <div ngbDropdown class="d-inline-block w-100"
                                                     [ngClass]="!ngForm.controls['district'].value ? 'disableButton' : ''">
@@ -321,7 +377,7 @@
                                     </div>
 
                                     <div class="col-12 col-md-4 col-lg-4 col-sm-6 col-xl-3 pt-1"
-                                        *ngIf="showOtherInputBox">
+                                        *ngIf="showOtherInputBox && isDirect">
                                         <div class="row">
                                             <div class="col-12 col-md-12 col-lg-12 col-xl-12">
                                                 <label for="otherInput" class="left-heading ">
@@ -335,7 +391,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-12 col-md-4 col-lg-4 col-sm-6 col-xl-3 pt-1">
+                                    <div class="col-12 col-md-4 col-lg-4 col-sm-6 col-xl-3 pt-1" *ngIf="isDirect">
                                         <div class="row">
                                             <div class="col-12 col-md-12 col-lg-12 col-xl-12">
                                                 <label for="address" class="left-heading ">Address</label>
@@ -347,10 +403,11 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-12 col-md-4 col-lg-4 col-sm-6 col-xl-3 pt-1">
+                                    <div class="col-12 col-md-4 col-lg-4 col-sm-6 col-xl-3 pt-1" *ngIf="isDirect">
                                         <div class="row">
                                             <div class="col-12 col-md-12 col-lg-12 col-xl-12">
-                                                <label for="mobile_no" class="left-heading required">Mobile No.</label>
+                                                <label for="mobile_no" class="left-heading required">Mobile
+                                                    No.</label>
                                             </div>
                                             <div class="col-12 col-md-12 col-lg-12 col-xl-12">
                                                 <input type="text" (input)="validateInput($event)"
@@ -369,7 +426,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-12 col-md-4 col-lg-4 col-sm-6 col-xl-3 pt-1">
+                                    <div class="col-12 col-md-4 col-lg-4 col-sm-6 col-xl-3 pt-1" *ngIf="isDirect">
                                         <div class="row">
                                             <div class="col-12 col-md-12 col-lg-12 col-xl-12">
                                                 <label for="email" class="left-heading required">
@@ -390,8 +447,8 @@
                                             </div>
                                         </div>
                                     </div>
-
-                                    <div class="col-12 col-md-4 col-lg-4 col-sm-6 col-xl-3 pt-1" *ngIf=!isLimeSection>
+                                    <!-- && (isDirect || isSelf) -->
+                                    <div class="col-12 col-md-4 col-lg-4 col-sm-6 col-xl-3 pt-1" *ngIf="!isLimeSection && (isDirect || isSelf)">
                                         <div class="row">
                                             <div class="col-12 col-md-12 col-lg-12 col-xl-12">
                                                 <label for="indent_qnt" class="left-heading required"
@@ -415,8 +472,8 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <div class="lime-main-section" *ngIf="isLimeSection ">
+                                <!-- && (isDirect || isSelf) -->
+                                <div class="lime-main-section" *ngIf="isLimeSection && (isDirect || isSelf)">
                                     <div class="lime-main-heading">
                                         <span>{{selectVariety }} is a Hybrid Variety. Please fill Indent Quantity for
                                             its
@@ -432,6 +489,7 @@
                                                     [value]="data && data.line_variety_name? data.line_variety_name : '' "
                                                     placeholder="Line Name" disabled>
                                             </div>
+                                            <!-- *ngIf="isDirect || isSelf" -->
                                             <div class="col-12 col-md-4 col-lg-4 col-sm-6 col-xl-2 pt-1 pl-0">
                                                 <label for="indentQnty_{{ i }}" class="left-heading required">Indent
                                                     Quantity ({{ this.unit }})</label>
@@ -459,13 +517,28 @@
                             <!-- finish section 2 -->
 
                             <!-- button section -->
-                            <div class="col-12 col-md-10 col-lg-10 pt-4 pb-2 buttons-phone col-xl-10">
+                            <div class="col-12 col-md-10 col-lg-10 pt-4 pb-2 buttons-phone col-xl-10" *ngIf="(isDirect || isSelf)">
                                 <button
                                     class="btn-inventory-cancel search d-inline-flex justify-content-center verticle-content-middle mb-3"
                                     (click)="revertDataCancelation()" style="border: 2px solid #B64B1D;">Cancel</button>
                                 <button
                                     class="search form-button btn-inventory ml-2 d-inline-flex justify-content-center verticle-content-middle mb-3"
-                                    (click)="createNewSpa()" *ngIf="!is_update">Save</button>
+                                    (click)="createNewSpa()" *ngIf="!showSaveButton && !is_update">
+                                    Save
+                                </button> 
+                                    <button class="search form-button btn-inventory ml-2 d-inline-flex justify-content-center verticle-content-middle mb-3"
+                                        (click)="createNewSpa()" 
+                                        *ngIf="showSaveButton && !is_update"
+                                        [disabled]="filterPaginateSearch && filterPaginateSearch.initialized && (!filterPaginateSearch.itemList || filterPaginateSearch.itemList.length > 0)">
+                                        Save
+                                    </button>
+                                
+                                    <!-- Message: "Already Indented" -->
+                                    <span *ngIf="filterPaginateSearch && filterPaginateSearch.initialized && (!filterPaginateSearch.itemList || filterPaginateSearch.itemList.length > 0) && showSaveButton && !is_update" 
+                                           >
+                                        <b class="text-danger ml-2">Already Indented, Edit from list if you need to modify the indent !</b> 
+                                    </span> 
+                                
                                 <button
                                     class="search form-button btn-inventory ml-2 d-inline-flex justify-content-center verticle-content-middle mb-3"
                                     (click)="updateForm()" *ngIf="is_update">Update</button>
@@ -483,9 +556,9 @@
                     </div>
                     <div class="col-12 col-md-12 col-lg-12 col-sm-12 col-xl-12">
                         <div class="list-wrapper">
-                            <div class="row d-none d-md-flex data-row-header">
+                            <div class="row d-none d-md-flex data-row-header ">
                                 <div
-                                    class="col-12 col-sm-2 col-md-2 col-lg-2 col-xl-2 py-2 d-flex align-items-center justify-content-center text-center">
+                                    class="col-12  col-sm-2 col-md-2 col-lg-2 col-xl-2 py-2 d-flex align-items-center justify-content-center text-center">
                                     Crop</div>
                                 <div
                                     class="col-12 col-sm-2 col-md-2 col-lg-2 col-xl-2 py-2 d-flex align-items-center justify-content-center text-center">
@@ -505,23 +578,24 @@
                                     *ngIf=showQuantity>
                                     Indent Qty (Kg)
                                 </div>
-                                <div
+                                <div *ngIf="isDirect"
                                     class="col-12 col-sm-1 col-md-1 col-lg-1 col-xl-1 py-2 d-flex align-items-center justify-content-center text-center">
                                     State
                                 </div>
-                                <div
+                                <div  *ngIf="isDirect"
                                     class="col-12 col-sm-1 col-md-1 col-lg-1 col-xl-2 py-2 d-flex align-items-center justify-content-center text-center">
                                     SPA
                                 </div>
-                                <div class="col-12 col-sm-1 col-md-1 col-lg-1 col-xl-1 py-22 d-flex align-items-center justify-content-center text-center" >
+                                <div
+                                    class="col-12 col-sm-1 col-md-1 col-lg-1 col-xl-1 py-22 d-flex align-items-center justify-content-center text-center">
                                     Generated On
-                                </div>           
+                                </div>
                                 <div
                                     class="col-12 col-sm-1 col-md-1 col-lg-1 col-xl-1 py-2 d-flex align-items-center justify-content-center text-center ">
                                     Action
                                 </div>
                             </div>
-                            <div>
+                            <div  >
                                 <div *ngFor="let data of filterPaginateSearch.itemList; let dataIndex=index"
                                     class="row data-row">
                                     <div
@@ -549,25 +623,62 @@
                                             </span>
                                         </div>
                                     </div>
-                                   
-                                    <div class="col-12 col-sm-2 col-md-2 col-lg-2 col-xl-2 py-1 d-flex align-items-center justify-content-center text-center">
+                                    <!-- <div class="col-12 col-sm-1 col-md-1 col-lg-1 col-xl-1 py-1 d-flex align-items-center justify-content-center text-center">
+                                        <div class="w-fit-content">
+                                            <ng-container *ngIf="data.parental_line && data.parental_line.length > 0; else noData">
+                                                <span *ngFor="let line of data.parental_line">
+                                                    <span style="cursor: pointer; word-break: break-word;"
+                                                        data-toggle="tooltip" data-placement="bottom"
+                                                        title="{{ line.variety_code_line }}">
+                                                        {{ line.line_variety_name}}
+                                                    </span><br>
+                                                </span>
+                                            </ng-container>
+                                            <ng-template #noData>
+                                                N/A
+                                            </ng-template>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-sm-1 col-md-1 col-lg-1 col-xl-1 py-1 d-flex align-items-center justify-content-center text-center">
+                                        <div class="w-fit-content">
+                                            <span *ngIf="data.parental_line && data.parental_line.length > 0">
+                                                <span *ngFor="let line of data.parental_line">
+                                                    <span style="cursor: pointer; word-break: break-word;"
+                                                        data-toggle="tooltip" data-placement="bottom"
+                                                        title="{{ line.variety_code_line }}">
+                                                        {{ line.quantity | number: '1.2-2' }}<br>
+                                                    </span>
+                                                </span>
+                                            </span>
+                                            <span *ngIf="!data.parental_line || data.parental_line.length === 0"> {{data
+                                                && data.quantity ? data.quantity : ""}}</span>
+                                        </div>
+                                    </div> -->
+
+                                    <div
+                                        class="col-12 col-sm-2 col-md-2 col-lg-2 col-xl-2 py-1 d-flex align-items-center justify-content-center text-center">
                                         <div class="row col-xl-12">
                                             <div class="col-12">
-                                                <ng-container *ngIf="data.parental_line && data.parental_line.length > 0; else noData">
+                                                <ng-container
+                                                    *ngIf="data.parental_line && data.parental_line.length > 0; else noData">
                                                     <div *ngFor="let line of data.parental_line">
                                                         <span class="row">
-                                                            <div class=" myClass col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 d-flex align-items-center justify-content-center text-center">
+                                                            <div
+                                                                class=" myClass col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 d-flex align-items-center justify-content-center text-center">
                                                                 <span style="cursor: pointer; word-break: break-word;"
                                                                     data-toggle="tooltip" data-placement="bottom"
                                                                     title="{{ line.variety_code_line }}">
-                                                                  {{ line.line_variety_name}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                                    {{
+                                                                    line.line_variety_name}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                                                 </span>
                                                             </div>
-                                                            <div class=" myClass col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 d-flex align-items-center justify-content-center text-center">
+                                                            <div
+                                                                class=" myClass col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 d-flex align-items-center justify-content-center text-center">
                                                                 <span style="cursor: pointer; word-break: break-word;"
                                                                     data-toggle="tooltip" data-placement="bottom"
                                                                     title="{{ line.variety_code_line }}">
-                                                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ line.quantity | number: '1.2-2' }}<br>
+                                                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ line.quantity
+                                                                    | number: '1.2-2' }}<br>
                                                                 </span>
                                                             </div>
                                                             <br>
@@ -575,12 +686,15 @@
                                                     </div>
                                                 </ng-container>
                                                 <ng-template #noData>
-                                                    <div class="row d-flex align-items-center justify-content-center text-center">
-                                                        <div class=" myClass col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 d-flex align-items-center justify-content-center text-center">
+                                                    <div
+                                                        class="row d-flex align-items-center justify-content-center text-center">
+                                                        <div
+                                                            class=" myClass col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 d-flex align-items-center justify-content-center text-center">
                                                             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;N/A&nbsp;
                                                             &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp;
                                                         </div>
-                                                        <div class=" myClass col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 d-flex verticle-content-top justify-content-end">
+                                                        <div
+                                                            class=" myClass col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 d-flex verticle-content-top justify-content-end">
                                                             {{data && data.quantity ? data.quantity : ""}}
                                                         </div>
                                                     </div>
@@ -589,7 +703,7 @@
                                         </div>
                                     </div>
 
-                                    <div
+                                    <div  *ngIf="isDirect"
                                         class="col-12 col-sm-1 col-md-1 col-lg-1 col-xl-1 py-1 d-flex align-items-center justify-content-center text-center">
                                         <div class="w-fit-content">
                                             <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
@@ -598,7 +712,7 @@
                                             </span>
                                         </div>
                                     </div>
-                                    <div
+                                    <div  *ngIf="isDirect"
                                         class="col-12 col-sm-1 col-md-1 col-lg-1 col-xl-2 py-1 d-flex align-items-center justify-content-center text-center">
                                         <div class="w-fit-content">
                                             <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"

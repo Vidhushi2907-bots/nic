@@ -7,7 +7,7 @@ import { SeedServiceService } from 'src/app/services/seed-service.service';
 import Swal from 'sweetalert2';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+//pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as XLSX from 'xlsx';
 import * as html2PDF from 'html2pdf.js';
 

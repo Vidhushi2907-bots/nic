@@ -1,4 +1,4 @@
-import { Component, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Item } from '@syncfusion/ej2-angular-pdfviewer';
@@ -25,10 +25,12 @@ interface InventoryItem {
 
 export class LiftingComponent implements OnInit {
   @ViewChild(PaginationUiComponent) paginationUiComponent!: PaginationUiComponent;
+  @Input() productionType: string;
   ngForm: FormGroup = new FormGroup([]);
   inventoryYearData: any;
   inventorySeasonData: any;
   inventoryVarietyData: any;
+  isRadioSelected = false;
   datatodisplay = [];
   isSearch: boolean;
   visibleTable: boolean = false;
@@ -65,7 +67,10 @@ export class LiftingComponent implements OnInit {
     { id: 2, charges: "License fee" },
     { id: 3, charges: "PPV fee" },
     { id: 4, charges: "Royalty" },
-    // { id: 5, charges: "Other" },
+    { id: 5, charges: "Transportation" },
+    { id: 6, charges: "Postage" },
+    { id: 7, charges: "Packing" },
+    { id: 8, charges: "Other" },
   ];
   dropdownList2 = [];
   dropdownList3 = [];
@@ -84,6 +89,8 @@ export class LiftingComponent implements OnInit {
   visiblerltCharges: boolean = false;
   selectedOption;
   allData: any;
+
+
   // dropdownSettings: IDropdownSettings = {};
   // cropName = [
   //   {
@@ -203,7 +210,7 @@ export class LiftingComponent implements OnInit {
   seedProcessRegisterDataList: any;
   runningNo: any;
   sppCode: any;
-  AESKey:string = environment.AESKey;
+  AESKey: string = environment.AESKey;
 
   // new variable created may 30
   lotDetailsArray: any = [];
@@ -230,6 +237,19 @@ export class LiftingComponent implements OnInit {
   totalAmount: any;
   payment_method: any;
   amount: any;
+  isButtonDisabled: boolean;
+  searchClicked2: boolean;
+  tagNoDetailsDatasecond: any[];
+  tagNoArrayData: any = [];
+  response: any;
+  Variety: any;
+  response3: any;
+  response2: any;
+  isUnique: boolean;
+  visiblePackingCharges: boolean;
+  visibleTransportCharges: boolean;
+  visiblePostageCharges: boolean;
+
   // Method to handle file input change event
   onFileChange(event: any) {
     const file = event.target.files[0];
@@ -262,7 +282,7 @@ export class LiftingComponent implements OnInit {
   selectTable(table: string) {
     this.selectedTable = table;
   }
-  constructor(private service: SeedServiceService, private fb: FormBuilder, private formBuilder: FormBuilder, private _productionCenter: ProductioncenterService, private route: Router,
+  constructor(private service: SeedServiceService, private productionService: ProductioncenterService, private fb: FormBuilder, private formBuilder: FormBuilder, private _productionCenter: ProductioncenterService, private route: Router,
     private renderer: Renderer2
   ) {
     this.createForm();
@@ -296,12 +316,32 @@ export class LiftingComponent implements OnInit {
       year: [''],
       season: [''],
       Status: [],
+      indentor_id: [],
       cropName: [''],
       crop_text: [''],
       search_click: [''],
       testing_lab_id: [''],
       variety: [''],
+      variety_level_2: [''],
       variety_code: [''],
+      selectSpa: [''],
+      indent_qnt: [''],
+      otherInput: [''],
+      state_text: [''],
+      district_text: [''],
+      variety_text: [''],
+      indenter_text: [''],
+      spa_code: [''],
+      spa_id: [''],
+      spa_text: [''],
+      variety_notification_year: [''],
+      state: [''],
+      state_code: [''],
+      otherSpaName: [''],
+      address: ['NA'],
+      district: [''],
+      mobile_no: ['NA'],
+      // [Validators.pattern(/^[6-9]\d{9}$/)]
       reason_id: [''],
       dd_no: [''],
       variety_line_code: [''],
@@ -312,7 +352,7 @@ export class LiftingComponent implements OnInit {
       mou_amt: [''],
       mougst_amt: [''],
       mougst_amt_total: [''],
-      totalgst_per: [''],
+      totalgst_per: [0],
       totalgst_amt: [''],
       ppvgst_amt: [''],
       rltgst_amt: [''],
@@ -326,12 +366,25 @@ export class LiftingComponent implements OnInit {
       oth_amt: [],
       othgst_amt: [],
       othgst_amt_total: [],
+      transport_amt: [''],
+      transportgst_amt: [''],
+      transportgst_amt_total: [''],
+      postage_amt: [''],
+      postagegst_amt: [''],
+      postagegst_amt_total: [''],
+      packing_amt: [''],
+      packinggst_amt: [''],
+      packinggst_amt_total: [''],
+      other_amt: [''],
+      othergst_amt: [''],
+      othergst_amt_total: [''],
       total_amt: [],
       grand_total_amt: [],
       final_grand_total_amt: [],
       ppvgst_amt_total: [],
-      draft: [],
-      total_final_amount:[],
+      draft: [""],
+      other_amt_text: [""],
+      total_final_amount: [],
       inventoryItems: this.fb.array([
         // this.inventoryItemsForms()
       ]),
@@ -349,7 +402,7 @@ export class LiftingComponent implements OnInit {
         this.ngForm.controls['season'].enable();
         this.ngForm.controls['crop_text'].disable();
         this.ngForm.controls['search_click'].disable();
-        this.variety_code=''
+        this.variety_code = ''
         this.selectCrop = "";
         // this.generateSampleSlipData.clear();
         this.liftingSeasonData();
@@ -362,7 +415,7 @@ export class LiftingComponent implements OnInit {
         this.ngForm.controls['search_click'].disable();
         // this.generateSampleSlipData.clear();
         this.selectCrop = "";
-        this.variety_code='';
+        this.variety_code = '';
         this.liftingCropData();
       }
     });
@@ -377,7 +430,7 @@ export class LiftingComponent implements OnInit {
       }
     });
     this.ngForm.controls['variety_array'].valueChanges.subscribe(newValue => {
-      this.variety_code='';
+      this.variety_code = '';
       this.liftingTableData()
     });
     this.ngForm.controls['indenter_array'].valueChanges.subscribe(newValue => {
@@ -412,20 +465,9 @@ export class LiftingComponent implements OnInit {
       singleSelection: false,
       idField: 'tag_no',
       textField: 'tag_no',
-      selectAllText: 'Select All',
-      unSelectAllText: 'UnSelect All',
-      itemsShowLimit: 3,
       allowSearchFilter: true
     };
-    // this.dropdownSettings2 = {
-    //   singleSelection: false,
-    //   idField: 'variety_id',
-    //   textField: 'variety_name',
-    //   selectAllText: 'Select All',
-    //   unSelectAllText: 'UnSelect All',
-    //   itemsShowLimit: 3,
-    //   allowSearchFilter: true
-    // };
+
     this.dropdownSettingsVariety = {
       singleSelection: false,
       idField: 'variety_id',
@@ -434,15 +476,8 @@ export class LiftingComponent implements OnInit {
       unSelectAllText: 'UnSelect All',
       itemsShowLimit: 3,
       allowSearchFilter: true
-
-      // singleSelection: false,
-      // idField: 'variety_id',
-      // textField: 'variety_name',
-      // selectAllText: 'Select All',
-      // unSelectAllText: 'UnSelect All',
-      // itemsShowLimit: 3,
-      // allowSearchFilter: true
     };
+
     this.dropdownSettings3 = {
       singleSelection: false,
       idField: 'indent_of_breeder_id',
@@ -452,6 +487,7 @@ export class LiftingComponent implements OnInit {
       itemsShowLimit: 3,
       allowSearchFilter: true
     };
+
     this.dropdownSettings4 = {
       singleSelection: false,
       idField: 'spa_code',
@@ -463,6 +499,7 @@ export class LiftingComponent implements OnInit {
     };
     this.getReason()
   }
+  
   liftingTableData(data = null): void {
     const route = "get-lifting-table-data";
     let variety = this.ngForm.controls['variety_array'].value;
@@ -576,10 +613,23 @@ export class LiftingComponent implements OnInit {
 
         //   })
         // }
-        console.log('result',result)
-        this.allData = result;
-        let filerData = []
+        console.log('result', result)
+        // this.allData = result;
 
+        this.allData = response;
+
+        // if (this.searchClicked1 === true && this.searchClicked2 === true) {
+        //   console.log("12 cli");
+        //   this.allData = result;
+        // } else if (this.searchClicked2 === true) {
+        //   console.log("11 cli");
+        //   this.allData = response;
+        // }
+
+
+        // this.allData = response;
+        let filerData = []
+        this.checkIfButtonShouldBeDisabled();
         // if(data){
         //   this.liftingDetails =  res.EncryptedResponse.data.filter(ele=>ele.Variety===data.Variety) || [];
         //   this.ngForm.controls['variety_code'].setValue(this.liftingDetails && this.liftingDetails[0] && this.liftingDetails[0].variety_code)       
@@ -597,6 +647,45 @@ export class LiftingComponent implements OnInit {
       this.allData = [];
     });
   }
+  getRowSpanForVariety(data: any[], currentVarietyName: string): number {
+    // Filter the rows with the same variety_name
+    return data.filter(item => item.variety_name === currentVarietyName).reduce((totalRows, item) => {
+      // Sum the rows for each SPA and its lifting details
+      return totalRows + item.spas.reduce((spaRows, spa) => {
+        return spaRows + (spa.lifting_details?.length || 1); // Default to 1 if no lifting details
+      }, 0);
+    }, 0);
+  }
+
+  // Function to calculate rowspan
+  getRowSpan(data: any): number {
+    return data.spas.reduce((acc, currentSpa) => acc + currentSpa.lifting_details.length, 0);
+  }
+  getSpaRowSpan(spas: any[], spaIndex: number): number {
+    let count = 0;
+    const currentSpaName = spas[spaIndex].name;
+
+    for (let i = spaIndex; i < spas.length; i++) {
+      // Count rows for the same SPA within the same indenter
+      if (spas[i].name === currentSpaName) {
+        count += spas[i].lifting_details?.length || 1; // Count lifting details or 1 if none
+      } else {
+        break;
+      }
+    }
+
+    return count;
+  }
+
+
+  shouldShowSpaCell(spas: any[], spaIndex: number): boolean {
+    const currentSpaName = spas[spaIndex]?.name?.trim();
+    const previousSpaName = spaIndex > 0 ? spas[spaIndex - 1]?.name?.trim() : null;
+
+    return currentSpaName !== previousSpaName;
+  }
+
+
   // lotNoData()
   liftingVarietyData(): void {
     const route = "get-lifting-variety";
@@ -676,6 +765,37 @@ export class LiftingComponent implements OnInit {
   onSPASelectAll(items: any) {
     console.log('All SPAs selected:', items);
   }
+  // liftingTagNoData(): void {
+  //   const route = "get-lifting-tag-no";
+  //   const param = {
+  //     search: {
+  //       year: this.ngForm.controls['year'].value,
+  //       season: this.ngForm.controls['season'].value,
+  //       crop: this.ngForm.controls['crop_code'].value,
+  //       variety_code: this.variety_code ?   this.variety_code : this.ngForm.controls['variety_code'].value,
+  //       parental_line:this.variety_line_code ? this.variety_line_code:''
+  //     }
+  //   };
+
+  //   this._productionCenter.postRequestCreator(route, param, null).subscribe(res => {
+  //     if (res && res.EncryptedResponse && res.EncryptedResponse.status_code === 200) {
+  //       // this.dropdownList4 = (res.EncryptedResponse.data || []).map(item => {
+  //       //   return { id: item.tag_no, tag_no: item.tag_no, lot_id: item.lot_id, lot_no: item.lot_no, no_of_bags: item.no_of_bags, bag_size: item.bag_size, tag_id: item.tag_id };
+  //       // });
+  //       console.log(res.EncryptedResponse,'res.EncryptedResponse')
+
+  //       this.dropdownList4 =  res.EncryptedResponse.data || [] 
+  //     } else {
+  //       this.dropdownList4 = [];
+  //     }
+  //   }, error => {
+  //     this.dropdownList4 = [];
+  //   });
+  //   console.log(this.dropdownList4,'this.dropdownList4')
+  //   if(this.dropdownList4 && this.dropdownList4.length>0){
+  //     this.dropdownList4= this.dropdownList4.sort((a, b) => b.tag_id - a.tag_id)
+  //   }
+  // }
   liftingTagNoData(): void {
     const route = "get-lifting-tag-no";
     const param = {
@@ -683,35 +803,196 @@ export class LiftingComponent implements OnInit {
         year: this.ngForm.controls['year'].value,
         season: this.ngForm.controls['season'].value,
         crop: this.ngForm.controls['crop_code'].value,
-        variety_code: this.variety_code ?   this.variety_code : this.ngForm.controls['variety_code'].value,
-        parental_line:this.variety_line_code ? this.variety_line_code:''
+        variety_code: this.variety_code ? this.variety_code : this.ngForm.controls['variety_code'].value,
+        parental_line: this.variety_line_code ? this.variety_line_code : ''
       }
     };
 
-    this._productionCenter.postRequestCreator(route, param, null).subscribe(res => {
-      if (res && res.EncryptedResponse && res.EncryptedResponse.status_code === 200) {
-        this.dropdownList4 = (res.EncryptedResponse.data || []).map(item => {
-          return { id: item.tag_no, tag_no: item.tag_no, lot_id: item.lot_id, lot_no: item.lot_no, no_of_bags: item.no_of_bags, bag_size: item.bag_size, tag_id: item.tag_id };
-        });
-      } else {
+    this._productionCenter.postRequestCreator(route, param, null).subscribe(
+      res => {
+        if (res && res.EncryptedResponse && res.EncryptedResponse.status_code === 200) {
+          // Extract and sort the response data
+          const data = res.EncryptedResponse.data || [];
+          console.log(data, 'Response Data');
+
+          // Sort data by `tag_id` (ensure `tag_id` exists in the response objects)
+          const sortedData = data.sort((a, b) => {
+            if (a.tag_id && b.tag_id) {
+              return b.tag_id - a.tag_id;
+            }
+            return 0; // No sorting if `tag_id` is undefined
+          });
+          console.log(sortedData, 'Sorted Data');
+          // Map sorted data to dropdownList4
+          this.dropdownList4 = sortedData.map(item => ({
+            id: item.tag_no,
+            tag_no: item.tag_no,
+            lot_id: item.lot_id,
+            lot_no: item.lot_no,
+            no_of_bags: item.no_of_bags,
+            bag_size: item.bag_size,
+            tag_id: item.tag_id
+          }));
+          console.log(this.dropdownList4, 'Final dropdownList4');
+        } else {
+          this.dropdownList4 = [];
+          console.log('No data found or invalid response');
+        }
+      },
+      error => {
+        console.error('Error fetching data:', error);
         this.dropdownList4 = [];
       }
-    }, error => {
-      this.dropdownList4 = [];
+    );
+  }
+
+
+
+  onTagNoSelectOld(item: any) {
+    console.log('Tag No selected:', item);
+    this.tagNoArrayData.push(item);
+    console.log('this.tagNoArrayData', this.tagNoArrayData);
+  }
+  onTagNoSelect(item: any, i) {
+    this.tagNoArrayData.push(item);
+    let tagArrayData = [];
+    this.tagNoArrayData.forEach(tag => {
+      const matchedTag = this.dropdownList4.find(item => item.tag_no === tag.tag_no);
+      tagArrayData.push(matchedTag.bag_size)
     });
-    console.log(this.dropdownList4,'this.dropdownList4')
-    if(this.dropdownList4 &&this.dropdownList4.length>0){
-      this.dropdownList4= this.dropdownList4.sort((a, b) => b.tag_id - a.tag_id)
+    this.ngForm.controls['inventoryItems']['controls'][i].controls['bag_size'].setValue(tagArrayData && tagArrayData[0] ? tagArrayData[0] : '')
+    console.log('this.tagNoArrayData===', this.tagNoArrayData);
+    console.log('tagArrayData=', tagArrayData[0]);
+
+    if (this.tagNoArrayData.length > 1) {
+      let uniqueData = tagArrayData.filter((value, index, self) => self.indexOf(value) === self.lastIndexOf(value));
+      // Find values that appear more than once (duplicate values)
+      let duplicateData = tagArrayData.filter((value, index, self) => self.indexOf(value) !== self.lastIndexOf(value));
+      // Handle case if no unique data found
+      if (uniqueData.length === 0) {
+        console.log("No unique data found.");
+        this.isUnique = true
+      } else {
+        this.isUnique = false
+        Swal.fire({
+          title: '<p style="font-size:25px;">Only tags of the same bag size can be selected together.</p>',
+          icon: 'warning',
+          confirmButtonText:
+            'OK',
+          confirmButtonColor: '#E97E15'
+        });
+        return;
+      }
+      // Handle case if there are any duplicate data
+      if (duplicateData.length === 0) {
+        console.log("No duplicate data found.");
+        // this.isUnique = false
+      } else {
+        console.log("Duplicate data:", duplicateData);
+        this.isUnique = true
+      }
+    } else {
+      this.isUnique = true
+    }
+  }
+
+  onTagNoSelectAll(items: any) {
+    this.tagNoArrayData.push(items);
+  }
+
+  onItemDeSelectTagDataOld(items: any) {
+    console.log('All Tag Nos deselected:', items);
+    this.tagNoArrayData.pop(items);
+    console.log('this.tagNoArrayData deselected', this.tagNoArrayData);
+  }
+  onItemDeSelectTagData(items: any) {
+    this.tagNoArrayData.pop(items);
+    let tagArrayData = [];
+    if (this.tagNoArrayData.length > 1) {
+      let uniqueData = tagArrayData.filter((value, index, self) => self.indexOf(value) === self.lastIndexOf(value));
+      // Find values that appear more than once (duplicate values)
+      let duplicateData = tagArrayData.filter((value, index, self) => self.indexOf(value) !== self.lastIndexOf(value));
+      // Handle case if no unique data found
+      if (uniqueData.length === 0) {
+        console.log("No unique data found.");
+        this.isUnique = true
+      } else {
+        this.isUnique = false
+        Swal.fire({
+          title: '<p style="font-size:25px;">Only tags of the same bag size can be selected together.</p>',
+          icon: 'warning',
+          confirmButtonText:
+            'OK',
+          confirmButtonColor: '#E97E15'
+        });
+        return;
+      }
+      // Handle case if there are any duplicate data
+      if (duplicateData.length === 0) {
+        console.log("No duplicate data found.");
+        // this.isUnique = false
+      } else {
+        console.log("Duplicate data:", duplicateData);
+        this.isUnique = true
+      }
+    } else {
+      this.isUnique = true
     }
   }
 
 
-  onTagNoSelect(item: any) {
-    console.log('Tag No selected:', item);
+  onDeSelectAllonItemDeSelect(items: any) {
+    console.log('All Tag Nos deselectedAll:', items);
+    this.tagNoArrayData.pop(items);
+    console.log('this.tagNoArrayData deselectedAll', this.tagNoArrayData);
   }
 
-  onTagNoSelectAll(items: any) {
-    console.log('All Tag Nos selected:', items);
+  formatTagNumbers(tagNumbers: any[]): string {
+    // console.log('Raw tagNumbers:', tagNumbers);
+
+    if (!tagNumbers || !Array.isArray(tagNumbers) || tagNumbers.length === 0) {
+      console.warn('Tag numbers array is null or empty');
+      return 'NA';
+    }
+
+    // Flatten the nested array
+    const flattenedTags = tagNumbers.flat(); // Flatten one level
+    // console.log('Flattened tags:', flattenedTags);
+
+    // Extract tag_no values
+    const extractedTags = flattenedTags
+      .map(tag => tag?.tag_no?.toString()) // Extract `tag_no` as string
+      .filter(Boolean); // Remove invalid entries
+    // console.log('Extracted tags:', extractedTags);
+
+    if (extractedTags.length === 0) return 'NA';
+
+    // Sort tags in ascending order
+    extractedTags.sort();
+
+    // Combine into ranges
+    const formattedRanges: string[] = [];
+    let rangeStart = extractedTags[0];
+    let lastTag = rangeStart;
+
+    for (let i = 1; i <= extractedTags.length; i++) {
+      const currentTag = extractedTags[i];
+      const currentNumber = currentTag?.split('/').pop();
+      const lastNumber = lastTag.split('/').pop();
+
+      if (currentNumber && lastNumber && +currentNumber === +lastNumber + 1) {
+        lastTag = currentTag;
+      } else {
+        const range = rangeStart === lastTag
+          ? rangeStart
+          : `${rangeStart}-${lastTag.split('/').pop()}`;
+        formattedRanges.push(range);
+        rangeStart = currentTag;
+        lastTag = currentTag;
+      }
+    }
+
+    return formattedRanges.join(', ');
   }
 
   liftingYearData() {
@@ -776,9 +1057,9 @@ export class LiftingComponent implements OnInit {
       year: this.ngForm.controls['year'].value,
       season: this.ngForm.controls['season'].value,
       crop_code: this.ngForm.controls['crop_code'].value,
-      variety_code:   this.variety_code ?   this.variety_code : this.ngForm.controls['variety_code'].value,
+      variety_code: this.variety_code ? this.variety_code : this.ngForm.controls['variety_code'].value,
       veriety_array: this.ngForm.controls['variety_array'].value
-      
+
 
     }
     this._productionCenter.postRequestCreator(route, param, null).subscribe(res => {
@@ -840,7 +1121,7 @@ export class LiftingComponent implements OnInit {
       // bag_weight: ['100',],
       // no_of_bags: ['50',],
       bag_weight: ['120'],
-      no_of_bags:['30'],
+      no_of_bags: ['30'],
       qnt_of_lifting: [''],
       mrp_per_unit: [''],
       total_amt: [''],
@@ -867,17 +1148,98 @@ export class LiftingComponent implements OnInit {
     return temp;
   }
   // tag_no_details_data
-  selectTagDetails(event, i) {
-    let lotDetails = this.lotNoDetailsData.filter(item => item.lot_no == event.target.value)
-    console.log(lotDetails,'lotDetails')
+  // selectTagDetails(event, i) {
+  //   let lotDetails = this.lotNoDetailsData.filter(item => item.lot_no == event.target.value)
+  //   console.log(lotDetails,'lotDetails')
+  //   if (lotDetails && lotDetails.length) {
+  //     // this.ngForm.controls['inventory_item_array']['controls'][i].controls['lot_id'].setValue(lotDetails && lotDetails[0] && lotDetails[0].lot_no ? lotDetails[0].lot_no:'' )    
+  //     this.ngForm.controls['inventoryItems']['controls'][i].controls['lot_id'].setValue(lotDetails && lotDetails[0] && lotDetails[0].lot_id ? lotDetails[0].lot_id : '')
+  //     // let tagNoDetailsData = this.dropdownList4.filter(item => item.lot_no == this.ngForm.controls['inventoryItems']['controls'][i].controls['lot_no'].value);
+  //     // this.ngForm.controls['inventoryItems']['controls'][i].controls['tag_no_details_data'].setValue(tagNoDetailsData)
+  //     // Filter and sort the tagNoDetailsData array
+  //    let tagNoDetailsData = this.dropdownList4.filter(item => item.lot_no === this.ngForm.controls['inventoryItems']['controls'][i].controls['lot_no'].value).sort((a, b) => a.tag_no.localeCompare(b.tag_no)); // Sort by tag_no in ascending order
+
+  //    // Set the sorted data in the form control
+  //     this.ngForm.controls['inventoryItems']['controls'][i].controls['tag_no_details_data'].setValue(tagNoDetailsData);
+
+  //     this.ngForm.controls['inventoryItems']['controls'][i].controls['bag_size'].setValue(lotDetails && lotDetails[0] && lotDetails[0].bag_weight ? lotDetails[0].bag_weight : '')
+  //   }
+  // }
+  selectTagDetailsOld(event: any, i: number) {
+
+    // Filter lot details based on the selected lot_no
+    const lotDetails = this.lotNoDetailsData.filter(item => item.lot_no === event.target.value);
+    console.log(lotDetails, 'lotDetails');
+
     if (lotDetails && lotDetails.length) {
-      // this.ngForm.controls['inventory_item_array']['controls'][i].controls['lot_id'].setValue(lotDetails && lotDetails[0] && lotDetails[0].lot_no ? lotDetails[0].lot_no:'' )    
-      this.ngForm.controls['inventoryItems']['controls'][i].controls['lot_id'].setValue(lotDetails && lotDetails[0] && lotDetails[0].lot_id ? lotDetails[0].lot_id : '')
-      let tagNoDetailsData = this.dropdownList4.filter(item => item.lot_no == this.ngForm.controls['inventoryItems']['controls'][i].controls['lot_no'].value);
-      this.ngForm.controls['inventoryItems']['controls'][i].controls['tag_no_details_data'].setValue(tagNoDetailsData)
-      this.ngForm.controls['inventoryItems']['controls'][i].controls['bag_size'].setValue(lotDetails && lotDetails[0] && lotDetails[0].bag_weight ? lotDetails[0].bag_weight : '')
+      // Set the lot_id in the form control
+      this.ngForm.controls['inventoryItems']['controls'][i].controls['lot_id'].setValue(lotDetails[0]?.lot_id || '');
+
+      // new code
+      let tagNoArray = [];
+      this.tagNoArrayData.forEach((ele) => {
+        tagNoArray.push(ele.tag_no);
+      })
+
+      let tagNoDetailsData;
+      if (tagNoArray && tagNoArray.length) {
+        let temp = this.dropdownList4.filter(item =>
+          !tagNoArray.includes(item.tag_no)
+        );
+        tagNoDetailsData = temp
+          .filter(item => item.lot_no === lotDetails[0]?.lot_no)
+          .sort((a, b) => a.tag_no.localeCompare(b.tag_no));
+        this.ngForm.controls['inventoryItems']['controls'][i].controls['tag_no_details_data'].setValue(tagNoDetailsData);
+      } else {
+        tagNoDetailsData = this.dropdownList4
+          .filter(item => item.lot_no === lotDetails[0]?.lot_no)
+          .sort((a, b) => a.tag_no.localeCompare(b.tag_no));
+        this.ngForm.controls['inventoryItems']['controls'][i].controls['tag_no_details_data'].setValue(tagNoDetailsData);
+      }
+      this.ngForm.controls['inventoryItems']['controls'][i].controls['bag_size'].setValue(
+        lotDetails[0]?.bag_weight || ''
+      );
+    } else {
+      // Clear form controls if no lotDetails match
+      this.ngForm.controls['inventoryItems']['controls'][i].controls['lot_id'].setValue('');
+      this.ngForm.controls['inventoryItems']['controls'][i].controls['tag_no_details_data'].setValue([]);
+      this.ngForm.controls['inventoryItems']['controls'][i].controls['bag_size'].setValue('');
     }
   }
+  selectTagDetails(event, i) {
+    let tagNoArray = [];
+    let tagNoDetailsData = [];
+    let temp = [];
+    let lotDetails = this.lotNoDetailsData.filter(item => item.lot_no == event.target.value)
+    if (lotDetails && lotDetails.length) {
+      this.ngForm.controls['inventoryItems']['controls'][i].controls['lot_id'].setValue(lotDetails && lotDetails[0] && lotDetails[0].lot_id ? lotDetails[0].lot_id : '')
+      this.tagNoArrayData.forEach((ele) => {
+        tagNoArray.push(ele.tag_no);
+      })
+      if (tagNoArray && tagNoArray.length) {
+        temp = this.dropdownList4.filter(item =>
+          !tagNoArray.includes(item.tag_no)
+        );
+        tagNoDetailsData = temp
+          .filter(item => item.lot_no === lotDetails[0]?.lot_no)
+          .sort((a, b) => a.tag_no.localeCompare(b.tag_no));
+        this.ngForm.controls['inventoryItems']['controls'][i].controls['tag_no_details_data'].setValue(tagNoDetailsData);
+      } else {
+        tagNoDetailsData = this.dropdownList4
+          .filter(item => item.lot_no === lotDetails[0]?.lot_no)
+          .sort((a, b) => a.tag_no.localeCompare(b.tag_no));
+        this.ngForm.controls['inventoryItems']['controls'][i].controls['tag_no_details_data'].setValue(tagNoDetailsData);
+      }
+      this.ngForm.controls['inventoryItems']['controls'][i].controls['bag_size'].setValue(lotDetails && lotDetails[0] && lotDetails[0].bag_weight ? lotDetails[0].bag_weight : '')
+    } else {
+      tagNoDetailsData = this.dropdownList4
+        .filter(item => item.lot_no === lotDetails[0]?.lot_no)
+        .sort((a, b) => a.tag_no.localeCompare(b.tag_no));
+      this.ngForm.controls['inventoryItems']['controls'][i].controls['tag_no_details_data'].setValue(tagNoDetailsData);
+    }
+  }
+
+
   selectNoOfBag(event, i) {
     let bagSize = this.dropdownList4.filter(item => item.tag_no == event.tag_no);
     let datas;
@@ -914,32 +1276,93 @@ export class LiftingComponent implements OnInit {
   deleteItem(index: number) {
     this.inventoryItems.removeAt(index);
   }
+  getFilteredOptions() {
+    let tagNoArray = [];
+    this.tagNoArrayData.forEach((ele) => {
+      tagNoArray.push(ele.tag_no);
+    })
+    let temp = this.dropdownList4.filter(item =>
+      !tagNoArray.includes(item.tag_no)
+    );
+  }
+
+
+  addToTableOld(inventoryItems) {
+    this.visibleTable = true;
+    this.fetchInviceData();
+  }
+
   addToTable(inventoryItems) {
+    let validData = false
+    inventoryItems.forEach((el, i) => {
+      console.log(el.controls['bag_size'].value);
+      if (el.controls['bag_size'].value || el.controls['lot_no'].value && el.controls['tag_no'].value) {
+        validData = true;
+      } else {
+        validData = false;
+      }
+    })
+
+    if (!validData) {
+      Swal.fire({
+        title: '<p style="font-size:25px;">Please Select Lots & Tags.</p>',
+        icon: 'warning',
+        confirmButtonText:
+          'OK',
+        confirmButtonColor: '#E97E15'
+      });
+      return;
+    }
     this.visibleTable = true;
     this.fetchInviceData();
   }
   grandTotal = 0;
-  
-  calculateCharges() {
+
+  calculateChargesOld() {
     this.ngForm.controls['final_grand_total_amt'].setValue(
       parseFloat(this.ngForm.controls['licence_amt'].value ? this.ngForm.controls['licence_amt'].value : 0) +
       parseFloat(this.ngForm.controls['mou_amt'].value ? this.ngForm.controls['mou_amt'].value : 0) +
-    parseFloat(this.ngForm.controls['ppv_amt'].value ? this.ngForm.controls['ppv_amt'].value : 0) +
-    parseFloat(this.ngForm.controls['rlt_amt'].value ? this.ngForm.controls['rlt_amt'].value : 0) +
+      parseFloat(this.ngForm.controls['ppv_amt'].value ? this.ngForm.controls['ppv_amt'].value : 0) +
+      parseFloat(this.ngForm.controls['rlt_amt'].value ? this.ngForm.controls['rlt_amt'].value : 0) +
       parseFloat(this.grandTotal ? this.grandTotal : this.ngForm.controls['grand_total_amt'].value ? this.ngForm.controls['grand_total_amt'].value : 0));
   }
+  calculateCharges() {
+    console.log('calculate', this.ngForm.controls['grand_total_amt'].value);
+    const controls = this.ngForm.controls;
+    // Helper function to get number safely
+    const val = (key: string) => +controls[key].value || 0;
+    this.grandTotal = val('grand_total_amt') + (val('grand_total_amt') * val('totalgst_per') / 100);
+    this.ngForm.controls['totalgst_amt'].setValue(val('grand_total_amt') * val('totalgst_per') / 100);
+    // Calculate GST-inclusive amount
+    const totalAmount =
+      val('licence_amt') + (val('licence_amt') * val('licencegst_amt') / 100) +
+      val('mou_amt') + (val('mou_amt') * val('mougst_amt') / 100) +
+      val('ppv_amt') + (val('ppv_amt') * val('ppvgst_amt') / 100) +
+      val('rlt_amt') + (val('rlt_amt') * val('rltgst_amt') / 100) +
+      val('transport_amt') + (val('transport_amt') * val('transportgst_amt') / 100) +
+      val('postage_amt') + (val('postage_amt') * val('postagegst_amt') / 100) +
+      val('packing_amt') + (val('packing_amt') * val('packinggst_amt') / 100) +
+      val('other_amt') + (val('other_amt') * val('othergst_amt') / 100) +
+      val('grand_total_amt') + (val('grand_total_amt') * val('totalgst_per') / 100);
+
+    // Set value with 2 decimal rounding
+    controls['final_grand_total_amt'].setValue(+totalAmount.toFixed(2));
+  }
+
   calculategstCharges(event) {
     this.ngForm.controls['final_grand_total_amt'].setValue(
       parseFloat(((this.ngForm.controls['licence_amt'].value) + (this.ngForm.controls['licence_amt'].value * this.ngForm.controls['licencegst_amt'].value) / 100)) +
       parseFloat(((this.ngForm.controls['mou_amt'].value) + (this.ngForm.controls['mou_amt'].value * this.ngForm.controls['mougst_amt'].value) / 100)) +
-    // parseFloat(((this.ngForm.controls['ppv_amt'].value) + (this.ngForm.controls['ppv_amt'].value * this.ngForm.controls['ppvgst_amt'].value) / 100)) +
-    // parseFloat(((this.ngForm.controls['rlt_amt'].value) + (this.ngForm.controls['rlt_amt'].value * this.ngForm.controls['rltgst_amt'].value) / 100)) +
+      parseFloat(((this.ngForm.controls['ppv_amt'].value) + (this.ngForm.controls['ppv_amt'].value * this.ngForm.controls['ppvgst_amt'].value) / 100)) +
+      parseFloat(((this.ngForm.controls['rlt_amt'].value) + (this.ngForm.controls['rlt_amt'].value * this.ngForm.controls['rltgst_amt'].value) / 100)) +
+      // parseFloat(((this.ngForm.controls['ppv_amt'].value) + (this.ngForm.controls['ppv_amt'].value * this.ngForm.controls['ppvgst_amt'].value) / 100)) +
+      // parseFloat(((this.ngForm.controls['rlt_amt'].value) + (this.ngForm.controls['rlt_amt'].value * this.ngForm.controls['rltgst_amt'].value) / 100)) +
       parseFloat(this.grandTotal ? this.grandTotal : this.ngForm.controls['grand_total_amt'].value ? this.ngForm.controls['grand_total_amt'].value : 0));
   }
   onDeSelectAll(event) {
 
   }
-  onItemSelect(item: any) {
+  onItemSelectOld(item: any) {
     switch (item.id) {
       case 1:
         this.visibleMouCharges = true
@@ -965,7 +1388,7 @@ export class LiftingComponent implements OnInit {
     }
   }
   // Method to handle item deselection from the dropdown
-  onItemDeSelect(item: any) {
+  onItemDeSelectOld(item: any) {
     switch (item.id) {
       case 1:
         this.visibleMouCharges = false;
@@ -985,31 +1408,44 @@ export class LiftingComponent implements OnInit {
         break;
     }
   }
-  removeChargeRow(arg0: string, arg1: string, arg2: string) {
+  removeChargeRowOld(arg0: string, arg1: string, arg2: string) {
     throw new Error('Method not implemented.');
   }
-  onDeSelect(item) {
+  onDeSelectOld(item) {
     // this.selectedItems = [];
     switch (item) {
       case 1:
         this.visibleMouCharges = false
         this.selectedItems = this.selectedItems.filter(ele => ele.id !== item);
+        this.ngForm.controls['mou_amt'].reset();
+        this.ngForm.controls['mougst_amt'].reset();
+        this.ngForm.controls['mougst_amt_total'].reset();
         break;
       case 2:
         this.visibleLicenceCharges = false;
         this.selectedItems = this.selectedItems.filter(ele => ele.id !== item);
+        this.ngForm.controls['licence_amt'].reset();
+        this.ngForm.controls['licencegst_amt'].reset();
+        this.ngForm.controls['licencegst_amt_total'].reset();
         break;
       case 3:
         this.visibleppvCharges = false;
         this.selectedItems = this.selectedItems.filter(ele => ele.id !== item);
+        this.ngForm.controls['ppv_amt'].reset();
+        this.ngForm.controls['ppvgst_amt'].reset();
+        this.ngForm.controls['ppvgst_amt_total'].reset();
         break;
       case 4:
         this.visiblerltCharges = false;
         this.selectedItems = this.selectedItems.filter(ele => ele.id !== item);
+        this.ngForm.controls['rlt_amt'].reset();
+        this.ngForm.controls['rltgst_amt'].reset();
+        this.ngForm.controls['rltgst_amt_total'].reset();
         break;
       case 5:
         this.visibleOtherCharges = false;
         this.selectedItems = this.selectedItems.filter(ele => ele.id !== item);
+
         break;
       default:
       // this.visibleMouCharges = false
@@ -1019,6 +1455,137 @@ export class LiftingComponent implements OnInit {
       // this.visibleOtherCharges = true;
     }
   }
+  onItemSelect(item: any) {
+    switch (item.id) {
+      case 1:
+        this.visibleMouCharges = true
+        break;
+      case 2:
+        this.visibleLicenceCharges = true;
+        break;
+      case 3:
+        this.visibleppvCharges = true;
+        break;
+      case 4:
+        this.visiblerltCharges = true;
+        break;
+      case 5:
+        this.visibleTransportCharges = true;
+        break;
+      case 6:
+        this.visiblePostageCharges = true;
+        break;
+      case 7:
+        this.visiblePackingCharges = true;
+        break;
+      case 8:
+        this.visibleOtherCharges = true;
+        break;
+      default:
+        this.visibleMouCharges = false
+        this.visibleLicenceCharges = false;
+        this.visibleppvCharges = false;
+        this.visiblerltCharges = false;
+        this.visibleTransportCharges = false;
+        this.visiblePostageCharges = false;
+        this.visiblePackingCharges = false;
+        this.visibleOtherCharges = false;
+    }
+  }
+
+  // Method to handle item deselection from the dropdown
+  onItemDeSelect(item: any) {
+    switch (item.id) {
+      case 1:
+        this.visibleMouCharges = false;
+        this.removeChargeRow('mou_amt', 'mougst_amt', 'mougst_amt_total');
+        break;
+      case 2:
+        this.visibleLicenceCharges = false;
+        this.removeChargeRow('licence_amt', 'licencegst_amt', 'licencegst_amt_total');
+        break;
+      case 3:
+        this.visibleppvCharges = false;
+        this.removeChargeRow('ppv_amt', 'ppvgst_amt', 'ppvgst_amt_total');
+        break;
+      case 4:
+        this.visiblerltCharges = false;
+        this.removeChargeRow('rlt_amt', 'rltgst_amt', 'rltgst_amt_total');
+        break;
+      case 5:
+        this.visibleTransportCharges = false;
+        this.removeChargeRow('transport_amt', 'transportgst_amt', 'transportgst_amt_total');
+        break;
+      case 6:
+        this.visiblePostageCharges = false;
+        this.removeChargeRow('postage_amt', 'postagegst_amt', 'postagegst_amt_total');
+        break;
+      case 7:
+        this.visiblePackingCharges = false;
+        this.removeChargeRow('packing_amt', 'packinggst_amt', 'packinggst_amt_total');
+        break;
+      case 8:
+        this.visibleOtherCharges = false;
+        this.removeChargeRow('other_amt', 'othergst_amt', 'othergst_amt_total');
+        break;
+    }
+  }
+
+  removeChargeRow(arg0: string, arg1: string, arg2: string) {
+    this.ngForm.controls[arg0].reset();
+    this.ngForm.controls[arg1].reset();
+    this.ngForm.controls[arg2].reset();
+    this.calculateCharges();
+  }
+
+  onDeSelect(item) {
+    // this.selectedItems = [];
+    switch (item) {
+      case 1:
+        this.visibleMouCharges = false
+        this.selectedItems = this.selectedItems.filter(ele => ele.id !== item);
+        this.removeChargeRow('mou_amt', 'mougst_amt', 'mougst_amt_total');
+        break;
+      case 2:
+        this.visibleLicenceCharges = false;
+        this.selectedItems = this.selectedItems.filter(ele => ele.id !== item);
+        this.removeChargeRow('licence_amt', 'licencegst_amt', 'licencegst_amt_total');
+        break;
+      case 3:
+        this.visibleppvCharges = false;
+        this.selectedItems = this.selectedItems.filter(ele => ele.id !== item);
+        this.removeChargeRow('ppv_amt', 'ppvgst_amt', 'ppvgst_amt_total');
+        break;
+      case 4:
+        this.visiblerltCharges = false;
+        this.selectedItems = this.selectedItems.filter(ele => ele.id !== item);
+        this.removeChargeRow('rlt_amt', 'rltgst_amt', 'rltgst_amt_total');
+        break;
+      case 5:
+        this.visibleTransportCharges = false;
+        this.selectedItems = this.selectedItems.filter(ele => ele.id !== item);
+        this.removeChargeRow('transport_amt', 'transportgst_amt', 'transportgst_amt_total');
+        break;
+      case 6:
+        this.visiblePostageCharges = false;
+        this.selectedItems = this.selectedItems.filter(ele => ele.id !== item);
+        this.removeChargeRow('postage_amt', 'postagegst_amt', 'postagegst_amt_total');
+        break;
+      case 7:
+        this.visiblePackingCharges = false;
+        this.selectedItems = this.selectedItems.filter(ele => ele.id !== item);
+        this.removeChargeRow('packing_amt', 'packinggst_amt', 'packinggst_amt_total');
+        break;
+      case 8:
+        this.visibleOtherCharges = false;
+        this.selectedItems = this.selectedItems.filter(ele => ele.id !== item);
+        this.removeChargeRow('other_amt', 'othergst_amt', 'othergst_amt_total');
+        break;
+      default:
+    }
+
+  }
+
   // Method to handle radio button change
   toggleTableDisplay() {
     this.showTable = true;
@@ -1096,8 +1663,29 @@ export class LiftingComponent implements OnInit {
     console.log('Starting scan...');
   }
   addTagNoItem() {
-    // this.inventoryItems.clear();
-    this.addItem();
+    if (!this.isRadioSelected) {
+      this.addItem();
+      this.isRadioSelected = true; // Disable further additions
+    }
+  }
+  addTagNoItemOld() {
+    this.inventory_item_array.clear();
+    this.inventoryItems.clear();
+    this.tagNoArrayData = [];
+    this.lotDetailsArray = [];
+    //  this.resetFormByVariety();
+    this.additionalChargesData();
+    if (!this.isRadioSelected) {
+      if (this.inventoryItems.length < 1) {
+        this.addItem();
+        this.isRadioSelected = true; // Disable further additions
+      } else {
+        this.inventory_item_array.removeAt(0);
+      }
+    }
+    if (this.inventoryItems.length == 0) {
+      this.inventoryItems.push(this.inventoryItemsForms());
+    }
   }
   fetchInviceData() {
     if (this.ngForm.controls['inventoryItems'].value) {
@@ -1140,18 +1728,18 @@ export class LiftingComponent implements OnInit {
           // bag_weight: [finalArray[i].bag_weight ? finalArray[i].bag_weight : 0],
           no_of_bags: [finalArray[i].tag_no ? finalArray[i].tag_no.length : 0],
           qnt_of_lifting: [finalArray[i].bag_weight ? (finalArray[i].tag_no.length * finalArray[i].bag_weight) : 0],
-          mrp_per_unit: [this.perUnitPrice ? this.perUnitPrice : 0],
+          mrp_per_unit: [this.perUnitPrice ? this.perUnitPrice.toFixed(3) : 0],
           total_amt: [finalArray[i].tag_no ? (finalArray[i].tag_no.length * this.perUnitPrice) : 0],
 
         });
 
       }
       let inventory_item_arrayData = this.ngForm.value && this.ngForm.value.inventory_item_array ? this.ngForm.value.inventory_item_array : ''
-      console.log(inventory_item_arrayData,'inventory_item_arrayDatainventory_item_arrayData')
-      let sum=0
-      if(inventory_item_arrayData && inventory_item_arrayData.length>0){
-        inventory_item_arrayData.forEach((el=>{
-          sum+=el['mrp_per_unit'][0]
+      console.log(inventory_item_arrayData, 'inventory_item_arrayDatainventory_item_arrayData')
+      let sum = 0
+      if (inventory_item_arrayData && inventory_item_arrayData.length > 0) {
+        inventory_item_arrayData.forEach((el => {
+          sum += el['mrp_per_unit'][0]
         }))
       }
       this.ngForm.controls['grand_total_amt'].setValue(sum)
@@ -1159,6 +1747,31 @@ export class LiftingComponent implements OnInit {
       this.inventoryItems.clear();
       this.addItem();
     }
+  }
+  additionalChargesData() {
+    // additional charge
+    this.ngForm.controls['selectedCharges'].setValue('');
+    this.ngForm.controls['totalgst_per'].setValue(0);
+    this.ngForm.controls['final_grand_total_amt'].setValue('');
+    this.ngForm.controls['licence_amt'].setValue(''); this.ngForm.controls['licencegst_amt'].setValue('');
+    this.ngForm.controls['mou_amt'].setValue(''); this.ngForm.controls['mougst_amt'].setValue('');
+    this.ngForm.controls['ppv_amt'].setValue(''); this.ngForm.controls['ppvgst_amt'].setValue('');
+    this.ngForm.controls['rlt_amt'].setValue(''); this.ngForm.controls['rltgst_amt'].setValue('');
+    this.ngForm.controls['transport_amt'].setValue(''); this.ngForm.controls['transportgst_amt'].setValue('');
+    this.ngForm.controls['postage_amt'].setValue(''); this.ngForm.controls['postagegst_amt'].setValue('');
+    this.ngForm.controls['packing_amt'].setValue(''); this.ngForm.controls['packinggst_amt'].setValue('');
+    this.ngForm.controls['other_amt'].setValue(''); this.ngForm.controls['othergst_amt'].setValue('');
+    this.grandTotal = 0; this.ngForm.controls['grand_total_amt'].setValue('');
+
+    this.visibleMouCharges = false
+    this.visibleLicenceCharges = false;
+    this.visibleppvCharges = false;
+    this.visiblerltCharges = false;
+    this.visibleTransportCharges = false;
+    this.visiblePostageCharges = false;
+    this.visiblePackingCharges = false;
+    this.visibleOtherCharges = false;
+
   }
   getTagNo(data, i) {
     let tagNo = []
@@ -1173,6 +1786,7 @@ export class LiftingComponent implements OnInit {
   }
   selectOption(option: string) {
     this.selectedOption = option;
+
   }
   addMore() {
     this.inventory_item_array.push(this.inventoryItemsArrayForms());
@@ -1200,8 +1814,9 @@ export class LiftingComponent implements OnInit {
     });
     this.ngForm.controls['grand_total_amt'].setValue(sumOfTotal);
   }
-  gstCalculateValue(event,key=null) {
-    console.log(event,'event')
+
+  gstCalculateValueOld(event, key = null) {
+    console.log(event, 'event')
 
     if (event == "sum") {
       this.ngForm.controls['totalgst_amt'].setValue((this.ngForm.controls['grand_total_amt'].value * this.ngForm.controls['totalgst_per'].value) / 100);
@@ -1212,56 +1827,199 @@ export class LiftingComponent implements OnInit {
       // alert('hii2')
       // licencegst_amt
       let data = this.ngForm.value.inventory_item_array;
-      let sum=0;
-      if(data && data.length>0){
-        data.forEach(el=>{
-          sum+=Number(el.total_amt)
+      let sum = 0;
+      if (data && data.length > 0) {
+        data.forEach(el => {
+          sum += Number(el.total_amt)
         })
       }
-      if(key==null){
+      if (key == null) {
         this.ngForm.controls['totalgst_amt'].setValue((sum * event.target.value) / 100);
       }
-      this.grandTotal =Number(sum) + parseFloat(this.ngForm.controls['totalgst_amt'].value);
-      let amount = this.amount ? this.amount:0;
-      if(this.ngForm.controls['final_grand_total_amt'].value){
+      this.grandTotal = Number(sum) + parseFloat(this.ngForm.controls['totalgst_amt'].value);
+      console.log(this.ngForm.controls['totalgst_amt'].value, 'totalgstAmount')
+      let amount = this.amount ? this.amount : 0;
+      if (this.ngForm.controls['final_grand_total_amt'].value) {
 
-        let totalAmount=Number(this.ngForm.controls['final_grand_total_amt'].value) - Number(amount);
-        console.log(totalAmount,'totalAmounttotalAmount')
-        this.ngForm.controls['total_final_amount'].setValue(totalAmount? totalAmount:0)
-        console.log( this.ngForm.controls['total_final_amount'].value,'vvv')
+        let totalAmount = Number(this.ngForm.controls['final_grand_total_amt'].value) - Number(amount);
+        console.log(totalAmount, 'totalAmounttotalAmount')
+        this.ngForm.controls['total_final_amount'].setValue(totalAmount ? totalAmount : 0)
+        console.log(this.ngForm.controls['total_final_amount'].value, 'vvv')
       }
 
     }
   }
+  gstCalculateValue(event, key = null) {
+    if (event == "sum") {
+      this.ngForm.controls['totalgst_amt'].setValue((this.ngForm.controls['grand_total_amt'].value * this.ngForm.controls['totalgst_per'].value) / 100);
+      this.grandTotal = this.ngForm.controls['totalgst_amt'].value + this.ngForm.controls['grand_total_amt'].value;
+    } else {
+      let data = this.ngForm.value.inventory_item_array;
+      let sum = 0;
+      if (data && data.length > 0) {
+        data.forEach(el => {
+          sum += Number(el.total_amt)
+        })
+      }
+      if ((this.ngForm.controls['totalgst_per'].value == 0) && key == 'per_unit_price') {
+        this.grandTotal = Number(sum ? sum : 0);
+        let amount = this.amount ? this.amount : 0;
+        let totalAmount = Number(this.ngForm.controls['final_grand_total_amt'].value) - Number(amount);
+        this.ngForm.controls['total_final_amount'].setValue(totalAmount ? totalAmount : 0)
+      } else {
+        if (key == null) {
+          this.ngForm.controls['totalgst_amt'].setValue((sum * event.target.value) / 100);
+        }
 
+        this.grandTotal = Number(sum ? sum : 0) + parseFloat(this.ngForm.controls['totalgst_amt'].value);
+        let amount = this.amount ? this.amount : 0;
+        if (this.ngForm.controls['final_grand_total_amt'].value) {
+          let totalAmount = Number(this.ngForm.controls['final_grand_total_amt'].value) - Number(amount);
+          this.ngForm.controls['total_final_amount'].setValue(totalAmount ? totalAmount : 0)
+        }
+      }
+    }
+  }
 
   toggleSearch() {
     this.searchClicked = true;
+    this.searchClicked2 = true;
     this.liftingTableData(null);
     this.liftingVarietyData();
+
+    this.getVarietyDetails();
+    this.getTotalProductionDetails();
+    this.getTotalLifting();
     this.liftingIndenterData();
     this.liftingSPAData();
   }
-  toggleSearchFirst(data, item, val) {
-    // this.renderer.setProperty(window, 'scrollTo', { top: 0, behavior: 'smooth' });
-    this.liftingTagNoData();
-    this.liftingLotNoData();
+  getVarietyDetails(): void {
+    const getLocalData = localStorage.getItem('BHTCurrentUser');
+    let data = JSON.parse(getLocalData)
+    let UserId = data.id
+    const route = "get-lifting-total-variety";
+    const param = {
+      search: {
+        year: this.ngForm.controls['year'].value,
+        season: this.ngForm.controls['season'].value,
+        crop_code: this.ngForm.controls['crop_code'].value,
+        user_id: UserId ? UserId.toString() : '',
 
+      }
+
+    }
+
+    this._productionCenter.postRequestCreator(route, param, null).subscribe(res => {
+      if (res && res.EncryptedResponse && res.EncryptedResponse.status_code === 200) {
+        this.response = res && res.EncryptedResponse && res.EncryptedResponse.data ? res.EncryptedResponse.data : '';
+      }
+    })
+  }
+
+
+  getTotalProductionDetails(): void {
+    const getLocalData = localStorage.getItem('BHTCurrentUser');
+    let data = JSON.parse(getLocalData)
+    let UserId = data.id
+    const route = "get-lifting-total-production";
+    const param = {
+      search: {
+        year: this.ngForm.controls['year'].value,
+        season: this.ngForm.controls['season'].value,
+        crop_code: this.ngForm.controls['crop_code'].value,
+        user_id: UserId ? UserId.toString() : '',
+
+      }
+
+    }
+
+    this._productionCenter.postRequestCreator(route, param, null).subscribe(res => {
+      if (res && res.EncryptedResponse && res.EncryptedResponse.status_code === 200) {
+        this.response2 = res && res.EncryptedResponse && res.EncryptedResponse.data ? res.EncryptedResponse.data : '';
+
+      }
+      console.log("this.response", this.response);
+
+    })
+  }
+
+  getTotalLifting(): void {
+    const getLocalData = localStorage.getItem('BHTCurrentUser');
+    let data = JSON.parse(getLocalData)
+    let UserId = data.id
+    const route = "get-total-lifting";
+    const param = {
+      search: {
+        year: this.ngForm.controls['year'].value,
+        season: this.ngForm.controls['season'].value,
+        crop_code: this.ngForm.controls['crop_code'].value,
+        user_id: UserId ? UserId.toString() : '',
+
+      }
+
+    }
+
+    this._productionCenter.postRequestCreator(route, param, null).subscribe(res => {
+      if (res && res.EncryptedResponse && res.EncryptedResponse.status_code === 200) {
+        this.response3 = res && res.EncryptedResponse && res.EncryptedResponse.data ? res.EncryptedResponse.data : '';
+
+      }
+      console.log("this.response", this.response);
+
+    })
+  }
+  get remainingQty() {
+    const totalProd = this.response2?.total_production ?? 0;
+    const totalLift = this.response3?.total_lifting ?? 0;
+    return totalProd - totalLift;
+  }
+  toggleSearchFirst(data, spa, lift) {
+    // this.renderer.setProperty(window, 'scrollTo', { top: 0, behavior: 'smooth' });
     this.variety_code = data && data.variety_code ? data.variety_code : '';
     this.variety_name = data && data.variety_name ? data.variety_name : '';
-    this.indentorId = item && item.indent ? item.indent : '';
-    this.spaId  = val && val.spa_code ? val.spa_code : '';
-    this.state_code = val && val.state_code ? val.state_code : '';
+    this.indentorId = data.allocation_to_indentor_for_lifting_seed_production_cnter && data.allocation_to_indentor_for_lifting_seed_production_cnter.indent ? data.allocation_to_indentor_for_lifting_seed_production_cnter.indent : '';
+    this.spaId = spa && spa.spa_code ? spa.spa_code : '';
+    this.state_code = spa && spa.state_code ? spa.state_code : '';
     this.variety_line_code = data && data.variety_line_code ? data.variety_line_code : '';
-    this.indentor_name=item && item.user && item.user.n ? item.user.n:'NA';
-    this.spaName = val && val.name  ? val.name:"NA"
-    this.allocated_quantity=val && val.allocated_quantity  ? val.allocated_quantity:"NA";
+    this.indentor_name = spa && spa.user && spa.user.n ? spa.user.n : 'NA';
+    this.spaName = spa && spa.name ? spa.name : "NA"
+    this.allocated_quantity = spa && spa.allocated_quantity ? spa.allocated_quantity : "NA";
     this.liftingTableData(data);
     this.getVarietyData()
     this.getInvoiceData()
+    this.liftingTagNoData();
+    this.liftingLotNoData();
     this.searchClicked1 = true;
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
+  }
+  toggleSearchFirst1(data) {
+    console.log("data", data);
+
+    // this.renderer.setProperty(window, 'scrollTo', { top: 0, behavior: 'smooth' });
+    const encryptedForm = CryptoJS.AES.encrypt(JSON.stringify({ id: data }), this.AESKey).toString();
+    let encryptedData = encodeURIComponent(encryptedForm);
+    console.log('encryptedData=================>', encryptedData)
+    const decryptedBytes = CryptoJS.AES.decrypt(decodeURIComponent(encryptedData), this.AESKey);
+    let decryptedId = JSON.parse(decryptedBytes.toString(CryptoJS.enc.Utf8)).id;
+    console.log('decryptedId=================>', decryptedId)
+    encryptedData = encryptedData ? encryptedData.trim() : '';
+    this.route.navigate(['Bill-Receipt/' + encryptedData]);
+
+  }
+  // Function to check the condition
+  checkIfButtonShouldBeDisabled(): void {
+    this.allData.spas.forEach((spa: any) => {
+      const breederStockTotal = spa?.breeder_stock_details?.total_quantity || 0;
+      const liftingDetailsTotal = spa.lifting_details.reduce((sum: number, lifting: any) => {
+        return sum + (lifting?.bill_details?.total_quantity || 0);
+      }, 0);
+      let totalleftquantity = (breederStockTotal - liftingDetailsTotal)
+      console.log("total left quantity", totalleftquantity)
+      if (breederStockTotal === liftingDetailsTotal) {
+        this.isButtonDisabled = true;
+      }
+    });
   }
   getVarietyData() {
     const param = {
@@ -1269,8 +2027,8 @@ export class LiftingComponent implements OnInit {
         variety_code: this.variety_code,
         variety_line_code: this.variety_line_code,
         crop: this.ngForm.controls['crop_code'].value,
-        year:this.ngForm.controls['year'].value,
-        season:this.ngForm.controls['season'].value,
+        year: this.ngForm.controls['year'].value,
+        season: this.ngForm.controls['season'].value,
         // crop:this.ngForm.controls['crop_code'].value,
       }
     }
@@ -1374,7 +2132,7 @@ export class LiftingComponent implements OnInit {
       // this.indentorId = item && item.indent ? item.indent:'';
       // this.spaId = val && val.spa_code ? val.spa_code:'';
       // this.state_code = val && val.state_code ? val.state_code:'';
-      console.log('tres',key)
+      console.log('tres1', key)
       data.push({
         "year": this.ngForm.controls['year'].value,
         "season": this.ngForm.controls['season'].value,
@@ -1393,8 +2151,11 @@ export class LiftingComponent implements OnInit {
         "no_of_bag": key.no_of_bags ? key.no_of_bags : '',
         "total_price": key.total_amt ? key.total_amt : '',
         "tag_data": key.tag_data ? key.tag_data : '',
-        "final_amt":this.ngForm.controls['final_grand_total_amt'].value-this.amount,
-        "total_lifting_price":this.ngForm.controls['final_grand_total_amt'].value ? this.ngForm.controls['final_grand_total_amt'].value:this.ngForm.controls['grand_total_amt'].value,
+        "final_amt": this.ngForm.controls['final_grand_total_amt'].value - this.amount,
+        "is_self": 0,
+        "production_type": this.productionType,
+        "gst": this.ngForm.controls['totalgst_amt'].value,
+        "total_lifting_price": this.ngForm.controls['final_grand_total_amt'].value ? this.ngForm.controls['final_grand_total_amt'].value : this.ngForm.controls['grand_total_amt'].value,
         "lifting_lots": [
           {
             "lot_no": key && key.lot_no ? key.lot_no.toString() : '',
@@ -1423,13 +2184,16 @@ export class LiftingComponent implements OnInit {
 
     // 4. Remove duplicated lifting_tags
     result.lifting_tags = data.flatMap(item => item.lifting_tags);
-    console.log('tres',result)
-   
+    console.log('tres', result)
+
 
     this._productionCenter.postRequestCreator(route, { "data": result }, null).subscribe(res => {
       if (res && res.EncryptedResponse && res.EncryptedResponse.status_code === 200) {
-        let liftingData=res && res.EncryptedResponse && res.EncryptedResponse.data ? res.EncryptedResponse.data:'';
-         let liftingId =liftingData && liftingData.id ? liftingData.id :''
+        let liftingData = res && res.EncryptedResponse && res.EncryptedResponse.data ? res.EncryptedResponse.data : '';
+        console.log("liftingdata", liftingData);
+        console.log("liftingres", res);
+
+        let liftingId = liftingData && liftingData.id ? liftingData.id : ''
         // Swal.fire({
         //   title: '<p style="font-size:25px;">View Bill Receipt</p>',
         //   icon: 'success',
@@ -1454,15 +2218,15 @@ export class LiftingComponent implements OnInit {
               variety_code: this.ngForm.controls['variety_code'].value ? this.ngForm.controls['variety_code'].value : "",
             };
             this._productionCenter.liftingData = data ? data : [];
-            console.log(this.AESKey,'this.AESKey')
-            const encryptedForm = CryptoJS.AES.encrypt(JSON.stringify({ id:liftingId}), this.AESKey).toString();
+            console.log(this.AESKey, 'this.AESKey')
+            const encryptedForm = CryptoJS.AES.encrypt(JSON.stringify({ id: liftingId }), this.AESKey).toString();
             let encryptedData = encodeURIComponent(encryptedForm);
-            console.log('encryptedData=================>',encryptedData)
+            console.log('encryptedData=================>', encryptedData)
             const decryptedBytes = CryptoJS.AES.decrypt(decodeURIComponent(encryptedData), this.AESKey);
             let decryptedId = JSON.parse(decryptedBytes.toString(CryptoJS.enc.Utf8)).id;
-            console.log('decryptedId=================>',decryptedId)
-            encryptedData= encryptedData ? encryptedData.trim():'';
-          // this.route.navigate(['Bill-Receipt/'+encryptedData]);
+            console.log('decryptedId=================>', decryptedId)
+            encryptedData = encryptedData ? encryptedData.trim() : '';
+            this.route.navigate(['Bill-Receipt/' + encryptedData]);
           } else if (result.isDenied) {
             Swal.fire("Changes are not saved", "", "info");
           }
@@ -1487,36 +2251,47 @@ export class LiftingComponent implements OnInit {
 
   }
   getReason() {
-    this._productionCenter.postRequestCreator('get-commnets-list',null).subscribe(apiresponse=>{
-      let res =apiresponse && apiresponse.EncryptedResponse && apiresponse.EncryptedResponse.data ? apiresponse.EncryptedResponse.data:'';
-      this.reasonData= res ;
+    this._productionCenter.postRequestCreator('get-commnets-list', null).subscribe(apiresponse => {
+      let res = apiresponse && apiresponse.EncryptedResponse && apiresponse.EncryptedResponse.data ? apiresponse.EncryptedResponse.data : '';
+      this.reasonData = res;
     })
   }
-  getInvoiceData(){
+  Cancel() {
+    this.searchClicked1 = false;
+    this.visibleTable = false;
+    this.selectedOption = '';
+  }
+  getInvoiceData() {
     const param = {
       search: {
         variety_code: this.variety_code,
         variety_line_code: this.variety_line_code,
         crop_code: this.ngForm.controls['crop_code'].value,
-        year:this.ngForm.controls['year'].value,
-        season:this.ngForm.controls['season'].value,
-        indenter_id:this.indentorId ? this.indentorId:'',
-        spa_code:this.spaId ? this.spaId :'',
-        state_code:this.state_code ? this.state_code:''
+        year: this.ngForm.controls['year'].value,
+        season: this.ngForm.controls['season'].value,
+        indenter_id: this.indentorId ? this.indentorId : '',
+        spa_code: this.spaId ? this.spaId : '',
+        state_code: this.state_code ? this.state_code : ''
         // crop:this.ngForm.controls['crop_code'].value,
       }
     }
-    this._productionCenter.postRequestCreator('get-generate-invoice-data',param).subscribe(apiResponse=>{
-      let data = apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.data ? apiResponse.EncryptedResponse.data:'';
-      this.breederStack=data;
-     let res = data.filter((arr, index, self) =>
-    index === self.findIndex((t) => (t.receipt_requestsid === arr.receipt_requestsid)))
-    this.totalAmount= res && res[0] && res[0].grand_total ? res[0].grand_total:'';
-     this.payment_method= res && res[0] && res[0].payment_method ? res[0].payment_method:'';
-     this.amount= res && res[0] && res[0].amount ? res[0].amount:0
-      console.log(data,'datadatadata') 
+    this._productionCenter.postRequestCreator('get-generate-invoice-data', param).subscribe(apiResponse => {
+      let data = apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.data ? apiResponse.EncryptedResponse.data : '';
+      this.breederStack = data;
+      let res = data.filter((arr, index, self) =>
+        index === self.findIndex((t) => (t.receipt_requestsid === arr.receipt_requestsid)))
+      this.totalAmount = res && res[0] && res[0].grand_total ? res[0].grand_total : '';
+      this.payment_method = res && res[0] && res[0].payment_method ? res[0].payment_method : '';
+      this.amount = res && res[0] && res[0].amount ? res[0].amount : 0
+      console.log(data, 'datadatadata')
     })
 
+  }
+  decimalConverter(value) {
+    if (value === null || value === undefined || isNaN(value)) {
+      return "0.000";   // default value
+    }
+    return parseFloat(value).toFixed(3);
   }
 }
 

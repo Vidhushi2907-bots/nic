@@ -100,7 +100,7 @@
                 <!-- start sectio 1 -->
                 <div class="col-12 col-md-10 col-lg-10 col-sm-12 pt-1 pl-4 formargin" *ngIf="searchClicked">
                     <div class="row">
-                        <div class="col-12 col-md-2 col-lg-2 col-sm-12   radio-container verticle-content-middle">
+                        <div class="col-12 col-md-2 col-lg-2 col-sm-12   radio-container verticle-content-middle" *ngIf="is_potato">
                             <label
                                 class="radio-label radio-input:checked verticle-content-middle ml-3 d-flex align-items-center justify-content-center">
                                 <input type="radio" name="tableSelection" [checked]="selectedTable === 'table1'" (change)="selectTable('table1')"

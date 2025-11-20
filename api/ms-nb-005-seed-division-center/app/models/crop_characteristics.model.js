@@ -20,10 +20,9 @@ module.exports = (sql, Sequelize) => {
         average_yeild_to: {
             type: Sequelize.INTEGER
         },
-        // notification_date:{
-            
-        //     type: Sequelize.STRING
-        // },
+        notification_date: {
+            type: Sequelize.STRING
+        },
         variety_code: {
             type: Sequelize.STRING
         },
@@ -72,13 +71,13 @@ module.exports = (sql, Sequelize) => {
         matuarity_day_to: {
             type: Sequelize.INTEGER
         },
-        matuarity_type_id: { 
+        matuarity_type_id: {
             type: Sequelize.INTEGER
         },
         percentage: {
             type: Sequelize.INTEGER
         },
-        select_state_release:{            
+        select_state_release: {
             type: Sequelize.INTEGER
         },
         reaction_abiotic_stress: {
@@ -123,8 +122,8 @@ module.exports = (sql, Sequelize) => {
         spacing_date: {
             type: Sequelize.STRING
         },
-        variety_name:{
-            type:Sequelize.STRING
+        variety_name: {
+            type: Sequelize.STRING
         },
         maturity_date: {
             type: Sequelize.STRING
@@ -132,66 +131,66 @@ module.exports = (sql, Sequelize) => {
         average_total: {
             type: Sequelize.STRING
         },
-        nitrogen:{
+        nitrogen: {
             type: Sequelize.STRING,
         },
-        phosphorus:{
+        phosphorus: {
             type: Sequelize.STRING,
         },
-        potash:{
+        potash: {
             type: Sequelize.STRING,
         },
-        other:{
+        other: {
             type: Sequelize.STRING,
         },
-        fertilizer_other_name:{
+        fertilizer_other_name: {
             type: Sequelize.STRING,
         },
-        fertilizer_other_value:{
+        fertilizer_other_value: {
             type: Sequelize.STRING,
-        },  
-        eology:{
+        },
+        eology: {
             type: Sequelize.STRING,
-        },  
-        maturity:{
+        },
+        maturity: {
             type: Sequelize.STRING,
-        },  
-        state_data:{
+        },
+        state_data: {
             type: Sequelize.JSON,
-        }, 
+        },
         // type:{
         //     type: Sequelize.STRING,
         // },
         // developed_by:{
         //     type: Sequelize.STRING,
         // },
-        state_of_release:{
+        state_of_release: {
             type: Sequelize.INTEGER,
             allowNull: true,
         },
-        region_data:{
+        region_data: {
             type: Sequelize.JSON,
         },
-        product_quality_attributes:{
+        product_quality_attributes: {
             type: Sequelize.STRING,
         },
-        climate_resilience:{
+        climate_resilience: {
             type: Sequelize.STRING,
         },
-        gi_tagged_reg_no:{
+        gi_tagged_reg_no: {
             type: Sequelize.STRING,
         },
-        ip_protected_reg_no:{
+        ip_protected_reg_no: {
             type: Sequelize.STRING,
         },
         is_active: {
             type: Sequelize.INTEGER,
             defaultValue: 1
         },
-        reaction_to_pets_json:{
+        reaction_to_pets_json: {
             type: Sequelize.JSON,
         },
-        reaction_major_diseases_json:{
+        reaction_major_diseases_json: {
             type: Sequelize.JSON,
         },
         created_at: {
@@ -205,8 +204,11 @@ module.exports = (sql, Sequelize) => {
         // notification_year:{
         //     type: Sequelize.INTEGER,
         // },
-        climate_resilience_json:{
+        climate_resilience_json: {
             type: Sequelize.JSON,
+        },
+        developed_by: {
+            type: Sequelize.STRING,
         },
         createdAt: { type: Sequelize.DATE, field: 'created_at' },
         updatedAt: { type: Sequelize.DATE, field: 'updated_at' },

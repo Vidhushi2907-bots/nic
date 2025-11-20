@@ -207,6 +207,7 @@ export class GenerateForwardingLetterForLabTestingComponent implements OnInit {
   stateSecond: any;
   isForSendingToSTLSelected: boolean;
   useragencttype: any;
+  is_potato: boolean=false;
   // seedProcessRegisterDta = [
   //   {
   //     // "id": 6,
@@ -796,6 +797,11 @@ export class GenerateForwardingLetterForLabTestingComponent implements OnInit {
     this.selectCrop_group = "";
     // this.ngForm.controls['crop_name'].setValue('')
     this.crop_text_check = 'crop_group'
+    if (item.crop_code == "H1101") {
+      this.is_potato = false;  
+    } else {
+      this.is_potato = true;
+    }
   }
   cropdatatext() {
     this.cropNameSecond;

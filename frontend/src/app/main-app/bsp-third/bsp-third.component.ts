@@ -62,6 +62,7 @@ export class BspThirdComponent implements OnInit {
   user_id: any;
   isRemonitorData = false;
   allData1: any;
+  countAll: any;
   constructor(private service: SeedServiceService, private breeder: BreederService, private masterService: MasterService, private productioncenter: ProductioncenterService, private fb: FormBuilder, private router: Router) {
     this.createForm();
     const BHTCurrentUser = localStorage.getItem('BHTCurrentUser');
@@ -477,6 +478,7 @@ export class BspThirdComponent implements OnInit {
           this.filterPaginateSearch.itemListPageSize = 50;
           this.allData = apiResponse.data;
           this.bspProformaData = apiResponse.data;
+          this.countAll = apiResponse.count
           if (this.allData === undefined) {
             this.allData = [];
           } 

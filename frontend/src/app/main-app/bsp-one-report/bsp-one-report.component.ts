@@ -17,7 +17,7 @@ import { IDropdownSettings, } from 'ng-multiselect-dropdown';
 import { ngbDropdownEvents } from 'src/app/_helpers/ngbDropdownEvents';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+//pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
   selector: 'app-bsp-one-report',

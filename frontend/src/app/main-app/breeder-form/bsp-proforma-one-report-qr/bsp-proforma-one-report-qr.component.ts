@@ -9,10 +9,11 @@ import { BreederService } from 'src/app/services/breeder/breeder.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductioncenterService } from 'src/app/services/productionCenter/productioncenter.service';
 import { MasterService } from 'src/app/services/master/master.service';
-import * as html2PDF from 'html2pdf.js';
-import * as pdfMake from 'pdfmake/build/pdfmake';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+// import * as html2PDF from 'html2pdf.js';
+// import * as pdfMake from 'pdfmake/build/pdfmake';
+// import * as pdfFonts from 'pdfmake/build/vfs_fonts';
+// //pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
 import * as CryptoJS from 'crypto-js';
 
 @Component({

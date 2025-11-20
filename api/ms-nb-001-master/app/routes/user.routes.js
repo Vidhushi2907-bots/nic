@@ -101,7 +101,7 @@ module.exports = app => {
     app.post(`${process.env.MICRO_SERVICE}/api/get-bsp-six-filter-data`, report.getBspSixFilterData);
 
     // List of Breeder Seed Production Center(Seed Division Report)
-    app.post(`${process.env.MICRO_SERVICE}/api/getListOfBreederSeedProductionforReports`, auth, users.getListOfBreederSeedProductionforReports);
+    app.post(`${process.env.MICRO_SERVICE}/api/getListOfBreederSeedProductionforReports`, users.getListOfBreederSeedProductionforReports);
 
     // Get State for Seed Testing Laboratory(Seed Division Report)
     app.get(`${process.env.MICRO_SERVICE}/api/getStateDataForSeedTestingLab`, auth, users.getStateDataForSeedTestingLab);
@@ -387,7 +387,6 @@ module.exports = app => {
     //monitoring team api's (dec-22-2023)
     app.post(`${process.env.MICRO_SERVICE}/api/check-monitoring-team-name-uniqueness`, auth, cordinator.checkMonitoringTeamNameUniqueness);
     app.post(`${process.env.MICRO_SERVICE}/api/get-all-monitoring-team-name`, auth, cordinator.getAllMonitoringTeamName);
-    app.get(`${process.env.MICRO_SERVICE}/api/get-indent-quantity`, users.getTotalIndentQuantity)
     app.post(`${process.env.MICRO_SERVICE}/api/getWiilingProduceVarietyDataSecond`, report.getWiilingProduceVarietyDataSecond);
     app.post(`${process.env.MICRO_SERVICE}/api/get-user-data-details`, auth, report.getUserData);
     app.post(`${process.env.MICRO_SERVICE}/api/get-bsp2-year`, report.bsp2year);
@@ -426,8 +425,10 @@ module.exports = app => {
 
 
     // characterstic new api's
-     app.get(`${process.env.MICRO_SERVICE}/api/get-agro-ecological-regions`,auth, users.getAgroEcologicalRegions)
-    app.post(`${process.env.MICRO_SERVICE}/api/get-crop-basic-data`,auth, users.getCropBasicData)
+     app.get(`${process.env.MICRO_SERVICE}/api/get-agro-ecological-regions`, users.getAgroEcologicalRegions)
+    app.post(`${process.env.MICRO_SERVICE}/api/get-crop-basic-data`, users.getCropBasicData)
     // getCarryOverList
+
+    app.get(`${process.env.MICRO_SERVICE}/api/sync-lab-data`, users.syncLabData);
 };
 

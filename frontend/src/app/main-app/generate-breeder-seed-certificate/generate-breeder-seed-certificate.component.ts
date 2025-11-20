@@ -31,7 +31,7 @@ export class GenerateBreederSeedCertificateComponent implements OnInit {
   dropdownSettings: IDropdownSettings;
   selectedItems = [];
   dropdownList1;
-  dropdownList2 ;
+  dropdownList2;
   dropdownList3;
   isDisabled: boolean = true;
   yearOfIndent;
@@ -68,8 +68,8 @@ export class GenerateBreederSeedCertificateComponent implements OnInit {
   selectedTable: string;
   dataToDisplay: any;
   dropdownLists: any;
-  unit:any;
-  AESKey:string = environment.AESKey;
+  unit: any;
+  AESKey: string = environment.AESKey;
 
   selectTable(table: string) {
     this.selectedTable = table;
@@ -79,39 +79,36 @@ export class GenerateBreederSeedCertificateComponent implements OnInit {
   ) {
     this.createForm();
   }
-  openBillReceiptDialog(data,item,val,id): void {
-    console.log('data=========>',data);
-    let variety_code = data && data.variety_code ? data.variety_code:'';
-    let indenter_id= item && item.user_id ? item.user_id:'';
-    let spa_code= val && val.spa_user_id ? val.spa_user_id:'';
-    let lifting_id= val && val.id ? val.id:'';
+  openBillReceiptDialog(data, item, val, id): void {
+    console.log('data=========>', data);
+    let variety_code = data && data.variety_code ? data.variety_code : '';
+    let indenter_id = item && item.user_id ? item.user_id : '';
+    let spa_code = val && val.spa_user_id ? val.spa_user_id : '';
+    let lifting_id = val && val.id ? val.id : '';
     let datas = localStorage.getItem('BHTCurrentUser');
     let localdata = JSON.parse(datas)
-    let userId = localdata && localdata.id ? localdata.id :''
-    let param={
-      variety_code:variety_code,
-      indenter_id:indenter_id,
-      spa_code:spa_code,
-      lifting_id:lifting_id
+    let userId = localdata && localdata.id ? localdata.id : ''
+    let param = {
+      variety_code: variety_code,
+      indenter_id: indenter_id,
+      spa_code: spa_code,
+      lifting_id: lifting_id
     }
-    console.log('item=========>',item);
-    console.log('val=========>',val);
-    if(val && val.lifting_id){
-
-      const encryptedForm = CryptoJS.AES.encrypt(JSON.stringify({ id,userId}), this.AESKey).toString();
-    const encryptedData = encodeURIComponent(encryptedForm);
-      this.router.navigate(['/Breeder-Seed-Certificate-Download/'+ encryptedData]);
+    if (val && val.lifting_id) {
+      const encryptedForm = CryptoJS.AES.encrypt(JSON.stringify({ id, userId }), this.AESKey).toString();
+      const encryptedData = encodeURIComponent(encryptedForm);
+      this.router.navigate(['/Breeder-Seed-Certificate-Download/' + encryptedData]);
       // this.productionService.postRequestCreator('save-generate-breeder-seed-certificate',param).subscribe(data=>{
       //   if(data && data.EncryptedResponse && data.EncryptedResponse.status_code && data.EncryptedResponse.status_code==200){
       //   }
       // })
-    }else{
-      this.productionService.postRequestCreator('save-generate-breeder-seed-certificate',param).subscribe(data=>{
-        if(data && data.EncryptedResponse && data.EncryptedResponse.status_code && data.EncryptedResponse.status_code==200){
+    } else {
+      this.productionService.postRequestCreator('save-generate-breeder-seed-certificate', param).subscribe(data => {
+        if (data && data.EncryptedResponse && data.EncryptedResponse.status_code && data.EncryptedResponse.status_code == 200) {
 
-      const encryptedForm = CryptoJS.AES.encrypt(JSON.stringify({ id}), this.AESKey).toString();
-      const encryptedData = encodeURIComponent(encryptedForm);
-          this.router.navigate(['/Breeder-Seed-Certificate-Download/'+ encryptedData]);
+          const encryptedForm = CryptoJS.AES.encrypt(JSON.stringify({ id }), this.AESKey).toString();
+          const encryptedData = encodeURIComponent(encryptedForm);
+          this.router.navigate(['/Breeder-Seed-Certificate-Download/' + encryptedData]);
         }
       })
     }
@@ -131,17 +128,17 @@ export class GenerateBreederSeedCertificateComponent implements OnInit {
 
     })
     this.ngForm.controls['year'].valueChanges.subscribe(newValue => {
-      this.ngForm.controls['variety_code'].setValue('',{emitEvent: false, onlySelf: true});
-      this.ngForm.controls['indentor'].setValue('',{emitEvent: false, onlySelf: true});
-      this.ngForm.controls['spa'].setValue('',{emitEvent: false, onlySelf: true})
-      this.ngForm.controls['bill'].setValue('',{emitEvent: false, onlySelf: true})
+      this.ngForm.controls['variety_code'].setValue('', { emitEvent: false, onlySelf: true });
+      this.ngForm.controls['indentor'].setValue('', { emitEvent: false, onlySelf: true });
+      this.ngForm.controls['spa'].setValue('', { emitEvent: false, onlySelf: true })
+      this.ngForm.controls['bill'].setValue('', { emitEvent: false, onlySelf: true })
       this.getSeason()
     })
     this.ngForm.controls['season'].valueChanges.subscribe(newValue => {
-      this.ngForm.controls['variety_code'].setValue('',{emitEvent: false, onlySelf: true});
-      this.ngForm.controls['indentor'].setValue('',{emitEvent: false, onlySelf: true});
-      this.ngForm.controls['spa'].setValue('',{emitEvent: false, onlySelf: true})
-      this.ngForm.controls['bill'].setValue('',{emitEvent: false, onlySelf: true})
+      this.ngForm.controls['variety_code'].setValue('', { emitEvent: false, onlySelf: true });
+      this.ngForm.controls['indentor'].setValue('', { emitEvent: false, onlySelf: true });
+      this.ngForm.controls['spa'].setValue('', { emitEvent: false, onlySelf: true })
+      this.ngForm.controls['bill'].setValue('', { emitEvent: false, onlySelf: true })
       this.getCrop()
     })
     this.ngForm.controls['variety_code'].valueChanges.subscribe(newValue => {
@@ -341,7 +338,7 @@ export class GenerateBreederSeedCertificateComponent implements OnInit {
     }
     this.productionService.postRequestCreator('get-lifting-data-print', param).subscribe(data => {
       let res = data && data.EncryptedResponse && data.EncryptedResponse.data && data.EncryptedResponse.data && data.EncryptedResponse.data.filterData ? data.EncryptedResponse.data.filterData : '';
-      let res2 = data && data.EncryptedResponse && data.EncryptedResponse.data && data.EncryptedResponse.data && data.EncryptedResponse.data.liftingData ? data.EncryptedResponse.data.liftingData : '';
+      // let res2 = data && data.EncryptedResponse && data.EncryptedResponse.data && data.EncryptedResponse.data && data.EncryptedResponse.data.liftingData ? data.EncryptedResponse.data.liftingData : '';
 
       this.dataToDisplay = res;
       if (this.dataToDisplay && this.dataToDisplay.length > 0) {
@@ -351,54 +348,48 @@ export class GenerateBreederSeedCertificateComponent implements OnInit {
         })
       }
       if (this.dataToDisplay && this.dataToDisplay.length > 0) {
-        if (res2 && res2.length > 0) {
-          res2.forEach(values => {
-
-            this.dataToDisplay.forEach(el => {
-              el.indentor.forEach(val => {
-                val.spa.forEach(item => {
-
-                  if (item.id == values.litting_seed_details_id) {
-                    el.toatalBags.push(values)
-                  }
-
-                })
-              })
-            })
-          })
-        }
+        // if (res2 && res2.length > 0) {
+        //   res2.forEach(values => {
+        //     this.dataToDisplay.forEach(el => {
+        //       el.indentor.forEach(val => {
+        //         val.spa.forEach(item => {
+        //           if (item.id == values.litting_seed_details_id) {
+        //             el.toatalBags.push(values)
+        //           }
+        //         })
+        //       })
+        //     })
+        //   })
+        // }
         this.dataToDisplay.forEach(el => {
           // el.spaData=[]
           el.indentor.forEach(val => {
             val.spa.forEach(item => {
               item.spaBags = []
-              el.spaData.push( val)
+              el.spaData.push(val)
             })
           })
-
         })
       }
-      this.dataToDisplay.forEach(variety => {
-        variety.indentor.forEach(indentor => {
-          indentor.spa.forEach(spaObj => {
-            spaObj.spas = []
-            const matchingBags = res2.filter(bagObj => bagObj.litting_seed_details_id === spaObj.id);
-            spaObj.spaBags = matchingBags;
-          });
-        });
-      });
+      // this.dataToDisplay.forEach(variety => {
+      //   variety.indentor.forEach(indentor => {
+      //     indentor.spa.forEach(spaObj => {
+      //       spaObj.spas = []
+      //       const matchingBags = res2.filter(bagObj => bagObj.litting_seed_details_id === spaObj.id);
+      //       spaObj.spaBags = matchingBags;
+      //     });
+      //   });
+      // });
       this.dataToDisplay.forEach(variety => {
         variety.indentor.forEach(indentor => {
           indentor.spa.forEach(spaObj => {
             spaObj.spaBags.forEach((val => {
-              spaObj.spas.push({ tag_size: val.tag_size, no_of_bags: val.no_of_bags })
+              spaObj.spas.push({ bag_weight: val.bag_weight, no_of_bags: val.no_of_bags })
             }))
           });
         });
       });
       console.log('res=================>', this.dataToDisplay)
-      // this.cropName=res ? res :'';
-      // this.cropNameSecond = this.cropName
     })
   }
 

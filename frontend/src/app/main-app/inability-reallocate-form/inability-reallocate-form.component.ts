@@ -9,6 +9,7 @@ import { IAngularMyDpOptions, IMyDate, IMyDateModel, IMyDefaultMonth } from 'ang
 import { checkDecimal } from 'src/app/_helpers/utility';
 import * as html2PDF from 'html2pdf.js';
 import { MasterService } from 'src/app/services/master.service';
+import { IDropdownSettings } from 'ng-multiselect-dropdown';
 @Component({
   selector: 'app-inability-reallocate-form',
   templateUrl: './inability-reallocate-form.component.html',
@@ -21,6 +22,7 @@ export class InabilityReallocateFormComponent implements OnInit {
 
   ngForm!: FormGroup
   filterPaginateSearch: FilterPaginateSearch = new FilterPaginateSearch();
+  dropdownSettings: IDropdownSettings = {}
   inventoryData = []
   allData: any;
   yearData;
@@ -293,6 +295,7 @@ export class InabilityReallocateFormComponent implements OnInit {
       id: [''],
       plot_no: [''],
       reports: [''],
+      target_qnt: [''],
       expected_production: [''],
       estimated_production: [''],
       crop_failure: [''],
@@ -303,17 +306,26 @@ export class InabilityReallocateFormComponent implements OnInit {
     return this.fb.group({
       id: [''],
       bspc_id: ['', [Validators.required]],
+      bspc_array: [''],
       nucleus_seed_available: [''],
       breeder_seed_available: [''],
       bs_to_bs_permission: [''],
-      assign_target: [0, [Validators.required]]
+      assign_target: [0, [Validators.required, Validators.min(0.01)]]
     })
   }
 
   ngOnInit(): void {
     this.addMore(0, null, null);
     this.getYearData();
-
+    this.dropdownSettings = {
+      singleSelection: true,
+      idField: 'bspc_id',
+      textField: 'name',
+      // selectAllText: 'Select All',
+      // unSelectAllText: 'Unselect All',
+      itemsShowLimit: 5,
+      allowSearchFilter: true
+    };
     // this.fetchQntInventryData(null);
   }
   inabilityStateChange() {
@@ -417,16 +429,14 @@ export class InabilityReallocateFormComponent implements OnInit {
       .subscribe((apiResponse: any) => {
         if (apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.status_code
           && apiResponse.EncryptedResponse.status_code == 200) {
-          // this.Bspclist = apiResponse.EncryptedResponse.data;
-          // this.BspclistSecond = apiResponse.EncryptedResponse.data;
           let editBspcData = apiResponse.EncryptedResponse.data;
-          // this.availableBSPCs = [...this.Bspclist];
-          // console.log("this.availableBSPCs======", this.availableBSPCs);
-
-          // console.log("this.Bspclist===",this.Bspclist);
           if (editBspcData && editBspcData.length) {
             let bspcData = editBspcData.filter(ele => ele.bspc_id == bspcId)
             if (bspcData) {
+              this.ngForm.controls['reallocate']['controls'][i].controls['bspc_array'].setValue([{
+                'bspc_id': bspcData && bspcData[0] && bspcData[0].bspc_id,
+                'name': bspcData && bspcData[0] && bspcData[0].name
+              }]);
               this.ngForm.controls['reallocate']['controls'][i].controls['nucleus_seed_available'].setValue(bspcData[0] && bspcData[0].nucleus_seed_available ? bspcData[0].nucleus_seed_available : 0)
               this.ngForm.controls['reallocate']['controls'][i].controls['breeder_seed_available'].setValue(bspcData[0] && bspcData[0].breeder_seed_available ? bspcData[0].breeder_seed_available : 0)
               if (bspcData[0].nucleus_seed_available < 1 && bspcData[0].breeder_seed_available < 1) {
@@ -439,7 +449,6 @@ export class InabilityReallocateFormComponent implements OnInit {
           this.ngForm.controls['reallocate']['controls'][i].controls['bspc_id'].setValue(bspcId)
         }
       });
-    // return this.availableBSPCs;
   }
 
   fetchQntInventryData(data = null, item = null) {
@@ -454,19 +463,20 @@ export class InabilityReallocateFormComponent implements OnInit {
         this.addBspc(i);
         let dificitamount = 0
         if (data.inability_data[i].crop_failure == 1) {
-          dificitamount = parseFloat(data.inability_data[i].expected_production)
+          dificitamount = parseFloat(data.inability_data[i].target_qnt)
         } else {
-          if (parseFloat(data.inability_data[i].expected_production) < parseFloat(data.inability_data[i].estimated_production)) {
+          if (parseFloat(data.inability_data[i].target_qnt) < parseFloat(data.inability_data[i].estimated_production)) {
             dificitamount = 0;
           } else {
-            dificitamount = parseFloat(data.inability_data[i].expected_production) - parseFloat(data.inability_data[i].estimated_production);
+            dificitamount = parseFloat(data.inability_data[i].target_qnt) - parseFloat(data.inability_data[i].estimated_production);
           }
         }
 
         totalDificit += dificitamount;
         this.ngForm.controls['bspc']['controls'][i].patchValue({
           plot_no: data.inability_data[i].plot ? data.inability_data[i].plot : '',
-          reports: data.inability_data[i].reports ? data.inability_data[i].reports : 0,
+          reports: data.inability_data[i].reports ? data.inability_data[i].reports : 'NA',
+          target_qnt: data.inability_data[i].target_qnt ? data.inability_data[i].target_qnt : 0,
           expected_production: data.inability_data[i].expected_production ? data.inability_data[i].expected_production : 0,
           estimated_production: data.inability_data[i].estimated_production ? data.inability_data[i].estimated_production : 0,
           crop_failure: data.inability_data[i].crop_failure ? (data.inability_data[i].crop_failure == 1 ? true : false) : '',
@@ -476,16 +486,9 @@ export class InabilityReallocateFormComponent implements OnInit {
       for (let i = 0; i < data.bspc_reallocate_data.length; i++) {
 
         this.addMore(i, null, null);
-        this.getBspcDataForEdit(i,data.bspc_reallocate_data[i].bspc_id);
+        this.getBspcDataForEdit(i, data.bspc_reallocate_data[i].bspc_id);
         console.log('data.bspc_reallocate_data[i].bspc_id', data.bspc_reallocate_data[i].bspc_id);
-        console.log('this.Bspclist===',this.Bspclist);
-        // this.ngForm.controls['reallocate']['controls'][i].controls['bspc_id'].setValue({name:"jha",bspc_id:676});
-        // this.bspcDetailsData(null,i,data.bspc_reallocate_data[i].bspc_id);
-        // this.bspcDetails(null,i,data.bspc_reallocate_data[i].bspc_id);
-
-        // if(this.Bspclist && this.Bspclist.length){
-        //   let bspcData = this.Bspclist.filter(ele => ele.bspc_id == data.bspc_reallocate_data[i].bspc_id)
-        //   if (bspcData) {
+        console.log('this.Bspclist===', this.Bspclist);
         this.ngForm.controls['reallocate']['controls'][i].controls['nucleus_seed_available'].setValue(data.bspc_reallocate_data[i] && data.bspc_reallocate_data[i].nucleus_seed_available ? data.bspc_reallocate_data[i].nucleus_seed_available : 0)
         this.ngForm.controls['reallocate']['controls'][i].controls['breeder_seed_available'].setValue(data.bspc_reallocate_data[i] && data.bspc_reallocate_data[i].breeder_seed_available ? data.bspc_reallocate_data[i].breeder_seed_available : 0)
         if (data.bspc_reallocate_data[i].nucleus_seed_available < 1 && data.bspc_reallocate_data[i].breeder_seed_available < 1) {
@@ -493,15 +496,13 @@ export class InabilityReallocateFormComponent implements OnInit {
         } else {
           this.ngForm.controls['reallocate']['controls'][i].controls['assign_target'].enable();
         }
-        //   }
-        // }
+
         this.ngForm.controls['reallocate']['controls'][i].patchValue({
           bspc_id: data && data.bspc_reallocate_data && data.bspc_reallocate_data[i] && data.bspc_reallocate_data[i].bspc_id ? data.bspc_reallocate_data[i].bspc_id : null,
           id: data.bspc_reallocate_data[i].id,
           bs_to_bs_permission: (data.bspc_reallocate_data && data.bspc_reallocate_data[i] && data.bspc_reallocate_data[i].isPermission),
           assign_target: data.bspc_reallocate_data && data.bspc_reallocate_data[i] && data.bspc_reallocate_data[i].target_qunatity ? data.bspc_reallocate_data[i].target_qunatity : 0,
         });
-        // this.getBspcData(i, data.bspc_reallocate_data[i].bspc_id);
       }
 
 
@@ -544,24 +545,20 @@ export class InabilityReallocateFormComponent implements OnInit {
           if (this.bspsData && this.bspsData.length) {
             this.addMore(0, null, null);
             for (let i = 0; i < this.bspsData.length; i++) {
-              // if (this.ngForm.controls['bspc'].value.length > 1) {
-              //   this.removeBspc(i);
-              // }
+
               this.addBspc(i);
               let dificitamount = 0
-              // if (data.inability_data[i].crop_failure == 1) {
-              //   dificitamount = parseFloat(this.bspsData[i].expected_production)
-              // } else {
-              if (parseFloat(this.bspsData[i].expected_production) < parseFloat(this.bspsData[i].estimated_production)) {
+
+              if (parseFloat(this.bspsData[i].target_qnt) < parseFloat(this.bspsData[i].estimated_production)) {
                 dificitamount = 0;
               } else {
-                dificitamount = (this.bspsData[i].expected_production) - (this.bspsData[i].estimated_production);
+                dificitamount = (this.bspsData[i].target_qnt) - (this.bspsData[i].estimated_production);
               }
-              // dificitamount = (this.bspsData[i].expected_production) - (this.bspsData[i].estimated_production);
               totalDificit += dificitamount
               this.ngForm.controls['bspc']['controls'][i].patchValue({
                 plot_no: this.bspsData[i].field_code ? this.bspsData[i].field_code : 0,
                 reports: this.bspsData[i].report ? this.bspsData[i].report : 0,
+                target_qnt: this.bspsData[i].target_qnt ? this.bspsData[i].target_qnt : 0,
                 expected_production: this.bspsData[i].expected_production ? this.bspsData[i].expected_production : 0,
                 estimated_production: this.bspsData[i].estimated_production ? this.bspsData[i].estimated_production : 0,
                 dificit_qnt: dificitamount,
@@ -598,33 +595,10 @@ export class InabilityReallocateFormComponent implements OnInit {
 
   addMore(i, status, bspcId) {
     this.reallocate.push(this.reallocateCreateForm());
-    // let selectedBSPC;
-    // if(i+1){
-    //   if (this.reallocate.at(i).get('bspc_id').value) {
-    //     selectedBSPC = this.reallocate.at(i).get('bspc_id')?.value;
-    //     console.log("selectedBSPC===", selectedBSPC);
-    //   }
-    // }
-
-    // // Remove the selected BSPC from available options
-    // if (selectedBSPC) {
-    //   console.log("Hii")
-    //   let availableBSPCsData = this.availableBSPCs.filter(bspc => bspc.bspc_id != selectedBSPC);
-    //   this.availableBSPCs = availableBSPCsData;
-    //   console.log("bspc data======", this.availableBSPCs)
-    // }
   }
 
   remove(value: number) {
     this.reallocate.removeAt(value);
-    // let selectedBSPC;
-    // if (this.reallocate.at(value).get('bspc_id').value) {
-    //   selectedBSPC = this.reallocate.at(value).get('bspc_id')?.value;
-    // }
-    // if (selectedBSPC) {
-    //   let bspcDataArray = this.Bspclist.filter(ele => ele.bspc_id == selectedBSPC)
-    //   this.availableBSPCs.push(bspcDataArray);
-    // }
   }
   getSelectedBSPC(index: number) {
     // let selectedBSPCData;
@@ -643,12 +617,6 @@ export class InabilityReallocateFormComponent implements OnInit {
     this.cropData = this.croplistSecond;
     this.ngForm.controls['crop'].setValue(item && item.crop_code ? item.crop_code : '')
   }
-  // bspclist1(item: any) {
-  //   this.selectBspc = item && item.crop_name ? item.crop_name : ''
-  //   this.ngForm.controls['crop_text'].setValue('', { emitEvent: false })
-  //   this.cropData = this.croplistSecond;
-  //   this.ngForm.controls['crop'].setValue(item && item.crop_code ? item.crop_code : '')
-  // }
 
   variety(item: any) {
     this.selectVariety = item && item.variety_name ? item.variety_name : ''
@@ -976,16 +944,16 @@ export class InabilityReallocateFormComponent implements OnInit {
     // console.log('event.target.checked===', event.target.checked);
     // console.log("event", event.target.checked)
     if (event.target.checked) {
-      this.ngForm.controls['bspc']['controls'][i].controls['dificit_qnt'].setValue(this.ngForm.controls['bspc']['controls'][i].controls['expected_production'].value)
+      this.ngForm.controls['bspc']['controls'][i].controls['dificit_qnt'].setValue(this.ngForm.controls['bspc']['controls'][i].controls['target_qnt'].value)
     } else if (!event.target.checked) {
-      if (this.ngForm.controls['bspc']['controls'][i].controls['expected_production'].value < this.ngForm.controls['bspc']['controls'][i].controls['estimated_production'].value) {
+      if (this.ngForm.controls['bspc']['controls'][i].controls['target_qnt'].value < this.ngForm.controls['bspc']['controls'][i].controls['estimated_production'].value) {
         this.ngForm.controls['bspc']['controls'][i].controls['dificit_qnt'].setValue(0)
       } else {
-        this.ngForm.controls['bspc']['controls'][i].controls['dificit_qnt'].setValue(this.ngForm.controls['bspc']['controls'][i].controls['expected_production'].value - this.ngForm.controls['bspc']['controls'][i].controls['estimated_production'].value)
+        this.ngForm.controls['bspc']['controls'][i].controls['dificit_qnt'].setValue(this.ngForm.controls['bspc']['controls'][i].controls['target_qnt'].value - this.ngForm.controls['bspc']['controls'][i].controls['estimated_production'].value)
       }
     }
     else {
-      this.ngForm.controls['bspc']['controls'][i].controls['dificit_qnt'].setValue(this.ngForm.controls['bspc']['controls'][i].controls['expected_production'].value - this.ngForm.controls['bspc']['controls'][i].controls['estimated_production'].value)
+      this.ngForm.controls['bspc']['controls'][i].controls['dificit_qnt'].setValue(this.ngForm.controls['bspc']['controls'][i].controls['target_qnt'].value - this.ngForm.controls['bspc']['controls'][i].controls['estimated_production'].value)
     }
     // total_dificit
     let dificitQnt = 0;
@@ -997,12 +965,19 @@ export class InabilityReallocateFormComponent implements OnInit {
   }
   getFilteredOptions(index: number) {
     // Get all selected bspc_ids as integers, except for the current dropdown
-    const selectedIds = this.reallocate.controls
-      .map((control, idx) => idx !== index ? parseInt(control.get('bspc_id')?.value.bspc_id, 10) : null)
-      .filter(id => id !== null);
 
-    // Return BSPC options that are not selected in other dropdowns
+    const selectedIds = this.reallocate.controls
+      .map((control, idx) => idx !== index ? parseInt(control.get('bspc_id')?.value, 10) : null) // (bspcData && bspcData.bspc_id):null)//old code => parseInt(control.get('bspc_id')?.value, 10) : null)
+      .filter(id => id !== null);
+    console.log('selectedIds===1', selectedIds);
     return this.Bspclist.filter(option => !selectedIds.includes(option.bspc_id));
+    // selectedIds = [5290];
+    // Return BSPC options that are not selected in other dropdowns
+    // if(selectedIds && selectedIds.length){
+
+    // }else{
+    //   return this.Bspclist;
+    // }
   }
 
   bspcDetailsData($event, index, data) {
@@ -1011,10 +986,20 @@ export class InabilityReallocateFormComponent implements OnInit {
   }
 
   bspcDetails(event, index, editData) {
-    console.log(event, index, editData);
-    if (editData || (event && event.target && event.target.value)) {
-      // alert("hiii");
-      let bspcData = this.BspclistSecond.filter(ele => ele.bspc_id == (editData ? editData : event.target.value ? event.target.value : null))
+    this.ngForm.controls['reallocate']['controls'][index].controls['bspc_id'].setValue(editData ? editData : event.bspc_id ? event.bspc_id : null)
+    let bspcDataValue;
+    if (editData) {
+      bspcDataValue = this.Bspclist.filter(option => option.bspc_id = editData);
+      this.ngForm.controls['reallocate']['controls'][index].controls['bspc_array'].setValue(bspcDataValue[0])
+      console.log('bspc_array====', this.ngForm.controls['reallocate']['controls'][index].controls['bspc_array'].value)
+    }
+    console.log('bspc_id===', this.ngForm.controls['reallocate']['controls'][index].controls['bspc_id'].value);
+    if (editData || (event && event.bspc_id)) {
+      // old code 
+      // let bspcData = this.BspclistSecond.filter(ele => ele.bspc_id == (editData ? editData : event.target.value ? event.target.value : null))
+      // new code
+      let bspcData = this.BspclistSecond.filter(ele => ele.bspc_id == (editData ? editData : event.bspc_id ? event.bspc_id : null))
+
       if (bspcData && bspcData[0]) {
         this.ngForm.controls['reallocate']['controls'][index].controls['nucleus_seed_available'].setValue(bspcData[0] && bspcData[0].nucleus_seed_available ? bspcData[0].nucleus_seed_available : 0)
         this.ngForm.controls['reallocate']['controls'][index].controls['breeder_seed_available'].setValue(bspcData[0] && bspcData[0].breeder_seed_available ? bspcData[0].breeder_seed_available : 0)
@@ -1166,7 +1151,9 @@ export class InabilityReallocateFormComponent implements OnInit {
     this.isVarietyClick = false;
     this.getVarietyData();
   }
+
   saveData() {
+    this.submitted = true;
     if (this.ngForm.invalid) {
       Swal.fire(
         {
@@ -1180,9 +1167,54 @@ export class InabilityReallocateFormComponent implements OnInit {
       return;
     }
     let sumOfAssignTargetValue = 0;
+    this.reallocate.value.forEach((element, i) => {
+      if (parseFloat(this.ngForm.controls['reallocate']['controls'][i].controls['assign_target'].value) <= 0) {
+        Swal.fire(
+          {
+            icon: 'error',
+            title: 'Assign Target Should Not  Be Zero',
+            showConfirmButton: true,
+            showCancelButton: false,
+            confirmButtonColor: '#B64B1D'
+          }
+        )
+        return;
+      }
+      // console.log(element.assign_target);
+      // if (element && Number(element.assign_target) === 0) {
+      //   Swal.fire(
+      //     {
+      //       icon: 'error',
+      //       title: 'Assign Target Should Not  Be Zero',
+      //       showConfirmButton: true,
+      //       showCancelButton: false,
+      //       confirmButtonColor: '#B64B1D'
+      //     }
+      //   )
+      //   return;
+      // }
+    });
+    // for (let i = 0; i <= this.reallocate.value.length; i++) {
+    //   console.log(this.reallocate.value[i].assign_target);
+    //   console.log(i);
+    //   if (this.reallocate.value && this.reallocate.value[i] && Number(this.reallocate.value[i].assign_target) === 0) {
+    //     Swal.fire(
+    //       {
+    //         icon: 'error',
+    //         title: 'Assign Target Should Not  Be Zero',
+    //         showConfirmButton: true,
+    //         showCancelButton: false,
+    //         confirmButtonColor: '#B64B1D'
+    //       }
+    //     )
+    //     return;
+    //   }
+    // }
+    // return;
     for (let key of this.reallocate.value) {
       sumOfAssignTargetValue += parseFloat(key.assign_target);
     }
+
     if ((sumOfAssignTargetValue) > this.ngForm.controls['total_dificit'].value) {
       Swal.fire(
         {
@@ -1194,63 +1226,63 @@ export class InabilityReallocateFormComponent implements OnInit {
         }
       )
       return;
-    }
-
-    // return;
-    let formData = {
-      "id": this.ngForm.controls['id'].value ? this.ngForm.controls['id'].value : '',
-      "year": this.ngForm.controls['year'].value,
-      "season": this.ngForm.controls['season'].value,
-      "crop_code": this.ngForm.controls['crop'].value,
-      "variety_code": this.ngForm.controls['variety'].value,
-      "variety_line_code": this.ngForm.controls['parental_line'].value,
-      "total_dificit": this.ngForm.controls['total_dificit'].value,
-      "inability_data": this.ngForm.controls['bspc'].value,
-      "bspc_reallocate_data": this.ngForm.controls['reallocate'].value,
-    }
-    let actionMessage = ""
-    if (this.ngForm.controls['id'].value) {
-      actionMessage = "Updated"
     } else {
-      actionMessage = "Saved"
+      // return;
+      let formData = {
+        "id": this.ngForm.controls['id'].value ? this.ngForm.controls['id'].value : '',
+        "year": this.ngForm.controls['year'].value,
+        "season": this.ngForm.controls['season'].value,
+        "crop_code": this.ngForm.controls['crop'].value,
+        "variety_code": this.ngForm.controls['variety'].value,
+        "variety_line_code": this.ngForm.controls['parental_line'].value,
+        "total_dificit": this.ngForm.controls['total_dificit'].value,
+        "inability_data": this.ngForm.controls['bspc'].value,
+        "bspc_reallocate_data": this.ngForm.controls['reallocate'].value,
+      }
+      let actionMessage = ""
+      if (this.ngForm.controls['id'].value) {
+        actionMessage = "Updated"
+      } else {
+        actionMessage = "Saved"
+      }
+      this.productionService.postRequestCreator('modify-inability-reallocated-data', formData).subscribe(data => {
+        if (data && data.EncryptedResponse && data.EncryptedResponse.status_code && data.EncryptedResponse.status_code == 200) {
+          let response = data && data.EncryptedResponse && data.EncryptedResponse.data ? data.EncryptedResponse.data : '';
+          Swal.fire(
+            {
+              icon: 'success',
+              title: 'Data ' + actionMessage + ' Successfully',
+              showConfirmButton: true,
+              showCancelButton: false,
+              confirmButtonColor: '#B64B1D'
+            }
+          ).then(x => {
+            if (x.isConfirmed) {
+              this.getVarietyData();
+              // this.getBspcData(null,null);
+              this.TableData();
+              this.isInability = false;
+              this.isInabilityTable = true;
+              this.isVarietyClick = false;
+              this.is_update = false;
+              this.clearData();
+              this.submitted = false;
+            }
+          })
+        }
+        else {
+          Swal.fire(
+            {
+              icon: 'error',
+              title: 'something went wrong',
+              showConfirmButton: true,
+              showCancelButton: false,
+              confirmButtonColor: '#B64B1D'
+            }
+          )
+        }
+      })
     }
-    this.productionService.postRequestCreator('modify-inability-reallocated-data', formData).subscribe(data => {
-      if (data && data.EncryptedResponse && data.EncryptedResponse.status_code && data.EncryptedResponse.status_code == 200) {
-        let response = data && data.EncryptedResponse && data.EncryptedResponse.data ? data.EncryptedResponse.data : '';
-        Swal.fire(
-          {
-            icon: 'success',
-            title: 'Data ' + actionMessage + ' Successfully',
-            showConfirmButton: true,
-            showCancelButton: false,
-            confirmButtonColor: '#B64B1D'
-          }
-        ).then(x => {
-          if (x.isConfirmed) {
-            this.getVarietyData();
-            // this.getBspcData(null,null);
-            this.TableData();
-            this.isInability = false;
-            this.isInabilityTable = true;
-            this.isVarietyClick = false;
-            this.is_update = false;
-            this.clearData();
-
-          }
-        })
-      }
-      else {
-        Swal.fire(
-          {
-            icon: 'error',
-            title: 'something went wrong',
-            showConfirmButton: true,
-            showCancelButton: false,
-            confirmButtonColor: '#B64B1D'
-          }
-        )
-      }
-    })
   }
 
   inputNumber(event) {

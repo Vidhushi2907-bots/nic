@@ -19,14 +19,13 @@
                         </button> -->
                     </div>
                 </div>
-                
+
                 <div class="float-right" style="margin-left: -385px;">
-                    
-                    <div class="container ">
+
+                    <div class="container">
                         <div class="rows" style="display: flex;
                         justify-content: center;
                         gap: 12px;">
-
                             <!-- <div class="cols-2 mt-3" style="float: right;">
                                 <div class=" header_nav" style="margin-top: -8%">
                                     <a (click)="logout()" class="btn btn-default btn-flat"><u>Sign out</u></a>
@@ -38,13 +37,21 @@
                                     <a href="/login-home">Home</a>
                                 </div>
                             </div> -->
-                            <div  class="pl-5 pt-2" >
+                            <div class="cols-7 pl-5 pt-2">
                                 <!-- Seednet login -->
                                 <!-- <button *ngIf="localStorageData.user_type=='SD' || localStorageData.user_type=='IN'" (click)="navigatetoSeedNet()" title="Redirect to Seednet" class="py-2"  style="margin-left: -250px;font-size: 17px;color: white;background: #DC8B3A 0% 0% no-repeat padding-box;border:none;float:right">
                                     Redirect to Seednet 
                                 </button> -->
-                                <!-- <a type="button" href="https://seednet.gov.in/SSO/SSOLogin.aspx?seednet_token={{seednet_token}}" (click)="logout()" style="margin-left: -250px;font-size: 17px;color: white;">Redirect to Seednet </a> -->
-                              </div>
+                                <!-- new code -->
+                                <!-- [href]="'https://seedtrace.gov.in/ms014/oilSeed/areaDashboard?seednet_token=' +
+                                seednet_token" -->
+                            </div>
+                            <div class="cols-2 pl-5 pt-2">
+                                <a *ngIf="localStorageData.user_type=='OILSEEDADMIN'" type="button"
+                                    class="btn btn-sm btn-oil-seed"
+                                    href="https://seedtrace.gov.in/ms014/oilSeed/areaDashboard" (click)="logout()"
+                                    style="margin-left: 250px;font-size: 17px;color: white;">Oil Seed</a>
+                            </div>
                             <div class="cols-1 mt-2 ml-2">
                                 <img src="assets/images/Group 1160.svg" class="user-logo pt-1" alt="">
                             </div>
@@ -52,12 +59,10 @@
                             <div class="cols-7 mt-3 header_nav ">
                                 {{ userName | uppercase}}
                             </div>
-                            <div class="cols-1 mt-3" style="float: left;" (click)="toggleforlogout()" (click)="showPopup(1,$event)">
+                            <div class="cols-1 mt-3" style="float: left;" (click)="toggleforlogout()"
+                                (click)="showPopup(1,$event)">
                                 <span class="" *ngIf="!toggledropdownforlogout"><i class="fas fa-angle-down" style="color:
                                 white;"></i></span>
-
-
-
                                 <span class="" *ngIf="toggledropdownforlogout"><i class="fas fa-angle-up" style="color:
                                     white;"></i></span>
                             </div>
@@ -106,42 +111,42 @@
 
 
                 </div>
-                
+
             </div>
             <div class="main_div header  pt-3 " *ngIf="currentUrl=='/seed-processing-plant'">
                 <div class="text_wrapper px-3 ">
-                    Last Date for reporting production details to Seed Division is 31/12/23 Please fill Estimated Processed Seed details for unprocessed seeds
+                    Last Date for reporting production details to Seed Division is 31/12/23 Please fill Estimated
+                    Processed Seed details for unprocessed seeds
                     <!-- &#9733; &nbsp; Last Date for reporting production details to Seed Division is 20/12/23 -->
                 </div>
                 <div class="transparent_div "></div>
-              </div>
-     
-         <!-- <div class="moving-text-container header pt-3" *ngIf="currentUrl=='/seed-processed-old'|| currentUrl=='/seed-processing-plant'">
+            </div>
+
+            <!-- <div class="moving-text-container header pt-3" *ngIf="currentUrl=='/seed-processed-old'|| currentUrl=='/seed-processing-plant'">
             <span class="moving-text px-3">
               Last Date for reporting production details to Seed Division is 31/12/23 Please fill Estimated Processed Seed details for unprocessed seeds
               &#9733; &nbsp; Last Date for reporting production details to Seed Division is 20/12/23
                
             </span>
           </div> -->
-          
-        
+
+
             <div class="row" *ngIf="currentUrl!='/seed-processing-plant'">
                 <div class="col-2">
 
                     <div class="py-3 px-4 user-text clip-path-header ">
                         <!-- Lorem Ispum -->
-                       
+
                     </div>
                 </div>
 
                 <div class="col-10 header-right-side-bottom-container">
                     <div class="row float-right py-3 pr-5">
                         <div class="header-right-side-section-1 pr-3">
-                            <!-- Lorem Ipsum is simply dummy text -->
                         </div>
 
                         <div class="pl-3 header-right-side-section-2">
-                            <!-- Lorem Ipsum is simply dummy text -->
+                            Data as on : {{ today | date:'dd/MM/yyyy' }}
                         </div>
                     </div>
                 </div>
@@ -186,6 +191,9 @@
                     </button>
                     <a type="button" href="https://seednet.gov.in/SSO/SSOLogin.aspx?seednet_token={{seednet_token}}" (click)="logout()" style="margin-left: -250px;font-size: 17px;color: white;">Redirect to Seednet </a>
                   </div> -->
+                <!-- (click)="logout()" -->
+                <!-- href="https://seedtrace.gov.in/ms014/oilSeed/areaDashboard?oilseed_token={{seednet_token}}" -->
+                <!-- (click)="logout()" -->
                 <div class="">
                     <div class="row py-2">
                         <div class="col-2">
@@ -193,9 +201,9 @@
                         </div>
                         <div class="col-10 py-2 top-right-side-header-title">
                             <div class="row">
-                                
+
                                 <div class="col-10">
-                                    {{ userName  }}
+                                    {{ userName }}
                                 </div>
                                 <div class="col-2" (click)="toggleforlogout()" (click)="showPopup(1,$event)">
                                     <span class="" *ngIf="!toggledropdownforlogout"><b><i class="fas fa-angle-down"
@@ -236,24 +244,27 @@
 
 
 
-<div class="col-md-3" *ngIf="toggledropdownforlogout"> 
+<div class="col-md-3" *ngIf="toggledropdownforlogout">
     <div class="card100" *ngIf="opened == true" (click)="$event.stopPropagation()">
         <ul>
             <!-- <li  [ngClass]="is_change_password ? '':'disableEdit'"><span class="fas fa-edit"></span>&nbsp; &nbsp;<a [routerLink]="['/profile/submission/view']" (click)="toggleforlogout()">View Profile</a></li>
             <hr >
              -->
-            <li><span class="fas fa-edit"></span>&nbsp; &nbsp;<a [routerLink]="['/profile/submission/view']" (click)="toggleforlogout()">View Profile</a></li>
+            <li><span class="fas fa-edit"></span>&nbsp; &nbsp;<a [routerLink]="['/profile/submission/view']"
+                    (click)="toggleforlogout()">View Profile</a></li>
             <hr>
             <!-- <li><span class="fa-brands fa-rocketchat"></span>&nbsp; &nbsp;<a [routerLink]="['/chat-support']" (click)="toggleforlogout()">Chat Support</a></li> -->
             <li>
                 <span class="fa-brands fa-rocketchat"></span>&nbsp; &nbsp;
-                <a [routerLink]="['/chat-support']" (click)="toggleforlogout()">Chat Support</a>&nbsp;  
-                <span *ngIf="totalUnreadMessages > 0"  class="badge badge-pill badge-danger">{{ totalUnreadMessages }}</span>
+                <a [routerLink]="['/chat-support']" (click)="toggleforlogout()">Chat Support</a>&nbsp;
+                <span *ngIf="totalUnreadMessages > 0" class="badge badge-pill badge-danger">{{ totalUnreadMessages
+                    }}</span>
             </li>
-            
-              
+
+
             <hr>
-            <li><span class="fa-sharp fa-solid fa-key"></span>&nbsp; &nbsp;<a routerLink="/change-password" (click)="toggleforlogout()">Change Password</a></li>
+            <li><span class="fa-sharp fa-solid fa-key"></span>&nbsp; &nbsp;<a routerLink="/change-password"
+                    (click)="toggleforlogout()">Change Password</a></li>
             <hr>
 
             <li><span class="fa fa-sign-out"></span>&nbsp; &nbsp;<a (click)="logout()">Sign out</a></li>

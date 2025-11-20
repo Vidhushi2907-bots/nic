@@ -69,12 +69,20 @@ export class DirectIndentComponent implements OnInit {
   stateCode: any;
   isShowTable = false;
   myId: any;
-  isLimeSection =  false;
+  isLimeSection = false;
   lineData: any;
-  varietyAndQuantity: any[] = []; 
+  varietyAndQuantity: any[] = [];
   unit: string;
-
-  constructor(private service: SeedServiceService, private breeder: BreederService, private masterService: MasterService, private productioncenter: ProductioncenterService, private fb: FormBuilder,private formBuilder: FormBuilder) {
+  productionType: string;
+  // isDisableNormal: boolean;
+  // isDisableDelay: boolean;
+  // isDisableNormalReallocate: boolean;
+  isDirect: boolean;
+  isSelf: boolean;
+  isSearchRadio: boolean = false
+  spaName: any;
+  showSaveButton: boolean;
+  constructor(private service: SeedServiceService, private breeder: BreederService, private masterService: MasterService, private productioncenter: ProductioncenterService, private fb: FormBuilder, private formBuilder: FormBuilder) {
     this.createForm();
   }
 
@@ -82,7 +90,7 @@ export class DirectIndentComponent implements OnInit {
     this.getYearData();
     this.getStateData();
     this.getCropData();
-    this.getPageData();
+    // this.getPageData();
     const BHTCurrentUser = localStorage.getItem('BHTCurrentUser');
     const data = JSON.parse(BHTCurrentUser);
     this.authUserId = data.id;
@@ -95,7 +103,7 @@ export class DirectIndentComponent implements OnInit {
       crop: ['', [Validators.required]],
       variety: ['', [Validators.required]],
       selectSpa: ['', [Validators.required]],
-      indent_qnt: ['',[]],
+      indent_qnt: ['', []],
       otherInput: [''],
       crop_text: [''],
       state_text: [''],
@@ -218,11 +226,11 @@ export class DirectIndentComponent implements OnInit {
         } else {
           this.unit = "Kg";
         }
-        if(this.lineData){
-        this.lineData.forEach((line, index) => {
-          this.ngForm.controls[`indentQnty_${index}`].reset();
-        });
-      }
+        if (this.lineData) {
+          this.lineData.forEach((line, index) => {
+            this.ngForm.controls[`indentQnty_${index}`].reset();
+          });
+        }
         this.ngForm.controls['variety_notification_year'].reset('');
         this.getVarietyNotificationYear();
       }
@@ -261,24 +269,24 @@ export class DirectIndentComponent implements OnInit {
   formatDate(dateString: string): string {
     if (!dateString) return '';
     const formattedDate = new Date(dateString).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
     });
     return formattedDate;
   }
 
   onInputChange(event: Event) {
-  const inputElement = event.target as HTMLInputElement;
-  const newValue = inputElement.value.toUpperCase();
-  this.ngForm.controls['address'].setValue(newValue);
+    const inputElement = event.target as HTMLInputElement;
+    const newValue = inputElement.value.toUpperCase();
+    this.ngForm.controls['address'].setValue(newValue);
   }
 
-  getFormControl(index: number): FormControl {  
-  return this.ngForm.get(`indentQnty_${index}`) as FormControl;
+  getFormControl(index: number): FormControl {
+    return this.ngForm.get(`indentQnty_${index}`) as FormControl;
   }
-  otherClicked(){
-    this.selectSpa= 'Other';
+  otherClicked() {
+    this.selectSpa = 'Other';
     this.ngForm.controls['selectSpa'].setValue(this.selectSpa, { emitEvent: false });
     this.onSelectSPA();
   }
@@ -293,14 +301,17 @@ export class DirectIndentComponent implements OnInit {
       this.showOtherInputBox = true;
       this.ngForm.controls['address'].patchValue('');
       this.ngForm.controls['mobile_no'].patchValue('');
-      this.ngForm.controls['email'].patchValue('');  
+      this.ngForm.controls['email'].patchValue('');
     }
     else {
+       
       this.showOtherInputBox = false;
       const selectedSpa = this.allSpaData.find(item => item.spa_name == selectedValue);
+      
+      this.spaName = selectedSpa.spa_name;
       if (selectedSpa.address) {
         this.ngForm.controls['address'].patchValue(selectedSpa.address);
-      } else{
+      } else {
         this.ngForm.controls['address'].patchValue('');
       }
       if (selectedSpa.mobile_number) {
@@ -311,7 +322,7 @@ export class DirectIndentComponent implements OnInit {
       if (selectedSpa.email_id) {
         this.ngForm.controls['email'].patchValue(selectedSpa.email_id);
       } else {
-        this.ngForm.controls['email'].patchValue('');  
+        this.ngForm.controls['email'].patchValue('');
       }
       // if (selectedSpa.district_id) {
       //   this.ngForm.controls['district'].patchValue(selectedSpa.district_id);
@@ -336,23 +347,23 @@ export class DirectIndentComponent implements OnInit {
   variety(item: any) {
     const indentQntControl = this.ngForm.get('indent_qnt');
     this.selectVariety = item && item.variety_name ? item.variety_name : '',
-    this.selectVarietyStatus = item && item.status ? item.status : '',
-    this.ngForm.controls['variety_text'].setValue('', { emitEvent: false })
+      this.selectVarietyStatus = item && item.status ? item.status : '',
+      this.ngForm.controls['variety_text'].setValue('', { emitEvent: false })
     this.varietyData = this.varietyListSecond;
     this.ngForm.controls['variety'].setValue(item && item.variety_code ? item.variety_code : '')
-    if(this.selectVarietyStatus == "hybrid"){
-     this.isLimeSection = true;
-     this.geVarietyLineData(item && item.variety_code ? item.variety_code : '');
-     indentQntControl.clearValidators();
+    if (this.selectVarietyStatus == "hybrid") {
+      this.isLimeSection = true;
+      this.geVarietyLineData(item && item.variety_code ? item.variety_code : '');
+      indentQntControl.clearValidators();
     } else {
-      if(this.lineData){
+      if (this.lineData) {
         this.lineData.forEach((line, index) => {
           this.ngForm.controls[`indentQnty_${index}`].clearValidators();
           this.ngForm.controls[`indentQnty_${index}`].updateValueAndValidity();
         });
       }
       indentQntControl.setValidators([Validators.required]);
-      this.isLimeSection = false; 
+      this.isLimeSection = false;
       this.lineData = null;
     }
     indentQntControl.updateValueAndValidity();
@@ -367,13 +378,13 @@ export class DirectIndentComponent implements OnInit {
     this.productioncenter.postRequestCreator(route, param, null).subscribe(data => {
       if (data.EncryptedResponse.status_code === 200) {
         this.lineData = data.EncryptedResponse.data;
-        if(this.lineData){
-        this.lineData.forEach((line, index) => {
-          this.ngForm.addControl(`indentQnty_${index}`, this.formBuilder.control('', Validators.required));
-          this.ngForm.addControl(`line_variety_${index}`, this.formBuilder.control(''));
-        });
+        if (this.lineData) {
+          this.lineData.forEach((line, index) => {
+            this.ngForm.addControl(`indentQnty_${index}`, this.formBuilder.control('', Validators.required));
+            this.ngForm.addControl(`line_variety_${index}`, this.formBuilder.control(''));
+          });
+        }
       }
-     }
     })
   }
 
@@ -385,10 +396,11 @@ export class DirectIndentComponent implements OnInit {
   }
 
   searchData() {
-    this.isShowTable = true;
+    this.isShowTable = false;
     this.isVarietySelected = true;
+    this.isSearchRadio = true;
     this.ngForm.controls['selectSpa'].disable();
-    this.getPageData()
+    // this.getPageData()
   }
 
   district(item: any) {
@@ -435,7 +447,7 @@ export class DirectIndentComponent implements OnInit {
     const route = "get-state-list";
     this.service.getRequestCreatorNew(route).subscribe((data: any) => {
       if (data.EncryptedResponse.status_code === 200) {
-        this.stateData = data && data.EncryptedResponse && data.EncryptedResponse.data ? data.EncryptedResponse.data:'' ;
+        this.stateData = data && data.EncryptedResponse && data.EncryptedResponse.data ? data.EncryptedResponse.data : '';
         this.stateData = this.stateData.filter(x => x.state_name != null);
         this.statelistSecond = this.stateData;
       }
@@ -446,7 +458,7 @@ export class DirectIndentComponent implements OnInit {
     const route = "get-all-crop-list";
     this.productioncenter.postRequestCreator(route, null, null).subscribe(data => {
       if (data.EncryptedResponse.status_code === 200) {
-        this.cropData = data && data.EncryptedResponse && data.EncryptedResponse.data ? data.EncryptedResponse.data: '';
+        this.cropData = data && data.EncryptedResponse && data.EncryptedResponse.data ? data.EncryptedResponse.data : '';
         this.croplistSecond = this.cropData;
       }
     })
@@ -460,7 +472,7 @@ export class DirectIndentComponent implements OnInit {
     }
     this.productioncenter.postRequestCreator(route, param, null).subscribe(data => {
       if (data.EncryptedResponse.status_code === 200) {
-        this.varietyData = data && data.EncryptedResponse && data.EncryptedResponse.data ? data.EncryptedResponse.data: '';
+        this.varietyData = data && data.EncryptedResponse && data.EncryptedResponse.data ? data.EncryptedResponse.data : '';
         this.varietyListSecond = this.varietyData;
         if (this.isEditMode) {
           const varietyName = this.varietyData.filter(variety => variety.variety_code === varietyCode);
@@ -484,7 +496,7 @@ export class DirectIndentComponent implements OnInit {
   }
 
   getdistrictData(districtCode: any) {
-    this.ngForm.controls['district'].patchValue('',{emitEvent: false});
+    this.ngForm.controls['district'].patchValue('', { emitEvent: false });
     const route = "get-district-list";
     this.masterService.postRequestCreator(route, null, {
       search: {
@@ -497,7 +509,7 @@ export class DirectIndentComponent implements OnInit {
         if (this.isPatchData) {
           const districtName = this.districtData.find(district => district.district_code === districtCode)?.district_name;
           this.selectDistrict = districtName;
-          this.ngForm.controls['district'].patchValue(districtCode,{emitEvent: false});
+          this.ngForm.controls['district'].patchValue(districtCode, { emitEvent: false });
           this.getSpaData(this.myId);
         }
         this.isPatchData = false;
@@ -512,7 +524,7 @@ export class DirectIndentComponent implements OnInit {
     }
     this.productioncenter.postRequestCreator(route, param, null).subscribe(data => {
       if (data.status === 200) {
-        this.allSpaData = data && data.data? data.data: '';
+        this.allSpaData = data && data.data ? data.data : '';
         this.spalistSecond = this.allSpaData;
         if (this.isEditMode) {
           const foundSpa = this.allSpaData.find(spa => spa.spa_code == spaCode);
@@ -538,59 +550,151 @@ export class DirectIndentComponent implements OnInit {
         const route = "deleteDirectIndent";
         this.productioncenter.postRequestCreator(route, { "id": id }, null).subscribe(data => {
           if (data.status === 200) {
-          Swal.fire({
-            title: "Deleted!",
-            text: "Your data has been deleted.",
-            icon: "success"
-          });
-          this.filterPaginateSearch.itemList = this.filterPaginateSearch.itemList.filter(item => item.id !== id);
+            Swal.fire({
+              title: "Deleted!",
+              text: "Your data has been deleted.",
+              icon: "success"
+            });
+            this.filterPaginateSearch.itemList = this.filterPaginateSearch.itemList.filter(item => item.id !== id);
           }
-        });     
+        });
       }
     });
   }
-
   createNewSpa() {
     this.submitted = true;
-    if (this.ngForm.invalid) {
-      return;
-    }
-    if ( !this.showOtherInputBox){
-      this.saveForm();
-    } else{
-    const route = "create-new-spa";
-    const param = {
-      state_id: this.ngForm.controls['state'].value,
-      district_id: this.ngForm.controls['district'].value,
-      address: this.ngForm.controls['address'].value,
-      mobile_number: this.ngForm.controls['mobile_no'].value,
-      email_id: this.ngForm.controls['email'].value,
-      spa_name: this.ngForm.controls['otherInput'].value,
-    }
-    this.productioncenter.postRequestCreator(route,param, null ).subscribe(data => {
-      if (data.status == 200) {
-        this.saveForm();
-      } else {
-        const message = data.EncryptedResponse?.data?.message || 'Something went wrong';
-        Swal.fire({
-          title: `<p style="font-size:25px;">${message}.</p>`,
-          icon: 'error',
-          confirmButtonText:
-            'OK',
-        confirmButtonColor: '#E97E15'
-        })
+    console.log('this.isDirect', this.isDirect);
+  
+    if (this.isDirect == true) {
+      if (this.ngForm.invalid) {
+        console.log('hellow 1');
+        return;
       }
-    })
-  }
+    }
+  
+    // Check for existing data before saving
+    const checkDuplicateRoute = "check-existing-spa"; // Create an API endpoint
+    const checkParam = {
+      state_code: this.ngForm.controls['state'].value,
+      district_code: this.ngForm.controls['district'].value,
+      spa_address: this.ngForm.controls['address'].value,
+      year: this.ngForm.controls['year'].value,
+      season: this.ngForm.controls['season'].value,
+      crop_code: this.ngForm.controls['crop'].value,
+      variety_code: this.ngForm.controls['variety'].value,
+      spa_mobile_number: this.ngForm.controls['mobile_no'].value
+    };
+    console.log("checkParam",checkParam);
+    
+  
+    this.productioncenter.postRequestCreator(checkDuplicateRoute, checkParam, null).subscribe((response: any) => {
+      if (response.status === 200 && response.exists === true) {
+        console.log("Triggering Swal.fire");
+        Swal.fire({
+          title: `<p style="font-size:25px;">Already Indented!</p>`,
+          icon: 'error',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#E97E15'
+        });
+        return; // Stop execution if duplicate found
+      } else {
+        console.log("create-new-spa");
+        
+        // Proceed with saving if no duplicate found
+        const route = "create-new-spa";
+        const param = {
+          state_id: this.ngForm.controls['state'].value,
+          district_id: this.ngForm.controls['district'].value,
+          address: this.ngForm.controls['address'].value,
+          mobile_number: this.ngForm.controls['mobile_no'].value,
+          email_id: this.ngForm.controls['email'].value,
+          spa_name: this.spaName || this.ngForm.controls['otherInput'].value,
+          is_self: this.isSelf ? this.isSelf : false
+        };
+  
+        this.productioncenter.postRequestCreator(route, param, null).subscribe(data => {
+          if (data.status == 200) {
+            console.log('data====', data);
+            this.saveForm();
+          } else {
+            const message = data.EncryptedResponse?.data?.message || 'Something went wrong';
+            Swal.fire({
+              title: `<p style="font-size:25px;">${message}.</p>`,
+              icon: 'error',
+              confirmButtonText: 'OK',
+              confirmButtonColor: '#E97E15'
+            });
+          }
+        });
+      }
+    });
   }
   
+
+  // createNewSpa() {
+  //   this.submitted = true;
+  //   console.log('this.isDirect', this.isDirect);
+  //   if (this.isDirect == true) {
+  //     if (this.ngForm.invalid) {
+  //       console.log('hellow 1');
+  //       return;
+  //     }
+  //   }
+
+  //   if (!this.showOtherInputBox && this.isDirect) {
+  //     console.log('hellow 2');
+  //     this.saveForm();
+  //   } else {
+  //     console.log('hellow 3');
+  //     const route = "create-new-spa";
+  //     const param = {
+  //       state_id: this.ngForm.controls['state'].value,
+  //       district_id: this.ngForm.controls['district'].value,
+  //       address: this.ngForm.controls['address'].value,
+  //       mobile_number: this.ngForm.controls['mobile_no'].value,
+  //       email_id: this.ngForm.controls['email'].value,
+  //       spa_name: this.ngForm.controls['otherInput'].value,
+  //       is_self: this.isSelf ? this.isSelf : false
+  //     }
+  //     this.productioncenter.postRequestCreator(route, param, null).subscribe(data => {
+  //       if (data.status == 200) {
+  //         console.log('data====', data);
+  //         this.saveForm();
+  //       }
+  //       if (data.EncryptedResponse && data.EncryptedResponse.status_code == 201) {
+  //         if (this.isSelf) {
+  //           this.saveForm();
+  //         }
+  //       }
+  //       else {
+  //         const message = data.EncryptedResponse?.data?.message || 'Something went wrong';
+  //         Swal.fire({
+  //           title: `<p style="font-size:25px;">${message}.</p>`,
+  //           icon: 'error',
+  //           confirmButtonText:
+  //             'OK',
+  //           confirmButtonColor: '#E97E15'
+  //         })
+  //       }
+  //     })
+  //   }
+  // }
+
   getPageData(loadPageNumberData: number = 1, searchData: any | undefined = undefined) {
+    console.log('this.isSelf', this.productionType);
+    let isSelfValue;
+    if (this.productionType && this.productionType == "direct") {
+      isSelfValue = false
+    } else {
+      isSelfValue = true
+    }
     const filters = {
       crop: this.ngForm.controls['crop'].value,
       year: this.ngForm.controls['year'].value,
       season: this.ngForm.controls['season'].value,
       variety: this.ngForm.controls['variety'].value,
-      user_id: this.authUserId
+      user_id: this.authUserId,
+      is_self: isSelfValue ? isSelfValue : false
     };
     const requestParams = {
       page: loadPageNumberData,
@@ -650,13 +754,37 @@ export class DirectIndentComponent implements OnInit {
     this.ngForm.controls['email'].markAsUntouched();
     this.ngForm.controls['state'].markAsUntouched();
     this.ngForm.controls['indent_qnt'].markAsUntouched();
-    if(this.lineData){
-    this.lineData.forEach((line, index) => {
-      this.ngForm.controls[`indentQnty_${index}`].reset();
-    });
+    if (this.lineData) {
+      this.lineData.forEach((line, index) => {
+        this.ngForm.controls[`indentQnty_${index}`].reset();
+      });
+    }
   }
+  revertDataCancelationSecond() {
+    this.selectDistrict = '';
+    this.selectState = '';
+    this.selectSpa = '';
+    this.ngForm.controls['selectSpa'].reset('');
+    this.ngForm.controls['indent_qnt'].patchValue('');
+    this.ngForm.controls['otherInput'].patchValue('');
+    this.ngForm.controls['state'].patchValue('');
+    this.ngForm.controls['address'].patchValue('');
+    this.ngForm.controls['mobile_no'].patchValue('');
+    this.ngForm.controls['email'].patchValue('');
+    this.ngForm.controls['district'].patchValue('');
+    this.is_update = false;
+    this.showOtherInputBox = false;
+    this.ngForm.controls['selectSpa'].markAsUntouched();
+    this.ngForm.controls['mobile_no'].markAsUntouched();
+    this.ngForm.controls['email'].markAsUntouched();
+    this.ngForm.controls['state'].markAsUntouched();
+    this.ngForm.controls['indent_qnt'].markAsUntouched();
+    if (this.lineData) {
+      this.lineData.forEach((line, index) => {
+        this.ngForm.controls[`indentQnty_${index}`].reset();
+      });
+    }
   }
-
   patchDataForUpdate(data: any) {
     this.isEditMode = true
     this.is_update = true;
@@ -669,8 +797,8 @@ export class DirectIndentComponent implements OnInit {
       this.selectCrop = cropName;
       this.selectState = stateName;
       this.ngForm.controls['selectSpa'].enable();
-      this.ngForm.controls['year'].patchValue(data.year,{ emitEvent: false });
-      this.ngForm.controls['season'].patchValue(data.season,{ emitEvent: false });
+      this.ngForm.controls['year'].patchValue(data.year, { emitEvent: false });
+      this.ngForm.controls['season'].patchValue(data.season, { emitEvent: false });
       this.ngForm.controls['crop'].patchValue(data.crop_code, { emitEvent: false });
       const firstChar = data.crop_code.substring(0, 1);
       if (firstChar == 'H') {
@@ -698,7 +826,7 @@ export class DirectIndentComponent implements OnInit {
         this.myId = data.spa_id;
       }
       this.lineData = data.parental_line;
-      if(this.lineData){
+      if (this.lineData) {
         this.isLimeSection = true;
         this.lineData.forEach((line, index) => {
           this.ngForm.addControl(`indentQnty_${index}`, this.formBuilder.control('', Validators.required));
@@ -707,32 +835,38 @@ export class DirectIndentComponent implements OnInit {
         });
       } else {
         this.isLimeSection = false;
-      }  
+      }
     }
   }
-
-  saveForm() {
+  
+  
+  saveForm(spaData=null) {
     this.submitted = true;
     this.isShowTable = true;
     this.varietyAndQuantity = [];
-    if (this.ngForm.invalid) {
-      return;
+    if (this.isDirect) {
+      if (this.ngForm.invalid) {
+        return;
+      }
     }
-    if(this.lineData){
-    this.lineData.forEach((line, index) => {
-      const variety_code_line = line.line_variety_code;
-      const quantity = this.ngForm.get(`indentQnty_${index}`).value;
-      const line_variety_name = line.line_variety_name;
-      this.varietyAndQuantity.push({ line_variety_name: line_variety_name, variety_code_line: variety_code_line, quantity: quantity });
-    });
+    if (this.lineData) {
+      this.lineData.forEach((line, index) => {
+        const variety_code_line = line.line_variety_code;
+        const quantity = this.ngForm.get(`indentQnty_${index}`).value;
+        const line_variety_name = line.line_variety_name;
+        this.varietyAndQuantity.push({ line_variety_name: line_variety_name, variety_code_line: variety_code_line, quantity: quantity });
+      });
     }
     let spaName: number;
-    const foundSpa = this.allSpaData.find(spa => spa.spa_code === this.ngForm.controls['selectSpa'].value);
-    if (foundSpa) {
-      spaName = foundSpa.spa_name;
+    if (this.isDirect) {
+      const foundSpa = this.allSpaData.find(spa => spa.spa_code === this.ngForm.controls['selectSpa'].value);
+      if (foundSpa) {
+        spaName = foundSpa.spa_name;
+      }
     }
-    const route = "saveDirectIndent";  
-    const qnty = this.ngForm.controls['indent_qnt'].value 
+   
+    const route = "saveDirectIndent";
+    const qnty = this.ngForm.controls['indent_qnt'].value
     const baseParam = {
       "user_id": this.authUserId,
       "year": this.ngForm.controls['year'].value,
@@ -745,7 +879,8 @@ export class DirectIndentComponent implements OnInit {
       "spa_mobile_number": this.ngForm.controls['mobile_no'].value,
       "quantity": qnty ? qnty : 0,
       "email_id": this.ngForm.controls['email'].value,
-      "perental_line_array": this.varietyAndQuantity
+      "perental_line_array": this.varietyAndQuantity,
+      "is_self": this.isSelf ? this.isSelf : false
     };
     let param;
     if (this.showOtherInput) {
@@ -789,11 +924,11 @@ export class DirectIndentComponent implements OnInit {
           this.ngForm.controls['indent_qnt'].markAsUntouched();
           this.districtData = null;
           this.allSpaData = null;
-          if(this.lineData){
-          this.lineData.forEach((line, index) => {
-            this.ngForm.controls[`indentQnty_${index}`].reset();
-          });
-        }
+          if (this.lineData) {
+            this.lineData.forEach((line, index) => {
+              this.ngForm.controls[`indentQnty_${index}`].reset();
+            });
+          }
         })
       } else {
         Swal.fire({
@@ -812,14 +947,14 @@ export class DirectIndentComponent implements OnInit {
     if (this.ngForm.invalid) {
       return;
     }
-    if(this.lineData){
+    if (this.lineData) {
       this.lineData.forEach((line, index) => {
         const variety_code_line = line.variety_code_line;
         const quantity = this.ngForm.get(`indentQnty_${index}`).value;
-        const line_variety_name = line.line_variety_name;  
+        const line_variety_name = line.line_variety_name;
         this.varietyAndQuantity.push({ line_variety_name: line_variety_name, variety_code_line: variety_code_line, quantity: quantity });
       });
-      }
+    }
     const route = "updateDirectIndent";
     const baseParam = {
       "id": this.dataId,
@@ -879,12 +1014,43 @@ export class DirectIndentComponent implements OnInit {
         this.ngForm.controls['indent_qnt'].markAsUntouched();
         this.districtData = null;
         this.allSpaData = null;
-        if(this.lineData){
-        this.lineData.forEach((line, index) => {
-          this.ngForm.controls[`indentQnty_${index}`].reset();
-        });
-      }
+        if (this.lineData) {
+          this.lineData.forEach((line, index) => {
+            this.ngForm.controls[`indentQnty_${index}`].reset();
+          });
+        }
       }
     })
   }
+
+  productionTypeValue(value) {
+    if (value) {
+      this.productionType = value;
+      this.revertDataCancelationSecond();
+      this.getPageData();
+      console.log('this.productionType====', this.productionType);
+      if (this.productionType == "direct") {
+        this.isShowTable = true;
+        this.isDirect = true;
+        this.isSelf = false;
+        this.showSaveButton = false;
+      } else if (this.productionType == "self") {
+        this.isShowTable = true;
+        this.isDirect = false;
+        this.isSelf = true;
+        this.showSaveButton = true;
+      }
+      else {
+        // this.isDirect = false;
+        // this.isSelf = false;
+      }
+      console.log(' this.isDirect====', this.isDirect);
+    }
+  }
+
+  resetRadioBtn() {
+    window.location.reload();
+    this.productionType = ""
+  }
+
 }

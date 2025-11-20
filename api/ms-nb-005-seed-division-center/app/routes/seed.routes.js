@@ -118,7 +118,7 @@ module.exports = app => {
   app.post(`${process.env.MICRO_SERVICE}/api/get-variety-code-data`, auth,  seed.getvarietCode);
 
   app.post(`${process.env.MICRO_SERVICE}/api/get-district-minmax-latitute`, auth, seed.getDistrictLatLong);
-  app.post(`${process.env.MICRO_SERVICE}/api/get-dynamic-variety-code-characterstics`, auth, seed.getDynamicVarietyCodeCharacterstics);
+  app.post(`${process.env.MICRO_SERVICE}/api/get-dynamic-variety-code-characterstics`, seed.getDynamicVarietyCodeCharacterstics);
 
   app.post(`${process.env.MICRO_SERVICE}/api/add-state-characterstics`, auth,  seed.addStateCharacterstics);
   app.post(`${process.env.MICRO_SERVICE}/api/freeze-indent-breeder-seed-data`,   seed.freezeIndentBreederSeedData);
@@ -145,12 +145,15 @@ module.exports = app => {
   app.post(`${process.env.MICRO_SERVICE}/api/get-seed-multiplication-data-second`, auth,  seed.getSeedMultiplicationRatioDataSecond)
  
   app.post(`${process.env.MICRO_SERVICE}/api/get-dashboard-item-count`, auth,  seed.getDashboardItemCount);
+  app.get(`${process.env.MICRO_SERVICE}/api/find-latest-year-season`,  seed.findLatestYearAndSeasons);
   app.post(`${process.env.MICRO_SERVICE}/api/get-total-indent`, auth,  seed.totalIndent);
   app.post(`${process.env.MICRO_SERVICE}/api/get-total-lifted-count`, auth,  seed.getTotalLiftedCount);
   app.post(`${process.env.MICRO_SERVICE}/api/get-filter-data`, auth, seed.getIndenterDetails);
   app.post(`${process.env.MICRO_SERVICE}/api/get-indeter-details`, auth,  seed.getIndenterDetails);
   app.post(`${process.env.MICRO_SERVICE}/api/get-variety`, auth,  seed.getVariety);
-  app.post(`${process.env.MICRO_SERVICE}/api/get-chart-indent-data`, auth,  seed.getChartIndentData);
+  app.post(`${process.env.MICRO_SERVICE}/api/get-chart-indent-crop-wise`, auth,  seed.getChartIndentCropWise);
+  app.post(`${process.env.MICRO_SERVICE}/api/get-chart-indent-crop-wise-crop-list`, auth,  seed.getChartIndentCropWiseCropList);
+  app.post(`${process.env.MICRO_SERVICE}/api/get-chart-indent-crop-to-variety-wise`, auth,  seed.getChartIndentCropToVarietieWise);
   app.post(`${process.env.MICRO_SERVICE}/api/get-chart-indent-data-variety`, auth,  seed.getChartIndentDataVariety);
 
   app.post(`${process.env.MICRO_SERVICE}/api/get-chart-data-by-crop`, auth,  seed.getChartDataByCrop)
@@ -166,7 +169,9 @@ module.exports = app => {
   app.post(`${process.env.MICRO_SERVICE}/api/update-profile-data`, auth, seed.updateProfileData);
   app.post(`${process.env.MICRO_SERVICE}/api/check-email_id`, auth, seed.CheckEmeailId);
   app.post(`${process.env.MICRO_SERVICE}/api/update_password/:id`, auth, seed.UpdatePassword);
-  app.post(`${process.env.MICRO_SERVICE}/api/get-plant-details`,  seed.getPlantDeatils);
+  // app.post(`${process.env.MICRO_SERVICE}/api/get-plant-details`,  seed.getPlantDeatils);
+  
+  app.post(`${process.env.MICRO_SERVICE}/api/get-plant-details`,  seed.getSPPDeatils);
   app.post(`${process.env.MICRO_SERVICE}/api/get-plant-district-details`,  seed.getPlantDistrictDetails);
   app.post(`${process.env.MICRO_SERVICE}/api/getProjectCoordinatorReport`, auth, seed.getProjectCoordinatorReport);
   app.post(`${process.env.MICRO_SERVICE}/api/getProjectCoordinatorReportCordinatorName`, auth, seed.getProjectCoordinatorReportCordinator);
@@ -215,10 +220,45 @@ module.exports = app => {
   app.post(`${process.env.MICRO_SERVICE}/api/getChartAllIndentorCropFilterforpdpc`, auth,  seed.getChartAllIndentorCropFilterforpdpc);
   app.post(`${process.env.MICRO_SERVICE}/api/getChartAllIndentorforPdpcSecond`, auth,  seed.getChartAllIndentorforPdpcSecond);
   app.post(`${process.env.MICRO_SERVICE}/api/getChartAllIndentorVarietyforpdpc`, auth,  seed.getChartAllIndentorVarietyforpdpc);
-  app.get(`${process.env.MICRO_SERVICE}/api/getVarietyCategoryList`, auth,  seed.getVarietyCategoryList);
+  app.get(`${process.env.MICRO_SERVICE}/api/getVarietyCategoryList`,  seed.getVarietyCategoryList);
   app.post(`${process.env.MICRO_SERVICE}/api/freeze-indent-breeder-seed-data-forward`,   seed.freezeIndentBreederSeedDataForward);
 
   // get characterstic maaping region data
   app.post(`${process.env.MICRO_SERVICE}/api/get-characterstic-agro-region-maping-data`,  seed.getCharactersticAgroRegionMapingData);
 
+
+
+  //New Dashboard donut Chart
+  //freezed Indent
+  app.post(`${process.env.MICRO_SERVICE}/api/get-freezed-indent-donut-chart-data`, auth, seed.getFreezedIndentDonutChartData);
+  //Assign to PDPC
+  app.post(`${process.env.MICRO_SERVICE}/api/get-assign-to-PD-PC-donut-chart-data`, auth, seed.getAssignToPDPCDonutChartData);
+
+  //Production
+  app.post(`${process.env.MICRO_SERVICE}/api/get-production-donut-chart-data`, auth, seed.getProductionDonutChartData);
+
+  //Allocation
+  app.post(`${process.env.MICRO_SERVICE}/api/get-allocation-donut-chart-data`, auth, seed.getAllocationDonutChartData);
+  //Lifting
+  app.post(`${process.env.MICRO_SERVICE}/api/get-lifting-donut-chart-data`, auth, seed.getLiftingDonutChartData);
+
+  //Area sown by state 
+  app.post(`${process.env.MICRO_SERVICE}/api/get-state-data`, auth, seed.getState);
+  app.post(`${process.env.MICRO_SERVICE}/api/get-area-sown-by-state-chart-data`, auth, seed.getAreaSownByStateChartData);
+  // Report 1
+  app.post(`${process.env.MICRO_SERVICE}/api/get-year-from-variety`, auth, seed.getYearFromVariety);
+  app.post(`${process.env.MICRO_SERVICE}/api/get-data-group-code-wise-report-one`, auth, seed.getDataGroupCodeWiseReportOne);
+  app.post(`${process.env.MICRO_SERVICE}/api/get-data-crop-code-wise-report-one`, auth, seed.getDataCropWiseReportOne);
+  app.post(`${process.env.MICRO_SERVICE}/api/get-data-variety-wise-report-one`, auth, seed.getDataVarietyWiseReportOne);
+  //Report 2
+  app.post(`${process.env.MICRO_SERVICE}/api/get-state-data-state-wise-report-two`, auth, seed.getStateDataStateWiseReportTwo);
+  app.post(`${process.env.MICRO_SERVICE}/api/get-state-data-crop-group-wise-report-two`, auth, seed.getStateDataCropGroupWiseReportTwo);
+  
+  app.post(`${process.env.MICRO_SERVICE}/api/get-crop-data-crop-group-wise-report-two`, auth, seed.getCropDataCropGroupWiseReportTwo);
+  app.post(`${process.env.MICRO_SERVICE}/api/get-crop-data-state-wise-report-two`, auth, seed.getCropDataStateWiseReportTwo);
+  
+  app.post(`${process.env.MICRO_SERVICE}/api/get-data-crop-wise-report-two`, auth, seed.getDataCropWiseReportTwo);
+  app.post(`${process.env.MICRO_SERVICE}/api/get-data-variety-wise-report-two`, auth, seed.getDataVarietyWiseReportTwo);
+  app.post(`${process.env.MICRO_SERVICE}/api/get-all-variety-details`, auth, seed.getAllVarietyDetails);
+  app.post(`${process.env.MICRO_SERVICE}/api/get-all-variety-details-for-excel`, auth, seed.getAllVarietyDetailsForExcel);
 }

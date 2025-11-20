@@ -1,0 +1,263 @@
+.chart-scroll-container {
+  overflow-x: auto; 
+  overflow-y: hidden;
+  width: 100%;
+  scrollbar-color: #FFFFFF #F5ECE9;
+  scrollbar-width: thin;
+  background-color: #F3F3F3;
+}
+
+.chart-scroll-container canvas {
+  min-width: 600px;
+  height: 690px !important;
+}
+
+.chart-scroll-container::-webkit-scrollbar {
+  height: 12px;
+  border-radius: 90px;
+}
+
+.chart-scroll-container::-webkit-scrollbar-track {
+  background: #F5ECE9;
+  border-radius: 90px;
+}
+
+.chart-scroll-container::-webkit-scrollbar-thumb {
+  background-color: #B64B1D;
+  border-radius: 90px;
+  border: 2px solid #B64B1D;
+}
+
+.chart-scroll-container::-webkit-scrollbar-button:single-button {
+  background-color: #B64B1D;
+  display: block;
+  height: 12px;
+  width: 12px;
+  border-radius: 90px;
+}
+
+
+/* .container-fluid{height:820px;} */
+
+/* /////////////////////////////////// */
+
+.chart-scroll-vertical {
+  max-height: 250px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+  scrollbar-color: #FFFFFF #F5ECE9;
+  scrollbar-width: thin;
+}
+
+.chart-scroll-vertical canvas {
+    min-width: 600px;
+  height: 700px !important;
+  display: block;
+}
+
+
+.chart-scroll-vertical::-webkit-scrollbar {
+  width: 12px;
+  border-radius: 90px;
+}
+
+.chart-scroll-vertical::-webkit-scrollbar-track {
+  background: #F5ECE9;
+  border-radius: 90px;
+}
+
+.chart-scroll-vertical::-webkit-scrollbar-thumb {
+  background-color: #B64B1D;
+  border-radius: 90px;
+  border: 2px solid #B64B1D;
+}
+
+
+.custom-legend {
+  text-align: left;
+  padding-left: 12px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+
+}
+
+.color-box {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+.label-text {
+  font-size: 12px;
+}
+
+.chart-card {
+  background-color: #f7f7f7;
+  border-radius: 12px;
+}
+
+.chart-scroll-container {
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+
+canvas {
+  max-height: 300px;
+}
+.season-btn {
+  background-color: #EDE3D7;
+  color: #9A411E;
+  width:121px;
+  font-size: 14px;
+  padding: 4px 12px;
+  min-width: 140px;
+  height: 37px;
+  border: none;
+  border-radius: 8px;
+  margin-left: 8px;
+  font-weight: 500;
+  gap:10px;
+}
+
+
+
+.active-btn {
+  background-color: #9A411E; 
+  color: #FFFFFF !important;
+}
+
+.container-fluid{
+  height: 1100px;
+}
+
+
+
+
+.responsive-wrapper {
+  width: 100%;
+  /* overflow-x: auto; */
+  white-space: nowrap;
+  padding-bottom: 10px;
+}
+
+
+.responsive-wrapper > * {
+  display: inline-block;
+  vertical-align: top;
+  min-width: 320px;
+  white-space: normal;
+}
+
+
+.chart-card {
+  min-width: 350px;
+}
+
+
+.season-scroll {
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 5px;
+}
+
+.season-scroll .season-btn {
+  white-space: nowrap;
+  min-width: 120px;
+  flex: 0 0 auto;
+}
+
+.season-btn {
+  flex: 1 1 auto;
+  min-width: 120px;
+}
+@media (max-width: 576px) {
+  .d-inline-flex {
+    flex-direction: column !important;
+    align-items: flex-end;
+    gap: 8px;
+  }
+}
+.chart{
+  background-color: #F3F3F3;
+}
+
+ .button{
+  margin-right: -22px;
+ }
+
+
+
+.bspc{
+  width: 510px;
+}
+.indenter{
+  width: 432px;
+  height: 400px;
+}
+.Area{
+  width:100px;
+  height: 400px;
+}
+.chart-wrapper {
+  width: 273px !important;
+  height: 500px;
+  
+}
+
+.chart-scroll-container1 canvas {
+  width: 100% !important;  
+}
+
+
+.chart-card1 {
+  /* width: 100%; */
+  width: 275px;
+  background-color: #F3F3F3;
+}
+
+.chart-scroll-container1 {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.chart-canvas {
+  width: 100% !important;
+  height: 250px !important;
+  display: block;
+}
+.charts{
+  width: auto;
+}
+
+
+ .scroll-wrapper {
+  width: 250px;
+  max-height: 320px;       
+  overflow-x: auto;  
+  overflow-y: hidden;  
+  background-color: #F3F3F3;;
+}
+.chart-canvas {
+  display: block;
+  width: 800px !important;
+  height: 320px !important;
+}
+
+.chart2{
+  height: 380px;
+}
+.filter{
+  width: 120px; 
+height: 31px;
+justify-content: space-between;
+border-radius: 4px;
+background-color: #FFFFFF;
+border: 1px solid #CDCDCD
+}

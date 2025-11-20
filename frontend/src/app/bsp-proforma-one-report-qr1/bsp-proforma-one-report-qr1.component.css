@@ -1,0 +1,183 @@
+.report-container {
+  background: #fff;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+.logo-box, .qr-box {
+
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.custom-table {
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: center;
+}
+
+.custom-table th, 
+.custom-table td {
+  border: 1px solid #000;
+  padding: 4px;
+}
+.custom-table td{
+  text-align: center;
+}
+
+.custom-table thead th {
+  background-color: #9df28a;
+  font-weight: bold;
+  font-size: 15px;
+}
+.custom-table thead tr:first-child th {
+  border-top: none;
+}
+
+
+.legend {
+  background:rgb(233, 209, 166);
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  padding: 8px 12px;
+  margin: 10px 0;
+  font-size: 15px;
+  text-align: left;
+  line-height: 1.6;
+}
+
+.legend p {
+  margin: 2px 0;
+}
+.sub-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: bold;
+}
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 10px;
+}
+
+.logo {
+  width: 100px;
+  height: 100px;
+  border: 1px solid #999;
+  text-align: center;
+  line-height: 60px;
+  font-size: 12px;
+}
+
+.title {
+  text-align: center;
+}
+.title h3 {
+  margin: 0;
+  font-size: 16px;
+}
+.title p {
+  margin: 0;
+  font-size: 13px;
+}
+.title h4 {
+  margin: 3px 0 0 0;
+  font-size: 14px;
+  color: green;
+}
+.testing{
+  padding-top: 15px;
+}
+.qr1 {
+  width: 100px;
+  height: 100px;
+
+  line-height: 80px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.qr {
+  width: 100px;
+  height: 100px;
+  text-align: center;
+  line-height: 80px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+.divider {
+  border: none;
+  border-top: 2px solid green;
+  margin: 5px 0;
+  padding-bottom: 20px;
+}
+.footer {
+  margin-top: 25px;
+  font-size: 12px;
+  text-align: right;
+  padding-left: 30px;
+  padding-right: 30px;
+}
+.signature {
+  margin-bottom: 15px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.center{
+  padding-top: 30px;
+}
+
+.note {
+  margin-top: 10px;
+  font-size: 20px;
+  font-style: italic;
+  text-align: center;
+}
+.date{
+  align-items: end;
+}
+.right{
+  padding-right: 50px;
+}
+
+.sub-header .right .date {
+  text-align: right;
+}
+.testing{
+  padding-top: 15px;
+}
+.title{
+  color: green;
+}
+.season{
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+ .hidden-pdf {
+  display: none;
+}
+#printSection {
+  page-break-inside: avoid;
+}
+
+.footer {
+  page-break-inside: avoid;
+  page-break-before: avoid;
+  page-break-after: avoid;
+}
+
+.signature, .legend, .note {
+  page-break-inside: avoid;
+}
+
+
+
+
+

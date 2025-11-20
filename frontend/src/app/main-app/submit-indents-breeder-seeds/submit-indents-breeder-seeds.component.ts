@@ -1081,7 +1081,7 @@ export class SubmitIndentsBreederSeedsComponent implements OnInit {
             useCORS: true
           },
           // jsPDF: { unit: 'mm', format: pageSize, orientation: 'portrait' }
-          jsPDF: { unit: 'mm', format: [550, 1600], orientation: 'landscape' }
+          jsPDF: { unit: 'mm', format: [550, 1600], orientation: 'portrait' }
         };
         html2PDF().set(options).from(element).toPdf().save();
       } else if (countIndenter > 10 && countIndenter <= 15) {

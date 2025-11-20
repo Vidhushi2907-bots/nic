@@ -58,6 +58,26 @@ db.mCharactersticAgroRegionMappingModel = require("./m_characterstic_agro_region
 db.mMajorClimateResiliencemapsModel = require("./m_major_climate_resilience_maps.model.js")(sequelize, Sequelize);
 db.mInstitutesModel = require("./m_institutes.model.js")(sequelize, Sequelize);
 
+db.seedProcessingRegister = require('./seed_processing_register.js')(sequelize, Sequelize);
+db.liftingLotNumberModel = require('./lifting_lot_number.model.js')(sequelize, Sequelize);
+db.allocationtoIndentorliftingseeds = require('./allocation_to_indentor_for_lifting_seeds.model.js')(sequelize, Sequelize);
+db.bspPerformaBspTwo = require('./bsp_proforma_2.model.js')(sequelize, Sequelize);
+db.bspPerformaBspThree = require('./bsp_proforma_3.model.js')(sequelize, Sequelize);
+db.bspProformaOneBspc = require('./bsp_proforma_one_bspc.model')(sequelize, Sequelize);
+db.bspPerformaBspOne = require('./bsp_proforma_1.model.js')(sequelize, Sequelize);
+db.availabilityOfBreederSeedModel = require("./availability_of_breeder_seed.model.js")(sequelize, Sequelize);
+db.bspProformaOneBspcModel = require('./bsp_proforma_1_bspcs.model.js')(sequelize, Sequelize);
+db.liftingSeedDetailsModel = require('./lifting_seed_details.model.js')(sequelize, Sequelize);
+db.bspProformaOneModel = require('./bsp_proforma_1s.model.js')(sequelize, Sequelize);
+db.seedProcessingRegisterModel = require('./seed_processing_register.js')(sequelize, Sequelize);
+db.mAgroLogicalRegionstatesModel = require('./m_agro_logical_region_states.model.js')(sequelize, Sequelize);
+db.mAgroEcologicalRegionsModel = require("./m_agro_ecological_regions.model.js")(sequelize, Sequelize);
+
+
+db.allocationToSPAProductionCenterSeed = require("./allocation_to_spa_for_lifting_seed_production_cnter.model")(sequelize, Sequelize);
+db.allocationToSPASeed = require("./allocation_to_spa_for_lifting_seeds.model")(sequelize, Sequelize);
+
+
 //reletion start here
 db.agencyDetailModel.hasOne(db.userModel, {
     foreignKey: 'agency_id'
@@ -385,5 +405,75 @@ db.cropVerietyModel.hasMany(db.varietyLineModel, {
     targetKey: 'variety_code',
     //  as: 'regions'
   });
+  db.bspProformaOneModel.belongsTo(db.bspProformaOneBspcModel, {
+    foreignKey: 'id',
+    targetKey: 'bspc_proforma_1_id'
+});
+
+
+  db.availabilityOfBreederSeedModel.belongsTo(db.cropModel, {
+    foreignKey: 'crop_code',
+    targetKey:'crop_code'
+});
+
+
+db.bspPerformaBspOne.belongsTo(db.bspProformaOneBspc, {
+    foreignKey: 'id',
+    targetKey: 'bspc_proforma_1_id',
+    as: 'bspc_mapping' // <-- define the alias explicitly
+  });
+
+  db.bspPerformaBspOne.belongsTo(db.cropModel, {
+    foreignKey: 'crop_code',
+    targetKey: 'crop_code'
+
+})
+  db.bspPerformaBspTwo.belongsTo(db.cropModel, {
+    foreignKey: 'crop_code',
+    targetKey: 'crop_code'
+})
+db.allocationToIndentorSeed.belongsTo(db.varietyModel, {
+    foreignKey: 'variety_id'
+});
+
+db.cropModel.hasMany(db.varietyModel, {
+  foreignKey: 'crop_code',
+  sourceKey: 'crop_code',
+});
+
+db.cropGroupModel.hasMany(db.cropModel, {
+  foreignKey: 'group_code',
+  sourceKey: 'group_code',
+  as: 'crops',
+});
+
+db.varietyModel.belongsTo(db.cropGroupModel, {
+    foreignKey: 'crop_group_code',
+    targetKey: 'group_code'
+});
+db.varietyModel.belongsTo(db.cropCharactersticsModel, {
+    foreignKey: 'variety_code',
+    targetKey: 'variety_code'
+});
+db.varietyModel.belongsTo(db.cropModel, {
+    foreignKey: 'crop_code',
+    targetKey: 'crop_code'
+});
+db.cropCharactersticsModel.belongsTo(db.stateModel, {
+    foreignKey: 'state_id',
+    targetKey: 'state_code'
+});
+db.cropCharactersticsModel.belongsTo(db.mAgroLogicalRegionstatesModel, {
+    foreignKey: 'state_id',
+    targetKey: 'state_code'
+});  
+db.mAgroLogicalRegionstatesModel.belongsTo(db.mAgroEcologicalRegionsModel, {
+    foreignKey: 'm_agro_logical_region_id',
+    targetKey: 'id'
+});
+db.userModel.hasMany(db.cropModel, {
+    foreignKey: 'breeder_id',
+    targetKey: 'id',
+});
 
 module.exports = db;

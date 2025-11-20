@@ -23,7 +23,7 @@ import { Observable } from 'rxjs';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit {
-
+  today: Date = new Date();
   mobileNumber = "+91 920 554 0267";
   email = "info@sathi.gov.in";
   showSidebar: boolean = true;
@@ -67,7 +67,7 @@ export class HeaderComponent implements OnInit {
     this.masterService.postRequestCreator('create-token', null, encData).subscribe(data => {
       let apiResponse = data && data.EncryptedResponse && data.EncryptedResponse.data ? data.EncryptedResponse.data : '';
       if (apiResponse) {
-        this.seednet_token = encodeURIComponent(apiResponse);
+        this.seednet_token = encodeURIComponent(apiResponse); 
         let decryptedData = this.encryptionService.decryption(this.seednet_token);
         console.log("Decrypted encData:", decryptedData);
       }
@@ -75,9 +75,10 @@ export class HeaderComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
     this.retrieveLoggedInUserId();
     this.createToken();
-    this.getUnreadMessages(); 
+    this.getUnreadMessages();
     if (isPlatformBrowser(this.platformId)) {
       const navMain = document.getElementById('navbarCollapse');
       if (navMain) {
@@ -88,12 +89,12 @@ export class HeaderComponent implements OnInit {
         };
       }
     }
-    this.getAgencyData(); 
+    this.getAgencyData();
     let loggedInUser = localStorage.getItem("logined_user");
     let userDataItem = localStorage.getItem("BHTCurrentUser");
-    let user_typeData= JSON.parse(userDataItem)
-    this.is_change_password=user_typeData.is_change_password
-    this.localStorageData=user_typeData
+    let user_typeData = JSON.parse(userDataItem)
+    this.is_change_password = user_typeData.is_change_password
+    this.localStorageData = user_typeData
 
     // let user_typeData = JSON.parse(userDataItem);
     // this.localStorageData = user_typeData;
@@ -120,7 +121,7 @@ export class HeaderComponent implements OnInit {
       }
     });
   }
-  
+
   retrieveLoggedInUserId(): void {
     const storedUser = localStorage.getItem('BHTCurrentUser');
     if (storedUser) {
@@ -136,12 +137,12 @@ export class HeaderComponent implements OnInit {
     }
   }
 
-  logout() {
+  async logout() {
     this.cookieService.deleteAll();
     localStorage.removeItem('state_code');
     this.authenticationService.logout();
   }
-  
+
   toggleforlogout() {
     this.toggledropdownforlogout = !this.toggledropdownforlogout;
   }
@@ -160,7 +161,7 @@ export class HeaderComponent implements OnInit {
       this.opened = false;
     }
   }
-   
+
   // getUnreadMessages(): void {
   //   const route = 'get-unread-message-count';
   //   const payload = {
@@ -169,10 +170,10 @@ export class HeaderComponent implements OnInit {
   //     }
   //   };
   //   console.log('Payload for unread messages:', payload);
-  
+
   //   this._productionCenter.postRequestCreator(route, payload).subscribe(res => {
   //     console.log('API Response:', res); // Log the entire response
-  
+
   //     if (res && res.EncryptedResponse && res.EncryptedResponse.status_code === 200) {
   //       const unreadCount = parseInt(res.EncryptedResponse.data.unreadCount, 10); // Ensure it's a number
   //       this.totalUnreadMessages = isNaN(unreadCount) ? 0 : unreadCount; // Handle NaN case
@@ -193,17 +194,17 @@ export class HeaderComponent implements OnInit {
   //       id: this.loggedInUserId
   //     }
   //   };
-    
+
   //   console.log('Payload for unread messages:', payload);
-  
+
   //   this._productionCenter.postRequestCreator(route, payload).subscribe(res => {
   //     console.log('API Response:', res); // Log the entire response
-      
+
   //     if (res && res.EncryptedResponse && res.EncryptedResponse.status_code === 200) {
   //       const unreadCount = parseInt(res.EncryptedResponse.data.unreadCount, 10); // Convert unreadCount to number
   //       this.totalUnreadMessages = unreadCount; 
   //       console.log(this.totalUnreadMessages);
-        
+
   //       if (!isNaN(unreadCount)) {
   //         this.totalUnreadMessages = unreadCount; // Update totalUnreadMessages
   //       } else {
@@ -227,18 +228,18 @@ export class HeaderComponent implements OnInit {
         id: this.loggedInUserId
       }
     };
-  
+
     console.log('Payload for unread messages:', payload);
-  
+
     this._productionCenter.postRequestCreator(route, payload).subscribe(
       res => {
         console.log('API Response:', res); // Log the entire response
-  
+
         // Ensure response has EncryptedResponse and status_code
         if (res && res.status_code === 200) {
           // Parse unreadCount and ensure it's a number
           const unreadCount = parseInt(res.data.unreadCount, 10);
-  
+
           if (!isNaN(unreadCount)) {
             this.totalUnreadMessages = unreadCount; // Update totalUnreadMessages
             this.cdRef.detectChanges(); // Force Angular to detect changes
@@ -257,8 +258,8 @@ export class HeaderComponent implements OnInit {
       }
     );
   }
-  
-  
+
+
 
   getAgencyData() {
     const data = localStorage.getItem('BHTCurrentUser');
@@ -280,5 +281,31 @@ export class HeaderComponent implements OnInit {
 
   navigatetoSeedNet() {
     window.location.href = "https://seednet.gov.in/SSO/SSOLogin.aspx?seednet_token=" + this.seednet_token;
+  }
+
+  async onRedirectClick(event: MouseEvent) {
+    event.preventDefault();
+    await this.logout();
+
+    // this.seednet_token = encodeURIComponent("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bm0iOiJPSUxTRUVEQURNSU4iLCJuYW1lIjpudWxsLCJyb2xlIjoiT0lMU0VFREFETUlOIiwic3RhdGVDb2RlIjoiQ0VOVFJBTCIsImlhdCI6MTc1Mzg3NDYxMywiZXhwIjoxNzUzODg1NDEzLCJhdWQiOiJPSUxTRUVEQURNSU4iLCJpc3MiOiJzY2FwbmljLmdvdi5pbiJ9.iF4X4l2ok-MaNTVKW2gCZopVMcXrAR2y2aebM9WOWrM")
+    const token = this.seednet_token ;
+    const expiryDate = new Date();
+    expiryDate.setTime(expiryDate.getTime() + 60 * 60 * 1000); // 1 hour
+    this.cookieService.set(
+      'token',
+      token,
+      expiryDate,
+      '/',
+      '',          // empty domain => same domain
+      true,        // secure
+      'Lax'        // SameSite
+    );
+
+    // Check if cookie is set (debugging)
+    console.log('Cookie Set:', this.cookieService.get('token'));
+    // Redirect to same-domain route (works)
+    //  this.router.navigateByUrl('/ms014/oilSeed/areaDashboard');
+    //https://seedtrace.gov.in/dashboard-phase-second
+    window.location.href = `https://seedtrace.gov.in/ms014/oilSeed/areaDashboard`;
   }
 }

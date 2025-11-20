@@ -28,7 +28,7 @@
                                                     <button class="dropdown-item" id="cg-dropdown" (click)="cropGroup(data)"
                                                         *ngFor="let data of response_crop_group" #dropdownItem
                                                         [attr.data-parent-name]="'cropGroup'">
-                                                        {{data && data.group_name ? data.group_name :croupGroup}}</button>
+                                                        {{data && data.group_name ? data.group_name :cropGroup}}</button>
                                                 </div>
                                             </div>
                                             <div class="pl-0 toggle-button" ngbDropdown>
@@ -58,7 +58,7 @@
                                                         <button class="dropdown-item" (click)="crop_name(data)"
                                                             *ngFor="let data of crop_name_list" #dropdownItem
                                                             [attr.data-parent-name]="'cropName'">
-                                                            {{data && data.crop_name ? data.crop_name :croupGroup}}</button>
+                                                            {{data && data.crop_name ? data.crop_name :cropGroup}}</button>
                                                     </div>
                                                 </div>
                                                 <div class="pl-0 toggle-button" ngbDropdown>

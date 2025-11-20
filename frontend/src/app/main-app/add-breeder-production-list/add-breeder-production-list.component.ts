@@ -49,6 +49,8 @@ export class AddBreederProductionListComponent implements OnInit {
   breeder_data_name_second: any;
   selected_agency: any;
   Userdata:any;
+  userType: any;
+  isActionBtnDisable: boolean;
   
   constructor(
     private restService: RestService,
@@ -60,7 +62,9 @@ export class AddBreederProductionListComponent implements OnInit {
     private service: SeedServiceService,
     private breederService: BreederService) {
     this.createEnrollForm();
-   
+    this.userType = this.masterService?.userBasicData?.user_type ?? 'NA';
+    this.isActionBtnDisable = this.userType === 'SUPERADMIN';
+
   }
 
   createEnrollForm() {

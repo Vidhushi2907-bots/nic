@@ -1,0 +1,156 @@
+/* General styling */
+.color {
+    color: green;
+    white-space: nowrap;
+}
+
+.table-bordered td,
+.table-bordered th {
+    border: 3px solid rgba(222, 219, 219, 0.957);  
+}
+
+.text-end {
+    text-align: end !important;
+}
+
+.underline-text {
+    text-decoration: underline;
+}
+
+.heading1 {
+    color: #228B22;
+}
+
+.headingofpdftable {
+    background-color: #90EE90;
+}
+
+tr th {
+    background-color: #90EE90;
+}
+
+tr td {
+    text-align: center !important;
+    vertical-align: top !important;
+    word-break: break-word !important; 
+    overflow-wrap: break-word !important; 
+    word-wrap: break-word !important; 
+}
+
+.break-words {
+    white-space: nowrap;
+    display: inline-block;
+    overflow-wrap: anywhere!important;
+}
+
+.break-words span {
+    display: block;
+    word-wrap: break-word;
+}
+
+/* Table responsiveness */
+table {
+    width: 100%;
+    table-layout: fixed;
+    overflow: hidden;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+@media screen and (max-width: 1150px){
+    .datalist{
+        white-space: nowrap;
+    }
+}
+
+/* Mobile view adjustments */
+@media screen and (max-width: 850px) {
+    .logoclass {
+        display: flex;
+        justify-content: center;
+    }
+
+    .heading_last_data {
+        display: flex !important;
+        justify-content: end !important;
+        float: right !important;
+    }
+
+    .grid-container {
+        grid-template-columns: repeat(2, 1fr); /* Adjust to 2 columns on smaller screens */
+        gap: 10px; /* Smaller gap for mobile */
+    }
+
+    .grid-item {
+        text-align: center;
+    }
+}
+
+/* Large tablet and desktop screens */
+@media screen and (min-width: 900px) {
+    .textheading {
+        white-space: nowrap;
+    }
+
+    .textheading2 {
+        margin-top: -6em;
+    }
+
+    .textheading3 {
+        margin-top: -5em;
+    }
+
+    .dateClass {
+        margin-left: -1em;
+    }
+
+    .refclass {
+        margin-left: -1em;
+    }
+
+    .grid-container {
+        grid-template-columns: repeat(4, 1fr); /* 4 columns for larger screens */
+    }
+
+    .grid-item {
+        text-align: center;
+    }
+}
+
+/* Mobile optimization for table */
+@media screen and (max-width: 768px) {
+    .table th, .table td {
+        padding: 10px 5px;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .headingofpdftable th {
+        font-size: 12px;
+    }
+
+    .table th, .table td {
+        font-size: 12px;
+        text-align: center;
+    }
+}
+
+/* For very small screens */
+@media screen and (max-width: 480px) {
+    .headingofpdftable th, .table th, .table td {
+        font-size: 10px;
+    }
+
+    .grid-container {
+        grid-template-columns: 1fr; /* Stack items vertically on small screens */
+    }
+
+    .grid-item {
+        font-size: 12px;
+    }
+}
+

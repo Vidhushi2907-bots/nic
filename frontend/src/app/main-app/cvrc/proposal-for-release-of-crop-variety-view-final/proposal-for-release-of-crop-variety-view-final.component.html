@@ -1,0 +1,935 @@
+<div class="pt-3 pb-3 px-4">
+    <!-- [formGroup]="ngForm" -->
+    <form>
+        <div class="card">
+            <div class="col-12 heading mt-3 pb-3 pl-3">
+                <div class="row">
+                    <span class="col-10">Proposals for Release of Crop Variety (24/0008/A0302/1) - View</span>
+                    <div class="form-group  justify-content-end col-2">
+                        <button type="button" class="btn btn-inventory btn-sm mr-3" (click)="download()" >
+                            <span class="bttt text-white">Download <i class="fas fa-file-pdf"></i></span>
+                        </button>
+                    </div>
+                </div>
+                 
+            </div>
+            <div class="col-sm-12 col-md-12 col-lg-12 pr-4" id="pdf-tables">
+                <div class="main-wrapper">
+
+
+                    <!-- Scrollable content -->
+                    <div class="scrollable-area">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">1. Proposal Type</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <a href="#">abcxyz.pdf <span><img src="../../../../assets/icons/square 1.png" alt=""></span></a>
+                                </div> -->
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">2. Name of crop</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <a href="#">abcxyz.pdf</a>
+                                </div> -->
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">2. (A) Scientific Name</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <a href="#">abcxyz.pdf</a>
+                                </div> -->
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">2. (B) Types of crops</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <a href="#">abcxyz.pdf</a>
+                                </div> -->
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">3. (A) Name of variety under which tested in ACRP trails</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <a href="#">abcxyz.pdf</a>
+                                </div> -->
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <!-- <div class="form-group"> -->
+                            <div *ngFor="let item of proposalDetails" class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">3. (B) Proposed name of variety</div>
+                                <div class="form-content col-md-7">{{ descriptionData.proposalType }}
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <a href="#">abcxyz.pdf</a>
+                                </div> -->
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">4. Sponsoring Institute</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <a href="#">abcxyz.pdf</a>
+                                </div> -->
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">5. (A) Type of instruction or agency responsible for developing variety</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <a href="#">abcxyz.pdf</a>
+                                </div>
+                            </div> -->
+                            <div class="col-md-1">
+                                <a href="#" class="pdf-link">
+                                    <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                </a>
+                              </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">5. (B) Institution/Agency name</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <a href="#">abcxyz.pdf</a>
+                                </div> -->
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">5. (C) Person involved in developing variety</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <a href="#">abcxyz.pdf</a>
+                                </div> -->
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">6.(A) Type</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <a href="#">abcxyz.pdf</a>
+                                </div> -->
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">6.(B) Parentage (Details of pedigree, including the source from which variety/Inbred/A,B,R lines of hybrids have been developed)</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <a href="#">abcxyz.pdf</a>
+                                </div> -->
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">6.(C) Source of material in case of introduction (country name) </div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <a href="#">abcxyz.pdf</a>
+                                </div> -->
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">6.(D) DNA profile of variety/hybrid/inbred/A,B,R lines of hybrid vis-a-vis check variety/line</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <a href="#">abcxyz.pdf</a>
+                                </div> -->
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">6.(E) Breeding method used</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <a href="#">abcxyz.pdf</a>
+                                </div> -->
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">6.(F) Breeding objective</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <a href="#">abcxyz.pdf</a>
+                                </div> -->
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">7. State varieties which most closely resemble the proposed variety in general characteristics</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <a href="#">abcxyz.pdf</a>
+                                </div> -->
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">8. Recommended productions ecology</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <a href="#">abcxyz.pdf</a>
+                                </div> -->
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">9. Specific area of its adaptation (zones and states for which variety is proposed) and recommended production ecology</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <a href="#">abcxyz.pdf</a>
+                                </div> -->
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">10. (A) Plant Height (cm)</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <a href="#">abcxyz.pdf</a>
+                                </div> -->
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">10. (B) Distinguishing morphological character</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <a href="#">abcxyz.pdf</a>
+                                </div> -->
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">10. (C) Maturity (number of days)</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <a href="#">abcxyz.pdf</a>
+                                </div> -->
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">10. (D) Maturity group</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <a href="#">abcxyz.pdf</a>
+                                </div> -->
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">10. (E) Reaction to major diseases</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <a href="#">abcxyz.pdf</a>
+                                </div> -->
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">10. (F) Reaction to major pests</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <a href="#">abcxyz.pdf</a>
+                                </div> -->
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">10. (G) Agronomic features</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <!-- <div class="col-md-1">
+                                    <a href="#">abcxyz.pdf</a>
+                                </div> -->
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">10. (H)Seed Rate (Kg/Ha)</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">10. (I) Fertilizer range</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">10. (J) Quality of produce</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">10. (K) Reaction to stresses</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">10. (L) Any other relevant information</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">11. (A) Plant height (cm)</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">11. (B) Distinguishing morphological character</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">11. (C) Days to flowering</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">11. (D) Days to Maturity</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">11. (E) Is there any problem of synchronization? If yes, method to overcome</div>
+                                <div class="form-content col-md-7">{{ descriptionData.proposalType }}
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">11. (F) Reaction to major diseases</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">11. (G) Reaction to major pests</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">11.(H) Agronomic features</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">11. (I) Reaction to stresses</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">11. (J) Any other relevant information</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">12(A). Yield data in coordinated trial (breeding, agronomy, pathology, entomology, quality) regional/inter-regional/district trials year-wise (level of fertilizer application, density of plant population, superiority over local control/ standard variety to be indicated)</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">12(B). Yield data from national demonstration/ large-scale demonstrations</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">13(A). Agency responsible for maintaining breeder seed</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">13(B). Quantity of breeder seed in stock</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">14. Specific recommendations, in any, for seed production (staggered sowing, planting ratio of parental lines of hybrids in foundation and certified seed production, probable area of seed production)</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">15. Vivid presentation (field view, single plant and seed/economic part)</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">16(A). Whether recommended by any workshop, seminar, conference, state seed committee, etc</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">16(B). Recommendations with justification for proposed variety</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">17. Acknowledgement of submission of seed samples</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">18. Package of practices along with attainable yield levels</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">19. Information on acceptability of variety by farmers/consumers/industry</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="left-heading required col-12 col-md-4">20. Any other pertinent information</div>
+                                <div class="form-content col-md-7">
+                                    {{ descriptionData.proposalType }}
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="#" class="pdf-link">
+                                        <span><img src="../../../../assets/icons/square 1.png" alt=""></span>abcxyz.pdf
+                                    </a>
+                                  </div>
+                            </div>
+
+                        </div>
+       
+
+ 
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group  align-items-end col-2">
+                <!-- <button (click)="cancel()" type="button" class="btn btn-inventory btn-sm mr-3">
+                    <span class="bttt text-white">Cancel</span>
+                </button>  -->
+            </div>
+        </div>
+        
+    </form>
+    
+</div>
+
+
+<!-- not use form -->
+<table class="table  table-bordered table-responsive-sm pt-3 pl-2 pr-2 d-none">
+    <thead class="table-formate">
+        <tr>
+            <th class="section-col left-header">Section</th>
+            <th>Details filled by proposer</th>
+            <th>Attachment</th>
+            <th class="right-header">Comments from State/PD/PC</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Row template -->
+        <tr>
+            <td><label for="" class="left-heading required">15. Visit presentation (field view, single plant and seed/
+                    economic part)</label></td>
+            <td>Lorem ipsum dolor sit amet... </td>
+            <td class="attachment-col"><a href="#"><img src="../../../../assets/icons/pdf-icon.png" alt="logo"
+                        width="30" height="30"> abcxyz.pdf</a></td>
+            <td>Lorem ipsum dolor sit amet, consectetur...</td>
+        </tr>
+
+        <tr>
+            <td><label for="" class="left-heading required">16(A). Whether recommended by any workshop, seminar,
+                    conference, state seed
+                    committee, etc.</label></td>
+            <td>Lorem ipsum dolor sit amet...</td>
+            <td><a href="#"><img src="../../../../assets/icons/pdf-icon.png" alt="logo" width="30"
+                        height="30">abcxyz.pdf</a></td>
+            <td>OK</td>
+        </tr>
+
+        <tr>
+            <td><label for="" class="left-heading required">16(B). If so, the recommendations with specific
+                    justifications for release of
+                    proposed variety</label></td>
+            <td>Lorem ipsum dolor sit amet...</td>
+            <td></td>
+            <td>OK</td>
+        </tr>
+
+        <tr>
+            <td><label for="" class="left-heading required">17. Acknowledgement of the submission of seed samples of
+                    variety/hybrid/inbred/A, B
+                    and R lines of the hybrid from the NBPGR and IC numbers</label></td>
+            <td>IC<br>Lorem ipsum dolor sit amet...</td>
+            <td><a href="#"><img src="../../../../assets/icons/pdf-icon.png" alt="logo" width="30"
+                        height="30">abcxyz.pdf</a></td>
+            <td>Lorem ipsum dolor sit amet, consectetur...</td>
+        </tr>
+
+        <tr>
+            <td><label for="" class="left-heading required">18. Package of practices along with attainable yield
+                    levels</label></td>
+            <td>Lorem ipsum dolor sit amet...</td>
+            <td><a href="#"><img src="../../../../assets/icons/pdf-icon.png" alt="logo" width="30"
+                        height="30">abcxyz.pdf</a></td>
+            <td>OK</td>
+        </tr>
+
+        <tr>
+            <td><label for="" class="left-heading required">19. Information on acceptability of variety by
+                    farmers/consumers/industry</label></td>
+            <td>Lorem ipsum dolor sit amet...</td>
+            <td></td>
+            <td>OK</td>
+        </tr>
+
+        <tr>
+            <td><label for="" class="left-heading required">20. Any other pertinent information</label></td>
+            <td>Lorem ipsum dolor sit amet...</td>
+            <td><a href="#"><img src="../../../../assets/icons/pdf-icon.png" alt="logo" width="30"
+                        height="30">abcxyz.pdf</a></td>
+            <td>Lorem ipsum dolor sit amet, consectetur...</td>
+        </tr>
+    </tbody>
+</table>

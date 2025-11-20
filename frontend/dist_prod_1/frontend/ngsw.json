@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1733811643220,
+  "timestamp": 1758972977497,
   "index": "/index.html",
   "assetGroups": [
     {
@@ -11,16 +11,17 @@
         "ignoreVary": true
       },
       "urls": [
-        "/489.213a456f296e11a5.js",
-        "/735.38d302f5f693b115.js",
+        "/293.6a38fb9b780f5917.js",
+        "/489.79358cb14da42a8a.js",
+        "/678.ce140b577a7c34ef.js",
         "/favicon.ico",
         "/index.html",
-        "/main.6dcf04508548fa7d.js",
+        "/main.16a088d9a211ad03.js",
         "/manifest.webmanifest",
         "/polyfills.1b90408a01823f31.js",
-        "/runtime.063431cf391e4df8.js",
-        "/scripts.74e37104b8240f0c.js",
-        "/styles.13bb4732aa1edf53.css"
+        "/runtime.1d30ea060b15c605.js",
+        "/scripts.46c82a0ef1bb845b.js",
+        "/styles.cffc5d1efaa198e9.css"
       ],
       "patterns": []
     },
@@ -46,6 +47,8 @@
         "/assets/icons/icon-96x96.png",
         "/assets/icons/icons - Shortcut.lnk",
         "/assets/icons/icons8-excel_white.svg",
+        "/assets/icons/maximize.svg",
+        "/assets/icons/minimize.svg",
         "/assets/icons/pdf-icon.png",
         "/assets/icons/sort-down.png",
         "/assets/icons/sort-up.png",
@@ -155,6 +158,7 @@
         "/assets/images/wash.svg",
         "/assets/images/wash_red.svg",
         "/assets/images/wash_white.svg",
+        "/assets/js/JSPrintManager.js",
         "/assets/js/bootstrap.min.js",
         "/assets/js/jquery.min.js",
         "/assets/params/css/fonts.googleapis.css",
@@ -192,8 +196,9 @@
   ],
   "dataGroups": [],
   "hashTable": {
-    "/489.213a456f296e11a5.js": "f8190b8c6bfeb299290a174644b1557f969c920c",
-    "/735.38d302f5f693b115.js": "ebf04c4e118049a0f2b039ff4b5f4c0ec1c1ef4c",
+    "/293.6a38fb9b780f5917.js": "599627a4e1ed8428055a00f68b8fcf7a108c2c25",
+    "/489.79358cb14da42a8a.js": "b48be7265f29fdb3869cb58ad61387f3b37b561c",
+    "/678.ce140b577a7c34ef.js": "5bdd87da3077785e24408a0ba248ac621aef6f31",
     "/Layer 93.bfdbd36baa33f360.svg": "072b94df06b7e1bd18c1ee3169d9c499c12c5a1f",
     "/assets/css/bootstrap.min.css": "8dd5f6145b7cbbfa32f2e0323f865158fda7d843",
     "/assets/css/print-custome.css": "2edba516f362f5bc4cfa198076d6075f04745549",
@@ -208,6 +213,8 @@
     "/assets/icons/icon-96x96.png": "3914125a4b445bf111c5627875fc190f560daa41",
     "/assets/icons/icons - Shortcut.lnk": "13049503fe5977ec595e7cecab00744fb0c434bd",
     "/assets/icons/icons8-excel_white.svg": "9a951441d555e0c8d3fe4407627df7072e78fb67",
+    "/assets/icons/maximize.svg": "f3089d47122a8bce1796c90518d204385e848d6f",
+    "/assets/icons/minimize.svg": "6fb003e0196157047451bb3fb7c9bbecdec64f25",
     "/assets/icons/pdf-icon.png": "8cc907bab5e24d56fc80296516ed4434427ea03e",
     "/assets/icons/sort-down.png": "a40f58a42be86d812ba9f2f17723840ae4942727",
     "/assets/icons/sort-up.png": "7cf0fd24b541b8d1668ab1ae52051e1cbc1373e1",
@@ -317,6 +324,7 @@
     "/assets/images/wash.svg": "012ede041edc0d0769ad1c054a2bc714f75d4099",
     "/assets/images/wash_red.svg": "f98c4df41e4e3aee3a86ea16c3937040fae6cb7c",
     "/assets/images/wash_white.svg": "c83d449020f14a5cec100782f8de3b0374899320",
+    "/assets/js/JSPrintManager.js": "e5252ea11b1c4871f8c716cc2f1fbb0bd2a4d67b",
     "/assets/js/bootstrap.min.js": "45be8ca0bae7e5b88244b718d4133c6aabd30cd8",
     "/assets/js/jquery.min.js": "ea61688671d0c3044f2c5b2f2c4af0a6620ac6c2",
     "/assets/params/css/fonts.googleapis.css": "38504c7d16d8009645bacad5ad1a0a214c19a2e5",
@@ -349,13 +357,13 @@
     "/fa-v4compatibility.7e7e1dad5cb38179.ttf": "3fc15c8154f8bd2d7bd1dfe55ae5ab1c33e5e40f",
     "/fa-v4compatibility.9765b558c4e8fd6e.woff2": "37ab2a6a0810d5a6c10a355fe1d7af0042bd6a2a",
     "/favicon.ico": "b03261f7f1a940cc221af641abc6397d13636ecd",
-    "/index.html": "34fac159d5f23ed49ff66ad3d725eb01114bf485",
-    "/main.6dcf04508548fa7d.js": "53c88141c268eea71f1f6b52239242b64f318bbd",
+    "/index.html": "386343238cf9666c0b9bac0198f4aa91fb29b3f5",
+    "/main.16a088d9a211ad03.js": "063b153b49b13b5dc96b50dd27b2c86dbf933541",
     "/manifest.webmanifest": "85e05bc91e09e81d4ae86e61a913cd8860b3f7be",
     "/polyfills.1b90408a01823f31.js": "87a69c6693409197c28b764672a77e526f24b0e8",
-    "/runtime.063431cf391e4df8.js": "0b353837765a3dee9fd1a917a8f82280f82b9c93",
-    "/scripts.74e37104b8240f0c.js": "6c9ec5be96b177b25fdb50a538ca890e6cf75afe",
-    "/styles.13bb4732aa1edf53.css": "9a2afdedfa4a8ce489c51e2608c8ed3e0bb46133"
+    "/runtime.1d30ea060b15c605.js": "02ff57cd73e0a7dc135bad594823a996fbbba168",
+    "/scripts.46c82a0ef1bb845b.js": "88929667abfa110215d035de7cd04a51f651845b",
+    "/styles.cffc5d1efaa198e9.css": "0ec4fe5e8330ca9b6d3d5975cf9787f3d460c5a7"
   },
   "navigationUrls": [
     {

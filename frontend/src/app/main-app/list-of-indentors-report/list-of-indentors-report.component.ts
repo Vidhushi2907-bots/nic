@@ -1,14 +1,9 @@
-
-// import { Component, OnIsubmit-indents-breeder-seedsnit } from '@angular/core';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FilterPaginateSearch } from 'src/app/common/data/data-among-components/filter-paginate-search';
-// import { AddSeedTestingLaboratorySearchComponent } from 'src/app/common/add-seed-testing-laboratory-search/add-seed-testing-laboratory-search.component';
 import { PaginationUiComponent } from 'src/app/common/pagination-ui/pagination-ui.component';
 import { BreederService } from 'src/app/services/breeder/breeder.service';
-// import { IndentBreederSeedAllocationSearchComponent } from 'src/app/common/indent-breeder-seed-allocation-search/indent-breeder-seed-allocation-search.component';
-// import { PaginationUiComponent } from 'src/app/common/pagination-ui/pagination-ui.component';
 
 import { RestService } from 'src/app/services/rest.service';
 import { SeedServiceService } from 'src/app/services/seed-service.service';
@@ -20,7 +15,6 @@ import { MaximumLotSizeSearchComponent } from 'src/app/common/maximum-lot-size-s
 import { MasterService } from 'src/app/services/master/master.service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
   selector: 'app-list-of-indentors-report',
@@ -30,99 +24,119 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 
 export class ListOfIndentorsReportComponent implements OnInit {
-  @ViewChild(MaximumLotSizeSearchComponent) indentBreederSeedAllocationSearchComponent: MaximumLotSizeSearchComponent | undefined = undefined;
-  @ViewChild(PaginationUiComponent) paginationUiComponent!: PaginationUiComponent;
-  filterPaginateSearch: FilterPaginateSearch = new FilterPaginateSearch();
-  cropGroupData;
-  statename = [];
-  identor = [];
-  ngForm!: FormGroup;
-  seasonList: any = [];
-  response_crop_group: any = [];
-  data: any;
-  data1: any;
-  custom_array: any[];
-  finalData: any[];
-  fileName = 'list-of-indentors-report.xlsx';
-  yearOfIndent: any = [
-    // {name: "2025 - 2026", "value": "2025"},
-    // {name: "2024 - 2025", "value": "2024"},
-    // {name: "2023 - 2024", "value": "2023"},
-    // {name: "2022 - 2023", "value": "2022"},
-    // {name: "2021 - 2022", "value": "2021"},
-    { name: "2020 - 2021", "value": "2020" }
-  ];
-  year: any;
-  season: any;
-  crop: any;
-  isSearch: boolean = false;
-  todayData = new Date();
-  tableId: any[];
-  allData: any;
-  countData: any;
-  districtList: any;
-  stateList: any;
-  exportdata: any;
-  selected_state: any;
-  stateListSecond: any;
-  isSearchData: boolean=false;
-  constructor(private breederService: BreederService, private fb: FormBuilder, private service: SeedServiceService, private router: Router, private masterService: MasterService) { this.createEnrollForm(); }
-  createEnrollForm() {
+    @ViewChild(MaximumLotSizeSearchComponent) indentBreederSeedAllocationSearchComponent: MaximumLotSizeSearchComponent | undefined = undefined;
+    @ViewChild(PaginationUiComponent) paginationUiComponent!: PaginationUiComponent;
+  
+    filterPaginateSearch: FilterPaginateSearch = new FilterPaginateSearch();
+  
+    cropGroupData;
+    statename = [];
+    identor = [];
+    ngForm!: FormGroup;
+    seasonList: any = [];
+    response_crop_group: any = [];
+    data: any;
+    data1: any;
+  
+    searchText: string = '';
+    allData: any[] = [];
+    user_type: any;
+    custom_array: any[];
+    finalData: any[];
+    fileName = 'list-of-indentors-report.xlsx';
+  
+    yearOfIndent: any = [
+      { name: "2020 - 2021", "value": "2020" }
+    ];
+  
+    year: any;
+    season: any;
+    crop: any;
+  
+    isSearch: boolean = false;
+    todayData = new Date();
+    tableId: any[];
+    districtList: any;
+    stateList: any;
+    exportdata: any;
+    showFilter: boolean = false;
+    selected_state: any;
+    stateListSecond: any;
+    isSearchData: boolean = false;
+    countData: any;
+    masterData: any[] = [];
+    completeData: any[] = [];
+    
+    constructor(
+        private breederService: BreederService,
+        private fb: FormBuilder,
+        private service: SeedServiceService,
+        private router: Router,
+        private masterService: MasterService
+      ) {
+        this.createEnrollForm();
+      }
+
+    createEnrollForm() {
     this.ngForm = this.fb.group({
       season: ['',],
       state_id: [''],
       district_id: [''],
       crop: ['',],
       year: ['',],
-      state_text: ['']
-
+      state_text: [''],
+      variety_search_filter: ['']
     });
-    this.ngForm.controls['state_id'].valueChanges.subscribe(newValue => {
 
+    this.ngForm.controls['state_id'].valueChanges.subscribe(newValue => {
       if (newValue) {
         this.getDistrictList(newValue);
       }
-    })
+    });
+
     this.ngForm.controls['state_text'].valueChanges.subscribe(newValue => {
       if (newValue) {
-        console.log(newValue)
-        this.stateList = this.stateListSecond
-        let response = this.stateList.filter(x => x.state_name.toLowerCase().startsWith(newValue.toLowerCase()))
-        this.stateList = response
-      }
-      else {
-        this.getStateList()
+        this.stateList = this.stateListSecond;
+        let response = this.stateList.filter(
+          x => x.state_name.toLowerCase().includes(newValue.toLowerCase())
+        );
+        this.stateList = response;
+      } else {
+        this.getStateList();
       }
     });
   }
-  ngOnInit(): void {
-    // localStorage.setItem('logined_user', "Seed");
-    // if (!localStorage.getItem('foo')) {
-    //   localStorage.setItem('foo', 'no reload')
-    //   // location.reload()
-    // } else {
-    //   localStorage.removeItem('foo')
-    // }
+
+   ngOnInit(): void {
+    this.selected_state = 'All';
+    this.ngForm.controls['state_id'].setValue('');
     this.getPageData();
     this.getStateList();
     this.runExcelApi();
-    // this.shortStatename();
-    // this.getCroupCroupList();
-    // this.getSeasonData();
-    // this.submitindentor();
+
+    this.ngForm.controls['variety_search_filter'].valueChanges.subscribe((value: string) => {
+      if (value && value.trim() !== '') {
+        this.applyFilter;
+      } else {
+        this.filterPaginateSearch.Init(this.allData, this, "getPageData", undefined, this.countData, true);
+        this.initSearchAndPagination();
+      }
+    });
+
+    this.applyFilter(this.allData);
   }
 
   async getStateList() {
-    this.masterService
-      .getRequestCreatorNew("get-state-list")
-      .subscribe((apiResponse: any) => {
-        if (apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.status_code
-          && apiResponse.EncryptedResponse.status_code == 200) {
-          this.stateList = apiResponse.EncryptedResponse.data;
-          this.stateListSecond = this.stateList
-        }
-      });
-  }
+  this.masterService
+    .getRequestCreatorNew("get-state-list")
+    .subscribe((apiResponse: any) => {
+      if (apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.status_code
+        && apiResponse.EncryptedResponse.status_code == 200) {
+        this.stateList = [{ state_name: 'All', state_code: '' }, ...apiResponse.EncryptedResponse.data];
+        this.stateListSecond = this.stateList;
+      }
+    });
+}
 
   async getDistrictList(newValue: any) {
     const searchFilters = {
@@ -141,30 +155,50 @@ export class ListOfIndentorsReportComponent implements OnInit {
   }
 
 
-  getPageData(loadPageNumberData: number = 1, searchData: any | undefined = undefined) {
+  getPageData1(loadPageNumberData: number = 1, searchData: any | undefined = undefined) {
     let route = "getAllIndentorsList";
-
     let data = {
       page: loadPageNumberData,
       pageSize: this.filterPaginateSearch.itemListPageSize || 50,
       search: { state_code: this.ngForm.controls['state_id'].value, }
     }
     this.service.postRequestCreator(route, null, data).subscribe(data => {
-      console.log(data)
       this.filterPaginateSearch.itemListPageSize = 50;
       this.allData = data.EncryptedResponse.data.rows;
+      this.countData = data.EncryptedResponse.data.count;
+      this.filterPaginateSearch.Init(this.allData, this, "getPageData", undefined, data.EncryptedResponse.data.count, true);
+      this.initSearchAndPagination();
+      this.runExcelApi()
+    });
+  }
+
+  getPageData(loadPageNumberData: number = 1, searchData: any | undefined = undefined) {
+    let route = "getAllIndentorsList";
+    let data = {
+      page: loadPageNumberData,
+      pageSize: this.filterPaginateSearch.itemListPageSize || 50,
+      search: { 
+        state_code: this.ngForm.controls['state_id'].value,
+        isReport : true
+
+       }
+    }
+    this.service.postRequestCreator(route, null, data).subscribe(data => {
+      this.filterPaginateSearch.itemListPageSize = 50;
+      this.allData = data.EncryptedResponse.data.rows;
+      this.masterData = [...this.allData];
+      this.completeData = [...this.allData]; 
       this.countData = data.EncryptedResponse.data.count;
 
       this.filterPaginateSearch.Init(this.allData, this, "getPageData", undefined, data.EncryptedResponse.data.count, true);
       this.initSearchAndPagination();
       this.runExcelApi()
-      // this.filterPaginateSearch.Init(data.EncryptedResponse.data.rows, this, "getPageData", undefined, data.EncryptedResponse.data.count, true);
-      // this.initSearchAndPagination();
     });
   }
+  
 search(){
-  this.isSearchData=true
-  this.getPageData()
+    this.isSearchData=true
+    this.getPageData()
 }
   initSearchAndPagination() {
     this.paginationUiComponent.Init(this.filterPaginateSearch);
@@ -176,8 +210,6 @@ search(){
       return;
     }
 
-    // this.indentBreederSeedAllocationSearchComponent.Init(this.filterPaginateSearch);
-    // this.paginationUiComponent.Init(this.filterPaginateSearch);
   }
 
   submit() {
@@ -197,152 +229,6 @@ search(){
     }
   }
 
-  // cropGroup(data: string) { { } }
-  // async shortStatename() {
-  //   const route = 'get-state-list';
-  //   const result = await this.breederService.getRequestCreatorNew(route).subscribe((data: any) => {
-  //     this.statename = data && data['EncryptedResponse'] && data['EncryptedResponse'].data ? data['EncryptedResponse'].data : '';
-  //     // console.log('state======>',this.statename);
-
-  //   })
-  // }
-
-  // async submitindentor(loadPageNumberData: number = 1, searchData: any | undefined = undefined) {
-
-  //   const route = 'submit-indents-breeder-seeds-list';
-  //   const result = await this.breederService.postRequestCreator(route, null, {
-  //     page: loadPageNumberData,
-  //     pageSize: this.filterPaginateSearch.itemListPageSize || 10,
-  //     search: searchData
-  //   }).subscribe((apiResponse: any) => {
-  //     if (apiResponse !== undefined
-  //       && apiResponse.EncryptedResponse !== undefined
-  //       && apiResponse.EncryptedResponse.status_code == 200) {
-  //       this.identor = apiResponse.EncryptedResponse.data.data;
-  //       this.data1 = apiResponse.EncryptedResponse.data;
-  //       this.custom_array = [];
-  //       // console.log('this.identorthis.identor',varietyId);
-  //       // arr = arr.data
-  //       let varietyId = []
-  //       for (let value of this.identor) {
-  //         varietyId.push(value.m_crop_variety.variety_name)
-  //       }
-  //       varietyId = [...new Set(varietyId)]
-  //       let newObj = [];
-
-  //       for (let value of varietyId) {
-  //         let keyArr = [];
-  //         for (let val of this.identor) {
-  //           if (val.m_crop_variety.variety_name == value) {
-  //             let state = val.user.agency_detail.m_state.state_short_name;
-  //             keyArr.push({ "state": state, 'value': val.indent_quantity });
-  //           }
-  //         }
-  //         let variety_id = (value).toString();
-  //         newObj.push({ "variety_id": value, 'data': keyArr })
-  //       }
-
-  //       this.finalData = newObj;
-  //       // console.log('this.identorthis.identor',this.finalData);
-
-  //       this.tableId = [];
-  //       for (let id of this.identor) {
-  //         this.tableId.push(id.id);
-  //       }
-  //       console.log('this.identorthis.identor', this.tableId);
-
-  //       const results = this.identor.filter(element => {
-  //         if (Object.keys(element).length !== 0) {
-  //           return true;
-  //         }
-
-  //         return false;
-  //       });
-  //       // console.log(results, 'resultssssssss');
-  //       if (this.identor === undefined) {
-  //         this.identor = [];
-  //       }
-  //       // let data =[];
-  //       const removeEmpty = (obj) => {
-  //         Object.entries(obj).forEach(([key, val]) =>
-  //           (val && typeof val === 'object') && removeEmpty(val) ||
-  //           (val === null || val === "") && delete obj[key]
-  //         );
-  //         return obj;
-  //       };
-  //       removeEmpty(this.identor)
-  //       this.filterPaginateSearch.Init(results, this, "getPageData", undefined, apiResponse.EncryptedResponse.data.count);
-  //       this.initSearchAndPagination();
-  //     }
-
-  //   });
-  // }
-
-  // freeze() {
-  //   const searchFilters = {
-  //     "search": {
-  //       "id": this.tableId
-  //     }
-  //   };
-  //   const route = "freeze-indent-breeder-seed-data";
-  //   this.service.postRequestCreator(route, null, searchFilters).subscribe((apiResponse: any) => {
-  //     if (apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.status_code
-  //       && apiResponse.EncryptedResponse.status_code == 200) {
-  //       Swal.fire({
-  //         toast: true,
-  //         icon: "success",
-  //         title: "Data Has Been Successfully Updated",
-  //         position: "center",
-  //         showConfirmButton: false,
-  //         showCancelButton: false,
-  //         timer: 2000
-  //       }).then(x => {
-
-  //         this.router.navigate(['/submit-indents-breeder-seeds']);
-  //       })
-  //     }
-  //     else {
-
-  //       Swal.fire({
-  //         toast: true,
-  //         icon: "error",
-  //         title: "An error occured",
-  //         position: "center",
-  //         showConfirmButton: false,
-  //         showCancelButton: false,
-  //         timer: 2000
-  //       })
-  //     }
-
-  //   });
-  // }
-
-  // getSeasonData() {
-  //   const route = "get-season-details";
-  //   const result = this.service.postRequestCreator(route, null).subscribe(data => {
-  //     this.seasonList = data && data.EncryptedResponse && data.EncryptedResponse.data ? data.EncryptedResponse.data : '';
-  //     // console.log(this.seasonList);
-  //   })
-  // }
-  // getCroupCroupList() {
-  //   const route = "crop-group";
-  //   const result = this.service.getPlansInfo(route).then((data: any) => {
-  //     this.response_crop_group = data && data['EncryptedResponse'] && data['EncryptedResponse'].data && data['EncryptedResponse'].data ? data['EncryptedResponse'].data : '';
-  //   })
-  // }
-  // initSearchAndPagination() {
-  //   this.paginationUiComponent.Init(this.filterPaginateSearch);
-  //   if (this.paginationUiComponent === undefined) {
-
-
-  //     setTimeout(() => {
-  //       this.initSearchAndPagination();
-  //     }, 300);
-  //     return;
-  //   }
-  //   // this.indentBreederSeedAllocationSearchComponent.Init(this.filterPaginateSearch);
-  // }
-
   myFunction() {
     document.getElementById("myDropdown").classList.toggle("show");
   }
@@ -361,7 +247,6 @@ search(){
   }
 
   runExcelApi() {
-
     let route = "getAllIndentorsList";
 
     let data = {
@@ -369,236 +254,178 @@ search(){
       search: { state_code: this.ngForm.controls['state_id'].value, }
     }
     this.service.postRequestCreator(route, null, data).subscribe(data => {
-      console.log(data)
-      // this.filterPaginateSearch.itemListPageSize = 10;
       this.exportdata = data.EncryptedResponse.data.rows;
-      console.log('exportdata', this.exportdata)
       this.countData = data.EncryptedResponse.data.count;
-
-      // this.filterPaginateSearch.Init(this.exportdata, this, "getPageData", undefined, data.EncryptedResponse.data.count, true);
-      // this.initSearchAndPagination();
-      // this.filterPaginateSearch.Init(data.EncryptedResponse.data.rows, this, "getPageData", undefined, data.EncryptedResponse.data.count, true);
-      // this.initSearchAndPagination();  
+      this.allData = this.exportdata;
+ 
     });
   }
 
   exportexcel(): void {
-    /* pass here the table id */
     let element = document.getElementById('excel-table');
     const ws: XLSX.WorkSheet = XLSX.utils.table_to_sheet(element);
 
-    /* generate workbook and add the worksheet */
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-
-    /* save to file */
     XLSX.writeFile(wb, this.fileName);
-
   }
 
-  download() {
-
-    // let selectedreportDataHeader = [
-    //   { text: 'Selected State Name', bold: true },
-    // ]
-    // let selectedReportData = this.exportdata.map((element, index) => {
-    //   let selectedReportData = [
-
-    //     this.ngForm.controls['state_id'].value ? this.ngForm.controls['state_id'].value : "Na"
-    //   ]
-    //   return selectedReportData
-    // },
-    // )
-
-    // selectedReportData = [[...selectedreportDataHeader], ...selectedReportData]
-
-
-    let reportDataHeader = [{ text: 'S/N', bold: true }, { text: 'Agency Name', bold: true }, { text: 'State', bold: true }, { text: 'District', bold: true },
-    { text: 'Address', bold: true },
-    { text: 'Contact Person Name', bold: true }, { text: 'Mobile Number', bold: true }, { text: 'Email', bold: true },
-    { text: 'Status', bold: true },
-    ]
-
-    let reportData = this.exportdata.map((element, index) => {
-      let reportData = [
+download() {
+  this.getAllIndentorData().subscribe((data: any) => {
+    let fullData = this.completeData; 
+    let reportDataHeader = [
+      { text: 'S/ N', bold: true },
+      { text: 'Agency Name', bold: true },
+      { text: 'State', bold: true },
+      { text: 'District', bold: true },
+      { text: 'Address', bold: true },
+      { text: 'Contact Person Name', bold: true }, 
+      { text: 'Mobile Number', bold: true }, 
+      { text: 'Email', bold: true },
+      { text: 'Status', bold: true },
+    ];
+    let reportData = fullData.map((element, index) => {
+      return [
         index + 1,
-        element && element.agency_name ? element.agency_name : 'NA',
-        element && element.m_state ? element.m_state.state_name : 'NA',
-        element && element.m_district && element.m_district.district_name ? element.m_district.district_name : 'NA',
-        // element && element && element.latitude ? element.latitude : 'NA',
-        // element && element.longitude ? element.longitude : 'NA',
-        element && (element.address) ? element.address : 'NA',
-        element && (element.contact_person_name) ? element.contact_person_name : 'NA',
-        //  element &&(element.agency_detail && element.agency_detail.designation_id) ? element.agency_detail.designation_id : 'NA',
-        element && element.mobile_number ? element.mobile_number : 'NA',
-        element && (element.email) ? element.email : 'NA',
-        element && (element.is_active) &&(element.is_active==1)?'ACTIVE':"ISACTIVE"
-      ]
-      return reportData;
-    })
-
-    reportData = [[...reportDataHeader], ...reportData,]
-    let pageWidth = 1700
-    let numberOfColumn = 10
-    let numberOfCharecter = 30
-    const columnWidth = (pageWidth - (2 * 2) - (1 * numberOfColumn)) / numberOfColumn
-    const maxFontSize = columnWidth / (1 * numberOfCharecter)
-    let docDefinition;
-    if(this.isSearchData){
-
-       docDefinition = {
-        pageOrientation: 'landscape',
-        // pageSize: {
-        //   width: 1800,
-        //   height: 600,
-        // },
-  
-        content: [
-          { text: 'List of Indenters', style: 'header' },
-          { text: `State Name : ${this.getStateListData(this.ngForm.controls['state_id'].value)}`,  },
-          // {
-          //   style: 'indenterTable',
-          //   table: {
-          //     // widths: [5,15,10,10,10,10,10,10,10,10],
-          //     body:
-          //       // selectedReportData,
-  
-          //   },
-          // },
-          {
-            style: 'indenterTable',
-            table: {
-              // widths: [5,15,10,10,10,10,10,10,10,10],
-              body:
-                reportData,
-  
-            },
-          },
-  
-  
-          // Add more table objects as needed
-        ],
-        // content: [
-        //   { text: 'List of Indenters', style: 'header' },
-  
-        //   {
-        //     style: 'indenterTable',
-        //     table: {
-        //       // widths: [5,15,10,10,10,10,10,10,10,10],
-        //       body: 
-        //       reportData,
-  
-        //     },
-        //   },
-        // ],
-        styles: {
-          header: {
-            fontSize: 18,
-            bold: true,
-            margin: [0, 0, 0, 10],
-          },
-          subheader: {
-            fontSize: 16,
-            bold: true,
-            margin: [0, 10, 0, 5],
-          },
-          indenterTable: {
-  
-            fontSize: maxFontSize,
-            margin: [0, 5, 0, 15],
-          },
+        element?.agency_name || 'NA',
+        element?.m_state?.state_name || 'NA',
+        element?.m_district?.district_name || 'NA',
+        element?.address || 'NA',
+        element?.contact_person_name || 'NA',
+        element?.mobile_number || 'NA',
+        element?.email || 'NA',
+        element?.is_active == 1 ? 'ACTIVE' : 'ACTIVE'
+      ];
+    });
+    reportData = [[...reportDataHeader], ...reportData];
+    const docDefinition = {
+      pageOrientation: 'landscape',
+      content: [
+        { text: 'List of Indenters', style: 'header' },
+        { 
+          text: `State : ${this.getStateListData(this.ngForm.controls['state_id'].value)} `,
+          margin: [0, 0, 0, 10]
         },
-      };
-    }
-    else{
-      docDefinition = {
-        pageOrientation: 'landscape',
-        // pageSize: {
-        //   width: 1800,
-        //   height: 600,
-        // },
-  
-        content: [
-          { text: 'List of Indenters', style: 'header' },
-          // { text: `State Name : ${this.getStateListData(this.ngForm.controls['state_id'].value)}`, style: 'header' },
-          // {
-          //   style: 'indenterTable',
-          //   table: {
-          //     // widths: [5,15,10,10,10,10,10,10,10,10],
-          //     body:
-          //       // selectedReportData,
-  
-          //   },
-          // },
-          {
-            style: 'indenterTable',
-            table: {
-              // widths: [5,15,10,10,10,10,10,10,10,10],
-              body:
-                reportData,
-  
-            },
-          },
-  
-  
-          // Add more table objects as needed
-        ],
-        // content: [
-        //   { text: 'List of Indenters', style: 'header' },
-  
-        //   {
-        //     style: 'indenterTable',
-        //     table: {
-        //       // widths: [5,15,10,10,10,10,10,10,10,10],
-        //       body: 
-        //       reportData,
-  
-        //     },
-        //   },
-        // ],
-        styles: {
-          header: {
-            fontSize: 18,
-            bold: true,
-            margin: [0, 0, 0, 10],
-          },
-          subheader: {
-            fontSize: 16,
-            bold: true,
-            margin: [0, 10, 0, 5],
-          },
-          indenterTable: {
-  
-            fontSize: maxFontSize,
-            margin: [0, 5, 0, 15],
-          },
+        {
+          style: 'indenterTable',
+          table: { body: reportData },
         },
-      };
-    }
+      ],
+      styles: {
+        header: { fontSize: 18, bold: true, margin: [0, 0, 0, 10] },
+        indenterTable: { fontSize: 8, margin: [0, 5, 0, 15] },
+      },
+    };
+
     pdfMake.createPdf(docDefinition).download('Indenter_list.pdf');
-  }
-
+  });
+}
+  
   click() {
     this.ngForm.controls['state_id'].setValue('');
     this.selected_state = ''
     this.isSearchData=false
     this.getPageData();
   }
-  state_select(data) {
 
-    console.log(data)
-    this.selected_state = data && data.state_name ? data.state_name : '';
-    this.ngForm.controls['state_id'].setValue(data && data.state_code ? data.state_code : '')
+  state_select1(data: any) {
+  this.selected_state = data?.state_name || '';
+  this.ngForm.controls['state_id'].setValue(data?.state_code || '');
+  this.ngForm.controls['state_text'].setValue('');
 
-    this.ngForm.controls['state_text'].setValue('')
+  // Apply filter immediately
+  if (data?.state_code === '') {
+    this.applyFilter(this.allData);
+  } else {
+    const filteredData = this.allData.filter(item => item.m_state?.state_code === data.state_code);
+    this.applyFilter(filteredData);
   }
+}
+
+state_select(data: any) {  
+    this.selected_state = data?.state_name || '';
+    this.ngForm.controls['state_id'].setValue(data?.state_code || '');
+    this.ngForm.controls['state_text'].setValue('');
+    this.searchText = '';
+    if (data?.state_code && data.state_code !== '') {
+      this.getPageData(1);  
+    } else {
+      this.ngForm.controls['state_id'].setValue('');
+      this.getPageData(1);
+    }
+  }
+
+
   cnClick() {
     document.getElementById('state').click();
   }
-  getStateListData(data) {
+  getAllIndentorData() {
+  return this.service.postRequestCreator("getAllIndentorsList", null, {
+    search: { state_code: this.ngForm.controls['state_id'].value }
+  });
+}
 
-    let state_namelist = this.stateList.filter(item => item.state_code == data)
-    let stateName = state_namelist && state_namelist[0] && state_namelist[0].state_name ? state_namelist[0].state_name : 'Na'
-    return stateName
+  getStateListData(data: any): string {
+  if (!data || data === '' || data === 0) {
+    return 'NA';
   }
+  let state_namelist = this.stateList.filter(item => item.state_code == data);
+  let stateName = (state_namelist && state_namelist[0] && state_namelist[0].state_name)
+    ? state_namelist[0].state_name
+    : 'NA';
+  return stateName;
+}
+
+onSearch1(): void {
+  const lowerSearch = this.searchText.trim().toLowerCase();
+
+  const filteredData = this.allData.filter((item: any) => {
+    return (
+      (item.agency_name?.toLowerCase().includes(lowerSearch)) ||
+      (item.short_name?.toLowerCase().includes(lowerSearch)) ||
+      (item.m_state?.state_name?.toLowerCase().includes(lowerSearch)) ||
+      (item.m_district?.district_name?.toLowerCase().includes(lowerSearch)) ||
+      (item.address?.toLowerCase().includes(lowerSearch)) ||
+      (item.contact_person_name?.toLowerCase().includes(lowerSearch)) ||
+      (item.m_designation?.name?.toLowerCase().includes(lowerSearch)) ||
+      (item.mobile_number?.toLowerCase().includes(lowerSearch)) ||
+      (item.email?.toLowerCase().includes(lowerSearch))
+    );
+  });
+
+  this.applyFilter(filteredData);
+}
+onSearch() {
+    if (!this.searchText || this.searchText.trim() === '') {
+      this.completeData = [...this.masterData];
+    } else {
+      const lower = this.searchText.toLowerCase();
+      this.completeData = this.masterData.filter(x =>
+        (x.agency_name && x.agency_name.toLowerCase().includes(lower)) ||
+        (x.short_name && x.short_name.toLowerCase().includes(lower)) ||
+        (x.m_state?.state_name && x.m_state.state_name.toLowerCase().includes(lower)) ||
+        (x.m_district?.district_name && x.m_district.district_name.toLowerCase().includes(lower)) ||
+        (x.contact_person_name && x.contact_person_name.toLowerCase().includes(lower)) ||
+        (x.email && x.email.toLowerCase().includes(lower)) ||
+        (x.mobile_number && x.mobile_number.toString().includes(lower))
+      );
+    }
+}
+
+toggleFilter() {
+  this.showFilter = !this.showFilter;
+}
+ 
+ applyFilter(data: any[]): void {
+  this.filterPaginateSearch.Init(
+    data,
+    this,
+    "getPageData",
+    undefined,
+    data.length,
+    true
+  );
+  this.initSearchAndPagination();
+  this.filterPaginateSearch.itemListCurrentPage = 1;
+}
 }

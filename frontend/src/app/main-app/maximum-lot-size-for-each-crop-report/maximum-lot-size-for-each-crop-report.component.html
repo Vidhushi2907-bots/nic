@@ -1,330 +1,266 @@
 <div class="row my-4 w-100 mx-0">
     <div class="col-12 d-flex justify-content-center verticle-content-middle">
-        <div class="main-content-form-wrapper px-0 py-2">
-            <div class="row">
-                <div class="w-100">
-                <form [formGroup]="ngForm">
-                    <div class="col-12 px-4 mt-2">
-                        <div class="row">
-                            <div class="col-md-12 pl-4 pb-2">
-                                <span class="heading_notofied">Crop Wise Maximum LOT Size</span>
-                            </div>
-                            <div class="col-md-2 pl-4 pb-0"
-                                style="font: normal normal 600 20px/30px Poppins; letter-spacing: 0px; color: #1C1C1C;">
-                            </div>
-                            <div class="col-md-4 pl-4 pb-0"
-                                style="font: normal normal 600 20px/30px Poppins; letter-spacing: 0px; color: #1C1C1C;">
-                            </div>
-                            <!-- <div class="col-md-6 mt-3">
-                                <div class="col-md-12">
-                                    <label for="" class="left-heading">Year</label>
-                                </div>
-                                <div _ngcontent-cvx-c131="" class="col-md-12">
-                                    <select class="form-control" formControlName="year">
-                                        <option value="">Select Year</option>
-                                        <option *ngFor="let data of yearOfIndent" value="{{data.value}}">{{data.name}}
-                                        </option>
-                                    </select>
-                                </div>
-                            </div> -->
-
-                            <!-- <div class="col-md-6 pl-0 mt-2 pl-2">
-                                <div class="col-md-12">
-                                    <label for="Crop Name" class="search_txt">Year of indent</label>
-                                </div>
-                                <div class="col-12">
-                                    <select class="form-select form-control" aria-label="Default select example"
-                                        formControlName="year">
-                                        <option value="">Select Year of indent</option>
-                                        <option *ngFor="let data of yearOfIndent" value="{{data.value}}">
-                                            {{data.name}}</option>
-                                    </select>
-                                    <div class="pl-0 toggle-button" ngbDropdown>
-                                        <img src="assets/images/16.svg" alt="" srcset="">
-                                    </div>
-                                </div>
-
-                            </div> -->
-                        
-
-                            
-                            <div class="col-12 pt-1 pt-md-0 pl-3">
-                                <div class="row ">
-                                    <div class="col-12 col-md-4 pl-0 pr-2 pl-md-2 mt-0 mt-md-2 pr-md-0">
-                                        <div class="col-12 mt-0 ml-0">
-                                            <label for="Crop Group" class="search_txt">Crop Group</label>
-                                        </div>
-                                        <div class="col-12 ml-0 pr-2 pr-md-0">
-                                            <div ngbDropdown class="d-inline-block w-100 "
-                                           
-                                            >
-                                                <button class="btn takeplacholder w-100 crop toggle-button"
-                                                     id="crop_group" ngbDropdownToggle
-                                                    style="text-align: left;">{{selectCrop  && (selectCrop.length>30) ? (selectCrop.substring(0,30)+'...'):selectCrop? selectCrop :'Select Crop
-                                                    Group'}}</button>
-                
-                                                <div class="dropdown-menu w-100" ngbDropdownMenu="crop_group" aria-labelledby="sortMenu">
-                                                    
-                                                    <input type="text" class="form-control px-4"  formControlName="crop_text" (click)="cropdatatext()" >
-                                                    
-                                                    <button class="dropdown-item" *ngFor="let data of seasonList"
-                                                        (click)="cropGroup(data)" #dropdownItem [attr.data-parent-name]="'crop_group'">
-                                                        {{data && data.group_name ? data.group_name :''}}
-                                                        <!-- <input type="hidden" formControlName="crop_code"> -->
-                                                    </button>
-                                                   
-                                                </div>
-                
-                                            </div>
-                                            <div class="pl-0 toggle-button" ngbDropdown
-                                                >
-                                                <i class="fa-solid fa-angle-down downicon" (click)="cgClick()"></i>
-                                            </div>
-                                            <!-- <select class="form-select form-control" aria-label="Default select example"
-                                                formControlName="group_code">
-                                                <option value="">Select Crop Group</option>
-                                            <option *ngFor="let data of seasonList" value="{{data.group_code}}">
-                                                {{data.group_name}}
-                                            </option>
-                                            </select> -->
-    
-                                        </div>
-                                        <div class="pl-0 toggle-button" ngbDropdown>
-                                            <img src="assets/images/16.svg" alt="" srcset="">
-    
-                                        </div>
-                                    </div>
-    
-                                    <div class="col-12 col-md-4 pl-0 pr-2 mt-0 mt-md-2 pr-md-0">
-                                        <div class="col-12 mt-0 ml-0">
-                                            <label for="Crop Group" class="search_txt">Crop Name</label>
-                                        </div>
-                                        <div class="col-12 ml-0 pr-2 pr-md-0">
-                                            <div ngbDropdown class="d-inline-block w-100 "
-                                           >
-                                                <button class="btn takeplacholder w-100 crop toggle-button" id="crop_name"
-                                                    ngbDropdownToggle style="text-align: left;">{{selectCrop_name && 
-                                                    (selectCrop_name.length>30) ? (selectCrop_name.substring(0,30)+'...'):selectCrop_name? selectCrop_name :'Select Crop Name'}}</button>
-            
-                                                <div *ngIf="isCropName" class="dropdown-menu w-100" ngbDropdownMenu="crop_name"
-                                                    aria-labelledby="sortMenu">
-                                                    <input type="text" class="form-control px-4" formControlName="name_text" (click)="cropnametext()">
-                                                    
-                                                    <button class="dropdown-item" (click)="crop_name(data)"
-                                                        *ngFor="let data of getCropNameListArr" #dropdownItem
-                                                        [attr.data-parent-name]="'cropName'">
-                                                        {{data && data['m_crop.crop_name'] ? data['m_crop.crop_name'] :''}}    
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div class="pl-0 toggle-button" ngbDropdown>
-                                                <i class="fa-solid fa-angle-down downicon" (click)="cnclick()"></i>
-                                            </div>
-                                            <!-- <select class="form-select form-control" aria-label="Default select example"
-                                                formControlName="crop_name">
-                                                <option value="" disabled selected>Select Crop Name</option>
-                                                <option *ngFor="let data of getCropNameListArr" value="{{data && data['m_crop.crop_code'] ? data['m_crop.crop_code'] :''}}">
-                                                    {{data && data['m_crop.crop_name'] ? data['m_crop.crop_name'] :''}}</option>
-                                            </select> -->
-    
-                                        </div>
-                                        <div class="pl-0 toggle-button" ngbDropdown>
-                                            <img src="assets/images/16.svg" alt="" srcset="">
-    
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                           
-
-                            <div _ngcontent-cvx-c131="" class="col-12 mt-0  buttons-phone">
-                                <button _ngcontent-cvx-c131=""
-                                    class="form-button   search ml-2 d-inline-flex justify-content-center verticle-content-middle mb-3 mx-2"
-                                    (click)="submit()"> Search </button>
-                                <button _ngcontent-cvx-c131="" (click)="clear()"
-                                    class="clear-form-button ml-2 d-inline-flex justify-content-center verticle-content-middle mb-3">
-                                    Clear
-                                </button>
-
-                                <div class="dropdown float-right export_dropdown">
-                                    <button (click)="myFunction()"
-                                        class="form-button  search ml-2 d-inline-flex justify-content-center verticle-content-middle mb-2 mx-2"
-                                        style="font-size: 87%;">Export To &nbsp;<i class="fa fa-angle-down"
-                                            aria-hidden="true"> </i></button>
-                                    <div id="myDropdown" class="dropdown-content">
-                                        <a (click)="download()"> <img src="assets\icons\pdf-icon.png" alt=""
-                                                width="20px" height="20px"> PDF</a>
-                                        <a (click)="exportexcel()"> <img src="assets\icons\excel.jpg" alt=""
-                                                width="20px" alt=""> Excel</a>
-                                    </div>
-                                </div>
-
-                            </div>
-
-
-
-
-
-                            <div _ngcontent-cvx-c131="" class="col-12 px-4">
-                                <hr _ngcontent-cvx-c131="" class="separator m-0">
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-                <!-- table for exel Download start -->
-                <table id="excel-table" style="display: none;">
-                    <tr>
-                        <td>
-                            Crop Wise Maximum LOT Size
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Crop Group</td>
-                        <td>Crop Name</td>
-                    </tr>
-                    <tr>
-                        <td>{{selectCrop ? selectCrop :''}}</td>
-                        <td>{{selectCrop_name  ? selectCrop_name :''}}</td>
-                    </tr>
-                    <thead>
-                        <tr>
-                            <th scope="col" class="col-md-0 py-3">S/N</th>
-                            <th scope="col" class="col-md-2 py-3">Crop Group</th>
-                            <th scope="col" class="col-md-5 py-3">Crop Name</th>
-                            <th scope="col" class="col-md-5 py-3">Maximum LOT Size</th>
-                        </tr>
-                    </thead>
-                    <tbody *ngFor="let data of exportdata; let dataIndex=index">
-                        <tr>
-                            <td>
-                                <span>{{dataIndex + 1}}.</span>
-                            </td>
-                            <td>
-
-                                <span style="cursor: pointer;" data-toggle="tooltip"
-                                    data-placement="bottom" title="{{data && data.m_crop && data.m_crop.m_crop_group
-                                        && data.m_crop.m_crop_group.group_name ?
-                                (data.m_crop.m_crop_group.group_name|uppercase) : 'NA'}}">{{data && data.m_crop && data.m_crop.m_crop_group
-                                            && data.m_crop.m_crop_group.group_name ?
-                                    (data.m_crop.m_crop_group.group_name|uppercase) : 'NA'}}</span>
-                            </td>
-                            <td>
-                                <span style="cursor: pointer;" data-toggle="tooltip"
-                                    data-placement="bottom" title="{{data && data.crop ?
-                                        data.crop : 'NA'}}">{{data && data.crop ?
-                                    data.crop : 'NA'}}</span>
-                            </td>
-                            <td>
-                                <span style="cursor: pointer;" data-toggle="tooltip"
-                                    data-placement="bottom" title="{{data && data.max_lot_size ?
-                                        data.max_lot_size :'NA'}} {{data.crop_code.split('')[0] == 'H' ? 'Kg':
-                                        'Quintal'}}">{{data && data.max_lot_size ?
-                                    data.max_lot_size :'NA'}} {{data.crop_code.split('')[0] == 'H' ? 'Kg':
-                                    'Quintal'}}</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <!-- table for exel Download end -->
-                <div class="col-12 px-4">
-                    <!-- <app-dynamic-fields [fieldsList]="fieldsList" [formGroup]="formGroup"></app-dynamic-fields> -->
-                    <div class="list-wrapper px-4 py-3">
-
-                        <div class="row d-md-flex data-row-header extra-header">
-                            <!-- <div class="col-6 col-md-4 py-3 d-flex verticle-content-middle">
-                            </div> -->
-                            <div class="col-12 col-md-12 py-3 d-flex justify-content-center"><span>
-                                Crop Wise Maximum LOT Size
-                            </span>
-                            </div>
-                            <!-- <div class="col-6 col-md-4 py-3 d-flex verticle-content-middle">
-                            </div> -->
-                        </div>
-                        <br>
-                        <!-- <div class="row d-md-flex data-row-header">
-                            <div class="col-4 col-md-4 py-3 d-flex verticle-content-middle">Year of indent :
-                                {{year?year:'2022'}}</div>
-                            <div class="col-4 col-md-4 py-3 d-flex verticle-content-middle">Crop Group :
-                                {{group_code?group_code:'BULB VEGETABLES'}}</div>
-                            
-
-                            <div class="col-4 col-md-4 py-3 d-flex justify-content-end">As on Date: {{todayData
-                                | date:"dd-MM-YYYY"}}</div>
-
-                        </div>
-
-                        <div class="middle_line"></div> -->
-
-                        <div class="row data-row">
-                            <table class="table table-bordered table-responsive">
-                                <thead>
-                                    <tr class="data-row-header">
-                                        <th scope="col" class="col-md-0 py-3 sn-report">S/N</th>
-                                        <th scope="col" class="col-md-4 py-3">Crop Group</th>
-                                        <th scope="col" class="col-md-6 py-3">Crop Name</th>
-                                        <th scope="col" class="col-md-6 py-3">Maximum LOT Size</th>
-                                    </tr>
-                                </thead>
-                                <tbody *ngFor="let data of filterPaginateSearch.itemList; let dataIndex=index">
-                                    <tr>
-                                        <td>
-                                            <span>{{ (filterPaginateSearch.itemListCurrentPage - 1) *
-                                                filterPaginateSearch.itemListPageSize + dataIndex + 1}}.</span>
-                                        </td>
-                                        <td>
-
-                                            <span style="cursor: pointer;" data-toggle="tooltip"
-                                                data-placement="bottom" title="{{data && data.m_crop && data.m_crop.m_crop_group
-                                                    && data.m_crop.m_crop_group.group_name ?
-                                            (data.m_crop.m_crop_group.group_name|uppercase) : 'NA'}}">{{data && data.m_crop && data.m_crop.m_crop_group
-                                                        && data.m_crop.m_crop_group.group_name ?
-                                                (data.m_crop.m_crop_group.group_name|uppercase) : 'NA'}}</span>
-                                        </td>
-                                        <td>
-
-                                            <span style="cursor: pointer;" data-toggle="tooltip"
-                                                data-placement="bottom" title="{{data && data.m_crop && data.m_crop.crop_name ?
-                                                    (data.m_crop.crop_name|uppercase) : 'NA'}}">{{data && data.m_crop && data.m_crop.crop_name ?
-                                                (data.m_crop.crop_name|uppercase) : 'NA'}}</span>
-                                        </td>
-                                        <td>
-
-                                            <span style="cursor: pointer;" data-toggle="tooltip"
-                                                data-placement="bottom" title="{{data && data.max_lot_size ?
-                                                    data.max_lot_size :'NA'}} {{data.crop_code.split('')[0] == 'H' ? 'Kg':
-                                                    'Quintal'}}">{{data && data.max_lot_size ?
-                                                data.max_lot_size :'NA'}} {{data.crop_code.split('')[0] == 'H' ? 'Kg':
-                                                'Quintal'}}</span>
-                                        </td>
-
-
-
-                                    </tr>
-
-                                </tbody>
-                            </table>
-                        </div>
-
-
-
-                    </div>
-                </div>
-
-
-                <div class="col-12 px-3   py-3">
-                    <app-pagination-ui></app-pagination-ui>
-                    <!-- <div _ngcontent-col-c109="" class="w-fit-content pr-2 d-block d-lg-inline-flex"><button _ngcontent-col-c109="" class="prev-paginate page-numbers d-inline-flex justify-content-center verticle-content-middle mx-2"><i _ngcontent-col-c109="" class="fal fa-less-than"></i></button><div _ngcontent-col-c109="" class="page-number-wrapper d-inline-flex py-2 py-lg-0"><button _ngcontent-col-c109="" class="page-numbers mx-2 active" ng-reflect-ng-class="active"> 1 </button><button _ngcontent-col-c109="" class="page-numbers mx-2" ng-reflect-ng-class=""> 2 </button>
-                    </div><div _ngcontent-col-c109="" class="enter-page-wrapper d-inline-flex mx-2"><input _ngcontent-col-c109="" placeholder="Enter Page No." formcontrolname="enterPage" class="px-2 ng-untouched ng-pristine ng-valid" ng-reflect-name="enterPage" ng-reflect-ng-class=""><button _ngcontent-col-c109="" class="page-numbers active">Go</button></div></div> -->
-                </div>
-                <div *ngIf="filterPaginateSearch && filterPaginateSearch.initialized &&(!filterPaginateSearch.itemList || filterPaginateSearch.itemList.length < 1)"
-                    class="px-2 py-3 w-100" style="height: 50px;">
-
-                    <div class="d-flex verticle-content-middle justify-content-center w-100">
-                        No Data Found.
-                    </div>
-                </div>
-            </div>
+      <div class="main-content-form-wrapper px-0 py-2">
+  
+        <!-- <div class="col-md-12 pb-2">
+          <span class="heading_notofied">Crop Wise Maximum LOT Size</span>
+        </div> -->
+  
+        <div class="col-12 d-flex justify-content-start mb-0 filting">
+          <button class="filter-btn" (click)="toggleFilter()">
+            <i class="fa fa-filter"></i> Filter Options
+          </button>
         </div>
+  
+        <div class="row">
+          <div *ngIf="showFilter" class="w-100">
+            <form [formGroup]="ngForm">
+              <div class="col-12 px-4 mt-2">
+                <div class="row">
+  
+                  <div class="col-md-2 pl-4 pb-0"
+                       style="font: normal normal 600 20px/30px Poppins; letter-spacing: 0px; color: #1C1C1C;">
+                  </div>
+  
+                  <div class="col-md-4 pl-4 pb-0"
+                       style="font: normal normal 600 20px/30px Poppins; letter-spacing: 0px; color: #1C1C1C;">
+                  </div>
+  
+                  <div class="col-12 pt-1 pt-md-0 pl-3">
+                    <div class="row">
+  
+                      <!-- Crop Group -->
+                      <div class="col-12 col-md-4 pl-0 pr-2 pl-md-2 mt-0 mt-md-2 pr-md-0">
+                        <div class="col-12 mt-0 ml-0">
+                          <label for="Crop Group" class="search_txt">Crop Group</label>
+                        </div>
+                        <div class="col-12 ml-0 pr-2 pr-md-0">
+                          <div ngbDropdown class="d-inline-block w-100">
+                            <button class="btn takeplacholder w-100 crop toggle-button"
+                                    id="crop_group"
+                                    ngbDropdownToggle
+                                    style="text-align: left;">
+                              {{selectCrop && (selectCrop.length>30) ? (selectCrop.substring(0,30)+'...') : selectCrop ? selectCrop :'Select Crop Group'}}
+                            </button>
+                            <div class="dropdown-menu w-100"
+                                 ngbDropdownMenu="crop_group"
+                                 aria-labelledby="sortMenu">
+                              <input type="text" class="form-control px-4" formControlName="crop_text" (click)="cropdatatext()" >
+                              <button class="dropdown-item"
+                                      (click)="cropGroup({ group_code: 'All', group_name: 'All' })"
+                                      #dropdownItem
+                                      [attr.data-parent-name]="'crop_group'">
+                                All
+                              </button>
+                              <button class="dropdown-item"
+                                      *ngFor="let data of seasonList"
+                                      (click)="cropGroup(data)"
+                                      #dropdownItem
+                                      [attr.data-parent-name]="'crop_group'">
+                                {{data && data.group_name ? data.group_name :''}}
+                              </button>
+                            </div>
+                          </div>
+                          <div class="pl-0 toggle-button" ngbDropdown>
+                            <i class="fa-solid fa-angle-down downicon" (click)="cgClick()"></i>
+                          </div>
+                        </div>
+                        <div class="pl-0 toggle-button" ngbDropdown>
+                          <img src="assets/images/16.svg" alt="" srcset="">
+                        </div>
+                      </div>
+  
+                      <!-- Crop Name -->
+                      <div class="col-12 col-md-4 pl-0 pr-2 mt-0 mt-md-2 pr-md-0">
+                        <div class="col-12 mt-0 ml-0">
+                          <label for="Crop Group" class="search_txt">Crop Name</label>
+                        </div>
+                        <div class="col-12 ml-0 pr-2 pr-md-0">
+                          <div ngbDropdown class="d-inline-block w-100">
+                            <button class="btn takeplacholder w-100 crop toggle-button"
+                                    id="crop_name"
+                                    ngbDropdownToggle
+                                    [disabled]="!selectCrop"
+                                    [ngClass]="{'disabled-dropdown': !selectCrop}"
+                                    style="text-align: left;">
+                              {{selectCrop_name && (selectCrop_name.length>30) ? (selectCrop_name.substring(0,30)+'...') : selectCrop_name ? selectCrop_name :'Select Crop Name'}}
+                            </button>
+                            <div *ngIf="isCropName"
+                                 class="dropdown-menu w-100"
+                                 ngbDropdownMenu="crop_name"
+                                 aria-labelledby="sortMenu">
+                              <input type="text" class="form-control px-4" formControlName="name_text" (click)="cropnametext()">
+                              <button class="dropdown-item"
+                                      (click)="crop_name({ 'm_crop.crop_code': 'All', 'm_crop.crop_name': 'All' })"
+                                      #dropdownItem
+                                      [attr.data-parent-name]="'cropName'">
+                                All
+                              </button>
+                              <button class="dropdown-item"
+                                      (click)="crop_name(data)"
+                                      *ngFor="let data of getCropNameListArr"
+                                      #dropdownItem
+                                      [attr.data-parent-name]="'cropName'">
+                                {{data && data['m_crop.crop_name'] ? data['m_crop.crop_name'] :''}}
+                              </button>
+                            </div>
+                          </div>
+                          <div class="pl-0 toggle-button" ngbDropdown>
+                            <i class="fa-solid fa-angle-down downicon" (click)="cnclick()"></i>
+                          </div>
+                        </div>
+                        <div class="pl-0 toggle-button" ngbDropdown>
+                          <img src="assets/images/16.svg" alt="" srcset="">
+                        </div>
+                      </div>
+  
+                    </div>
+                  </div>
+  
+                  <div class="col-12 px-4">
+                    <hr class="separator m-0">
+                  </div>
+  
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+  
+        <!-- Table for Excel Download Start -->
+        <table id="excel-table" style="display: none;">
+          <tr>
+            <td>Crop Wise Maximum LOT Size</td>
+          </tr>
+          <tr>
+            <td>Crop Group</td>
+            <td>Crop Name</td>
+          </tr>
+          <tr>
+            <td>{{selectCrop ? selectCrop :''}}</td>
+            <td>{{selectCrop_name ? selectCrop_name :''}}</td>
+          </tr>
+          <thead>
+            <tr>
+              <th scope="col" class="col-md-0 py-3">S/N</th>
+              <th scope="col" class="col-md-2 py-3">Crop Group</th>
+              <th scope="col" class="col-md-5 py-3">Crop Name</th>
+              <th scope="col" class="col-md-5 py-3">Maximum LOT Size</th>
+            </tr>
+          </thead>
+          <tbody *ngFor="let data of completeData; let dataIndex=index">
+            <tr>
+              <td><span>{{dataIndex + 1}}.</span></td>
+              <td>
+                <span style="cursor: pointer;" data-toggle="tooltip" data-placement="bottom"
+                      title="{{data && data.m_crop && data.m_crop.m_crop_group && data.m_crop.m_crop_group.group_name ? (data.m_crop.m_crop_group.group_name|uppercase) : 'NA'}}">
+                  {{data && data.m_crop && data.m_crop.m_crop_group && data.m_crop.m_crop_group.group_name ? (data.m_crop.m_crop_group.group_name|uppercase) : 'NA'}}
+                </span>
+              </td>
+              <td>
+                <span style="cursor: pointer;" data-toggle="tooltip" data-placement="bottom"
+                      title="{{data && data.crop ? data.crop : 'NA'}}">
+                  {{data && data.crop ? data.crop : 'NA'}}
+                </span>
+              </td>
+              <td>
+                <span style="cursor: pointer;" data-toggle="tooltip" data-placement="bottom"
+                      title="{{data && data.max_lot_size ? data.max_lot_size :'NA'}} {{data.crop_code.split('')[0] == 'H' ? 'Kg': 'Quintal'}}">
+                  {{data && data.max_lot_size ? data.max_lot_size :'NA'}} {{data.crop_code.split('')[0] == 'H' ? 'Kg': 'Quintal'}}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <!-- Table for Excel Download End -->
+  
+        <div class="col-12 px-4">
+          <div class="list-wrapper px-2 py-3">
+  
+            <div class="row d-md-flex data-row-header extra-header">
+              <div class="col-12 col-md-12 py-3 d-flex justify-content-between align-items-center text-white">
+                <div class="mx-auto">Crop Wise Maximum LOT Size</div>
+                <div>(Total: {{ totalIndenters }})</div>
+              </div>
+            </div>
+  
+            <div class="col-12 col-sm-12 col-md-12 col-lg-12 pt-3">
+              <div class="search-export-container mb-2">
+                <input type="text"
+                       class="form-control search-input input1"
+                       placeholder="Search"
+                       [(ngModel)]="searchTerm"
+                       (input)="onSearch()" />
+                <div class="dropdown float-right export_dropdown drop1">
+                  <button type="button" (click)="myFunction()"
+                          class="form-button search ml-1 d-inline-flex justify-content-center verticle-content-middle mb-2 mx-0"
+                          style="font-size: 87%;">Export To &nbsp;<i class="fa fa-angle-down" aria-hidden="true"> </i>
+                  </button>
+                  <div id="myDropdown" class="dropdown-content">
+                    <a (click)="download()">
+                      <img src="assets\icons\pdf-icon.png" alt="" width="20px" height="20px"> PDF
+                    </a>
+                    <a (click)="exportexcel()">
+                      <img src="assets\icons\excel.jpg" alt="" width="20px"> Excel
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            <br>
+  
+            <div class="row data-row">
+              <table class="table table-bordered table-responsive">
+                <thead>
+                  <tr class="data-row-header">
+                    <th scope="col" class="col-md-0 py-3 sn-report">S/N</th>
+                    <th scope="col" class="col-md-4 py-3">Crop Group</th>
+                    <th scope="col" class="col-md-6 py-3">Crop Name</th>
+                    <th scope="col" class="col-md-6 py-3">Maximum LOT Size</th>
+                  </tr>
+                </thead>
+                <tbody *ngFor="let data of completeData; let dataIndex=index">
+                  <tr>
+                    <td><span>{{ dataIndex + 1}}.</span></td>
+                    <td>
+                      <span style="cursor: pointer;" data-toggle="tooltip" data-placement="bottom"
+                            title="{{data && data.m_crop && data.m_crop.m_crop_group && data.m_crop.m_crop_group.group_name ? (data.m_crop.m_crop_group.group_name|uppercase) : 'NA'}}">
+                        {{data && data.m_crop && data.m_crop.m_crop_group && data.m_crop.m_crop_group.group_name ? (data.m_crop.m_crop_group.group_name|uppercase) : 'NA'}}
+                      </span>
+                    </td>
+                    <td>
+                      <span style="cursor: pointer;" data-toggle="tooltip" data-placement="bottom"
+                            title="{{data && data.m_crop && data.m_crop.crop_name ? (data.m_crop.crop_name|uppercase) : 'NA'}}">
+                        {{data && data.m_crop && data.m_crop.crop_name ? (data.m_crop.crop_name|uppercase) : 'NA'}}
+                      </span>
+                    </td>
+                    <td>
+                      <span style="cursor: pointer;" data-toggle="tooltip" data-placement="bottom"
+                            title="{{data && data.max_lot_size ? data.max_lot_size :'NA'}} {{data.crop_code.split('')[0] == 'H' ? 'Kg': 'Quintal'}}">
+                        {{data && data.max_lot_size ? data.max_lot_size :'NA'}} {{data.crop_code.split('')[0] == 'H' ? 'Kg': 'Quintal'}}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+  
+          </div>
+        </div>
+  
+        <div class="col-12 px-3 py-3">
+          <!-- <app-pagination-ui></app-pagination-ui> -->
+        </div>
+  
+        <div *ngIf="completeData && completeData.length < 1"
+             class="px-2 py-3 w-100" style="height: 50px;">
+          <div class="d-flex verticle-content-middle justify-content-center w-100">
+            No Data Found.
+          </div>
+        </div>
+  
+      </div>
     </div>
-</div>
+  </div>
+  

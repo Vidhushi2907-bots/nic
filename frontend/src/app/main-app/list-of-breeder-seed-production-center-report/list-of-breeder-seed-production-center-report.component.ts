@@ -16,7 +16,7 @@ import * as html2PDF from 'html2pdf.js';
 import Swal from 'sweetalert2';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { timer } from 'rxjs';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+//pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import { MasterService } from 'src/app/services/master/master.service';
 // import { saveAs } from 'file-saver';
 
@@ -38,11 +38,12 @@ export class ListOfBreederSeedProductionCenterReportComponent implements OnInit 
   response_crop_group: any = [];
   data: any;
   data1: any;
+  showFilter: boolean = false;
+  totalIndenters: number = 0;
   custom_array: any[];
   finalData: any[];
   fileName = 'list-of-breeder-seed-production-center-report.xlsx';
-  // fileName = 'list-of-breeder-seed-production-center-report.xlsx';
-  yearOfIndent: any = [
+ yearOfIndent: any = [
 
   ];
   year: any;
@@ -51,14 +52,14 @@ export class ListOfBreederSeedProductionCenterReportComponent implements OnInit 
   isSearch: boolean = false;
   todayData = new Date();
   tableId: any[];
-
-  allData: any;
+    searchText: string = '';
+  allData: any[] = []; 
+  exportdata: any[] = []; 
 
   state_data: any;
   breeder_data: any;
   breeder_data_district: any;
   breeder_data_name: any;
-  exportdata: any;
   selected_state: any;
   selected_district: any;
   selected_agency: any;
@@ -68,6 +69,8 @@ export class ListOfBreederSeedProductionCenterReportComponent implements OnInit 
   breeder_data_name_second: any;
   disabledfieldAgency = true;
   submited = false;
+  masterData: any[];
+  completeData: any[];
 
   constructor(private breederService: BreederService, private fb: FormBuilder, private service: SeedServiceService, private router: Router, private masterService: MasterService) { this.createEnrollForm(); }
   createEnrollForm() {
@@ -100,59 +103,88 @@ export class ListOfBreederSeedProductionCenterReportComponent implements OnInit 
 
       }
     })
+    // this.ngForm.controls['state_text'].valueChanges.subscribe(newValue => {
+    //   if (newValue) {
+    //     console.log(newValue)
+    //     this.state_data = this.state_data_second
+    //     let response = this.state_data.filter(x => x.state_name.toLowerCase().startsWith(newValue.toLowerCase()))
+    //     this.state_data = response
+    //   }
+    //   else {
+    //     this.getState()
+    //   }
+    // });
     this.ngForm.controls['state_text'].valueChanges.subscribe(newValue => {
-      if (newValue) {
-        console.log(newValue)
-        this.state_data = this.state_data_second
-        let response = this.state_data.filter(x => x.state_name.toLowerCase().startsWith(newValue.toLowerCase()))
-        this.state_data = response
-      }
-      else {
-        this.getState()
-      }
-    });
+  if (newValue) {
+    this.state_data = this.state_data_second;
+    let response = this.state_data.filter(x =>
+      x.state_name.toLowerCase().includes(newValue.toLowerCase())  
+    );
+    this.state_data = response;
+  } else {
+    this.getState();
+  }
+});
+    // this.ngForm.controls['agency_text'].valueChanges.subscribe(newValue => {
+    //   if (newValue) {
+    //     this.breeder_data_name = this.breeder_data_name_second
+    //     let response = this.breeder_data_name.filter(x => x.name.toLowerCase().startsWith(newValue.toLowerCase()))
+
+    //     this.breeder_data_name = response
+
+    //   }
+    //   else {
+    //     this.getBspcReportName(this.ngForm.controls['district'].value)
+
+    //   }
+    // });
     this.ngForm.controls['agency_text'].valueChanges.subscribe(newValue => {
-      if (newValue) {
-        this.breeder_data_name = this.breeder_data_name_second
-        let response = this.breeder_data_name.filter(x => x.name.toLowerCase().startsWith(newValue.toLowerCase()))
+  if (newValue) {
+    this.breeder_data_name = this.breeder_data_name_second;
+    let response = this.breeder_data_name.filter(x =>
+      x.name.toLowerCase().includes(newValue.toLowerCase()) 
+    );
+    this.breeder_data_name = response;
+  } else {
+    this.getBspcReportName(this.ngForm.controls['district'].value);
+  }
+});
+    // this.ngForm.controls['district_text'].valueChanges.subscribe(newValue => {
+    //   if (newValue) {
+    //     console.log(newValue)
+    //     this.breeder_data_district = this.breeder_data_district_second
+    //     let response = this.breeder_data_district.filter(x => x.agency_detail.m_district.district_name.toLowerCase().startsWith(newValue.toLowerCase()))
 
-        this.breeder_data_name = response
+    //     this.breeder_data_district = response
 
-      }
-      else {
-        this.getBspcReportName(this.ngForm.controls['district'].value)
+    //   }
+    //   else {
+    //     this.getBspcReportDistrict(this.ngForm.controls['state'].value)
 
-      }
-    });
+    //   }
+    // });
+
     this.ngForm.controls['district_text'].valueChanges.subscribe(newValue => {
-      if (newValue) {
-        console.log(newValue)
-        this.breeder_data_district = this.breeder_data_district_second
-        let response = this.breeder_data_district.filter(x => x.agency_detail.m_district.district_name.toLowerCase().startsWith(newValue.toLowerCase()))
-
-        this.breeder_data_district = response
-
-      }
-      else {
-        this.getBspcReportDistrict(this.ngForm.controls['state'].value)
-
-      }
-    });
+  if (newValue) {
+    this.breeder_data_district = this.breeder_data_district_second;
+    let response = this.breeder_data_district.filter(x =>
+      x.agency_detail.m_district.district_name.toLowerCase().includes(newValue.toLowerCase())  // ✅ contains search
+    );
+    this.breeder_data_district = response;
+  } else {
+    this.getBspcReportDistrict(this.ngForm.controls['state'].value);
+  }
+});
   }
   ngOnInit(): void {
-    // localStorage.setItem('logined_user', "Seed");
-    // if (!localStorage.getItem('foo')) {
-    //   localStorage.setItem('foo', 'no reload')
-    //   location.reload()
-    // } else {
-    //   localStorage.removeItem('foo')
-    // }
+
 
     this.getState();
     this.getBreeder();
     this.getPageData();
 
     this.runExcelApi();
+    this.getPageData();
 
   }
 
@@ -197,12 +229,125 @@ export class ListOfBreederSeedProductionCenterReportComponent implements OnInit 
         }
       });
   }
+  //   onSearch(): void {
+  //   const lowerSearch = this.searchText.toLowerCase().trim();
+
+  //   if (!lowerSearch) {
+  //     this.applyFilter(this.allData);
+  //     return;
+  //   }
+    
+
+  //   const filteredData = this.allData.filter((item: any) => {
+  //     return (
+  //       (item.agency_detail?.agency_name?.toLowerCase().includes(lowerSearch)) ||
+  //       (item.name?.toLowerCase().includes(lowerSearch)) ||
+  //       (item.code?.toLowerCase().includes(lowerSearch)) ||
+  //       (item.agency_detail?.m_state?.state_name?.toLowerCase().includes(lowerSearch)) ||
+  //       (item.agency_detail?.m_district?.district_name?.toLowerCase().includes(lowerSearch)) ||
+  //       (item.agency_detail?.address?.toLowerCase().includes(lowerSearch)) ||
+  //       (item.agency_detail?.contact_person_name?.toLowerCase().includes(lowerSearch)) ||
+  //       (item.agency_detail?.m_designation?.name?.toLowerCase().includes(lowerSearch)) ||
+  //       (item.mobile_number?.toLowerCase().includes(lowerSearch)) ||
+  //       (item.email_id?.toLowerCase().includes(lowerSearch))
+  //     );
+  //   });
+
+  //   this.applyFilter(filteredData);
+  // }
+
+  onSearch1() {
+
+    console.log("---22-2-2-2-2-2-22-2-- TExttttt")
+  const lowerSearch = this.searchText.toLowerCase().trim();
+
+  let filtered = this.exportdata; 
+
+  
+  if (this.selected_state) {
+    filtered = filtered.filter(item => item.agency_detail?.m_state?.state_name === this.selected_state);
+  }
+  if (this.selected_district) {
+    filtered = filtered.filter(item => item.agency_detail?.m_district?.district_name === this.selected_district);
+  }
+  if (this.selected_agency) {
+    filtered = filtered.filter(item => item.agency_detail?.agency_name === this.selected_agency);
+  }
+  if (lowerSearch) {
+    filtered = filtered.filter(item =>
+      item.agency_detail?.agency_name?.toLowerCase().includes(lowerSearch) ||
+      item.name?.toLowerCase().includes(lowerSearch) ||
+      item.code?.toLowerCase().includes(lowerSearch)
+      // add other fields as needed
+    );
+  }
+
+  this.applyFilter(filtered); 
+}
+
+onSearch(): void {
+  if (!this.searchText || this.searchText.trim() === '') {
+    // ✅ Reset data if search is empty
+    this.completeData = [...this.masterData];
+    console.log("---Complete Data", this.completeData);
+  } else {
+    const lower = this.searchText.toLowerCase();
+
+    this.completeData = this.masterData.filter(item => {
+      const agency = item.agency_detail || {};
+
+      return (
+        (agency.agency_name && agency.agency_name.toLowerCase().includes(lower)) ||
+        (agency.short_name && agency.short_name.toLowerCase().includes(lower)) ||
+        (agency.m_state?.state_name && agency.m_state.state_name.toLowerCase().includes(lower)) ||
+        (agency.m_district?.district_name && agency.m_district.district_name.toLowerCase().includes(lower)) ||
+        (agency.address && agency.address.toLowerCase().includes(lower)) ||
+        (agency.contact_person_name && agency.contact_person_name.toLowerCase().includes(lower)) ||
+        (agency.m_designation?.name && agency.m_designation.name.toLowerCase().includes(lower)) ||
+        (item.mobile_number && item.mobile_number.toLowerCase().includes(lower)) ||
+        (item.email_id && item.email_id.toLowerCase().includes(lower)) ||
+        (item.code && item.code.toLowerCase().includes(lower))
+      );
+    });
+  }
+}
+
+    applyFilter(data: any[]): void {
+    this.filterPaginateSearch.Init(
+      data,
+      this,
+      "getPageData",
+      undefined,
+      data.length,
+      true
+    );
+    this.initSearchAndPagination();
+  }
+
+
+
+  initSearchAndPagination() {
+        if (this.paginationUiComponent === undefined) {
+      setTimeout(() => {
+        this.initSearchAndPagination();
+      }, 300);
+      return;
+    }
+
+    this.paginationUiComponent.Init(this.filterPaginateSearch);
+    if (this.paginationUiComponent === undefined) {
+      setTimeout(() => this.initSearchAndPagination(), 300);
+      return;
+    }
+    this.paginationUiComponent.Init(this.filterPaginateSearch);
+  }
   getBspcReportName(newValue) {
     // this.breeder_data = []
     const param = {
       search: {
         district_id: newValue,
-        state_id: this.ngForm.controls['state'].value
+        state_id: this.ngForm.controls['state'].value,
+        isRepott : true,
       }
     }
     this.service
@@ -211,23 +356,26 @@ export class ListOfBreederSeedProductionCenterReportComponent implements OnInit 
         if (apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.data) {
           this.breeder_data_name = apiResponse.EncryptedResponse.data.rows;
           this.breeder_data_name_second = this.breeder_data_name
-
-          // this.breeder_data_district =  this.breeder_data_district.filter((arr, index, self) =>
-          // index === self.findIndex((t) => (t.agency_detail.m_district.district_name === arr.agency_detail.m_district.district_name )))
         }
       });
   }
 
   getPageData(loadPageNumberData: number = 1, searchData: any | undefined = undefined) {
+        this.allData = this.exportdata;
+    this.applyFilter(this.allData);
     searchData = {
       isSearch: false,
+      isReport : true,
+
     }
+   
 
     this.masterService
       .postRequestCreator("getListOfBreederSeedProductionforReports?usertype=BPC", null, {
         page: loadPageNumberData,
         pageSize: this.filterPaginateSearch.itemListPageSize || 50,
-        searchData: searchData
+        searchData: searchData,
+        
       })
       .subscribe((apiResponse: any) => {
         if (apiResponse !== undefined
@@ -235,26 +383,29 @@ export class ListOfBreederSeedProductionCenterReportComponent implements OnInit 
           && apiResponse.EncryptedResponse.status_code == 200) {
           this.filterPaginateSearch.itemListPageSize = 50;
           this.allData = apiResponse.EncryptedResponse.data.rows;
+          this.masterData = [...this.allData];
+          this.completeData = [...apiResponse.EncryptedResponse.data.rows]; 
           if (this.allData === undefined) {
             this.allData = [];
           }
           console.log(this.allData)
+          this.totalIndenters = apiResponse.EncryptedResponse.data.count;
           this.filterPaginateSearch.Init(this.allData, this, "getPageData", undefined, apiResponse.EncryptedResponse.data.count, true);
           this.initSearchAndPagination();
         }
       });
   }
 
-  initSearchAndPagination() {
-    if (this.paginationUiComponent === undefined) {
-      setTimeout(() => {
-        this.initSearchAndPagination();
-      }, 300);
-      return;
-    }
+  // initSearchAndPagination() {
+  //   if (this.paginationUiComponent === undefined) {
+  //     setTimeout(() => {
+  //       this.initSearchAndPagination();
+  //     }, 300);
+  //     return;
+  //   }
 
-    this.paginationUiComponent.Init(this.filterPaginateSearch);
-  }
+  //   this.paginationUiComponent.Init(this.filterPaginateSearch);
+  // }
 
   submit(loadPageNumberData: number = 1, searchData: any | undefined = undefined) {
     this.submited = true;
@@ -309,8 +460,6 @@ export class ListOfBreederSeedProductionCenterReportComponent implements OnInit 
     this.selected_state = '';
     this.disabledfieldDist = true;
     this.disabledfieldAgency = true;
-    // district: [''],
-    // production_name:['']
 
     this.getPageData();
     this.filterPaginateSearch.itemListCurrentPage = 1;
@@ -367,62 +516,13 @@ export class ListOfBreederSeedProductionCenterReportComponent implements OnInit 
       });
   }
 
-  exportexcel(): void {
-    /* pass here the table id */
-    let element = document.getElementById('excel-table');
-    // const ws: XLSX.WorkSheet = XLSX.utils.table_to_sheet(element);
-
-    // /* generate workbook and add the worksheet */
-    // const wb: XLSX.WorkBook = XLSX.utils.book_new();
-    // XLSX.utils.book_append_sheet(wb, ws, 'list_of_breeder_seed_production_center');
-
-    // let element = document.getElementById('excel-table-data');
+  exportexcel(): void {    let element = document.getElementById('excel-table');
     const ws: XLSX.WorkSheet = XLSX.utils.table_to_sheet(element);
 
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
 
     XLSX.writeFile(wb, this.fileName);
-
-    // /* save to file */
-    // XLSX.writeFile(wb, this.fileName);
-    // let arrResponse = []
-    // let response = this.exportdata.forEach((element, index) => {
-    //   const temp = {
-
-    //     'S/N': index + 1,
-    //     'Name of Bspc': element && element.agency_detail && element.agency_detail.agency_name ? element.agency_detail.agency_name : 'NA',
-    //     'Short Name': element && element.name ? element.name : 'NA',
-    //     'BSPC Code': element && element.code ? element.code : 'NA',
-    //     'State': element && element.agency_detail && element.agency_detail.m_state && element.agency_detail.m_state.state_name ? element.agency_detail.m_state.state_name : "NA",
-    //     'District': element && element.agency_detail && element.agency_detail.m_district && element.agency_detail.m_district.district_name ? element.agency_detail.m_district.district_name : "NA",
-    //     'Longitude': element && element.agency_detail && element.agency_detail.longitude ? element.agency_detail.longitude : 'NA',
-    //     'Latitude': element && element.agency_detail && element.agency_detail.latitude ? element.agency_detail.latitude : "NA",
-    //     'Address': element && element.agency_detail && element.agency_detail.address ? element.agency_detail.address : "NA",
-    //     'Contact Person Name': element && element.agency_detail && element.agency_detail.contact_person_name ? element.agency_detail.contact_person_name : 'NA',
-    //     'Mobile Number': element && element.mobile_number ? element.mobile_number : 'NA',
-    //     Email: element && element.email_id ? element.email_id : "NA",
-    //     'Contact Person Designation': element && element.agency_detail && element.agency_detail.m_designation && element.agency_detail.m_designation.name ? element.agency_detail.m_designation.name : 'NA',
-    //     Status: element && element.agency_detail &&
-    //       element.agency_detail.is_active && element.agency_detail.is_active == 1 ? 'ACTIVE' : 'INACTIVE'
-    //   }
-    //   arrResponse.push(temp)
-
-    // });
-
-    // const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(arrResponse);
-    // const titleRow = XLSX.utils.sheet_add_aoa(worksheet, [['reportTitle']], { origin: 'A1' });
-    // const workbook: XLSX.WorkBook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
-    // const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-
-
-    // // Save the file with the desired name
-    // const fileName = 'data.xlsx';
-    // const file = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    // //  saveAs(file, fileName);
-
-    // XLSX.writeFile(workbook, fileName)
-
   }
 
   download() {
@@ -445,7 +545,7 @@ export class ListOfBreederSeedProductionCenterReportComponent implements OnInit 
     };
     html2PDF().set(options).from(element).toPdf().save();
   }
-  downloadPdf(): void {
+  downloadP(): void {
     let reportDataHeader1 = [
       "List of Breeder Seed Production Center"
     ];
@@ -458,8 +558,6 @@ export class ListOfBreederSeedProductionCenterReportComponent implements OnInit 
         'BSPC Code',
         'State',
         'District',
-        // 'Longitude',
-        // 'Latitude',
         'Address',
         'Contact Person Name',
         'Contact Person Designation',
@@ -469,7 +567,7 @@ export class ListOfBreederSeedProductionCenterReportComponent implements OnInit 
       ];
 
     let arrResponse = []
-      let response = this.exportdata.forEach((element, index) => {
+      let response = this.completeData.map((element, index) => {
         const temp = {
 
           'S/N': index + 1,
@@ -478,8 +576,6 @@ export class ListOfBreederSeedProductionCenterReportComponent implements OnInit 
           'BSPC Code': element && element.code ? element.code : 'NA',
           'State': element && element.agency_detail && element.agency_detail.m_state && element.agency_detail.m_state.state_name ? element.agency_detail.m_state.state_name : "NA",
           'District': element && element.agency_detail && element.agency_detail.m_district && element.agency_detail.m_district.district_name ? element.agency_detail.m_district.district_name : "NA",
-          // 'Longitude':element && element.agency_detail && element.agency_detail.longitude ? element.agency_detail.longitude :'NA' ,
-          // 'Latitude':element && element.agency_detail && element.agency_detail.latitude ? element.agency_detail.latitude :"NA" ,
           'Address': element && element.agency_detail && element.agency_detail.address ? element.agency_detail.address : "NA",
           'Contact Person Name': element && element.agency_detail && element.agency_detail.contact_person_name ? element.agency_detail.contact_person_name : 'NA',
           'Mobile Number': element && element.mobile_number ? element.mobile_number : 'NA',
@@ -508,14 +604,10 @@ export class ListOfBreederSeedProductionCenterReportComponent implements OnInit 
 
     const docDefinition = {
       pageOrientation: 'landscape',
-      // pageSize: {
-      //   width: 1800,
-      //   height: 600,
-      // },
       text: [
-        { text: 'Text 1', fontSize: 18, bold: true, color: 'blue' },
-        { text: ' Text 2', fontSize: 14, italic: true, color: 'green' },
-        { text: ' Text 3', fontSize: 12, decoration: 'underline', color: 'red' }
+        // { text: 'Text 1', fontSize: 18, bold: true, color: 'blue' },
+        // { text: ' Text 2', fontSize: 14, italic: true, color: 'green' },
+        // { text: ' Text 3', fontSize: 12, decoration: 'underline', color: 'red' }
       ],
       content: [
         { text: 'List of Breeder Seed Production Center', style: 'header' },
@@ -556,50 +648,167 @@ export class ListOfBreederSeedProductionCenterReportComponent implements OnInit 
     //Pdf code end
   }
 
-  state_select(data) {
-    this.selected_state = data && data.state_name ? data.state_name : '';
-    this.ngForm.controls['state'].setValue(data && data.state_code ? data.state_code : '')
-    // this.ngForm.controls['state_text'].setValue('',{eventEmitter:false})
-    if (this.ngForm.controls['state_text'].value) {
-      this.ngForm.controls['state_text'].setValue('', { eventEmitter: false })
-    }
-  }
+  // state_select(data) {
+  //   this.selected_state = data && data.state_name ? data.state_name : '';
+  //   this.ngForm.controls['state'].setValue(data && data.state_code ? data.state_code : '')
+  //   // this.ngForm.controls['state_text'].setValue('',{eventEmitter:false})
+  //   if (this.ngForm.controls['state_text'].value) {
+  //     this.ngForm.controls['state_text'].setValue('', { eventEmitter: false })
+  //   }
+  // }
 
   cnClick() {
     document.getElementById('state').click();
   }
 
-  district_select(data) {
-    console.log('daata====>', data)
-    this.selected_district = data && data.agency_detail && data.agency_detail.m_district && data.agency_detail.m_district.district_name ?
-      data.agency_detail.m_district.district_name : '';
-    if (this.ngForm.controls['district_text'].value) {
-      this.ngForm.controls['district_text'].setValue('')
+  // district_select(data) {
+  //   console.log('daata====>', data)
+  //   this.selected_district = data && data.agency_detail && data.agency_detail.m_district && data.agency_detail.m_district.district_name ?
+  //     data.agency_detail.m_district.district_name : '';
+  //   if (this.ngForm.controls['district_text'].value) {
+  //     this.ngForm.controls['district_text'].setValue('')
 
-    }
-    this.ngForm.controls['district'].setValue(data && data.agency_detail && data.agency_detail.m_district && data.agency_detail.m_district.district_code ?
-      data.agency_detail.m_district.district_code : '')
-  }
+  //   }
+  //   this.ngForm.controls['district'].setValue(data && data.agency_detail && data.agency_detail.m_district && data.agency_detail.m_district.district_code ?
+  //     data.agency_detail.m_district.district_code : '')
+  // }
 
   cdClick() {
     document.getElementById('district').click();
   }
 
-  agency_select(data) {
-    console.log(data)
-    this.selected_agency = data && data.agency_name ? data.agency_name : '';
-    this.ngForm.controls['production_name'].setValue(data && data.agency_name ? data.agency_name : '')
-    if (this.ngForm.controls['agency_text'].value) {
-      this.ngForm.controls['agency_text'].setValue('')
+  // agency_select(data) {
+  //   console.log(data)
+  //   this.selected_agency = data && data.agency_name ? data.agency_name : '';
+  //   this.ngForm.controls['production_name'].setValue(data && data.agency_name ? data.agency_name : '')
+  //   if (this.ngForm.controls['agency_text'].value) {
+  //     this.ngForm.controls['agency_text'].setValue('')
 
-    }
-  }
+  //   }
+  // }
   caClick() {
     document.getElementById('agency').click();
   }
 
 
+toggleFilter() {
+  this.showFilter = !this.showFilter;
+}
+state_select(data: any) {
+  if (!data) { // All selected
+    this.selected_state = '';
+    this.ngForm.controls['state'].setValue('');
+    this.searchText = ''
 
+    this.selected_district = ''
+    this.selected_agency = '';
+    this.ngForm.controls['district'].setValue('')
+    this.ngForm.controls['production_name'].setValue('')
+    this.disabledfieldAgency = true;
+    this.disabledfieldDist = true;
+
+
+    
+    this.getPageData();
+  } else {
+    this.selected_state = data.state_name;
+    this.ngForm.controls['state'].setValue(data.state_code);
+    this.searchText = ''
+  }
+  this.applyLiveFilter();
+}
+
+district_select(data: any) {
+  if (!data) {
+    this.selected_district = '';
+    this.selected_agency = '';
+    this.ngForm.controls['district'].setValue('');
+    this.ngForm.controls['production_name'].setValue('')
+
+    this.disabledfieldAgency = true;
+
+  } else {
+    this.selected_district = data.agency_detail.m_district.district_name;
+    this.ngForm.controls['district'].setValue(data.agency_detail.m_district.district_code);
+  }
+  this.applyLiveFilter();
+}
+
+agency_select(data: any) {
+  if (!data) {
+    this.selected_agency = '';
+    this.ngForm.controls['production_name'].setValue('');
+
+   
+    
+  } else {
+    this.selected_agency = data.agency_name;
+    this.ngForm.controls['production_name'].setValue(data.agency_name);
+  }
+  this.applyLiveFilter();
+}
+applyLiveFilter1() {
+  // let filtered = this.exportdata;
+  
+  let filtered = this.completeData;
+  if (this.selected_state) {
+    filtered = filtered.filter(item => item.agency_detail?.m_state?.state_name === this.selected_state);
+  }
+
+  if (this.selected_district) {
+    filtered = filtered.filter(item => item.agency_detail?.m_district?.district_name === this.selected_district);
+  }
+
+  if (this.selected_agency) {
+    filtered = filtered.filter(item => item.agency_detail?.agency_name === this.selected_agency);
+  }
+
+  console.log("----, filtered", filtered)
+
+  this.completeData = filtered
+  this.totalIndenters = this.completeData.length
+
+
+  console.log("----, filtered completeData", this.completeData)
+
+
+  // this.applyFilter(filtered);
+
+
+}
+
+
+
+applyLiveFilter(loadPageNumberData: number = 1) {
+  const userData = localStorage.getItem('BHTCurrentUser');
+  const data = JSON.parse(userData);
+  const user_type = data.user_type;
+
+  const searchData = {
+    isSearch: true,
+    state_code: this.ngForm.controls['state'].value ? this.ngForm.controls['state'].value : '',
+    district_code: this.ngForm.controls['district'].value ? this.ngForm.controls['district'].value : '',
+    production_name: this.ngForm.controls['production_name'].value ? this.ngForm.controls['production_name'].value : '',
+    isReport : true,
+
+  };
+
+
+  this.masterService.postRequestCreator("getListOfBreederSeedProductionforReports?usertype=BPC", null, {
+    page: loadPageNumberData,
+    pageSize: this.filterPaginateSearch.itemListPageSize || 10,
+    searchData: searchData
+  }).subscribe((apiResponse: any) => {
+    if (apiResponse?.EncryptedResponse?.status_code == 200) {
+      this.allData = apiResponse.EncryptedResponse.data.rows || [];
+      this.masterData = [...this.allData];
+      this.completeData = [...apiResponse.EncryptedResponse.data.rows]; 
+      this.totalIndenters = this.completeData.length
+      this.filterPaginateSearch.Init(this.allData, this, "getPageData", undefined, apiResponse.EncryptedResponse.data.count, true);
+      this.initSearchAndPagination();
+    }
+  });
+}
 
 
 }

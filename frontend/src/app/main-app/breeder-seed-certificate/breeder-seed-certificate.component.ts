@@ -10,7 +10,7 @@ import jspdf from 'jspdf';
 import { environment } from 'src/environments/environment';
 
 
-// pdfMake.vfs = pdfFonts.pdfMake.vfs;
+// //pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 
 @Component({

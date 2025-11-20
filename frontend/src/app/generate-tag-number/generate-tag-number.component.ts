@@ -13,6 +13,7 @@ import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { Modal } from 'bootstrap'
 import { environment } from 'src/environments/environment';
 import * as CryptoJS from 'crypto-js';
+import { JsPrintManagerService } from '../jsprintmanager.service';
 // import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap'; 
 @Component({
   selector: 'app-generate-tag-number',
@@ -25,7 +26,8 @@ export class GenerateTagNumberComponent implements OnInit {
   @ViewChild('alertButton', { static: false }) button: ElementRef;
   dummyData = []
   baseUrl: string = environment.ms_nb_01_master.baseUrl;
-  ngForm!: FormGroup
+  ngForm!: FormGroup;
+  lotForm!: FormGroup
   filterPaginateSearch: FilterPaginateSearch = new FilterPaginateSearch();
   inventoryData = []
   allData: any;
@@ -158,6 +160,10 @@ export class GenerateTagNumberComponent implements OnInit {
   previewTagtext: boolean;
   encryptedData: string;
   prtintAllTag: boolean;
+  displayStyle: string;
+  updateLotDataArray: any;
+  is_potato: boolean = false;
+  printedTaglength: any;
   get generateDefaultMonth(): string {
     let date = { year: this.todayDate.getFullYear(), month: (this.todayDate.getMonth() + 1), day: this.todayDate.getDate() + 1 }
 
@@ -174,9 +180,11 @@ export class GenerateTagNumberComponent implements OnInit {
     // disableUntil: { year: parseInt(this.y), month: parseInt(this.m)+1, day: this.todayDate.getDate() -1 },
     // disableSince: { year: this.todayDate.getFullYear(), month: (this.todayDate.getMonth() + 1), day: this.todayDate.getDate() + 1 }
   };
-  constructor(private service: SeedServiceService, private fb: FormBuilder, private productionService: ProductioncenterService, private modalService: NgbModal) {
+  constructor(private service: SeedServiceService, private fb: FormBuilder, private productionService: ProductioncenterService, private modalService: NgbModal, private jsPrintManagerService: JsPrintManagerService) {
     this.createForm();
+    this.createLotForm();
   }
+
 
   createForm() {
     this.ngForm = this.fb.group({
@@ -192,6 +200,7 @@ export class GenerateTagNumberComponent implements OnInit {
         this.bspcCreateForm()
       ])
     });
+
     this.ngForm.controls['season'].disable();
 
 
@@ -284,8 +293,24 @@ export class GenerateTagNumberComponent implements OnInit {
 
 
   }
-
+  createLotForm() {
+    this.lotForm = this.fb.group({
+      no_of_bags: [''],
+      bag_size: [''],
+      total_qty: [''],
+      lot_no: [''],
+      variety_code: [''],
+      no_of_bags_pre: [''],
+      lot_id: ['']
+    });
+    this.lotForm.controls['no_of_bags'].valueChanges.subscribe(newvalue => {
+      if (newvalue) {
+        this.lotForm.controls['total_qty'].setValue(newvalue * 50);
+      }
+    })
+  }
   ngOnInit(): void {
+
     if (this.tagsDetails && this.tagsDetails.length > 0) {
       let sum = 0
       this.tagsDetails.forEach((el) => {
@@ -319,6 +344,8 @@ export class GenerateTagNumberComponent implements OnInit {
       limitSelection: -1,
     };
     this.getBscpData()
+    this.jsPrintManagerService.start(); // Start the JSPM connection
+
   }
   get bspc(): FormArray {
     return this.ngForm.get('bspc') as FormArray;
@@ -372,7 +399,11 @@ export class GenerateTagNumberComponent implements OnInit {
       this.getVarietyData();
       this.getStllotData();
       this.getListData()
-
+      if (this.ngForm.controls['crop'].value == "H1101") {
+        this.is_potato = false;
+      } else {
+        this.is_potato = true;
+      }
     }
 
     // this.tableData = [
@@ -482,12 +513,13 @@ export class GenerateTagNumberComponent implements OnInit {
     this.showLotPageData = true;
     this.showBagDetails = false;
     this.gridData = data;
-    console.log('lota data item', item);
     this.lotData = item;
   }
+
   submit() {
     this.getDataofGeneratingTags()
   }
+
   getDataofGeneratingTags() {
     const getLocalData = localStorage.getItem('BHTCurrentUser');
     let datas = JSON.parse(getLocalData)
@@ -509,7 +541,8 @@ export class GenerateTagNumberComponent implements OnInit {
   }
   save() {
     let data = this.ngForm.value;
-    let param = data;
+    let param = data;    
+    param.spr_id = this.lotData && this.lotData.spr_id ? this.lotData.spr_id:null
     param.variety_name = this.gridData && this.gridData.variety_name ? this.gridData.variety_name : '';
     param.variety_code = this.gridData && this.gridData.variety_code ? this.gridData.variety_code : '';
     param.variety_code_line = this.gridData && this.gridData.variety_code_line ? this.gridData.variety_code_line : '';
@@ -527,8 +560,11 @@ export class GenerateTagNumberComponent implements OnInit {
     }
     if (this.lotData && this.lotData.action && this.lotData.action == 1) {
       param.no_of_bags = this.lotData && this.lotData.totalBags ? this.lotData.totalBags : '';
-      param.godown_no = this.lotData && this.lotData.godownNoStack ? this.convertToString(this.lotData.godownNoStack) : '';
-      param.stack_no = this.lotData && this.lotData.stack_no_stl ? this.lotData.stack_no_stl : '';
+      // param.godown_no = this.lotData && this.lotData.godownNoStack ? this.convertToString(this.lotData.godownNoStack) : '';
+      // param.stack_no = this.lotData && this.lotData.stack_no_stl ? this.lotData.stack_no_stl : '';
+      param.godown_no = this.lotData && this.lotData.godown_no_register ? (this.lotData.godown_no_register) : '';
+      param.stack_no = this.lotData && this.lotData.stack_no_register ? this.lotData.stack_no_register : '';
+
     } else {
       param.no_of_bags = this.lotData && this.lotData.no_of_bags_register ? this.lotData.no_of_bags_register : '';
       param.godown_no = this.lotData && this.lotData.godown_no_register ? (this.lotData.godown_no_register) : '';
@@ -563,6 +599,7 @@ export class GenerateTagNumberComponent implements OnInit {
     let code = datas && datas.code ? datas.code : "NA";
     param.code = code;
     console.log(param, 'param')
+    // return;
     this.productionService.postRequestCreator('save-data-seed-tags', param).subscribe(data => {
       if (data && data.EncryptedResponse && data.EncryptedResponse.status_code && data.EncryptedResponse.status_code == 200) {
         let response = data && data.EncryptedResponse && data.EncryptedResponse.data ? data.EncryptedResponse.data : '';
@@ -585,7 +622,7 @@ export class GenerateTagNumberComponent implements OnInit {
 
     })
   }
-   
+
   formatDate(dateInput: string): string {
     if (!dateInput) return 'NA';
 
@@ -709,7 +746,7 @@ export class GenerateTagNumberComponent implements OnInit {
 
   //   return formattedDate;
   // }
- 
+
   tagProcessedTags() {
     const getLocalData = localStorage.getItem('BHTCurrentUser');
     let datas = JSON.parse(getLocalData)
@@ -1040,6 +1077,7 @@ export class GenerateTagNumberComponent implements OnInit {
       this.croplistSecond = res ? res : ''
     });
   }
+
   convertArrayToRange(arr) {
     //  arr = arr.map(Number);q
     let ranges = [];
@@ -1055,8 +1093,8 @@ export class GenerateTagNumberComponent implements OnInit {
     } else {
       return 'Na'
     }
-
   }
+
   convertToString(item) {
     if (item && item.length > 0) {
       return item ? item.toString() : ''
@@ -1110,6 +1148,8 @@ export class GenerateTagNumberComponent implements OnInit {
     this.ngForm.controls['bspc']['controls'][index].controls['tag_range'].setValue('', { emitEvent: false })
   }
   previewTag(i) {
+    console.log("i", i);
+
     this.previewTagtext = true;
     if (this.ngForm.controls['bspc']['controls'][i].controls['select_tag_range'].value == 1) {
 
@@ -1271,9 +1311,11 @@ export class GenerateTagNumberComponent implements OnInit {
         })
         this.tagArraydata = tagArray;
         console.log("tagArraydata", this.tagArraydata);
+        // bag_weight
         const { lot_no, pure_seed, inert_matter, germination, date_of_test, valid_upto, bag_weight } = this.lotData;
         const { variety_name, line_variety_name } = this.gridData;
-        const filteredProperties = { lot_no, pure_seed, inert_matter, germination, date_of_test, valid_upto, bag_weight };
+        let bag_weight2 = this.ngForm.controls['bspc']['controls'][i].controls['bag_size'].value
+        const filteredProperties = { lot_no, pure_seed, inert_matter, germination, date_of_test, valid_upto, bag_weight2 };
         const filteredProperties2 = { variety_name, line_variety_name };
 
         tags = tags.map(item => {
@@ -1326,7 +1368,6 @@ export class GenerateTagNumberComponent implements OnInit {
   }
 
   printTag(i) {
-    console.log('this.carddata========', this.carddata);
     this.previewTagtext = false;
     let data = this.ngForm.controls['bspc']['controls'][i].controls['tag_range'].value;
     let tags = []
@@ -1343,20 +1384,22 @@ export class GenerateTagNumberComponent implements OnInit {
           })
           tagArray.push(el.tag_no)
         })
-        console.log('this.lotData==============', this.lotData)
+        // this.lotData[i]['bag_weight'] = this.ngForm.controls['bspc']['controls'][i].controls['bag_size'].value
+        console.log('this.lotData==============', this.lotData);
         this.tagArraydata = tagArray;
+        let bag_weight2 = { bag_weight: this.ngForm.controls['bspc']['controls'][i].controls['bag_size'].value };
         console.log("tagArraydata", this.tagArraydata);
-        const { lot_no, pure_seed, inert_matter, germination, date_of_test, valid_upto, lot_id, bag_weight } = this.lotData;
-        const { variety_name, line_variety_name } = this.gridData;
-        const filteredProperties = { lot_no, pure_seed, inert_matter, germination, date_of_test, valid_upto, lot_id, bag_weight };
-        const filteredProperties2 = { variety_name, line_variety_name };
+        let { lot_no, pure_seed, inert_matter, germination, date_of_test, valid_upto, lot_id, bag_weight } = this.lotData;
+        let { variety_name, line_variety_name } = this.gridData;
+        let filteredProperties = { lot_no, pure_seed, inert_matter, germination, date_of_test, valid_upto, lot_id, bag_weight2 };
+        let filteredProperties2 = { variety_name, line_variety_name };
 
         tags = tags.map(item => {
           return { ...item, ...filteredProperties, ...filteredProperties2 };
         });
 
         this.carddata = tags;
-        console.log()
+        console.log('this.carddata new ', this.carddata)
         this.carddata = this.carddata.map((item, index) => {
           item.pageId = (index + 1) % 2 === 0 ? 'page-break1' : 'page-break2';
           return item;
@@ -1378,8 +1421,12 @@ export class GenerateTagNumberComponent implements OnInit {
       let data = this.ngForm.controls['bspc']['controls'][i].controls['tag_range'].value;
       let item = this.lotData && this.lotData.seed_tag_range && this.lotData.seed_tag_range[i] && this.lotData.seed_tag_range[i] ? this.lotData.seed_tag_range[i] : '';
       let range = this.parseRanges(data);
+      // console.log('range====',range);
+      // console.log('range data===',item);
+
       let start = item && item.start_range ? item.start_range : 0;
       let end = item && item.end_range ? item.end_range : 0;
+      // return;
       if (range && range.length > 0) {
 
         for (let i = 0; i < range.length; i++) {
@@ -1392,7 +1439,6 @@ export class GenerateTagNumberComponent implements OnInit {
               confirmButtonColor: '#E97E15'
             })
             return;
-
             // alert(`Element ${range[i]} is out of range!`);
           }
           else {
@@ -1429,6 +1475,7 @@ export class GenerateTagNumberComponent implements OnInit {
                 });
               }
             }
+            console.log("this.lotData", this.lotData);
             if (this.lotData && this.lotData.get_carry_over && (this.lotData.get_carry_over == 2)) {
               let proceseedData = this.lotData && this.lotData.process_details ? this.lotData.process_details : '';
               let year = this.lotData && this.lotData.year_of_indent ? this.lotData.year_of_indent : 'NA';
@@ -1439,10 +1486,28 @@ export class GenerateTagNumberComponent implements OnInit {
                   rangeData.push({ tags: `B/${year}/${code}/${this.toSixDigitStrings(el)}` })
                 })
               }
-              const { lot_no, pure_seed, inert_matter, germination, date_of_test, valid_upto, lot_id, bag_weight } = this.lotData;
-              const { variety_name, line_variety_name } = this.gridData;
-              const filteredProperties = { lot_no, pure_seed, inert_matter, germination, date_of_test, valid_upto, lot_id, bag_weight };
-              const filteredProperties2 = { variety_name, line_variety_name };
+
+              // Extract tag_no values from lotData.rangeData
+              const existingTags = new Set(this.lotData.rangeData.map(item => item.tag_no));
+
+              // Check if every tag in data exists in lotData.rangeData
+              rangeData.forEach(item => {
+                if (!existingTags.has(item.tags)) {
+                  Swal.fire({
+                    title: '<p style="font-size:25px;">Tag No. is out of valid range.</p>',
+                    icon: 'error',
+                    confirmButtonText:
+                      'OK',
+                    confirmButtonColor: '#E97E15'
+                  })
+                  return;
+                }
+              });
+              // return;
+              let { lot_no, pure_seed, inert_matter, germination, date_of_test, valid_upto, lot_id, bag_weight } = this.lotData;
+              let { variety_name, line_variety_name } = this.gridData;
+              let filteredProperties = { lot_no, pure_seed, inert_matter, germination, date_of_test, valid_upto, lot_id, bag_weight };
+              let filteredProperties2 = { variety_name, line_variety_name };
 
               rangeData = rangeData.map(item => {
                 return { ...item, ...filteredProperties, ...filteredProperties2 };
@@ -1453,13 +1518,8 @@ export class GenerateTagNumberComponent implements OnInit {
                 item.pageId = (index + 1) % 2 === 0 ? 'page-break1' : 'page-break2';
                 return item;
               });
-              // this.updateLotStaus(i)
-              console.log("this.carddata", this.carddata);
-              console.log(rangeData, 'ran')
             }
-
           }
-
         }
       }
     }
@@ -1528,6 +1588,42 @@ export class GenerateTagNumberComponent implements OnInit {
     let datas = JSON.parse(getLocalData)
     let UserId = datas.id
     let data = this.carddata;
+    // console.log('this.carddata==',this.carddata);
+
+    // return;
+    // Pass the dynamic label data to print
+
+    console.log('this.carddata==', this.carddata);
+    let printTagFinalArray = [];
+    // if (this.carddata && this.carddata.length) {
+    //   this.carddata.forEach(ele => {
+    //     printTagFinalArray.push(
+    //       {
+    //         companyName: this.agency_name ? this.agency_name : "NA",
+    //         location: this.district_name ? this.district_name + ', ' : "NA" + this.state_name ? this.state_name : 'NA',
+    //         seedClass: 'Breeder Seed',
+    //         qrCodeUrl:this.baseUrl+'tag-number-verification?tagNo='+(ele.tags?ele.tags:"NA"),
+    //         crop: this.selectCrop,
+    //         testDate: ele.date_of_test ? ele.date_of_test : "NA",
+    //         variety: ele.variety_name ? ele.variety_name : "NA",
+    //         pureSeedPercentage: ele.pure_seed ? ele.pure_seed : "NA",
+    //         parentalLine: ele.line_variety_name ? ele.line_variety_name : "NA",
+    //         inertSeedPercentage: ele.inert_matter ? ele.inert_matter : "NA",
+    //         germinationPercentage: ele.germination ? ele.germination : "NA",
+    //         lotNumber: ele.lot_no ? ele.lot_no : "NA",
+    //         tagNumber: ele.tags ? ele.tags : "NA",
+    //         bagWeight: ele.bag_weight ? ele.bag_weight : "NA",
+    //         executiveDirector: this.contactPersonName ? this.contactPersonName : "NA",
+    //         directorName: this.designation_name ? this.designation_name : "NA",
+    //         footer: 'This tag is system generated and does not require any signature.'
+    //       }
+    //     )
+    //   })
+    // }
+    // console.log('printTagFinalArray',printTagFinalArray);
+    // this.jsPrintManagerService.printLabels(printTagFinalArray); 
+    // return;
+    // Pass the dynamic label data to print
     let tags = [];
     let item = this.lotData && this.lotData.seed_tag_range && this.lotData.seed_tag_range[i] && this.lotData.seed_tag_range[i] ? this.lotData.seed_tag_range[i] : '';
     if (data && data.length > 0) {
@@ -1545,7 +1641,35 @@ export class GenerateTagNumberComponent implements OnInit {
       let res = data && data.EncryptedResponse && data.EncryptedResponse.data && data.EncryptedResponse.data ? data.EncryptedResponse.data : '';
       if (data && data.EncryptedResponse && data.EncryptedResponse.status_code && data.EncryptedResponse.status_code == 200) {
         data.EncryptedResponse.status_code;
-        this.printag();
+        // this.printag(); // for pdf generate
+        let printTagFinalArray = [];
+        if (this.carddata && this.carddata.length) {
+          this.carddata.forEach(ele => {
+            printTagFinalArray.push(
+              {
+                companyName: this.agency_name ? this.agency_name : "NA",
+                location: this.district_name ? this.district_name + ', ' : "NA" + this.state_name ? this.state_name : 'NA',
+                seedClass: 'Breeder Seed',
+                qrCodeUrl: this.baseUrl + 'tag-number-verification?tagNo=' + (ele.tags ? ele.tags : "NA"),
+                crop: this.selectCrop,
+                testDate: ele.date_of_test ? ele.date_of_test : "NA",
+                variety: ele.variety_name ? ele.variety_name : "NA",
+                pureSeedPercentage: ele.pure_seed ? ele.pure_seed : "NA",
+                parentalLine: ele.line_variety_name ? ele.line_variety_name : "NA",
+                inertSeedPercentage: ele.inert_matter ? ele.inert_matter : "NA",
+                germinationPercentage: ele.germination ? ele.germination : "NA",
+                lotNumber: ele.lot_no ? ele.lot_no : "NA",
+                tagNumber: ele.tags ? ele.tags : "NA",
+                bagWeight: ele.bag_weight ? ele.bag_weight : "NA",
+                executiveDirector: this.contactPersonName ? this.contactPersonName : "NA",
+                directorName: this.designation_name ? this.designation_name : "NA",
+                footer: 'This tag is system generated and does not require any signature.'
+              }
+            )
+          })
+        }
+        // console.log('printTagFinalArray',printTagFinalArray);
+        this.jsPrintManagerService.printLabels(printTagFinalArray);
       } else {
         Swal.fire({
           title: '<p style="font-size:25px;">Tag Number already Printed.</p>',
@@ -1554,8 +1678,11 @@ export class GenerateTagNumberComponent implements OnInit {
             'OK',
           confirmButtonColor: '#E97E15'
         })
+        this.ngForm.controls['bspc']['controls'][i].controls['tag_range'].setValue('');
+        this.getTagData(i)
         return;
       }
+      this.ngForm.controls['bspc']['controls'][i].controls['tag_range'].setValue('');
       this.getTagData(i)
     });
   }
@@ -1674,5 +1801,100 @@ export class GenerateTagNumberComponent implements OnInit {
       //   }
 
     });
+  }
+  openpopup() {
+    this.displayStyle = 'block'
+  }
+  close() {
+    this.displayStyle = 'none'
+  }
+  openLotModal(data) {
+    this.lotForm.controls['total_qty'].disable();
+    this.lotForm.controls['bag_size'].disable();
+    this.openpopup();
+    console.log("data===", data);
+
+
+    const result = this.productionService.postRequestCreator('get-seed-tags-details', {
+      "search": { id: data && data.lot_details && data.lot_details[0] && data.lot_details[0].seed_tag_range && data.lot_details[0].seed_tag_range[0] && data.lot_details[0].seed_tag_range[0].seed_tag_range_id ? data.lot_details[0].seed_tag_range[0].seed_tag_range_id : null }
+    }).subscribe((data: any) => {
+      let res = data && data.EncryptedResponse && data.EncryptedResponse.data && data.EncryptedResponse.data ? data.EncryptedResponse.data.length : '';
+      console.log("res==length", res);
+      this.printedTaglength = res ? res : 0
+    })
+    // this.lotDataValue = res;
+    this.lotForm.controls['lot_id'].setValue(data && data.lot_details && data.lot_details[0] && data.lot_details[0].lot_id ? data.lot_details[0].lot_id : null);
+    this.lotForm.controls['no_of_bags'].setValue(data && data.lot_details && data.lot_details[0] && data.lot_details[0].no_of_bags_register ? data.lot_details[0].no_of_bags_register : 0);
+    this.lotForm.controls['no_of_bags_pre'].setValue(data && data.lot_details && data.lot_details[0] && data.lot_details[0].no_of_bags_register ? data.lot_details[0].no_of_bags_register : 0);
+    this.lotForm.controls['bag_size'].setValue(50);
+    this.lotForm.controls['total_qty'].setValue(this.lotForm.controls['no_of_bags'].value * 50);
+    this.lotForm.controls['variety_code'].setValue(data && data.variety_code ? data.variety_code : '')
+  }
+  updateLot() {
+    if (this.lotForm.controls['no_of_bags'].value == 0) {
+      Swal.fire(
+        {
+          icon: 'warning',
+          title: 'The number of bags cannot be 0.',
+          showConfirmButton: true,
+          showCancelButton: false,
+          confirmButtonColor: '#B64B1D'
+        }
+      )
+      return;
+    }
+    if (this.lotForm.controls['no_of_bags'].value > this.lotForm.controls['no_of_bags_pre'].value) {
+      Swal.fire(
+        {
+          icon: 'warning',
+          title: 'The number of bags cannot exceed the initial estimated amount.',
+          showConfirmButton: true,
+          showCancelButton: false,
+          confirmButtonColor: '#B64B1D'
+        }
+      )
+      return;
+    }
+    if ((this.printedTaglength !== 0) && this.printedTaglength > this.lotForm.controls['no_of_bags'].value) {
+      Swal.fire(
+        {
+          icon: 'warning',
+          title: 'The number of bags cannot be less than the number of tags already printed.',
+          showConfirmButton: true,
+          showCancelButton: false,
+          confirmButtonColor: '#B64B1D'
+        }
+      )
+      return;
+    }
+    let param = {
+      year: this.ngForm.controls['year'].value,
+      season: this.ngForm.controls['season'].value,
+      crop_code: this.ngForm.controls['crop'].value,
+      variety_code: this.lotForm.controls['variety_code'].value,
+      lot_id: this.lotForm.controls['lot_id'].value,
+      no_of_bag: this.lotForm.controls['no_of_bags'].value,
+      bag_size: this.lotForm.controls['bag_size'].value,
+      total_qty: this.lotForm.controls['total_qty'].value,
+    }
+    console.log(param);
+    this.productionService.postRequestCreator('update-generate-tag-lot-data', param).subscribe((data: any) => {
+      if (data.EncryptedResponse.status_code == 200) {
+        Swal.fire(
+          {
+            icon: 'success',
+            title: 'Data Updated Successfully',
+            showConfirmButton: true,
+            showCancelButton: false,
+            confirmButtonColor: '#B64B1D'
+          }
+        ).then(x => {
+          if (x.isConfirmed) {
+            this.close();
+            this.searchData()
+          }
+        })
+      }
+    })
   }
 }

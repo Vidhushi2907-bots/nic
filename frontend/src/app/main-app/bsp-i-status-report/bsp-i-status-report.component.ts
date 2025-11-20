@@ -75,6 +75,10 @@ export class BspIStatusReportComponent implements OnInit {
   authUserId: any;
   user_id: any;
   cropListSecond: any;
+  productionType: any;
+  isDisableNormal: boolean;
+  isDisableDelay: boolean;
+  isDisableNormalReallocate: boolean;
 
   constructor(private service: SeedServiceService, private breeder: BreederService, private masterService: MasterService, private productioncenter: ProductioncenterService, private fb: FormBuilder, private formBuilder: FormBuilder, private _productionCenter: ProductioncenterService, private route: Router,
     private renderer: Renderer2) {
@@ -191,12 +195,13 @@ export class BspIStatusReportComponent implements OnInit {
   onVarietySelectAll(items: any) {
     console.log('All varieties selected:', items);
   }
-
+ 
   BspYearData() {
     let route = "get-bsp-proforma-one-year-data-report";
     let param = {
       "search": { 
-        form_type: 'report_1'
+        form_type: 'report_1',
+        // production_type: this.productionType 
       }
     }
     this._productionCenter.postRequestCreator(route, param, null).subscribe(res => {
@@ -211,7 +216,8 @@ export class BspIStatusReportComponent implements OnInit {
     let param = {
       "search": { 
         "year": this.ngForm.controls['year'].value,
-        "form_type": 'report_1'
+        "form_type": 'report_1',
+        // production_type: this.productionType 
       }
     }
     this._productionCenter.postRequestCreator(route, param, null).subscribe(res => {
@@ -226,7 +232,8 @@ export class BspIStatusReportComponent implements OnInit {
       "search": {
         "year": this.ngForm.controls['year'].value,
         "season": this.ngForm.controls['season'].value ? this.ngForm.controls['season'].value : newData ? newData : '',
-        "form_type": 'report_1'
+        "form_type": 'report_1',
+        // production_type: this.productionType 
         // "crop_code": "A0120"
       }
     }
@@ -238,7 +245,34 @@ export class BspIStatusReportComponent implements OnInit {
       }
     });
   }
-   
+  productionTypeValue(value) {
+    if (value) {
+      this.productionType = value;
+      if (this.productionType == "NORMAL") {
+        this.isDisableNormal = false;
+        this.isDisableDelay = true;
+        this.isDisableNormalReallocate = true;
+      } else if (this.productionType == "DELAY") {
+        this.isDisableNormal = true;
+        this.isDisableDelay = false;
+        this.isDisableNormalReallocate = true;
+      } else if (this.productionType == "REALLOCATION") {
+        this.isDisableNormal = true;
+        this.isDisableDelay = true;
+        this.isDisableNormalReallocate = false;
+      }
+      else {
+        // this.isDisableNormal= false;
+        // this.isDisableDelay= false;
+        // this.isDisableNormalReallocate= true;
+      }
+    }
+    this.BspYearData();
+  }
+  resetRadioBtn() {
+    window.location.reload();
+    this.productionType = ""
+  }
   BspVarietyData() {
     this.ngForm.controls['variety'].patchValue(''); // Reset the form control value
     const route = "get-variety-data";
@@ -287,6 +321,7 @@ export class BspIStatusReportComponent implements OnInit {
         crop_code: this.ngForm.controls['crop_code'].value,  // Ensure crop_code is correct here
         // variety_code_arr: varietyCodeArr,
         user_id: this.authUserId,
+        // production_type: this.productionType 
       }
     };
 

@@ -1,6 +1,7 @@
 require('dotenv').config()
 const response = require('../_helpers/response')
 const status = require('../_helpers/status.conf')
+const stl_lab = require('../_helpers/getstl-lebourity')
 const db = require("../models");
 let Validator = require('validatorjs');
 const { getYear, parseISO } = require('date-fns');
@@ -37,7 +38,21 @@ const lotNumberModel = db.lotNumberModel;
 const seedTestingReportsModel = db.seedTestingReportsModel;
 const varietyCategoryModel = db.varietyCategoryModel;
 const allocationToIndentorProductionCenterSeed = db.allocationToIndentorProductionCenterSeed;
-const allocationToIndentorSeed = db.allocationToIndentorSeed
+const allocationToIndentorSeed = db.allocationToIndentorSeed;
+const seedProcessingRegister = db.seedProcessingRegister;
+const liftingLotNumberModel = db.liftingLotNumberModel
+const allocationtoIndentorliftingseeds = db.allocationtoIndentorliftingseeds
+const bspProformaOneBspc = db.bspProformaOneBspc
+const bspPerformaBspOne = db.bspPerformaBspOne
+const availabilityOfBreederSeedModel = db.availabilityOfBreederSeedModel;
+const bspProformaOneBspcModel = db.bspProformaOneBspcModel;
+const liftingSeedDetailsModel = db.liftingSeedDetailsModel;
+const bspProformaOneModel = db.bspProformaOneModel;
+const seedProcessingRegisterModel = db.seedProcessingRegisterModel;
+const mAgroLogicalRegionstatesModel = db.mAgroLogicalRegionstatesModel;
+const mAgroEcologicalRegionsModel = db.mAgroEcologicalRegionsModel;
+const allocationToSPASeed = db.allocationToSPASeed;
+const allocationToSPAProductionCenterSeed = db.allocationToSPAProductionCenterSeed
 
 const sequelize = require('sequelize');
 const ConditionCreator = require('../_helpers/condition-creator');
@@ -74,13 +89,12 @@ class SeedController {
         srr: req.body.srr,
         group_code: req.body.group_code,
         is_active: req.body.active,
-        hindi_name:req.body.crop_name_hindi? req.body.crop_name_hindi :null,
+        hindi_name: req.body.crop_name_hindi ? req.body.crop_name_hindi : null,
         scientific_name: req.body.botanic_name,
         user_id: user_id,
-        
+
       };
 
-      // console.log('dataRow============'.dataRow);
       // else{
       let tabledAlteredSuccessfully = false;
       if (req.params && req.params["id"]) {
@@ -262,7 +276,21 @@ class SeedController {
   static getCroupGroupDeatils = async (req, res) => {
     let data = {};
     try {
-      let condition = {}
+      // let condition = {}
+      let cropGroup;
+      if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+        cropGroup = { group_code: { [Op.like]: 'A04%' } };
+      }
+      if (req.body.loginedUserid.user_type === "PULSESSEEDADMIN") {
+        cropGroup = { group_code: { [Op.like]: 'A03%' } };
+      }
+
+      let condition = {
+        where: {
+          ...cropGroup
+        }
+      }
+
       condition.order = [['group_name', 'ASC']]
       data = await cropGroupModel.findAll(condition);
       // res.send(data)
@@ -287,21 +315,165 @@ class SeedController {
     }
   }
 
-  static getCropDataByGroupCode = async (req, res) => {
-    try {
-      const data = await cropModel.findAll({
-        where: {
-          group_code: req.body.cropGroupCode
-        }
-      })
 
-      response(res, status.DATA_AVAILABLE, 200, data)
+//     static getCropDataByGroupCode = async (req, res) => {
+//   try {
+//     console.log('Received body:', req.body);
+//     let groupCode = req.body.group_code;
 
-    } catch (error) {
-      console.log(error)
-      response(res, status.UNEXPECTED_ERROR, 500)
+//     let condition = {};
+
+
+//     if (!groupCode || groupCode === 'ALL') {
+//       condition = {};
+//     } else {
+//       condition = { group_code: groupCode };
+//     }
+
+//     const crops = await cropModel.findAll({
+//       where: condition
+//     });
+
+//     return res.status(200).json({
+//       status_code: 200,
+//       message: crops.length ? 'Crops fetched successfully' : 'No crops found',
+//       data: crops
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({
+//       status_code: 500,
+//       message: 'Internal server error',
+//       data: null
+//     });
+//   }
+// };
+
+static getCropDataByGroupCode = async (req, res) => {
+  try {
+    const { group_code, crop_code } = req.body;
+
+
+    if (crop_code) {
+      const varieties = await varietyModel.findAll({
+        where: { crop_code: crop_code },
+        attributes: [
+          'id',
+          'crop_code',
+          'variety_code',
+          'variety_name',
+          'meeting_number',
+          'type',
+          'not_date',
+          'not_number',
+          'is_notified',
+          'developed_by',
+          'introduce_year',
+          'release_date',
+          'crop_group_code'
+        ],
+        order: [['id', 'ASC']]
+      });
+
+      return res.status(200).json({
+        status_code: 200,
+        message: varieties.length ? 'Varieties fetched successfully' : 'No varieties found',
+        data: varieties
+      });
     }
+
+    let condition = {};
+    if (group_code && group_code !== 'ALL') {
+      condition.group_code = group_code;
+    }
+
+    const crops = await cropModel.findAll({
+      where: condition,
+      attributes: [
+        'id',
+        'crop_code',
+        'crop_name',
+        'crop_group',
+        'group_code',
+        'botanic_name',
+        'season',
+        'srr',
+        [sequelize.literal(`(
+          SELECT COUNT(*)
+          FROM m_crop_varieties v
+          WHERE v.crop_code = m_crop.crop_code
+        )`), 'total_variety_count']
+      ],
+      order: [['id', 'ASC']]
+    });
+
+    return res.status(200).json({
+      status_code: 200,
+      message: crops.length ? 'Crops fetched successfully' : 'No crops found',
+      total_crop_count: crops.length,
+      data: crops
+    });
+
+  } catch (error) {
+    console.error("❌ Error in getCropDataByGroupCode:", error);
+    return res.status(500).json({
+      status_code: 500,
+      message: 'Internal server error',
+      data: null
+    });
   }
+};
+
+
+  // static getCropDataByGroupCode = async (req, res) => {
+  //   try {
+  //     console.log('Received body:', req.body);
+  //     const groupCode = req.body.group_code;
+
+  //     if (!groupCode) {
+  //       return res.status(400).json({
+  //         status_code: 400,
+  //         message: 'Group code is required',
+  //         data: null
+  //       });
+  //     }
+
+  //     const crops = await cropModel.findAll({
+  //       where: { group_code: groupCode }
+  //     });
+
+  //     res.status(200).json({
+  //       status_code: 200,
+  //       message: 'Crops fetched successfully',
+  //       data: crops
+  //     });
+
+  //   } catch (error) {
+  //     console.error(error);
+  //     res.status(500).json({
+  //       status_code: 500,
+  //       message: 'Internal server error',
+  //       data: null
+  //     });
+  //   }
+  // };
+
+  // static getCropDataByGroupCode = async (req, res) => {
+  //   try {
+  //     console.log('Received body:', req.body);
+  //     const data = await cropModel.findAll({
+  //       where: {
+  //         group_code: req.body.cropGroupCode
+  //       }
+  //     })
+
+  //     response(res, status.DATA_AVAILABLE, 200, data)
+
+  //   } catch (error) {
+  //     console.log(error)
+  //     response(res, status.UNEXPECTED_ERROR, 500)
+  //   }
+  // }
   static getSeasonDetails = async (req, res) => {
     let data = {};
     try {
@@ -604,8 +776,7 @@ class SeedController {
         && req.body.crop_data.length > 0) {
         for (let index = 0; index < req.body.crop_data.length; index++) {
           const element = req.body.crop_data[index];
-          console.log(element,'element')
-          console.log('hiiiii', element.crop_code);
+          console.log(element, 'element')
           const datas = cropModel.update({
             breeder_id: null
           }, {
@@ -615,15 +786,15 @@ class SeedController {
           })
         }
       }
-      const param={
-        is_active:0
+      const param = {
+        is_active: 0
       }
-      agencyDetailModel.update(param,{
+      agencyDetailModel.update(param, {
         where: {
           id: req.params.id
         }
       });
-      userModel.update(param,{
+      userModel.update(param, {
         where: {
           agency_id: req.params.id
         }
@@ -708,90 +879,6 @@ class SeedController {
     }
   }
 
-  //   static addIndentor = async (req, res) => {
-  //     try {
-  //         const dataRow = {
-  //           agency_name: req.body.agency_name,
-  //           created_by: 1,//req.body.created_by,
-  //           category: req.body.category,
-  //           state_id: req.body.state,
-  //           district_id: req.body.district,
-  //           short_name: req.body.display_name,
-  //           address: req.body.address,
-  //           contact_person_name: req.body.contact_person_name,
-  //           contact_person_designation: req.body.contact_person_designation_id,
-  //           // contact_person_mobile: req.body.mobile_number,
-  //           phone_number: req.body.phone_number,
-  //           fax_no: req.body.fax_no,
-  //           longitude: req.body.longitude,
-  //           latitude: req.body.latitude,
-  //           email:req.body.email,
-  //           bank_name: req.body.bank_name,
-  //           bank_branch_name: req.body.bank_branch_name,
-  //           bank_ifsc_code: req.body.bank_ifsc_code,
-  //           bank_account_number: req.body.bank_account_number,
-  //           state_id: req.body.state_id,
-  //           district_id: req.body.district_id,
-  //           mobile_number:req.body.mobile_number
-
-  //         };
-  //         let tabledAlteredSuccessfully = false;
-  //         if (req.params && req.params["id"]) {
-  //             await agencyDetailModel.update(dataRow, { where: { id: req.params["id"] } }).then(function (item) {
-  //                 tabledAlteredSuccessfully = true;
-  //             }).catch(function (err) {
-
-  //             });
-  //         }
-  //         else {
-  //             const existingData = await agencyDetailModel.findAll(
-  //                 {
-  //                     where: {
-  //                       agency_name: req.body.agency_name,
-  //                       created_by: 1,//req.body.created_by,
-  //                       category: req.body.category,
-  //                       state_id: req.body.state,
-  //                       district_id: req.body.district,
-  //                       short_name: req.body.display_name,
-  //                       address: req.body.address,
-  //                       contact_person_name: req.body.contact_person_name,
-  //                       contact_person_designation: req.body.contact_person_designation_id,
-  //                       // contact_person_mobile: req.body.mobile_number,
-  //                       phone_number: req.body.phone_number,
-  //                       fax_no: req.body.fax_no,
-  //                       longitude: req.body.longitude,
-  //                       latitude: req.body.latitude,
-  //                       email:req.body.email,
-  //                       bank_name: req.body.bank_name,
-  //                       bank_branch_name: req.body.bank_branch_name,
-  //                       bank_ifsc_code: req.body.bank_ifsc_code,
-  //                       bank_account_number: req.body.bank_account_number,
-  //                       state_id: req.body.state_id,
-  //                       district_id: req.body.district_id,
-  //                       mobile_number:req.body.mobile_number
-
-  //                     }
-  //                 }
-  //             );
-  //             console.log(existingData,'existingData');
-  //             if (existingData === undefined || existingData.length < 1) {
-  //                 const data = await agencyDetailModel.create(dataRow);
-  //                 // await data.save();
-  //                 tabledAlteredSuccessfully = true;
-  //             }
-  //         }
-
-  //         if (tabledAlteredSuccessfully) {
-  //             return response(res, status.DATA_SAVE, 200, {})
-  //         } else {
-  //             return response(res, status.DATA_NOT_AVAILABLE, 404)
-  //         }
-  //     }
-  //     catch (error) {
-  //         console.log(error, 'dataRow');
-  //         return response(res, status.DATA_NOT_SAVE, 500)
-  //     }
-  // }
   static viewIndentor = async (req, res) => {
     let data = {};
     try {
@@ -808,20 +895,9 @@ class SeedController {
             attributes: ['*']
           },
         ],
-        // where: {
-        //   is_active: 1
-        // },
-        // raw: false,
-        // attributes: [
-        //   '*'
-        // ]
-        // where: {
-        //   id: req.body.id
-        // }
+
       };
 
-      // const sortOrder = req.body.sort ? req.body.sort : 'id';
-      // const sortDirection = req.body.order ? req.body.order : 'DESC';
 
       if (page && pageSize) {
         condition.limit = pageSize;
@@ -844,7 +920,14 @@ class SeedController {
 
   static viewSeedMuliplicationRatio = async (req, res) => {
     try {
-      let { page, pageSize, search } = req.body;
+      let { page, pageSize, search, isReport } = req.body;
+      let cropGroup;
+      if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+        cropGroup = { group_code: { [Op.like]: 'A04%' } };
+      }
+      if (req.body.loginedUserid.user_type === "PULSESSEEDADMIN") {
+        cropGroup = { group_code: { [Op.like]: 'A03%' } };
+      }
 
       let condition = {
         include: [
@@ -869,7 +952,10 @@ class SeedController {
             },
             include: [
               {
-                model: cropGroupModel
+                model: cropGroupModel,
+                where: {
+                  ...cropGroup
+                }
               }
 
             ],
@@ -897,13 +983,31 @@ class SeedController {
 
 
       }
-      if (page === undefined) page = 1;
-      // if (pageSize === undefined) pageSize = 50;
+      
+      // if (page === undefined) page = 1;
+      // // if (pageSize === undefined) pageSize = 50;
 
-      if (page > 0 && pageSize > 0) {
-        condition.limit = pageSize;
-        condition.offset = (page * pageSize) - pageSize;
+      // if (page > 0 && pageSize > 0) {
+      //   condition.limit = pageSize;
+      //   condition.offset = (page * pageSize) - pageSize;
+      // }
+
+
+      if (!isReport) {
+        if (page === undefined) page = 1;
+        // if (pageSize === undefined) pageSize = 50;
+  
+        if (page > 0 && pageSize > 0) {
+          condition.limit = pageSize;
+          condition.offset = (page * pageSize) - pageSize;
+        }
       }
+      else
+      {
+        
+      }
+
+      
 
       // const sortOrder = req.body.sort ? req.body.sort : 'id';
       // const sortDirection = req.body.order ? req.body.order : 'DESC';
@@ -937,7 +1041,7 @@ class SeedController {
 
   static viewSeedMuliplicationRatioByCropCode = async (req, res) => {
     try {
-      let { page, pageSize, search } = req.body;
+      let { page, pageSize, search, isReport } = req.body;
 
       let condition = {
         include: [
@@ -972,13 +1076,29 @@ class SeedController {
         ],
         where: {}
       }
-      if (page === undefined) page = 1;
+
+      // if (page === undefined) page = 1;
+      // if (pageSize === undefined) pageSize = 50;
+
+      // if (page > 0 && pageSize > 0) {
+      //   condition.limit = pageSize;
+      //   condition.offset = (page * pageSize) - pageSize;
+      // }
+
+      if (!isReport) {
+        if (page === undefined) page = 1;
       if (pageSize === undefined) pageSize = 50;
 
       if (page > 0 && pageSize > 0) {
         condition.limit = pageSize;
         condition.offset = (page * pageSize) - pageSize;
       }
+
+      }
+      {
+
+      }
+      
 
       const sortOrder = req.body.sort ? req.body.sort : 'id';
       const sortDirection = req.body.order ? req.body.order : 'DESC';
@@ -1801,6 +1921,14 @@ class SeedController {
         return response(res, status.BAD_REQUEST, 400, errorResponse, internalCall)
       }
 
+      let cropGroup;
+      if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+        cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+      }
+      if (req.body.loginedUserid.user_type === "PULSESSEEDADMIN") {
+        cropGroup = { crop_code: { [Op.like]: 'A03%' } };
+      }
+
       let condition = {
         include: [
           {
@@ -1821,6 +1949,7 @@ class SeedController {
         ],
         where: {
           // is_active:1
+          ...cropGroup
         }
       };
 
@@ -1843,7 +1972,18 @@ class SeedController {
         }
       }
       let { page, pageSize, search } = req.body;
-      if (page === undefined) page = 1;
+
+      // if (page === undefined) page = 1;
+      // if (pageSize === undefined)
+      //   pageSize = 10; // set pageSize to -1 to prevent sizing
+
+      // if (page > 0 && pageSize > 0) {
+      //   condition.limit = pageSize;
+      //   condition.offset = (page * pageSize) - pageSize;
+      // }
+
+      if (!search?.isReport) {
+        if (page === undefined) page = 1;
       if (pageSize === undefined)
         pageSize = 10; // set pageSize to -1 to prevent sizing
 
@@ -1851,6 +1991,13 @@ class SeedController {
         condition.limit = pageSize;
         condition.offset = (page * pageSize) - pageSize;
       }
+      }
+      else
+      {
+        
+      }
+  
+
       // condition.order = [['group_name', 'ASC'], ['crop', 'ASC']];
       condition.order = [[sequelize.col('m_crop->m_crop_group.group_name'), 'ASC'], [sequelize.col('m_crop.crop_name'), 'ASC']]
       const data = await maxLotSizeModel.findAndCountAll(condition);
@@ -2190,7 +2337,7 @@ class SeedController {
     }
   }
 
-  static getLabTestData = async (req, res) => {
+  static getLabTestDataold = async (req, res) => {
     let returnResponse = {};
     try {
       let rules = {
@@ -2199,6 +2346,8 @@ class SeedController {
         'district_id': 'string',
         'lab_name': 'string'
       };
+
+      // const stvvv = await stlLab(req.body.stateCode);
 
       let validation = new Validator(req.body, rules);
 
@@ -2298,6 +2447,58 @@ class SeedController {
       }
       if (!data) {
         return response(res, status.DATA_NOT_AVAILABLE, 404)
+      }
+    } catch (error) {
+      console.log(error)
+      return response(res, status.UNEXPECTED_ERROR, 500, returnResponse);
+    }
+  }
+
+  static getLabTestData = async (req, res) => {
+    let returnResponse = {};
+    try {
+      let rules = {
+        'id': 'integer',
+        'state_id': 'string',
+      };
+
+      console.log(req.body.search.state_code, "***************");
+
+
+
+      let validation = new Validator(req.body, rules);
+
+      const isValidData = validation.passes();
+
+      if (!isValidData) {
+        let errorResponse = {};
+        for (let key in rules) {
+          const error = validation.errors.get(key);
+          if (error.length) {
+            errorResponse[key] = error;
+          }
+        }
+        return response(res, status.BAD_REQUEST, 400, errorResponse, internalCall)
+      }
+      else {
+        // console.log("jfhhuj");
+        const stlnewLab = await stl_lab(req.body.search.state_code);
+        const data = stlnewLab.data.map(item => ({
+          ...item,
+          // idtype: typeof item.labId,
+          lab_name: item.labName || 'NA',
+          lab_code: item.labCode || 'NA'
+        }));
+
+        console.log("Modified Data:", data);
+        if (data) {
+          return response(res, status.DATA_AVAILABLE, 200, { count: data.length, rows: data });
+
+          // return response(res, status.DATA_AVAILABLE, 200, data);
+        }
+        if (!data) {
+          return response(res, status.DATA_NOT_AVAILABLE, 404)
+        }
       }
     } catch (error) {
       console.log(error)
@@ -2419,7 +2620,7 @@ class SeedController {
         image_url: req.body.data,
         variety_code: req.body.variety_code,
         notification_date: req.body.notification_date,
-        notification_year:req.body.notification_year,
+        notification_year: req.body.notification_year,
         meeting_number: req.body.meeting_number,
         variety_name: req.body.variety_name,
         iet_number: req.body.iet_number,
@@ -2433,7 +2634,7 @@ class SeedController {
         matuarity_day_to: req.body.maturity_to,
         maturity_date: req.body.maturity_date,
         spacing_from: req.body.spacing_from,
-        climate_resilience_json:req.body.climate_resilience,
+        climate_resilience_json: req.body.climate_resilience,
         matuarity_type_id: req.body.matuarity_type_id,
         spacing_to: req.body.spacing_to,
         spacing_date: req.body.spacing_date,
@@ -2450,8 +2651,8 @@ class SeedController {
         reaction_abiotic_stress: req.body.abiotic_stress,
         // reaction_major_diseases: req.body.major_diseases,
         // reaction_to_pets: req.body.major_pest,
-        reaction_to_pets_json:req.body.major_pest,
-        reaction_major_diseases_json:req.body.major_diseases,
+        reaction_to_pets_json: req.body.major_pest,
+        reaction_major_diseases_json: req.body.major_diseases,
         crop_code: req.body.crop_code,
         year_of_release: req.body.year_release,
         user_id: user_id,
@@ -2506,41 +2707,41 @@ class SeedController {
         let pestsData;
         let climateResilence;
         let regionMapping;
-        if(data){
-          
-          if(req.body.climate_resilience && req.body.climate_resilience.length){
-            for(let key of req.body.climate_resilience){
+        if (data) {
+
+          if (req.body.climate_resilience && req.body.climate_resilience.length) {
+            for (let key of req.body.climate_resilience) {
               climateResilence = await db.mMajorClimateResiliencemapsModel.create({
-                m_variety_characterstic_id:data.dataValues.id,
-                climate_resilience_id:key.id
+                m_variety_characterstic_id: data.dataValues.id,
+                climate_resilience_id: key.id
               })
             }
           }
-          if(req.body.regions && req.body.regions.length){
-            for(let key of req.body.regions){
-              if(key.regions_checkbox && key.regions_checkbox==true){
+          if (req.body.regions && req.body.regions.length) {
+            for (let key of req.body.regions) {
+              if (key.regions_checkbox && key.regions_checkbox == true) {
                 regionMapping = await db.mCharactersticAgroRegionMappingModel.create({
                   variety_code: req.body.variety_code,
                   variety_id: req.body.variety_id,
-                  region_id:key.regions_id,
-                  is_checked:key.regions_checkbox ? key.regions_checkbox:false
+                  region_id: key.regions_id,
+                  is_checked: key.regions_checkbox ? key.regions_checkbox : false
                 })
               }
             }
           }
-          if(req.body.major_pest && req.body.major_pest.length){
-            for(let key of req.body.major_pest){
+          if (req.body.major_pest && req.body.major_pest.length) {
+            for (let key of req.body.major_pest) {
               pestsData = await db.mMajorInsectPestsMapModel.create({
-                m_variety_characterstic_id:data.dataValues.id,
-                insect_pests_id:key.id
+                m_variety_characterstic_id: data.dataValues.id,
+                insect_pests_id: key.id
               })
             }
           }
-          if(req.body.major_pest && req.body.major_diseases.length){
-            for(let key of req.body.major_diseases){
+          if (req.body.major_pest && req.body.major_diseases.length) {
+            for (let key of req.body.major_diseases) {
               diseasesData = await db.mMajorDiseasesMapModel.create({
-                m_variety_characterstic_id:data.dataValues.id,
-                diseases_id:key.id
+                m_variety_characterstic_id: data.dataValues.id,
+                diseases_id: key.id
               })
             }
           }
@@ -2644,11 +2845,11 @@ class SeedController {
         adoptation: req.body.recommended_ecology,
         responsible_insitution_for_breeder_seed: req.body.responsible_insitution_for_breeder_seed,
         reaction_abiotic_stress: req.body.abiotic_stress,
-        climate_resilience_json:req.body.climate_resilience,
+        climate_resilience_json: req.body.climate_resilience,
         // reaction_major_diseases: req.body.major_diseases,
         // reaction_to_pets: req.body.major_pest,
-        reaction_to_pets_json:req.body.major_pest,
-        reaction_major_diseases_json:req.body.major_diseases,
+        reaction_to_pets_json: req.body.major_pest,
+        reaction_major_diseases_json: req.body.major_diseases,
         crop_code: req.body.crop_code,
         year_of_release: req.body.year_release,
         user_id: 1,
@@ -2665,7 +2866,7 @@ class SeedController {
         is_active: req.body.active,
         region_data: req.body.region_data,
         // climate_resilience: ,
-        climate_resilience_json:req.body.climate_resilience,
+        climate_resilience_json: req.body.climate_resilience,
         product_quality_attributes: req.body.product_quality_attributes,
         gi_tagged_reg_no: req.body.gi_tagged_reg_no,
         ip_protected_reg_no: req.body.ip_protected_reg_no,
@@ -2691,20 +2892,20 @@ class SeedController {
           let fertilizerOtherData = await otherFertilizerModel.create(otherFertilizer)
           let diseasesData;
           let pestsData;
-          if(fertilizerOtherData){
-            if(req.body.major_pest && req.body.major_pest.length){
-              for(let key of req.body.major_pest){
+          if (fertilizerOtherData) {
+            if (req.body.major_pest && req.body.major_pest.length) {
+              for (let key of req.body.major_pest) {
                 pestsData = await db.mMajorInsectPestsMapModel.create({
-                  m_variety_characterstic_id:fertilizerOtherData.dataValues.id,
-                  insect_pests_id:key.id
+                  m_variety_characterstic_id: fertilizerOtherData.dataValues.id,
+                  insect_pests_id: key.id
                 })
               }
             }
-            if(req.body.major_pest && req.body.major_diseases.length){
-              for(let key of req.body.major_diseases){
+            if (req.body.major_pest && req.body.major_diseases.length) {
+              for (let key of req.body.major_diseases) {
                 diseasesData = await db.mMajorDiseasesMapModel.create({
-                  m_variety_characterstic_id:fertilizerOtherData.dataValues.id,
-                  diseases_id:key.id
+                  m_variety_characterstic_id: fertilizerOtherData.dataValues.id,
+                  diseases_id: key.id
                 })
               }
             }
@@ -2753,147 +2954,155 @@ class SeedController {
 
 
 
-      let isExist = await cropCharactersticsModel.findOne({where:{variety_code:req.body.variety_code}});
-      let  data;
-      if(isExist){
-         data = await cropCharactersticsModel.update(dataRow, {
+      let isExist = await cropCharactersticsModel.findOne({ where: { variety_code: req.body.variety_code } });
+      let data;
+      if (isExist) {
+        data = await cropCharactersticsModel.update(dataRow, {
           where: {
             id: isExist.id
           }
         });
-        if(isExist){
+        if (isExist) {
           // if(fertilizerOtherData){
-            let isExitDelete = await db.mMajorInsectPestsMapModel.destroy({where:{
-              m_variety_characterstic_id:isExist.id
-            }});
-            let isExitDelete1 = await db.mMajorDiseasesMapModel.destroy({where:{
-              m_variety_characterstic_id:isExist.id
-            }})
-            let isExitDelete3 = await db.mMajorClimateResiliencemapsModel.destroy({where:{
-              m_variety_characterstic_id:isExist.id
-            }})
-            let isExitDelete4 = await db.mCharactersticAgroRegionMappingModel.destroy({where:{
-              variety_id:req.body.varierty_id,
-              variety_code:req.body.variety_code
-            }})
-            let pestsData;
-            let pestsData1;
-            let climateResilence;
-            let regionMapping;
-            if(isExitDelete || isExitDelete1){
-              if(req.body.major_pest && req.body.major_pest.length){
-                for(let key of req.body.major_pest){
-                  pestsData = await db.mMajorInsectPestsMapModel.create({
-                    m_variety_characterstic_id:isExist.id,
-                    insect_pests_id:key.id
-                  })
-                }
-              }
-              if(req.body.major_pest && req.body.major_diseases.length){
-                for(let key of req.body.major_diseases){
-                  pestsData1 = await db.mMajorDiseasesMapModel.create({
-                    m_variety_characterstic_id:isExist.id,
-                    diseases_id:key.id
-                  })
-                }
+          let isExitDelete = await db.mMajorInsectPestsMapModel.destroy({
+            where: {
+              m_variety_characterstic_id: isExist.id
+            }
+          });
+          let isExitDelete1 = await db.mMajorDiseasesMapModel.destroy({
+            where: {
+              m_variety_characterstic_id: isExist.id
+            }
+          })
+          let isExitDelete3 = await db.mMajorClimateResiliencemapsModel.destroy({
+            where: {
+              m_variety_characterstic_id: isExist.id
+            }
+          })
+          let isExitDelete4 = await db.mCharactersticAgroRegionMappingModel.destroy({
+            where: {
+              variety_id: req.body.varierty_id,
+              variety_code: req.body.variety_code
+            }
+          })
+          let pestsData;
+          let pestsData1;
+          let climateResilence;
+          let regionMapping;
+          if (isExitDelete || isExitDelete1) {
+            if (req.body.major_pest && req.body.major_pest.length) {
+              for (let key of req.body.major_pest) {
+                pestsData = await db.mMajorInsectPestsMapModel.create({
+                  m_variety_characterstic_id: isExist.id,
+                  insect_pests_id: key.id
+                })
               }
             }
-            if(isExitDelete3){
-              if(req.body.climate_resilience && req.body.climate_resilience.length){
-                for(let key of req.body.climate_resilience){
-                  climateResilence = await db.mMajorClimateResiliencemapsModel.create({
-                    m_variety_characterstic_id:isExist.id,
-                    climate_resilience_id:key.id
-                  })
-                }
+            if (req.body.major_pest && req.body.major_diseases.length) {
+              for (let key of req.body.major_diseases) {
+                pestsData1 = await db.mMajorDiseasesMapModel.create({
+                  m_variety_characterstic_id: isExist.id,
+                  diseases_id: key.id
+                })
               }
             }
-            // if(isExitDelete4){
-              if(req.body.regions && req.body.regions.length){
-                for(let key of req.body.regions){
-                  if(key.regions_checkbox && key.regions_checkbox==true){
-                    regionMapping = await db.mCharactersticAgroRegionMappingModel.create({
-                      variety_code: req.body.variety_code,
-                      variety_id: req.body.varierty_id,
-                      region_id:key.regions_id,
-                      is_checked:key.regions_checkbox ? key.regions_checkbox:false
-                    })
-                  }
-                }
+          }
+          if (isExitDelete3) {
+            if (req.body.climate_resilience && req.body.climate_resilience.length) {
+              for (let key of req.body.climate_resilience) {
+                climateResilence = await db.mMajorClimateResiliencemapsModel.create({
+                  m_variety_characterstic_id: isExist.id,
+                  climate_resilience_id: key.id
+                })
               }
-            // }
-          
+            }
+          }
+          // if(isExitDelete4){
+          if (req.body.regions && req.body.regions.length) {
+            for (let key of req.body.regions) {
+              if (key.regions_checkbox && key.regions_checkbox == true) {
+                regionMapping = await db.mCharactersticAgroRegionMappingModel.create({
+                  variety_code: req.body.variety_code,
+                  variety_id: req.body.varierty_id,
+                  region_id: key.regions_id,
+                  is_checked: key.regions_checkbox ? key.regions_checkbox : false
+                })
+              }
+            }
+          }
+          // }
+
           // }
         }
-      }else{
+      } else {
         data = await cropCharactersticsModel.create(dataRow);
-        if(data){
+        if (data) {
           // if(fertilizerOtherData){
-            // let isExitDelete = await db.mMajorInsectPestsMapModel.destroy({where:{
-            //   m_variety_characterstic_id:data.dataValues.id
-            // }});
-            // let isExitDelete1 = await db.mMajorDiseasesMapModel.destroy({where:{
-            //   m_variety_characterstic_id:data.dataValues.id
-            // }})
-            // let isExitDelete3 = await db.mMajorClimateResiliencemapsModel.destroy({where:{
-            //   m_variety_characterstic_id:data.dataValues.id
-            // }})
-            // let isExitDelete4 = await db.mCharactersticAgroRegionMappingModel.destroy({where:{
-            //   variety_id:req.body.varierty_id,
-            //   variety_code:req.body.variety_code
-            // }})
-            let pestsData;
-            let pestsData1;
-            let climateResilence;
-            let regionMapping;
-            // if(isExitDelete || isExitDelete1){
-              if(req.body.major_pest && req.body.major_pest.length){
-                for(let key of req.body.major_pest){
-                  pestsData = await db.mMajorInsectPestsMapModel.create({
-                    m_variety_characterstic_id:data.dataValues.id,
-                    insect_pests_id:key.id
-                  })
-                }
+          // let isExitDelete = await db.mMajorInsectPestsMapModel.destroy({where:{
+          //   m_variety_characterstic_id:data.dataValues.id
+          // }});
+          // let isExitDelete1 = await db.mMajorDiseasesMapModel.destroy({where:{
+          //   m_variety_characterstic_id:data.dataValues.id
+          // }})
+          // let isExitDelete3 = await db.mMajorClimateResiliencemapsModel.destroy({where:{
+          //   m_variety_characterstic_id:data.dataValues.id
+          // }})
+          // let isExitDelete4 = await db.mCharactersticAgroRegionMappingModel.destroy({where:{
+          //   variety_id:req.body.varierty_id,
+          //   variety_code:req.body.variety_code
+          // }})
+          let pestsData;
+          let pestsData1;
+          let climateResilence;
+          let regionMapping;
+          // if(isExitDelete || isExitDelete1){
+          if (req.body.major_pest && req.body.major_pest.length) {
+            for (let key of req.body.major_pest) {
+              pestsData = await db.mMajorInsectPestsMapModel.create({
+                m_variety_characterstic_id: data.dataValues.id,
+                insect_pests_id: key.id
+              })
+            }
+          }
+          if (req.body.major_pest && req.body.major_diseases.length) {
+            for (let key of req.body.major_diseases) {
+              pestsData1 = await db.mMajorDiseasesMapModel.create({
+                m_variety_characterstic_id: data.dataValues.id,
+                diseases_id: key.id
+              })
+            }
+          }
+          // }
+          // if(isExitDelete3){
+          if (req.body.climate_resilience && req.body.climate_resilience.length) {
+            for (let key of req.body.climate_resilience) {
+              climateResilence = await db.mMajorClimateResiliencemapsModel.create({
+                m_variety_characterstic_id: data.dataValues.id,
+                climate_resilience_id: key.id
+              })
+            }
+          }
+          // }
+          // if(isExitDelete4){
+          if (req.body.regions && req.body.regions.length) {
+            for (let key of req.body.regions) {
+              if (key.regions_checkbox && key.regions_checkbox == true) {
+                regionMapping = await db.mCharactersticAgroRegionMappingModel.create({
+                  variety_code: req.body.variety_code,
+                  variety_id: req.body.varierty_id,
+                  region_id: key.regions_id,
+                  is_checked: key.regions_checkbox ? key.regions_checkbox : false
+                })
               }
-              if(req.body.major_pest && req.body.major_diseases.length){
-                for(let key of req.body.major_diseases){
-                  pestsData1 = await db.mMajorDiseasesMapModel.create({
-                    m_variety_characterstic_id:data.dataValues.id,
-                    diseases_id:key.id
-                  })
-                }
-              }
-            // }
-            // if(isExitDelete3){
-              if(req.body.climate_resilience && req.body.climate_resilience.length){
-                for(let key of req.body.climate_resilience){
-                  climateResilence = await db.mMajorClimateResiliencemapsModel.create({
-                    m_variety_characterstic_id:data.dataValues.id,
-                    climate_resilience_id:key.id
-                  })
-                }
-              }
-            // }
-            // if(isExitDelete4){
-              if(req.body.regions && req.body.regions.length){
-                for(let key of req.body.regions){
-                  if(key.regions_checkbox && key.regions_checkbox==true){
-                    regionMapping = await db.mCharactersticAgroRegionMappingModel.create({
-                      variety_code: req.body.variety_code,
-                      variety_id: req.body.varierty_id,
-                      region_id:key.regions_id,
-                      is_checked:key.regions_checkbox ? key.regions_checkbox:false
-                    })
-                  }
-                }
-              }
-            // }
-          
+            }
+          }
+          // }
+
           // }
         }
       }
-    
-   
+
+
       tabledAlteredSuccessfully = true;
 
       if (tabledAlteredSuccessfully) {
@@ -2927,69 +3136,156 @@ class SeedController {
   }
 
   static addCropCharacteristicsList = async (req, res) => {
-    let data = {};
     try {
-      // let userId = req.body.loginedUserid.id
-      // console.log('userId', userId);
+      let data = {};
+      let { page, pageSize, search } = req.body;
       let condition = {}
+      function transformFlatArrayToNestedArray(inputArray) {
+        return inputArray.map(input => ({
+          id: input.id,
+          developed_by: input.developed_by,
+          crop_code: input.crop_code,
+          introduce_year: input.introduce_year,
+          crop_group_code: input.crop_group_code,
+          is_notified: input.is_notified,
+          meeting_number: input.meeting_number,
+          not_date: input.not_date,
+          not_number: input.not_number,
+          release_date: input.release_date,
+          type: input.type,
+          user_id: input.user_id || null,
+          variety_code: input.variety_code,
+          variety_name: input.variety_name,
+          is_active: input.is_active,
+          is_status_active: input.is_status_active,
+          status: input.status,
+          created_at: input.created_at,
+          updated_at: input.updated_at,
+          m_crop: input["m_crop.id"] ? {
+            id: input["m_crop.id"],
+            botanic_name: input["m_crop.botanic_name"],
+            crop_code: input["m_crop.crop_code"],
+            crop_group: input["m_crop.crop_group"],
+            crop_name: input["m_crop.crop_name"],
+            group_code: input["m_crop.group_code"],
+            season: input["m_crop.season"],
+            srr: input["m_crop.srr"],
+            is_active: input["m_crop.is_active"],
+            breeder_id: input["m_crop.breeder_id"],
+            hindi_name: input["m_crop.hindi_name"],
+            scientific_name: input["m_crop.scientific_name"],
+            created_at: input["m_crop.created_at"],
+            updated_at: input["m_crop.updated_at"],
+            m_crop_group: input["m_crop.m_crop_group.id"] ? {
+              id: input["m_crop.m_crop_group.id"],
+              group_name: input["m_crop.m_crop_group.group_name"],
+              group_code: input["m_crop.m_crop_group.group_code"],
+              is_active: input["m_crop.m_crop_group.is_active"]
+            } : null
+          } : null,
+          m_variety_characteristic: input["m_variety_characteristic.id"] ? {
+            id: input["m_variety_characteristic.id"],
+            variety_name: input["m_variety_characteristic.variety_name"],
+            crop_code: input["m_variety_characteristic.crop_code"],
+            variety_code: input["m_variety_characteristic.variety_code"],
+            crop_group: input["m_variety_characteristic.crop_group"],
+            year_of_release: input["m_variety_characteristic.year_of_release"],
+            year_of_introduction_market: input["m_variety_characteristic.year_of_introduction_market"],
+            agronomic_features: input["m_variety_characteristic.agronomic_features"],
+            adoptation: input["m_variety_characteristic.adoptation"],
+            average_yeild_from: input["m_variety_characteristic.average_yeild_from"],
+            average_yeild_to: input["m_variety_characteristic.average_yeild_to"],
+            spacing_from: input["m_variety_characteristic.spacing_from"],
+            spacing_to: input["m_variety_characteristic.spacing_to"],
+            seed_rate: input["m_variety_characteristic.seed_rate"],
+            recommended_state: input["m_variety_characteristic.recommended_state"],
+            resemblance_to_variety: input["m_variety_characteristic.resemblance_to_variety"],
+            reaction_major_diseases: input["m_variety_characteristic.reaction_major_diseases"],
+            reaction_to_pets: input["m_variety_characteristic.reaction_to_pets"],
+            reaction_abiotic_stress: input["m_variety_characteristic.reaction_abiotic_stress"],
+            product_quality_attributes: input["m_variety_characteristic.product_quality_attributes"],
+            climate_resilience: input["m_variety_characteristic.climate_resilience"],
+            created_at: input["m_variety_characteristic.created_at"],
+            updated_at: input["m_variety_characteristic.updated_at"]
+          } : null
+        }));
+      }
+
       condition = {
         include: [
           {
             model: cropModel,
-            include: [{
-              model: cropGroupModel
-            }],
-            left: true,
-            // where: { is_active: 1 }
+            required: false, // LEFT OUTER JOIN
+            attributes: [
+              'id', 'crop_name', 'crop_code', 'botanic_name',
+              'group_code', 'crop_group', 'srr', 'season',
+              'is_active', 'breeder_id', 'hindi_name', 'scientific_name',
+              'created_at', 'updated_at'
+            ],
+            include: [
+              {
+                model: cropGroupModel,
+                required: false, // LEFT OUTER JOIN
+                attributes: ['id', 'group_name', 'group_code', 'is_active']
+              }
+            ]
           },
-
           {
             model: cropCharactersticsModel,
-            // where: { is_active: 1 },
-            left: true
-          },
-
-
+            required: false, // LEFT OUTER JOIN
+            attributes: [
+              'id', 'variety_name', 'crop_code', 'variety_code', 'crop_group',
+              'year_of_release', 'year_of_introduction_market',
+              'agronomic_features', 'adoptation', 'average_yeild_from', 'average_yeild_to',
+              'spacing_from', 'spacing_to', 'seed_rate', 'recommended_state',
+              'resemblance_to_variety', 'reaction_major_diseases', 'reaction_to_pets',
+              'reaction_abiotic_stress', 'product_quality_attributes', 'climate_resilience',
+              'created_at', 'updated_at'
+            ]
+          }
+        ],
+        attributes: [
+          'id', 'variety_name', 'variety_code', 'status', 'developed_by',
+          'introduce_year', 'crop_code', 'crop_group_code',
+          'is_notified', 'not_date', 'not_number', 'meeting_number',
+          'release_date', 'type', 'is_active', 'is_status_active',
+          'created_at', 'updated_at'
         ],
         where: {
-        }
-      };
-      let { page, pageSize, search } = req.body;
+          [Op.or]: [
+            { status: 'hybrid' },
+            { status: 'variety' },
+            { status: null },
+          ],
+        },
+        order: [
+          [cropModel, cropGroupModel, 'group_name', 'ASC'],
+          [cropModel, 'crop_name', 'ASC'],
+          ['variety_name', 'ASC']
+        ],
+        raw: true
+      }
       if (req.body.page) {
         if (page === undefined) page = 1;
         if (pageSize === undefined) {
-          pageSize = 10; // set pageSize to -1 to prevent sizing
+          pageSize = 10;
         }
-
         if (page > 0 && pageSize > 0) {
           condition.limit = pageSize;
           condition.offset = (page * pageSize) - pageSize;
         }
       }
 
-      const sortOrder = req.body.sort ? req.body.sort : 'id';
-      const sortDirection = req.body.order ? req.body.order : 'DESC';
-      // condition.order = [[sortOrder, sortDirection]];
-
-
       condition.order = [[sequelize.col('m_crop->m_crop_group.group_name'), 'ASC'], [sequelize.col('m_crop.crop_name'), 'ASC'], ['variety_name', 'ASC']];
-      // condition.where.user_id = userId;
       if (search) {
         condition.where = {};
-        // if (req.body.search.cropGroup) {
-        //   condition.where.crop_group_code = (req.body.search.cropGroup);
-        // }
         if (req.body.search.crop_group) {
           condition.include[0].where = {};
           condition.include[0].where.group_code = (req.body.search.crop_group);
-          // condition.include[0].where.is_active = 1;
         }
         if (req.body.search.crop_name) {
           condition.where.crop_code = (req.body.search.crop_name);
         }
-        // if (req.body.search.user_id) {
-        //   condition.where.user_id = req.body.search.user_id;
-        // }
         if (req.body.search.is_notified) {
           if (req.body.search.is_notified == "notified") {
             console.log('req.body.search.is_notified', req.body.search.is_notified);
@@ -3000,7 +3296,6 @@ class SeedController {
               ]
             };
           }
-
           if (req.body.search.is_notified == "non_notified") {
             console.log('req.body.search.is_notified', req.body.search.is_notified);
             condition.where.not_date = {
@@ -3010,7 +3305,6 @@ class SeedController {
               ]
             };
           }
-
         }
         if (req.body.search.variety_name) {
           condition.where.variety_code = (req.body.search.variety_name);
@@ -3022,7 +3316,6 @@ class SeedController {
           condition.where.variety_name = {
             [Op.or]: [
               { [Op.iLike]: "%" + req.body.search.variety_name_filter.toLowerCase().trim() + "%" },
-              //     { [Op.like]: req.body.search.variety_name_filter.toUpperCase().trim()+"%" },
             ]
           };
         }
@@ -3035,65 +3328,49 @@ class SeedController {
         }
       }
 
-	condition.where.status = { [Op.notIn]: ['other'] }
+      condition.where.status = { [Op.notIn]: ['other'] }
       condition.where.status = {
         [Op.or]: [
           {
             [Op.in]: ['hybrid', 'variety']
-
           },
-
           {
             [Op.eq]: null
-
           },
-
         ]
       };
+      if (req.body.search.user_type == 'ICAR') {
+        condition.where.crop_code = { [Op.like]: 'A%' };
+      }
+      if (req.body.search.user_type == 'HICAR') {
+        condition.where.crop_code = { [Op.like]: 'H%' };
+      }
+      if (req.body.search.user_type == 'OILSEEDADMIN') {
+        console.log("----------OILSEEDADMIN--------")
+        console.log("----------OILSEEDADMIN--------")
+        console.log("----------OILSEEDADMIN--------")
+        console.log("----------OILSEEDADMIN--------")
 
-      // console.log('user_id',req.body.loginedUserid.id);
+        condition.where.crop_code = { [Op.like]: 'A04%' };
+      }
+      if (req.body.search.user_type == 'PULSESSEEDADMIN') {
+        console.log("----------PULSESSEEDADMIN--------")
+        console.log("----------PULSESSEEDADMIN--------")
+        console.log("----------PULSESSEEDADMIN--------")
+        console.log("----------PULSESSEEDADMIN--------")
+        condition.where.crop_code = { [Op.like]: 'A03%' };
+      }
 
-
-      // if (req.body.search) {
-      //   if (req.body.search.group_code) {
-
-      //     condition.include[0].where.group_code = (req.body.search.group_code);
-      //   }
-      //   if (req.body.search.crop_name) {
-      //     condition.where.crop_code = (req.body.search.crop_name);
-      //   }
-      //   if (req.body.search.variety_name) {
-      //     condition.where.variety_code = (req.body.search.variety_name);
-      //   }
-      // }
-      // condition
       data = await cropVerietyModel.findAndCountAll(condition);
-      // console.log(data);
-
-
-
-      //  datas = resa.sort((a, b) => {
-      //   if (a.m_crop.crop_group < b.m_crop.crop_group ) {
-      //     if( a.m_crop.crop_name < b.m_crop.crop_name){
-
-      //       return -1;
-      //     }
-      //   }
-      // });
-      // datasValue = datas.sort((a, b) => {
-      //   if (e) {
-      //     return -1;
-      //   }
-      // });
-
-      response(res, status.DATA_AVAILABLE, 200, data)
+      const nestedArray = transformFlatArrayToNestedArray(data.rows);
+      response(res, status.DATA_AVAILABLE, 200, { count: data.count, rows: nestedArray })
     } catch (error) {
       console.log(error)
       response(res, status.DATA_NOT_AVAILABLE, 500)
     }
   }
 
-  static addCropCharacteristicsListWithDynamicField = async (req, res) => {
+  static addCropCharacteristicsListWithDynamicFieldOLd = async (req, res) => {
     let data = {};
     try {
       // let userId = req.body.loginedUserid.id
@@ -3190,10 +3467,8 @@ class SeedController {
             else if (items && items.value == "responsible_insitution_developing_seed") {
               temp = [sequelize.col('m_variety_characteristics.responsible_insitution_for_breeder_seed'), 'responsible_insitution_for_breeder_seed']
             }
-
-
             else {
-              temp = ['id'];
+              temp = [sequelize.col('m_variety_characteristics.id'), 'id'];
             }
             attributesData.push(temp);
 
@@ -3201,6 +3476,7 @@ class SeedController {
           attributesData.push([sequelize.col('m_variety_characteristics.is_active'), 'is_active'])
         }
       }
+      console.log('attributesData', attributesData);
       let condition = {}
       condition = {
         include: [
@@ -3334,6 +3610,126 @@ class SeedController {
       response(res, status.DATA_NOT_AVAILABLE, 500)
     }
   }
+
+  static addCropCharacteristicsListWithDynamicField = async (req, res) => {
+    try {
+      let attributesData = [];
+
+      // Field-to-column mapping
+      const fieldMap = {
+        crop_group: ['m_crop->m_crop_group.group_name', 'group_name'],
+        variety_name: ['m_crop_varieties.variety_name', 'variety_name'],
+        crop_name: ['m_crop.crop_name', 'crop_name'],
+        variety_code: ['m_crop_varieties.variety_code', 'variety_code'],
+        developed_by: ['m_crop_varieties.developed_by', 'developed_by'],
+        matuarity_day_from: ['m_variety_characteristic.matuarity_day_from', 'matuarity_day_from'],
+        matuarity_day_to: ['m_variety_characteristic.matuarity_day_to', 'matuarity_day_to'],
+        spacing_from: ['m_variety_characteristic.spacing_from', 'spacing_from'],
+        spacing_to: ['m_variety_characteristic.spacing_to', 'spacing_to'],
+        generic_morphological: ['m_variety_characteristic.generic_morphological', 'generic_morphological'],
+        seed_rate: ['m_variety_characteristic.seed_rate', 'seed_rate'],
+        average_yeild_from: ['m_variety_characteristic.average_yeild_from', 'average_yeild_from'],
+        average_yeild_to: ['m_variety_characteristic.average_yeild_to', 'average_yeild_to'],
+        fertilizer_dosage: ['m_variety_characteristic.fertilizer_dosage', 'fertilizer_dosage'],
+        agronomic_features: ['m_variety_characteristic.agronomic_features', 'agronomic_features'],
+        adoptation: ['m_variety_characteristic.adoptation', 'adoptation'],
+        reaction_abiotic_stress: ['m_variety_characteristic.reaction_abiotic_stress', 'reaction_abiotic_stress'],
+        reaction_major_diseases: ['m_variety_characteristic.reaction_major_diseases', 'reaction_major_diseases'],
+        reaction_to_pets: ['m_variety_characteristic.reaction_to_pets', 'reaction_to_pets'],
+        specific_morphological: ['m_variety_characteristic.specific_morphological', 'specific_morphological'],
+        notification_date: ['m_variety_characteristic.notification_date', 'notification_date'],
+        year_of_introduction_market: ['m_variety_characteristic.year_of_introduction_market', 'year_of_introduction_market'],
+        notification_number: ['m_crop_varieties.not_number', 'notification_number'],
+        meeting_number: ['m_crop_varieties.meeting_number', 'meeting_number'],
+        year_of_release: ['m_variety_characteristic.year_of_release', 'year_of_release'],
+        nitrogen: ['m_variety_characteristic.nitrogen', 'nitrogen'],
+        phosphorus: ['m_variety_characteristic.phosphorus', 'phosphorus'],
+        potash: ['m_variety_characteristic.potash', 'potash'],
+        other: ['m_variety_characteristic.other', 'other'],
+        fertilizer_other_name: ['m_variety_characteristic.fertilizer_other_name', 'fertilizer_other_name'],
+        fertilizer_other_value: ['m_variety_characteristic.fertilizer_other_value', 'fertilizer_other_value'],
+        maturity: ['m_variety_characteristic.maturity', 'maturity'],
+        type: ['m_crop_varieties.type', 'type'],
+        ecology: ['m_variety_characteristic.eology', 'eology'], // check spelling
+        resemblance_to_variety: ['m_variety_characteristic.resemblance_to_variety', 'resemblance_to_variety'],
+        recommended_state_for_cultivation: ['m_variety_characteristic.state_data', 'state_data'],
+        responsible_insitution_developing_seed: ['m_variety_characteristic.responsible_insitution_for_breeder_seed', 'responsible_insitution_for_breeder_seed']
+      };
+
+      // Build attributesData from request
+      if (req.body.search?.fieldData?.length) {
+        for (const item of req.body.search.fieldData) {
+          if (item?.value && fieldMap[item.value]) {
+            const [col, alias] = fieldMap[item.value];
+            attributesData.push([sequelize.col(col), alias]);
+          } else {
+            attributesData.push([sequelize.col('m_variety_characteristic.id'), 'id']);
+          }
+        }
+      }
+
+      // Always include is_active
+      attributesData.push([sequelize.col('m_variety_characteristic.is_active'), 'is_active']);
+
+      const condition = {
+        include: [
+          {
+            model: cropModel,
+            attributes: [],
+            include: [{ model: cropGroupModel, attributes: [] }],
+            left: true
+          },
+          {
+            model: cropCharactersticsModel,
+            attributes: [],
+            required: false
+          }
+        ],
+        attributes: attributesData,
+        raw: true,
+        where: {}
+      };
+
+      // Pagination
+      let { page = 1, pageSize = 10, search } = req.body;
+      if (page > 0 && pageSize > 0) {
+        condition.limit = pageSize;
+        condition.offset = (page - 1) * pageSize;
+      }
+
+      // Sorting
+      condition.order = [
+        [sequelize.col('m_crop.crop_group'), 'ASC'],
+        [sequelize.col('m_crop.crop_name'), 'ASC'],
+        [sequelize.col('m_crop_varieties.variety_name'), 'ASC']
+      ];
+
+      // Filters
+      if (search) {
+        if (search.crop_group) {
+          condition.include[0].where = { group_code: search.crop_group };
+        }
+        if (search.crop_name) {
+          condition.where.crop_code = search.crop_name;
+        }
+        if (search.variety_name) {
+          condition.where.variety_code = search.variety_name;
+        }
+        if (search.is_notified) {
+          // condition.where.notification_date =
+          //   search.is_notified === 'notified'
+          //     ? { [Op.or]: [{ [Op.not]: null }, { [Op.not]: '' }] }
+          //     : { [Op.or]: [{ [Op.eq]: null }, { [Op.eq]: '' }] };
+        }
+      }
+
+      const data = await cropVerietyModel.findAndCountAll(condition);
+      response(res, status.DATA_AVAILABLE, 200, data);
+    } catch (error) {
+      console.error(error);
+      response(res, status.DATA_NOT_AVAILABLE, 500);
+    }
+  };
 
   //Add/update seed multiplication ratio
   static addSeedMultiplicationRatioData = async (req, res) => {
@@ -4085,9 +4481,9 @@ class SeedController {
       }
 
       let condition = {
-        include:[
+        include: [
           {
-            model:  db.varietyCategoryMappingModel,
+            model: db.varietyCategoryMappingModel,
             attributes: ['m_variety_category_id'],
             as: 'category',
             include: [
@@ -4147,7 +4543,7 @@ class SeedController {
 
   static freezeIndentBreederSeedDataForward = async (req, res) => {
     try {
-      const id = [] = req.body.search.id;     
+      const id = [] = req.body.search.id;
       const data = await indentOfBreederseedModel.update({
         is_forward: 1
       }, {
@@ -4163,7 +4559,7 @@ class SeedController {
       response(res, status.DATA_NOT_SAVE, 500, error)
     }
   }
-  
+
 
   static freezeIndentBreederSeedReport = async (req, res) => {
     let data = {};
@@ -5052,13 +5448,28 @@ class SeedController {
         ],
         where: {}
       }
-      if (req.body.page) {
-        if (page === undefined) page = 1;
-        if (pageSize === undefined) pageSize = 10;
-        if (page > 0 && pageSize > 0) {
-          condition.limit = pageSize;
-          condition.offset = (page * pageSize) - pageSize;
+      // if (req.body.page) {
+      //   if (page === undefined) page = 1;
+      //   if (pageSize === undefined) pageSize = 10;
+      //   if (page > 0 && pageSize > 0) {
+      //     condition.limit = pageSize;
+      //     condition.offset = (page * pageSize) - pageSize;
+      //   }
+      // }
+
+      if (!searchData?.isReport) {
+        if (req.body.page) {
+          if (page === undefined) page = 1;
+          if (pageSize === undefined) pageSize = 10;
+          if (page > 0 && pageSize > 0) {
+            condition.limit = pageSize;
+            condition.offset = (page * pageSize) - pageSize;
+          }
         }
+      }
+      else
+      {
+        
       }
 
 
@@ -5279,195 +5690,6 @@ class SeedController {
       console.log(error);
       return response(res, status.DATA_NOT_SAVE, 500, error);
     }
-  }
-
-  static getDashboardItemCount = async (req, res) => {
-    let data = [];
-    try {
-      let condition = {}
-      if (req.body.loginedUserid && req.body.loginedUserid.user_type && req.body.loginedUserid.user_type == 'SD') {
-        console.log(req.body.loginedUserid.user_type, 'get-dashboard-item-count')
-        condition = {
-          attributes: [
-            [sequelize.literal("COUNT(DISTINCT(crop_code))"), "crop_code"],
-          ],
-          where: {
-            is_active: 1,
-            // crop_code: {
-            //   [Op.like]: req.body.search.crop_type + '%'
-            // }
-          }
-        };
-      }
-      else if (req.body.search && req.body.search.crop_type) {
-        condition = {
-          attributes: [
-            [sequelize.literal("COUNT(DISTINCT(crop_code))"), "crop_code"],
-          ],
-          where: {
-            is_active: 1,
-            crop_code: {
-              [Op.like]: req.body.search.crop_type + '%'
-            }
-          }
-        };
-
-      } else {
-        condition = {
-          attributes: [
-            [sequelize.literal("COUNT(DISTINCT(crop_code))"), "crop_code"],
-          ],
-          where: {
-            // is_active: 1,
-
-          }
-        };
-      }
-
-      let cropCount = await cropModel.findAll(condition);
-      data.push({ "total_crop": cropCount[0].dataValues.crop_code });
-
-      // response(res, status.DATA_AVAILABLE, 200, data)
-    } catch (error) {
-      console.log(error)
-      response(res, status.DATA_NOT_AVAILABLE, 500)
-    }
-    try {
-      let condition = {}
-      if (req.body.search && req.body.search.crop_type) {
-
-        condition = {
-          attributes: [
-            [sequelize.literal("COUNT(DISTINCT(variety_code))"), "variety_code"],
-          ],
-          where: {
-            is_active: 1,
-            is_notified: 1,
-            crop_code: {
-              [Op.like]: req.body.search.crop_type + '%'
-            }
-          }
-        };
-      } else {
-        condition = {
-          attributes: [
-            [sequelize.literal("COUNT(DISTINCT(variety_code))"), "variety_code"],
-          ],
-          where: {
-            is_active: 1,
-            is_notified: 1,
-
-          }
-        };
-      }
-      let varietyCount = await cropVerietyModel.findAll(condition);
-      data.push({ "total_variety": varietyCount[0].dataValues.variety_code });
-
-    } catch (error) {
-      console.log(error)
-      response(res, status.DATA_NOT_AVAILABLE, 500)
-    }
-    try {
-      let condition = {
-        attributes: [
-          [sequelize.literal("COUNT(DISTINCT(username))"), "username"],
-        ],
-        where: {
-          is_active: 1,
-          user_type: 'IN'
-        }
-      };
-      let indenterCount = await userModel.findAll(condition);
-      data.push({ "total_indenter": indenterCount[0].dataValues.username });
-
-    } catch (error) {
-      console.log(error)
-      response(res, status.DATA_NOT_AVAILABLE, 500)
-    }
-    try {
-      let condition = {
-        attributes: [
-          [sequelize.literal("COUNT(DISTINCT(username))"), "username"],
-        ],
-        where: {
-          is_active: 1,
-          user_type: 'BR'
-          // user_type:'ICAR'
-        }
-      };
-      let icarCount = await userModel.findAll(condition);
-      data.push({ "total_icar": icarCount[0].dataValues.username });
-
-    } catch (error) {
-      console.log(error)
-      response(res, status.DATA_NOT_AVAILABLE, 500)
-    }
-
-    try {
-      let condition = {
-        attributes: [
-          [sequelize.literal("COUNT(DISTINCT(username))"), "username"],
-        ],
-        where: {
-          is_active: 1,
-          user_type: 'BPC'
-        },
-
-      };
-      let BPCCount = await userModel.findAll(condition);
-
-      data.push({ "total_bpc": BPCCount[0].dataValues.username });
-
-    } catch (error) {
-      console.log(error)
-      response(res, status.DATA_NOT_AVAILABLE, 500)
-    }
-    try {
-      let condition = {
-        attributes: [
-          [sequelize.literal("COUNT(DISTINCT(username))"), "username"],
-        ],
-        where: {
-          is_active: 1,
-          user_type: 'SPP'
-        },
-        raw: true
-      };
-      let BPCCount = await userModel.findAll(condition);
-      data.push({ "total_spp": BPCCount && BPCCount[0] && BPCCount[0].username ? BPCCount[0].username : 0 });
-
-    } catch (error) {
-      console.log(error)
-      response(res, status.DATA_NOT_AVAILABLE, 500)
-    }
-
-    //spp
-
-
-
-    try {
-      let condition = {
-        attributes: [
-          [sequelize.literal("COUNT(id)"), "totallab"],
-        ],
-        where: {
-          is_active: 1,
-          // user_type: 'BPC'
-        },
-        raw: true
-      };
-
-      let SPPCount = await db.seedLabTestModel.findAll(condition);
-
-      data.push({ "total_lab": SPPCount && SPPCount[0] && SPPCount[0].totallab ? SPPCount[0].totallab : 0 });
-
-    } catch (error) {
-      console.log(error)
-      response(res, status.DATA_NOT_AVAILABLE, 500)
-    }
-
-
-    response(res, status.DATA_AVAILABLE, 200, data)
   }
 
   static totalIndent = async (req, res) => {
@@ -6155,6 +6377,714 @@ class SeedController {
       response(res, status.DATA_NOT_AVAILABLE, 500)
     }
   }
+
+  static getDashboardItemCount = async (req, res) => {
+    let data = [];
+    try {
+      const { graphType, crop_type } = req.body.search || {};
+      let include = [];
+      let whereCondition = { is_active: 1 };
+
+      // If oil-seeds, join cropGroupModel and filter group_code
+      if (graphType === 'oil-seeds') {
+        include.push({
+          model: cropGroupModel,
+          attributes: [],
+          required: true,
+          where: { group_code: 'A04' }
+        });
+      } else if  (graphType === 'pulses-seeds') {
+        include.push({
+          model: cropGroupModel,
+          attributes: [],
+          required: true,
+          where: { group_code: 'A03' }
+        });
+      } else if (graphType === 'nodal') {
+        whereCondition.crop_code = { [Op.like]: `${crop_type}%` };
+      } 
+
+      const cropCount = await cropModel.findOne({
+        attributes: [
+          [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('crop_code'))), 'total_crop']
+        ],
+        where: whereCondition,
+        include,
+        raw: true
+      });
+
+      data.push({ total_crop: cropCount.total_crop });
+
+    } catch (error) {
+      console.error(error);
+      response(res, status.DATA_NOT_AVAILABLE, 500);
+    }
+    try {
+      const { graphType, crop_type } = req.body.search || {};
+      const statusCondition = {
+        [Op.or]: [
+          { status: { [Op.in]: ['hybrid', 'variety'] } },
+          { status: null }
+        ]
+      };
+
+      // Filter by group_code for oil-seeds
+      let include = [];
+      if (graphType == 'oil-seeds') {
+        include.push({
+          model: cropModel,
+          attributes: [],
+          required: true,
+          include: [
+            {
+              model: cropGroupModel,
+              attributes: [],
+              required: true,
+              where: { group_code: 'A04' }
+            }
+          ]
+        }
+        );
+      } else if (graphType === 'nodal') {
+        statusCondition.crop_code = { [Op.like]: `${crop_type}%` };
+      }
+
+      const varietyCount = await cropVerietyModel.findAll({
+        attributes: ["variety_code"],
+        include,
+        where: statusCondition,
+        raw: true
+      });
+
+      data.push({ total_variety: varietyCount.length || 0 });
+
+    } catch (error) {
+      console.error(error);
+      return response(res, status.DATA_NOT_AVAILABLE, 500);
+    }
+    try {
+      let condition = {
+        attributes: [
+          [sequelize.literal("COUNT(DISTINCT(username))"), "username"],
+        ],
+        where: {
+          // is_active: 1,
+          user_type: 'IN'
+        }
+      };
+      let indenterCount = await userModel.findAll(condition);
+      data.push({ "total_indenter": indenterCount[0].dataValues.username });
+
+    } catch (error) {
+      console.log(error)
+      response(res, status.DATA_NOT_AVAILABLE, 500)
+    }
+    try {
+      const { graphType, crop_type } = req.body.search || {};
+      let whereCondition = {
+        is_active: 1,
+        user_type: 'BR'
+      };
+
+      let include = [];
+      if (graphType === 'oil-seeds') {
+        include.push({
+          model: cropModel,
+          attributes: [],
+          required: true,
+          where: { group_code: 'A04' }
+        });
+      } else if (graphType === 'nodal') {
+        include.push({
+          model: cropModel,
+          attributes: [],
+          required: true,
+          where: {
+            crop_code: { [Op.like]: `${crop_type}%` },
+            breeder_id: { [Op.ne]: null }
+          }
+        });
+      }
+
+      // Just one aggregated result
+      let result = await userModel.findAll({
+        attributes: ['id'],
+        group: ['user.id'],
+        where: whereCondition,
+        include,
+        raw: true
+      });
+      data.push({ total_icar: result?.length || 0 });
+
+    } catch (error) {
+      console.error(error);
+      response(res, status.DATA_NOT_AVAILABLE, 500);
+    }
+
+    try {
+      let condition = {
+        attributes: [
+          [sequelize.literal("COUNT(DISTINCT(username))"), "username"],
+        ],
+        where: {
+          is_active: 1,
+          user_type: 'BPC'
+        },
+
+      };
+      let BPCCount = await userModel.findAll(condition);
+
+      data.push({ "total_bpc": BPCCount[0].dataValues.username });
+
+    } catch (error) {
+      console.log(error)
+      response(res, status.DATA_NOT_AVAILABLE, 500)
+    }
+    try {
+      let condition = {
+        attributes: [
+          [sequelize.literal("COUNT(DISTINCT(username))"), "username"],
+        ],
+        where: {
+          // is_active: 1,
+          user_type: 'SPP'
+        },
+        raw: true
+      };
+      let BPCCount = await userModel.findAll(condition);
+      data.push({ "total_spp": BPCCount && BPCCount[0] && BPCCount[0].username ? BPCCount[0].username : 0 });
+
+    } catch (error) {
+      console.log(error)
+      response(res, status.DATA_NOT_AVAILABLE, 500)
+    }
+
+    try {
+      let condition = {
+        attributes: [
+          [sequelize.literal("COUNT(id)"), "totallab"],
+        ],
+        where: {
+          is_active: 1,
+        },
+        raw: true
+      };
+
+      let totalLab = await db.seedLabTestModel.findAll(condition);
+      data.push({ "total_lab": totalLab && totalLab[0] && totalLab[0].totallab ? totalLab[0].totallab : 0 });
+
+    } catch (error) {
+      console.log(error)
+      response(res, status.DATA_NOT_AVAILABLE, 500)
+    }
+    response(res, status.DATA_AVAILABLE, 200, data)
+  }
+
+  static findLatestYearAndSeasons = async (req, res) => {
+    try {
+      const targetSeasons = ['Kharif', 'Rabi'];
+      const currentYear = new Date().getFullYear();
+
+      const lastTwoYears = [
+        `${currentYear}-${(currentYear + 1).toString().slice(-2)}`,
+        `${currentYear - 1}-${currentYear.toString().slice(-2)}`
+      ];
+
+      const seasonYears = lastTwoYears.flatMap(year => {
+        return targetSeasons.map(season => `${season} ${year}`);
+      });
+
+      return response(res, status.DATA_AVAILABLE, 200, seasonYears);
+    } catch (error) {
+      console.error('Error:', error);
+      return response(res, status.DATA_NOT_AVAILABLE, 500, { error: error.message });
+    }
+  };
+
+  static async indentOfBreederseedFilters(body) {
+    const { search, loginedUserid } = body;
+    const whereCondition = {};
+    if (search?.year) whereCondition.year = search.year;
+    if (search?.season) whereCondition.season = search.season;
+    if (search?.crop_code) whereCondition.crop_code = search.crop_code;
+    if (search?.group_code) whereCondition.group_code = search.group_code;
+    if (search?.graphType === 'seed-devision') {
+      // whereCondition.is_indenter_freeze = 1;
+    } else if (search?.graphType === 'indenter') {
+      whereCondition.user_id = loginedUserid.id;
+    } else if (search?.graphType === 'nodal') {
+      whereCondition.crop_code = { [Op.like]: `${search.crop_type}%` };
+      whereCondition.is_freeze = 1;
+      whereCondition.is_forward = 1;
+    } else if (search?.graphType === 'oil-seeds') {
+      whereCondition.group_code = 'A04';
+      // whereCondition.is_freeze = 1;
+    } else if (search?.graphType === 'bspc') {
+      const bspcPerform1Data = await bspProformaOneModel.findOne({
+        attributes: ['year', 'season', 'crop_code'],
+        include: [
+          {
+            model: bspProformaOneBspcModel,
+            attributes: [],
+            // where: { bspc_id: 601 }
+            where: { bspc_id: loginedUserid.id }
+          }
+        ],
+        raw: false,
+      });
+      if (!bspcPerform1Data) return null;
+
+      whereCondition.is_freeze = 1;
+      whereCondition.icar_freeze = 1;
+      whereCondition.user_id = loginedUserid.id;
+      if (bspcPerform1Data?.dataValues?.year) whereCondition.year = bspcPerform1Data?.dataValues.year;
+      if (bspcPerform1Data?.dataValues?.season) whereCondition.season = bspcPerform1Data?.dataValues.season;
+      if (bspcPerform1Data?.dataValues?.crop_code) whereCondition.crop_code = bspcPerform1Data?.dataValues.crop_code;
+    } else if (search?.graphType === 'BR') {
+      // PDPc do later
+    }
+    return whereCondition;
+  }
+
+  static async seedProcessingRegisterFilters(body) {
+    const { search, loginedUserid } = body;
+    const whereCondition = {};
+    if (search?.year) whereCondition.year = search.year;
+    if (search?.season) whereCondition.season = search.season;
+    if (search?.crop_code) whereCondition.crop_code = search.crop_code;
+    if (search?.group_code) whereCondition.crop_code = { [Op.like]: `${search.group_code}%` };
+    whereCondition.is_active = 1;
+    if (search?.graphType === 'indenter') {
+      whereCondition.user_id = loginedUserid.id;
+    } else if (search?.graphType === 'nodal') {
+      whereCondition.crop_code = { [Op.like]: `${search.crop_type}%` };
+    } else if (search?.graphType === 'oil-seeds') {
+      whereCondition.crop_code = { [Op.like]: `A04%` };
+    } else if (search?.graphType === 'bspc') {
+      const bspcPerform1Data = await bspProformaOneModel.findOne({
+        attributes: ['year', 'season', 'crop_code'],
+        include: [
+          {
+            model: bspProformaOneBspcModel,
+            attributes: [],
+            where: { bspc_id: loginedUserid.id }
+          }
+        ],
+        raw: false,
+      });
+      if (!bspcPerform1Data) return null;
+
+      whereCondition.bspc_id = loginedUserid.id;
+      if (bspcPerform1Data?.dataValues?.year) whereCondition.year = bspcPerform1Data?.dataValues.year;
+      if (bspcPerform1Data?.dataValues?.season) whereCondition.season = bspcPerform1Data?.dataValues.season;
+      if (bspcPerform1Data?.dataValues?.crop_code) whereCondition.crop_code = bspcPerform1Data?.dataValues.crop_code;
+    } else if (search?.graphType === 'BR') {
+      // PDPc do later
+    }
+    return whereCondition;
+  }
+
+  static async allocationToIndentorSeedFilters(body) {
+    const { search, loginedUserid } = body;
+    const whereCondition = {};
+    if (search?.year) whereCondition.year = search.year;
+    if (search?.season) whereCondition.season = search.season;
+    if (search?.crop_code) whereCondition.crop_code = search.crop_code;
+    if (search?.group_code) whereCondition.crop_group_code = search.group_code;
+    whereCondition.is_active = 1;
+    if (search?.graphType === 'indenter') {
+      // whereCondition.indent_of_breeder_id = loginedUserid.id; // in joining table
+      // whereCondition.is_freeze = 1;
+      // whereCondition.is_variety_submitted = 1;
+    } else if (search?.graphType === 'nodal') {
+      whereCondition.crop_code = { [Op.like]: `${search.crop_type}%` };
+      whereCondition.is_freeze = 1;
+      // whereCondition.is_variety_submitted = 1;
+    } else if (search?.graphType === 'oil-seeds') {
+      whereCondition.crop_group_code = 'A04';
+      // whereCondition.is_freeze = 1;
+      // whereCondition.is_variety_submitted = 1;
+    } else if (search?.graphType === 'bspc') {
+      const bspcPerform1Data = await bspProformaOneModel.findOne({
+        attributes: ['year', 'season', 'crop_code'],
+        include: [
+          {
+            model: bspProformaOneBspcModel,
+            attributes: [],
+            where: { bspc_id: loginedUserid.id }
+          }
+        ],
+        raw: false,
+      });
+      if (!bspcPerform1Data) return null;
+
+      whereCondition.is_freeze = 1;
+      whereCondition.is_variety_submitted = 1;
+      // whereCondition.indent_of_breeder_id = loginedUserid.id;  // in joining table
+      if (bspcPerform1Data?.dataValues?.year) whereCondition.year = bspcPerform1Data?.dataValues.year;
+      if (bspcPerform1Data?.dataValues?.season) whereCondition.season = bspcPerform1Data?.dataValues.season;
+      if (bspcPerform1Data?.dataValues?.crop_code) whereCondition.crop_code = bspcPerform1Data?.dataValues.crop_code;
+    } else if (search?.graphType === 'BR') {
+      // PDPc do later
+    }
+    return whereCondition;
+  }
+
+  static async liftingSeedDetailsFilters(body) {
+    const { search, loginedUserid } = body;
+    const whereCondition = {};
+    if (search?.year) whereCondition.year = search.year;
+    if (search?.season) whereCondition.season = search.season;
+    if (search?.crop_code) whereCondition.crop_code = search.crop_code;
+    if (search?.group_code) whereCondition.crop_code = { [Op.like]: `${search.group_code}%` };
+
+    if (search?.graphType === 'indenter') {
+      whereCondition.indentor_id = loginedUserid.id
+    } else if (search?.graphType === 'nodal') {
+      whereCondition.crop_code = { [Op.like]: `${search.crop_type}%` };
+    } else if (search?.graphType === 'oil-seeds') {
+      whereCondition.crop_code = { [Op.like]: `A04%` };
+    } else if (search?.graphType === 'bspc') {
+      const bspcPerform1Data = await bspProformaOneModel.findOne({
+        attributes: ['year', 'season', 'crop_code'],
+        include: [
+          {
+            model: bspProformaOneBspcModel,
+            attributes: [],
+            where: { bspc_id: loginedUserid.id }
+          }
+        ],
+        raw: false,
+      });
+      if (!bspcPerform1Data) return null;
+
+      whereCondition.user_id = loginedUserid.id;
+      if (bspcPerform1Data?.dataValues?.year) whereCondition.year = bspcPerform1Data?.dataValues.year;
+      if (bspcPerform1Data?.dataValues?.season) whereCondition.season = bspcPerform1Data?.dataValues.season;
+      if (bspcPerform1Data?.dataValues?.crop_code) whereCondition.crop_code = bspcPerform1Data?.dataValues.crop_code;
+    } else if (search?.graphType === 'BR') {
+      // PDPc do later
+    }
+    return whereCondition;
+  }
+
+  static getChartIndentCropWise = async (req, res) => {
+    try {
+      const { search, loginedUserid } = req.body;
+      const dummyData = {
+        crop_code: null,
+        crop_name: null,
+        total_indent_quantity: 0,
+        total_produced_quantity: 0,
+        total_allocate_quantity: 0,
+        total_lifted_quantity: 0,
+      };
+      if (search?.graphType === 'nodal' && !search.crop_type) {
+        return response(res, 'Crop Type is required', 400, null);
+      }
+
+      // Fetch filters
+      const [indentOfBreederseedFilter, seedProcessingRegisterFilter, allocationToIndentorSeedFilter, liftingSeedDetailsFilter] =
+        await Promise.all([
+          this.indentOfBreederseedFilters(req.body),
+          this.seedProcessingRegisterFilters(req.body),
+          this.allocationToIndentorSeedFilters(req.body),
+          this.liftingSeedDetailsFilters(req.body),
+        ]);
+
+      if (!indentOfBreederseedFilter || !seedProcessingRegisterFilter || !allocationToIndentorSeedFilter || !liftingSeedDetailsFilter) {
+        return response(res, status.DATA_AVAILABLE, 200, dummyData);
+      }
+
+      const allocationToIndentorProductionCenterSeedWhere = {};
+      if (['bspc', 'indenter'].includes(search?.graphType)) {
+        allocationToIndentorProductionCenterSeedWhere.indent_of_breeder_id = loginedUserid.id;
+      }
+
+      // Fetch raw data
+      const [indentDataRaw, produceDataRaw, allocatedDataRaw, liftingDataRaw] = await Promise.all([
+        indentOfBreederseedModel.findAll({
+          attributes: ['crop_code', 'indent_quantity'],
+          where: indentOfBreederseedFilter,
+          raw: true
+        }),
+        seedProcessingRegisterModel.findAll({
+          attributes: ['crop_code', 'total_processed_qty'],
+          where: seedProcessingRegisterFilter,
+          raw: true
+        }),
+        allocationToIndentorSeed.findAll({
+          attributes: ['crop_code', [sequelize.col('allocation_to_indentor_for_lifting_seed_production_cnters.allocated_quantity'), 'total_allocate_quantity']],
+          where: allocationToIndentorSeedFilter,
+          include: [
+            {
+              model: allocationToIndentorProductionCenterSeed,
+              attributes: [], ...(Object.keys(allocationToIndentorProductionCenterSeedWhere).length ? { where: allocationToIndentorProductionCenterSeedWhere } : {})
+            }
+          ],
+          raw: true,
+        }),
+        liftingSeedDetailsModel.findAll({ attributes: ['crop_code', 'no_of_bag', 'bag_weight'], where: liftingSeedDetailsFilter, raw: true }),
+      ]);
+
+      // Utility to sum up quantities with optional conversion
+      const sumQuantities = (rows, qtyKey, conversionFn = (c, q) => q) => {
+        return rows.reduce((map, row) => {
+          const quantity = conversionFn(row.crop_code, Number(row[qtyKey]) || 0);
+          map[row.crop_code] = (map[row.crop_code] || 0) + quantity;
+          return map;
+        }, {});
+      };
+      const maybeConvert = (code, qty) => code.startsWith('H') ? qty / 100 : qty;
+
+      // Reduce all data
+      const indentData = sumQuantities(indentDataRaw, 'indent_quantity', maybeConvert);
+      const produceData = sumQuantities(produceDataRaw, 'total_processed_qty', maybeConvert);
+      const allocatedData = sumQuantities(allocatedDataRaw, 'total_allocate_quantity', maybeConvert);
+      const liftingData = liftingDataRaw.reduce((map, row) => {
+        let total = Number(row.no_of_bag) * Number(row.bag_weight);
+        // total = maybeConvert(row.crop_code, total);
+        total = total / 100;
+        map[row.crop_code] = (map[row.crop_code] || 0) + total;
+        return map;
+      }, {});
+
+      // Gather all crop codes
+      const allCropCodes = new Set([...Object.keys(indentData), ...Object.keys(produceData), ...Object.keys(allocatedData), ...Object.keys(liftingData)]);
+      if (!allCropCodes.size) return response(res, status.DATA_AVAILABLE, 200, dummyData);
+
+      // Fetch crop names
+      const crops = await cropModel.findAll({ attributes: ['crop_code', 'crop_name'], where: { crop_code: Array.from(allCropCodes) }, raw: true });
+      const cropNameMap = crops.reduce((map, c) => { map[c.crop_code] = c.crop_name; return map; }, {});
+
+      // Build final response
+      const finalDataWithNames = Array.from(allCropCodes).map((code) => ({
+        crop_code: code,
+        crop_name: cropNameMap[code] || null,
+        total_indent_quantity: indentData[code] || 0,
+        total_produced_quantity: produceData[code] || 0,
+        total_allocate_quantity: allocatedData[code] || 0,
+        total_lifted_quantity: liftingData[code] || 0,
+      }));
+
+      // Sort by total_indent_quantity in descending order
+      finalDataWithNames.sort((a, b) => b.total_indent_quantity - a.total_indent_quantity);
+      return response(res, status.DATA_AVAILABLE, 200, finalDataWithNames.length ? finalDataWithNames : dummyData);
+    } catch (error) {
+      console.error('Error in getChartIndentData:', error);
+      return response(res, status.DATA_NOT_AVAILABLE, 500, { error: error.message });
+    }
+  };
+
+  static getChartIndentCropWiseCropList = async (req, res) => {
+    try {
+      const { search, loginedUserid } = req.body;
+      const dummyData = {
+        crop_code: null,
+        crop_name: null,
+      };
+      if (search?.graphType === 'nodal' && !search.crop_type) {
+        return response(res, 'Crop Type is required', 400, null);
+      }
+
+      // Fetch filters
+      const [indentOfBreederseedFilter, seedProcessingRegisterFilter, allocationToIndentorSeedFilter, liftingSeedDetailsFilter] =
+        await Promise.all([
+          this.indentOfBreederseedFilters(req.body),
+          this.seedProcessingRegisterFilters(req.body),
+          this.allocationToIndentorSeedFilters(req.body),
+          this.liftingSeedDetailsFilters(req.body),
+        ]);
+
+      if (!indentOfBreederseedFilter || !seedProcessingRegisterFilter || !allocationToIndentorSeedFilter || !liftingSeedDetailsFilter) {
+        return response(res, status.DATA_AVAILABLE, 200, dummyData);
+      }
+
+      const allocationToIndentorProductionCenterSeedWhere = {};
+      if (['bspc', 'indenter'].includes(search?.graphType)) {
+        allocationToIndentorProductionCenterSeedWhere.indent_of_breeder_id = loginedUserid.id;
+      }
+
+      // Fetch raw data
+      const [indentData, produceData, allocatedData, liftingData] = await Promise.all([
+        indentOfBreederseedModel.findAll({
+          attributes: ['crop_code'],
+          where: indentOfBreederseedFilter,
+          raw: true
+        }),
+        seedProcessingRegisterModel.findAll({
+          attributes: ['crop_code'],
+          where: seedProcessingRegisterFilter,
+          raw: true
+        }),
+        allocationToIndentorSeed.findAll({
+          attributes: ['crop_code'],
+          where: allocationToIndentorSeedFilter,
+          include: [
+            {
+              model: allocationToIndentorProductionCenterSeed,
+              attributes: [], ...(Object.keys(allocationToIndentorProductionCenterSeedWhere).length ? { where: allocationToIndentorProductionCenterSeedWhere } : {})
+            }
+          ],
+          raw: true,
+        }),
+        liftingSeedDetailsModel.findAll({
+          attributes: ['crop_code'],
+          where: liftingSeedDetailsFilter,
+          raw: true
+        }),
+      ]);
+
+      const allCropCodes = Array.from(new Set([
+        ...indentData.map(item => item.crop_code),
+        ...produceData.map(item => item.crop_code),
+        ...allocatedData.map(item => item.crop_code),
+        ...liftingData.map(item => item.crop_code),
+      ]));
+
+      // If no crop codes found, return dummy
+      if (!allCropCodes.length) return response(res, status.DATA_AVAILABLE, 200, dummyData);
+
+      // Fetch crop names
+      const crops = await cropModel.findAll({
+        attributes: ['crop_code', 'crop_name'],
+        where: { crop_code: allCropCodes },
+        raw: true,
+      });
+
+      // Return array of { crop_code, crop_name }
+      return response(res, status.DATA_AVAILABLE, 200, crops.length ? crops : dummyData);
+    } catch (error) {
+      console.error('Error in getChartIndentData:', error);
+      return response(res, status.DATA_NOT_AVAILABLE, 500, { error: error.message });
+    }
+  };
+
+  static getChartIndentCropToVarietieWise = async (req, res) => {
+    try {
+      const { search, loginedUserid } = req.body;
+      const dummyData = {
+        variety_code: null,
+        variety_name: null,
+        total_indent_quantity: 0,
+        total_produced_quantity: 0,
+        total_allocate_quantity: 0,
+        total_lifted_quantity: 0,
+      };
+      if (!search?.crop_code) {
+        return response(res, 'Crop code is required', 400, null);
+      }
+
+      if (search?.graphType === 'nodal' && !search.crop_type) {
+        return response(res, 'Crop Type is required', 400, null);
+      }
+
+      // Fetch filters
+      const [indentOfBreederseedFilter, seedProcessingRegisterFilter, allocationToIndentorSeedFilter, liftingSeedDetailsFilter] =
+        await Promise.all([
+          this.indentOfBreederseedFilters(req.body),
+          this.seedProcessingRegisterFilters(req.body),
+          this.allocationToIndentorSeedFilters(req.body),
+          this.liftingSeedDetailsFilters(req.body),
+        ]);
+
+      if (!indentOfBreederseedFilter || !seedProcessingRegisterFilter || !allocationToIndentorSeedFilter || !liftingSeedDetailsFilter) {
+        return response(res, status.DATA_AVAILABLE, 200, dummyData);
+      }
+
+      const allocationToIndentorProductionCenterSeedWhere = {};
+      if (['bspc', 'indenter'].includes(search?.graphType)) {
+        allocationToIndentorProductionCenterSeedWhere.indent_of_breeder_id = loginedUserid.id;
+      }
+
+      // Fetch raw data
+      const [indentDataRaw, produceDataRaw, allocatedDataRaw, liftingDataRaw] = await Promise.all([
+        indentOfBreederseedModel.findAll({
+          attributes: ['indent_quantity', [sequelize.col('m_crop_variety.variety_code'), 'variety_code']],
+          where: indentOfBreederseedFilter,
+          include: [
+            {
+              model: varietyModel,
+              attributes: []
+            }
+          ],
+          raw: true
+        }),
+        seedProcessingRegisterModel.findAll({
+          attributes: ['variety_code', 'total_processed_qty'],
+          where: seedProcessingRegisterFilter,
+          raw: true
+        }),
+        allocationToIndentorSeed.findAll({
+          attributes: ['variety_code', [sequelize.col('allocation_to_indentor_for_lifting_seed_production_cnters.allocated_quantity'), 'total_allocate_quantity'],
+            [sequelize.col('m_crop_variety.variety_code'), 'variety_code']
+          ],
+          where: allocationToIndentorSeedFilter,
+          include: [
+            {
+              model: allocationToIndentorProductionCenterSeed,
+              attributes: [], ...(Object.keys(allocationToIndentorProductionCenterSeedWhere).length ? { where: allocationToIndentorProductionCenterSeedWhere } : {})
+            },
+            {
+              model: varietyModel,
+              attributes: []
+            }
+          ],
+          raw: true,
+        }),
+        liftingSeedDetailsModel.findAll({ attributes: ['variety_code', 'no_of_bag', 'bag_weight'], where: liftingSeedDetailsFilter, raw: true }),
+      ]);
+
+      // Utility to sum up quantities with optional conversion
+      const sumQuantities = (rows, qtyKey, conversionFn = (c, q) => q) => {
+        return rows.reduce((map, row) => {
+          const quantity = conversionFn(row.variety_code, Number(row[qtyKey]) || 0);
+          map[row.variety_code] = (map[row.variety_code] || 0) + quantity;
+          return map;
+        }, {});
+      };
+
+      // Reduce all data
+      const indentData = sumQuantities(indentDataRaw, 'indent_quantity');
+      const produceData = sumQuantities(produceDataRaw, 'total_processed_qty');
+      const allocatedData = sumQuantities(allocatedDataRaw, 'total_allocate_quantity');
+
+      const liftingData = liftingDataRaw.reduce((map, row) => {
+        let total = Number(row.no_of_bag) * Number(row.bag_weight);
+        map[row.variety_code] = (map[row.variety_code] || 0) + total;
+        return map;
+      }, {});
+
+      // Gather all crop codes
+      const allVarietyCodes = new Set([...Object.keys(indentData), ...Object.keys(produceData), ...Object.keys(allocatedData), ...Object.keys(liftingData)]);
+      if (!allVarietyCodes.size) return response(res, status.DATA_AVAILABLE, 200, dummyData);
+
+      // Fetch crop names
+      const varietys = await varietyModel.findAll({ attributes: ['variety_code', 'variety_name'], where: { variety_code: Array.from(allVarietyCodes) }, raw: true });
+      const varietyNameMap = varietys.reduce((map, c) => { map[c.variety_code] = c.variety_name; return map; }, {});
+
+      // Build final response
+      let finalDataWithNames = Array.from(allVarietyCodes).map((code) => {
+        const convert = (val) => search.crop_code.startsWith('H') ? val / 100 : val;
+        return {
+          variety_code: code,
+          variety_name: varietyNameMap[code] || null,
+          total_indent_quantity: convert(indentData[code] || 0),
+          total_produced_quantity: convert(produceData[code] || 0),
+          total_allocate_quantity: convert(allocatedData[code] || 0),
+          total_lifted_quantity: liftingData[code] / 100 || 0,
+        };
+      });
+
+      // Sort by total_indent_quantity in descending order
+      finalDataWithNames.sort((a, b) => b.total_indent_quantity - a.total_indent_quantity);
+      return response(res, status.DATA_AVAILABLE, 200, finalDataWithNames.length ? finalDataWithNames : dummyData);
+    } catch (error) {
+      console.error('Error in getChartIndentData:', error);
+      return response(res, status.DATA_NOT_AVAILABLE, 500, { error: error.message });
+    }
+  };
+
   static getChartIndentDataVariety = async (req, res) => {
     let data = {};
     try {
@@ -6506,6 +7436,8 @@ class SeedController {
 
   static getCropCharactersticsWithId = async (req, res) => {
     try {
+
+      
       // let { page, pageSize, search } = req.body;
       let condition = {}
       if (req.body.search.view) {
@@ -6523,10 +7455,10 @@ class SeedController {
             },
             {
               model: cropCharactersticsModel,
-              include:[
+              include: [
                 {
                   model: db.mCharactersticAgroRegionMappingModel,
-                  attributes: ['is_checked','region_id'],
+                  attributes: ['is_checked', 'region_id'],
                   as: 'regions',
                   // include: [
                   //   {
@@ -6537,7 +7469,7 @@ class SeedController {
                   // ],
                 }
               ]
-            }, 
+            },
           ],
           where: {}
         }
@@ -6559,7 +7491,7 @@ class SeedController {
               // attributes: ['crop_name']
             },
             {
-              model:cropCharactersticsModel
+              model: cropCharactersticsModel
             },
             // {
             //   model: db.mCharactersticAgroRegionMappingModel,
@@ -6574,7 +7506,7 @@ class SeedController {
             //   // ],
             //   left:true
             // },
-            
+
           ],
           // nest:true,
           where: {}
@@ -6595,17 +7527,27 @@ class SeedController {
 
       // condition.order = [[sortOrder, sortDirection]];
 
-      if (req.params.id) {
-        if (req.params.id) {
-          condition.where.variety_code = req.params.id
-        }
+      const isNumericId = /^\d+$/.test(req.params.id);
 
-        // if (search.crop_code) {
-        //   condition.where['crop_code'] = search.crop_code
-        // }
+      if (req.params.id) {
+        if (isNumericId) {
+          condition.where.id = parseInt(req.params.id); // safely use as number
+        } else {
+          condition.where.variety_code = req.params.id; // use different field (e.g. variety_code)
+        }
       }
+      // if (req.params.id) {
+      //   if (req.params.id) {
+      //     condition.where.id = req.params.id
+      //   }
+
+      //   // if (search.crop_code) {
+      //   //   condition.where['crop_code'] = search.crop_code
+      //   // }
+      // }
 
       const data = await cropVerietyModel.findAll(condition);
+      console.log('datadata=====', data);
       if (!data) {
         return response(res, status.DATA_NOT_AVAILABLE, 404);
       }
@@ -7972,15 +8914,15 @@ class SeedController {
         // mobile_number:mobile ? mobile :null, 
         contact_person_designation_id: contact_person_designation,
         pincode: pincode ? pincode : null,
-        mobile_number :mobile ? mobile : null,
-        contact_person_mobile : mobile ? mobile : null
+        mobile_number: mobile ? mobile : null,
+        contact_person_mobile: mobile ? mobile : null
       }
       if (contactPersonDesignation) {
         dataRow.contact_person_designation = contact_person_designation ? contact_person_designation : '';
       } else {
         dataRow.contact_person_designation_id = contact_person_designation ? contact_person_designation : '';
       }
-     
+
       data = await db.agencyDetailModel.update(dataRow, {
         where: {
           id: agency_id
@@ -8119,10 +9061,10 @@ class SeedController {
       }
 
       let { page, pageSize, search } = req.body;
-      let whereClause={}
-      let {email_id} = req.body.search;
-      if(email_id){
-        whereClause.email_id=email_id
+      let whereClause = {}
+      let { email_id } = req.body.search;
+      if (email_id) {
+        whereClause.email_id = email_id
       }
       let condition = {
 
@@ -8131,7 +9073,7 @@ class SeedController {
           // email_id: req.body.search.email_id,
           // password: req.body.search.currentpassword,
           id: req.params.id,
-         
+
         },
         raw: false,
 
@@ -8142,7 +9084,7 @@ class SeedController {
       if (queryData.rows.length > 0) {
         const data = {
           // password: req.body.search.password,
-          is_change_password:true,
+          is_change_password: true,
         }
         const user_data = await userModel.update(data, { where: { id: req.params.id } })
       }
@@ -8159,109 +9101,224 @@ class SeedController {
   }
 
 
-  static getPlantDeatils = async (req, res) => {
-    const { internalCall } = req.body;
-    let returnResponse = {};
-    try {
+  // static getPlantDeatils = async (req, res) => {
+  //   const { internalCall } = req.body;
+  //   let returnResponse = {};
+  //   try {
 
-      let rules = {
-        'search.state_code': 'integer',
-        'search.district_code': 'integer',
+  //     let rules = {
+  //       'search.state_code': 'integer',
+  //       'search.district_code': 'integer',
 
-      };
+  //     };
 
-      let validation = new Validator(req.body, rules);
+  //     let validation = new Validator(req.body, rules);
 
-      const isValidData = validation.passes();
+  //     const isValidData = validation.passes();
 
-      if (!isValidData) {
-        let errorResponse = {};
-        for (let key in rules) {
-          const error = validation.errors.get(key);
-          if (error.length) {
-            errorResponse[key] = error;
-          }
+  //     if (!isValidData) {
+  //       let errorResponse = {};
+  //       for (let key in rules) {
+  //         const error = validation.errors.get(key);
+  //         if (error.length) {
+  //           errorResponse[key] = error;
+  //         }
+  //       }
+  //       return response(res, status.BAD_REQUEST, 400, errorResponse, internalCall)
+  //     }
+
+  //     let { page, pageSize, isReport } = req.body;
+
+  //     if (!page) page = 1;
+  //     let condition = {
+  //       include: [
+  //         {
+
+  //           model: stateModel,
+  //         },
+  //         {
+  //           model: districtModel
+  //         },
+  //         {
+  //           model: designationModel
+  //         }
+  //       ],
+  //       where: {
+  //         // state_id : req.body.search.state_code ? req.body.search.state_code : undefined
+  //       }
+
+
+  //     };
+
+
+
+
+
+  //     // const sortOrder = req.body.sort ? req.body.sort : 'created_at';
+  //     // const sortDirection = req.body.order ? req.body.order : 'DESC';
+
+  //     if(!isReport)
+  //     {
+  //       if (page && pageSize) {
+  //         condition.limit = pageSize;
+  //         condition.offset = (page * pageSize) - pageSize;
+  //       }
+  //     }
+  //     else
+  //     {
+
+  //     }
+     
+
+  //     condition.order = [[sequelize.col('plant_details.plant_name'), 'asc'],
+  //     [sequelize.col('m_state.state_name'), 'asc'],
+
+  //     [sequelize.col('m_district.district_name'), 'asc'],
+  //     [sequelize.col('plant_details.latitude'), 'asc'],
+  //     [sequelize.col('plant_details.longitude'), 'asc'], 
+
+
+  //     ]
+
+  //     // condition.order = [[sortOrder, sortDirection]];
+
+  //     if (req.body.search) {
+
+  //       if (req.body.search.state_code) {
+
+  //         condition.where.state_id = parseInt(req.body.search.state_code);
+  //       }
+
+  //       if (req.body.search.district_code) {
+
+  //         condition.where.district_id = (req.body.search.district_code);
+  //       }
+
+
+  //     }
+
+
+  //     const queryData = await plantDetail.findAndCountAll(condition);
+
+
+
+  //     return response(res, status.OK, 200, queryData, internalCall);
+
+  //   } catch (error) {
+  //     returnResponse = {
+  //       message: error.message
+  //     };
+  //     return response(res, status.UNEXPECTED_ERROR, 500, returnResponse, internalCall);
+  //   }
+  // }
+  static getSPPDeatils = async (req, res) => {
+  const { internalCall } = req.body;
+  let returnResponse = {};
+  try {
+    let rules = {
+      'search.state_code': 'integer',
+      'search.district_code': 'integer',
+    };
+
+    let validation = new Validator(req.body, rules);
+    if (!validation.passes()) {
+      let errorResponse = {};
+      for (let key in rules) {
+        const error = validation.errors.get(key);
+        if (validation.errors.get(key).length) {
+          errorResponse[key] = validation.errors.get(key);
         }
-        return response(res, status.BAD_REQUEST, 400, errorResponse, internalCall)
       }
+      return response(res, status.BAD_REQUEST, 400, errorResponse, internalCall);
+    }
 
-      let { page, pageSize } = req.body;
+    let { page, pageSize, isReport } = req.body;
+    if (!page) page = 1;
 
-      if (!page) page = 1;
-      let condition = {
-        include: [
-          {
+    let condition = {
+      attributes: [
+        'code',
+        'is_active',
+      ],
+      include: [
+        {
+          model: agencyDetailModel,
+          attributes: [
+            'agency_name',
+            'address',
+            'contact_person_name',
+            'mobile_number',
+            'email',
+          ],
+          include: [
+            {
+              model: stateModel,
+              attributes: ['state_name'],
+            },
+            {
+              model: districtModel,
+              attributes: ['district_name'],
+            },
+            {
+              model: designationModel,
+              attributes: [['name', 'designation_name']],
+            },
+          ],
+        },
+      ],
+      where: {
+        user_type: 'SPP',
+      },
+    };
 
-            model: stateModel,
-          },
-          {
-            model: districtModel
-          },
-          {
-            model: designationModel
-          }
-        ],
-        where: {
-          // state_id : req.body.search.state_code ? req.body.search.state_code : undefined
-        }
-
-
-      };
-
-
-
-
-
-      // const sortOrder = req.body.sort ? req.body.sort : 'created_at';
-      // const sortDirection = req.body.order ? req.body.order : 'DESC';
-
+    // Pagination
+    if (!isReport) {
       if (page && pageSize) {
         condition.limit = pageSize;
         condition.offset = (page * pageSize) - pageSize;
       }
-
-      condition.order = [[sequelize.col('plant_details.plant_name'), 'asc'],
-      [sequelize.col('m_state.state_name'), 'asc'],
-
-      [sequelize.col('m_district.district_name'), 'asc'],
-      [sequelize.col('plant_details.latitude'), 'asc'],
-      [sequelize.col('plant_details.longitude'), 'asc'],
-        // [sequelize.col('agency_detail.addrress'), 'asc'],
-
-
-      ]
-
-      // condition.order = [[sortOrder, sortDirection]];
-
-      if (req.body.search) {
-
-        if (req.body.search.state_code) {
-
-          condition.where.state_id = parseInt(req.body.search.state_code);
-        }
-
-        if (req.body.search.district_code) {
-
-          condition.where.district_id = (req.body.search.district_code);
-        }
-
-
-      }
-
-
-      const queryData = await plantDetail.findAndCountAll(condition);
-
-
-
-      return response(res, status.OK, 200, queryData, internalCall);
-
-    } catch (error) {
-      returnResponse = {
-        message: error.message
-      };
-      return response(res, status.UNEXPECTED_ERROR, 500, returnResponse, internalCall);
     }
+
+    // Filters
+    if (req.body.search) {
+      if (req.body.search.state_code) {
+        condition.include[0].where = {
+          ...(condition.include[0].where || {}),
+          state_id: parseInt(req.body.search.state_code),
+        };
+      }
+      if (req.body.search.district_code) {
+        condition.include[0].where = {
+          ...(condition.include[0].where || {}),
+          district_id: req.body.search.district_code,
+        };
+      }
+    }
+
+    // Ordering
+     condition.order = [
+  ['code', 'ASC'],
+  ['is_active', 'ASC'],
+  [agencyDetailModel, stateModel, 'state_name', 'ASC'],
+  [agencyDetailModel, districtModel, 'district_name', 'ASC'],
+  [agencyDetailModel, 'agency_name', 'ASC'],
+  [agencyDetailModel, 'address', 'ASC'],
+  [agencyDetailModel, 'contact_person_name', 'ASC'],
+  [agencyDetailModel, 'mobile_number', 'ASC'],
+  [agencyDetailModel, 'email', 'ASC'],
+];
+
+
+    const queryData = await userModel.findAndCountAll(condition);
+
+    return response(res, status.OK, 200, queryData, internalCall);
+  } catch (error) {
+    returnResponse = { message: error.message };
+    return response(res, status.UNEXPECTED_ERROR, 500, returnResponse, internalCall);
   }
+};
+
+  
   static getPlantDistrictDetails = async (req, res) => {
     let data = [];
     try {
@@ -8871,8 +9928,11 @@ class SeedController {
 
   static getCropNameofSeedMultiplictionRatioReport = async (req, res) => {
     try {
-      let { page, pageSize, search } = req.body;
-
+      let { page, pageSize, search, isReport } = req.body;
+      let cropGroup;
+      if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+        cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+      }
       let condition = {
         include: [
           {
@@ -8888,15 +9948,32 @@ class SeedController {
         ],
         raw: true,
         where: {
-          crop_group_code: req.body.search.cropGroupCode
+          crop_group_code: req.body.search.cropGroupCode,
+          ...cropGroup
         }
       }
-      if (page === undefined) page = 1;
-      if (pageSize === undefined) pageSize = 10;
 
-      if (page > 0 && pageSize > 0) {
-        condition.limit = pageSize;
-        condition.offset = (page * pageSize) - pageSize;
+
+      // if (page === undefined) page = 1;
+      // if (pageSize === undefined) pageSize = 10;
+
+      // if (page > 0 && pageSize > 0) {
+      //   condition.limit = pageSize;
+      //   condition.offset = (page * pageSize) - pageSize;
+      // }
+
+      if (!isReport) {
+        if (page === undefined) page = 1;
+        if (pageSize === undefined) pageSize = 10;
+  
+        if (page > 0 && pageSize > 0) {
+          condition.limit = pageSize;
+          condition.offset = (page * pageSize) - pageSize;
+        }
+      }
+      else
+      {
+        
       }
 
       // const sortOrder = req.body.sort ? req.body.sort : 'id';
@@ -8931,7 +10008,10 @@ class SeedController {
   static getCropNameofMaximumLotsizeReport = async (req, res) => {
     try {
       let { page, pageSize, search } = req.body;
-
+      let cropGroup;
+      if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+        cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+      }
       let condition = {
         include: [
           {
@@ -8946,7 +10026,9 @@ class SeedController {
           [sequelize.fn('DISTINCT', sequelize.col('m_crop.crop_name')), 'crop_name'],
         ],
         raw: true,
-        where: {}
+        where: {
+          ...cropGroup
+        }
       }
       if (page === undefined) page = 1;
       if (pageSize === undefined) pageSize = 10;
@@ -8969,8 +10051,6 @@ class SeedController {
 
           // condition.where.group_code = req.body.search.cropGroupCode
         }
-
-
       }
 
       const data = await maxLotSizeModel.findAndCountAll(condition);
@@ -10477,17 +11557,10 @@ class SeedController {
       let condition = {
         where: {
           characterstics_id: req.query.characterstics_id
-
         },
 
       }
-
-
-
-
-
       let data = await otherFertilizerModel.findAndCountAll(condition);
-
 
       if (data) {
         response(res, status.DATA_AVAILABLE, 200, data);
@@ -10582,7 +11655,7 @@ class SeedController {
       }
       condition.order = [[sequelize.col('m_crop->m_crop_group.group_name'), 'ASC']];
 
-      let data = await cropCharactersticsModel.findAndCountAll(condition);
+      let data = await cropVerietyModel.findAndCountAll(condition);
       let filterdata = []
       data.rows.forEach(element => {
         if (element.dataValues.group_code != null) {
@@ -10652,7 +11725,7 @@ class SeedController {
 
 
       };
-      condition.order = [['agency_name','ASC']]
+      condition.order = [['agency_name', 'ASC']]
       let data = await agencyDetailModel.findAndCountAll(condition);
       if (!data) {
         return response(res, status.DATA_NOT_AVAILABLE, 404);
@@ -12701,9 +13774,9 @@ class SeedController {
   static getCharactersticAgroRegionMapingData = async (req, res) => {
     try {
       const agroRegionData = await db.mCharactersticAgroRegionMappingModel.findAll();
-      if(agroRegionData.length){
+      if (agroRegionData.length) {
         return response(res, status.SUCCESS, 200, agroRegionData);
-      }else{
+      } else {
         return response(res, status.SUCCESS, 201, []);
       }
     } catch (error) {
@@ -12711,7 +13784,2676 @@ class SeedController {
       res.status(500).json({ error: "Internal server error" });
     }
   }
+
+
+  static getFreezedIndentDonutChartData_WithQuantity = async (req, res) => {
+    try {
+      const { search, loginedUserid } = req.body;
+      console.log("loginedUserid", loginedUserid.id)
+      console.log("------search.crop_type---", search.crop_type)
+
+      const whereCondition = {};
+      const whereConditionIndentor = {};
+      const whereConditionNodal = {};
+      const whereConditionBspc = {};
+      const whereConditionOilSeed = {};
+
+      if (search?.year) whereCondition.year = search.year;
+      if (search?.season) whereCondition.season = search.season;
+      if (search?.crop_code) whereCondition.crop_code = search.crop_code;
+
+      if (search?.graphType === "indenter") {
+        whereConditionIndentor.user_id = loginedUserid.id;
+      }
+
+      if (search?.graphType === "nodal") {
+        if (!search.crop_type)
+          return response(res, status.BAD_REQUEST, 400, "Crop Type is required.");
+        whereConditionNodal.crop_code = { [Op.like]: `${search.crop_type}%` };
+        whereConditionNodal.is_freeze = 1;
+      }
+      if (search?.graphType === "oil-seeds") {
+        whereConditionOilSeed.group_code = "A04";
+      }
+      if (search?.graphType === "bspc") {
+        const bspcPerform1Data = await bspProformaOneModel.findOne({
+          attributes: ["year", "season", "crop_code"],
+          include: [
+            {
+              model: bspProformaOneBspcModel,
+              attribute: [],
+              where: { bspc_id: 601 },
+            },
+          ],
+          raw: false,
+        });
+        return response(res, status.DATA_AVAILABLE, 200, bspcPerform1Data);
+      }
+      const indentData = await indentOfBreederseedModel.findAll({
+        attributes: ["indent_quantity", "is_freeze"],
+        where: {
+          ...whereConditionIndentor,
+          ...whereCondition,
+          ...whereConditionNodal,
+          ...whereConditionOilSeed,
+          is_active: 1,
+        },
+        raw: true,
+      });
+
+      let completed = 0;
+      let pending = 0;
+      let total = 0;
+
+      for (const row of indentData) {
+        const qty = Number(row.indent_quantity) || 0;
+        total += qty;
+
+        if (row.is_freeze === 1) {
+          completed += qty;
+        } else {
+          pending += qty;
+        }
+      }
+
+      const completedInPercentage = total > 0 ? Number(((completed / total) * 100).toFixed(2)) : 0;
+      const pendingInPercentage = total > 0 ? Number(((pending / total) * 100).toFixed(2)) : 0;
+
+      const result = {
+        total,
+        completed,
+        pending,
+        completedInPercentage,
+        pendingInPercentage,
+      };
+
+      return response(res, status.DATA_AVAILABLE, 200, result);
+    } catch (error) {
+      console.error("getFreezedIndentDonutChartData error:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  };
+
+  static getFreezedIndentDonutChartDataBackup = async (req, res) => {
+    try {
+      const { search, loginedUserid } = req.body;
+
+      const whereCondition = {};
+      const whereConditionIndentor = {};
+      const whereConditionNodal = {};
+      const whereConditionBspc = {};
+      const whereConditionOilSeed = {};
+
+
+      if (search?.year) whereCondition.year = search.year;
+      if (search?.season) whereCondition.season = search.season;
+      if (search?.crop_code) whereCondition.crop_code = search.crop_code;
+
+      // ✅ New: If group_code exists, fetch crop_codes first
+      if (search?.group_code) {
+        const crops = await db.cropModel.findAll({
+          attributes: ['crop_code'],
+          where: {
+            group_code: search.group_code,
+            is_active: 1 // ✅ Corrected syntax: use colon instead of equals
+          },
+          raw: true
+        });
+
+        const cropCodes = crops.map(row => row.crop_code);
+        if (cropCodes.length === 0) {
+          return response(res, status.DATA_AVAILABLE, 200, []); // No crops for this group_code, return empty
+        }
+
+        whereCondition.crop_code = { [Op.in]: cropCodes };
+      }
+
+
+      if (search?.graphType === "indenter") {
+        whereConditionIndentor.user_id = loginedUserid.id;
+      }
+
+      if (search?.graphType === "nodal") {
+        if (!search.crop_type)
+          return response(res, status.BAD_REQUEST, 400, "Crop Type is required.");
+        whereConditionNodal.crop_code = { [Op.like]: `${search.crop_type}%` };
+        whereConditionNodal.is_freeze = 1;
+        whereConditionNodal.is_forward = 1;
+      }
+
+      if (search?.graphType === "oil-seeds") {
+        whereConditionOilSeed.group_code = "A04";
+      }
+
+      if (search?.graphType === "bspc") {
+        const bspcPerform1Data = await bspProformaOneModel.findOne({
+          attributes: ["year", "season", "crop_code"],
+          include: [
+            {
+              model: bspProformaOneBspcModel,
+              attribute: [],
+              where: { bspc_id: loginedUserid?.id || 601 },
+            },
+          ],
+          raw: false,
+        });
+        return response(res, status.DATA_AVAILABLE, 200, bspcPerform1Data);
+      }
+
+      const indentData = await indentOfBreederseedModel.findAll({
+        attributes: ["crop_code", "is_freeze"],
+        where: {
+          ...whereConditionIndentor,
+          ...whereCondition,
+          ...whereConditionNodal,
+          ...whereConditionOilSeed,
+          is_active: 1,
+        },
+        raw: true,
+      });
+
+      const allCropSet = new Set();
+      const completedCropSet = new Set();
+      const pendingCropSet = new Set();
+
+      for (const row of indentData) {
+        if (!row.crop_code) continue;
+        allCropSet.add(row.crop_code);
+
+        if (row.is_freeze === 1) {
+          completedCropSet.add(row.crop_code);
+        } else {
+          pendingCropSet.add(row.crop_code);
+        }
+      }
+      console.log("----indentData", indentData)
+      const total = allCropSet.size;
+      const completed = completedCropSet.size;
+      const pending = pendingCropSet.size;
+
+      console.log("----total indentData", total)
+      console.log("----completed indentData", completed)
+      console.log("----pending indentData", pending)
+
+
+      const completedInPercentage = total > 0 ? Number(((completed / total) * 100).toFixed(2)) : 0;
+      const pendingInPercentage = total > 0 ? Number(((pending / total) * 100).toFixed(2)) : 0;
+
+      const result = {
+        total,
+        completed,
+        pending,
+        completedInPercentage,
+        pendingInPercentage,
+      };
+
+      return response(res, status.DATA_AVAILABLE, 200, result);
+    } catch (error) {
+      console.error("getFreezedIndentDonutChartData error:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  };
+
+  static getFreezedIndentDonutChartData = async (req, res) => {
+    try {
+      const { search, loginedUserid } = req.body;
+
+      const whereCondition = {
+        is_active: 1
+      };
+
+      if (search?.year) whereCondition.year = search.year;
+      if (search?.season) whereCondition.season = search.season;
+      if (search?.crop_code) whereCondition.crop_code = search.crop_code;
+
+      // ✅ If group_code exists, fetch crop_codes first
+      if (search?.group_code) {
+        const crops = await db.cropModel.findAll({
+          attributes: ['crop_code'],
+          where: {
+            group_code: search.group_code,
+            is_active: 1
+          },
+          raw: true
+        });
+
+        const cropCodes = crops.map(row => row.crop_code);
+        if (cropCodes.length === 0) {
+          return response(res, status.DATA_AVAILABLE, 200, []); // No crops for this group_code
+        }
+
+        whereCondition.crop_code = { [Op.in]: cropCodes };
+      }
+
+      // ✅ Adjust where condition based on graphType
+      switch (search?.graphType) {
+        case "indenter":
+          whereCondition.user_id = loginedUserid.id;
+          break;
+
+        case "nodal":
+          if (!search.crop_type) {
+            return response(res, status.BAD_REQUEST, 400, "Crop Type is required.");
+          }
+          whereCondition.crop_code = { [Op.like]: `${search.crop_type}%` };
+          whereCondition.is_freeze = 1;
+          whereCondition.is_forward = 1;
+          break;
+
+        case "oil-seeds":
+          whereCondition.group_code = "A04";
+          break;
+
+        case "pulses-seeds":
+          whereCondition.group_code = "A03";
+          break;
+
+        case "bspc":
+          const bspcPerform1Data = await bspProformaOneModel.findOne({
+            attributes: ["year", "season", "crop_code"],
+            include: [{
+              model: bspProformaOneBspcModel,
+              where: { bspc_id: loginedUserid?.id || 601 },
+            }],
+            raw: false,
+          });
+          return response(res, status.DATA_AVAILABLE, 200, bspcPerform1Data);
+
+        default:
+          break;
+      }
+
+      const indentData = await indentOfBreederseedModel.findAll({
+        attributes: [
+          [db.Sequelize.fn('DISTINCT', db.Sequelize.col('crop_code')), 'crop_code'],
+          [db.Sequelize.fn('MAX', db.Sequelize.col('is_freeze')), 'max_is_freeze']
+        ],
+        where: whereCondition,
+        group: ['crop_code'],
+        raw: true,
+      });
+
+      const total = indentData.length;
+      const completed = indentData.filter(row => row.max_is_freeze == 1).length;
+      const pending = total - completed;
+
+      const completedInPercentage = total > 0 ? Number(((completed / total) * 100).toFixed(2)) : 0;
+      const pendingInPercentage = total > 0 ? Number(((pending / total) * 100).toFixed(2)) : 0;
+
+      const result = {
+        total,
+        completed,
+        pending,
+        completedInPercentage,
+        pendingInPercentage,
+      };
+
+      return response(res, status.DATA_AVAILABLE, 200, result);
+    } catch (error) {
+      console.error("getFreezedIndentDonutChartData error:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  };
+
+
+  static getAssignToPDPCDonutChartData1 = async (req, res) => {
+    try {
+      const { search, loginedUserid } = req.body;
+
+      const whereCondition = {};
+      const whereConditionIndentor = {};
+      const whereConditionNodal = {};
+      const whereConditionOilSeed = {};
+
+      // ✅ New: If group_code exists, fetch crop_codes first
+      if (search?.group_code) {
+        const crops = await db.cropModel.findAll({
+          attributes: ['crop_code'],
+          where: {
+            group_code: search.group_code,
+            is_active: 1 // ✅ Corrected syntax: use colon instead of equals
+          },
+          raw: true
+        });
+
+        const cropCodes = crops.map(row => row.crop_code);
+        if (cropCodes.length === 0) {
+          return response(res, status.DATA_AVAILABLE, 200, []); // No crops for this group_code, return empty
+        }
+
+        whereCondition.crop_code = { [Op.in]: cropCodes };
+      }
+
+      if (search?.year) whereCondition.year = search.year;
+      if (search?.season) whereCondition.season = search.season;
+      if (search?.crop_code) whereCondition.crop_code = search.crop_code;
+
+      if (search?.graphType === "indenter") {
+        whereConditionIndentor.user_id = loginedUserid?.id;
+      }
+
+      if (search?.graphType === "nodal") {
+        if (!search.crop_type) {
+          return response(res, status.BAD_REQUEST, 400, 'Crop Type is required.');
+        }
+        whereConditionNodal.crop_code = { [Op.like]: `${search.crop_type}%` };
+      }
+
+      if (search?.graphType === "oil-seeds") {
+        whereConditionOilSeed.group_code = 'A04';
+      }
+
+      if (search?.graphType === "bspc") {
+        const bspcPerform1Data = await bspProformaOneModel.findOne({
+          attributes: ['year', 'season', 'crop_code'],
+          include: [
+            {
+              model: bspProformaOneBspcModel,
+              where: { bspc_id: loginedUserid?.id },
+              attributes: []
+            }
+          ],
+          raw: false,
+        });
+        return response(res, status.DATA_AVAILABLE, 200, bspcPerform1Data);
+      }
+      // Fetch indent data with crop join
+      const indentData = await db.indentOfBreederseedModel.findAll({
+        attributes: ['crop_code', 'is_freeze', 'icar_freeze', 'is_forward'],
+        include: [
+          {
+            model: db.cropModel,
+            as: 'm_crop',
+            required: true,
+            attributes: ['breeder_id'],
+            where: {
+              breeder_id: { [Op.ne]: null },
+              ...whereConditionOilSeed,
+            },
+          },
+        ],
+        where: {
+          ...whereCondition,
+          ...whereConditionIndentor,
+          ...whereConditionNodal,
+          is_active: 1,
+        },
+        raw: true,
+      });
+      const totalSet = new Set();
+      const completedSet = new Set();
+      const pendingSet = new Set();
+
+      for (const row of indentData) {
+        const cropCode = row.crop_code;
+        if (!cropCode) continue;
+
+        totalSet.add(cropCode);
+
+        if ((row.is_freeze === 1 && row.icar_freeze === 1 && row.is_forward === 1) && row['m_crop.breeder_id']) {
+          completedSet.add(cropCode);
+        } else {
+          pendingSet.add(cropCode);
+        }
+      }
+
+      const total = totalSet.size;
+      // const completed = completedSet.size;
+      const completed = totalSet.size - pendingSet.size;
+
+      const pending = pendingSet.size;
+      const completedInPercentage = total > 0 ? parseFloat(((completed / total) * 100).toFixed(2)) : 0;
+      const pendingInPercentage = total > 0 ? parseFloat(((pending / total) * 100).toFixed(2)) : 0;
+
+      const result = {
+        total,                  // distinct crop_code count
+        completed,              // distinct crop_code count where freeze + icar_freeze = 1
+        pending,                // distinct crop_code count where not both frozen
+        completedInPercentage,
+        pendingInPercentage,
+      };
+
+      return response(res, status.DATA_AVAILABLE, 200, result);
+    } catch (error) {
+      console.error("getAssignToPDPCDonutChartData error:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  };
+  static getAssignToPDPCDonutChartData = async (req, res) => {
+    try {
+      const { search, loginedUserid } = req.body;
+
+      const whereCondition = {
+        is_active: 1
+      };
+      const whereConditionIndentor = {};
+      const whereConditionNodal = {};
+      const whereConditionOilSeed = {};
+
+      // ✅ If group_code exists, fetch crop_codes first
+      if (search?.group_code) {
+        const crops = await db.cropModel.findAll({
+          attributes: ['crop_code'],
+          where: {
+            group_code: search.group_code,
+            is_active: 1
+          },
+          raw: true 
+        });
+
+        const cropCodes = crops.map(row => row.crop_code);
+        if (cropCodes.length === 0) {
+          return response(res, status.DATA_AVAILABLE, 200, []); // No crops for this group_code
+        }
+
+        whereCondition.crop_code = { [Op.in]: cropCodes };
+      }
+
+      if (search?.year) whereCondition.year = search.year;
+      if (search?.season) whereCondition.season = search.season;
+      if (search?.crop_code) whereCondition.crop_code = search.crop_code;
+
+      if (search?.graphType === "indenter") {
+        whereConditionIndentor.user_id = loginedUserid?.id;
+      }
+
+      if (search?.graphType === "nodal") {
+        if (!search.crop_type) {
+          return response(res, status.BAD_REQUEST, 400, 'Crop Type is required.');
+        }
+        whereConditionNodal.crop_code = { [Op.like]: `${search.crop_type}%` };
+      }
+
+      if (search?.graphType === "oil-seeds") {
+        whereConditionOilSeed.group_code = 'A04';
+      }
+      if (search?.graphType === "pulses-seeds") {
+        whereConditionOilSeed.group_code = 'A03';
+      }
+
+      if (search?.graphType === "bspc") {
+        const bspcPerform1Data = await bspProformaOneModel.findOne({
+          attributes: ['year', 'season', 'crop_code'],
+          include: [
+            {
+              model: bspProformaOneBspcModel,
+              where: { bspc_id: loginedUserid?.id },
+              attributes: []
+            }
+          ],
+          raw: false,
+        });
+        return response(res, status.DATA_AVAILABLE, 200, bspcPerform1Data);
+      }
+
+      // ⭐ Use single aggregated query with GROUP BY and join conditions
+      const indentData = await db.indentOfBreederseedModel.findAll({
+        attributes: [
+          [db.Sequelize.col('indent_of_breederseeds.crop_code'), 'crop_code'],
+          [db.Sequelize.fn('MAX', db.Sequelize.col('indent_of_breederseeds.is_freeze')), 'max_is_freeze'],
+          [db.Sequelize.fn('MAX', db.Sequelize.col('indent_of_breederseeds.icar_freeze')), 'max_icar_freeze'],
+          [db.Sequelize.fn('MAX', db.Sequelize.col('indent_of_breederseeds.is_forward')), 'max_is_forward'],
+          [db.Sequelize.fn('MAX', db.Sequelize.col('m_crop.breeder_id')), 'breeder_id']
+        ],
+        include: [
+          {
+            model: db.cropModel,
+            as: 'm_crop',
+            required: true,
+            attributes: [],
+            where: {
+              breeder_id: { [Op.ne]: null },
+              ...whereConditionOilSeed,
+            },
+          },
+        ],
+        where: {
+          ...whereCondition,
+          ...whereConditionIndentor,
+          ...whereConditionNodal,
+        },
+        group: ['indent_of_breederseeds.crop_code'],
+        raw: true,
+      });
+
+      const total = indentData.length;
+
+      // ✅ Calculate completed count directly from aggregated results
+      const completed = indentData.filter(row =>
+        row.max_is_freeze == 1 &&
+        row.max_icar_freeze == 1 &&
+        row.max_is_forward == 1 &&
+        row.breeder_id != null
+      ).length;
+
+      const pending = total - completed;
+
+      const completedInPercentage = total > 0 ? Number(((completed / total) * 100).toFixed(2)) : 0;
+      const pendingInPercentage = total > 0 ? Number(((pending / total) * 100).toFixed(2)) : 0;
+
+      const result = {
+        total,                  // distinct crop_code count
+        completed,              // distinct crop_code count where freeze + icar_freeze + forward + breeder_id exist
+        pending,
+        completedInPercentage,
+        pendingInPercentage,
+      };
+
+      return response(res, status.DATA_AVAILABLE, 200, result);
+
+    } catch (error) {
+      console.error("getAssignToPDPCDonutChartData error:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  };
+
+
+  static getProductionDonutChartDataBackup = async (req, res) => {
+    try {
+      const { search, loginedUserid } = req.body;
+      // ✅ New: If group_code exists, fetch crop_codes first
+      if (search?.group_code) {
+        const crops = await db.cropModel.findAll({
+          attributes: ['crop_code'],
+          where: {
+            group_code: search.group_code,
+            is_active: 1 // ✅ Corrected syntax: use colon instead of equals
+          },
+          raw: true
+        });
+
+        const cropCodes = crops.map(row => row.crop_code);
+        if (cropCodes.length === 0) {
+          return response(res, status.DATA_AVAILABLE, 200, []); // No crops for this group_code, return empty
+        }
+
+        whereCondition.crop_code = { [Op.in]: cropCodes };
+      }
+
+      const whereCondition = {};
+      const whereConditionIndentor = {};
+      const whereConditionNodal = {};
+      const whereConditionOilSeed = {};
+
+      if (search?.year) whereCondition.year = search.year;
+      if (search?.season) whereCondition.season = search.season;
+      if (search?.crop_code) whereCondition.crop_code = search.crop_code;
+
+      if (search?.graphType === "indenter") {
+        whereConditionIndentor.user_id = loginedUserid?.id;
+      }
+
+      if (search?.graphType === "nodal") {
+        if (!search.crop_type) {
+          return response(res, status.BAD_REQUEST, 400, 'Crop Type is required.');
+        }
+        whereConditionNodal.crop_code = { [Op.like]: `${search.crop_type}%` };
+      }
+
+      if (search?.graphType === "oil-seeds") {
+        whereConditionOilSeed.group_code = 'A04';
+      }
+
+      // Step 1: Fetch bspPerformaBspOne and associated bspc_id
+      const bspOneData = await db.bspPerformaBspOne.findAll({
+        attributes: ['id', 'crop_code', 'user_id'],
+        where: {
+          ...whereCondition,
+          ...whereConditionIndentor,
+          ...whereConditionNodal,
+        },
+        include: [
+          {
+            model: db.cropModel,
+            as: 'm_crop',
+            required: true,
+            attributes: ['group_code'],
+            where: {
+              ...whereConditionOilSeed,
+            },
+          },
+          {
+            model: db.bspProformaOneBspc,
+            as: 'bspc_mapping',
+            attributes: ['bspc_proforma_1_id', 'bspc_id'],
+          },
+        ],
+        raw: true,
+      });
+
+
+
+      // Step 2: Group crop_code → unique bspc_id set
+      const cropToBspcIdsMap = new Map();
+
+      for (const row of bspOneData) {
+        const cropCode = row.crop_code;
+        const bspcId = row['bspc_mapping.bspc_id'];
+        const bspcProforma1Id = row['bspc_mapping.bspc_proforma_1_id'];
+
+        if (!cropCode || !bspcId || !bspcProforma1Id) continue;
+
+        if (!cropToBspcIdsMap.has(cropCode)) {
+          cropToBspcIdsMap.set(cropCode, new Set());
+        }
+        cropToBspcIdsMap.get(cropCode).add(bspcId);
+      }
+
+      // Step 3: Fetch all submitted bspc user_ids
+      const submittedUsers = await db.availabilityOfBreederSeedModel.findAll({
+        attributes: ['user_id'],
+        where: { is_final_submit: 1 },
+        raw: true,
+      });
+
+      const submittedUserIds = new Set(submittedUsers.map(row => row.user_id));
+
+      // Step 4: Count how many crop codes are fully completed
+      let completed = 0;
+
+      for (const [cropCode, bspcIdSet] of cropToBspcIdsMap.entries()) {
+        const allSubmitted = [...bspcIdSet].every(id => submittedUserIds.has(id));
+        if (allSubmitted) completed++;
+      }
+
+      const total = cropToBspcIdsMap.size;
+      const pending = total - completed;
+
+      const completedInPercentage = total > 0 ? parseFloat(((completed / total) * 100).toFixed(2)) : 0;
+      const pendingInPercentage = total > 0 ? parseFloat(((pending / total) * 100).toFixed(2)) : 0;
+
+      const result = {
+        total,
+        completed,
+        pending,
+        completedInPercentage,
+        pendingInPercentage,
+      };
+
+      return response(res, status.DATA_AVAILABLE, 200, result);
+    } catch (error) {
+      console.error("getProductionDonutChartData error:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  };
+
+  static getProductionDonutChartData = async (req, res) => {
+    try {
+      const { search, loginedUserid } = req.body;
+
+      const whereCondition = {};
+      const whereConditionIndentor = {};
+      const whereConditionNodal = {};
+      const whereConditionOilSeed = {};
+      const whereConditionPulseSeed ={};
+
+      // ⭐ Populate conditions
+      if (search?.year) whereCondition.year = search.year;
+      if (search?.season) whereCondition.season = search.season;
+      if (search?.crop_code) whereCondition.crop_code = search.crop_code;
+
+      if (search?.graphType === "indenter") {
+        whereConditionIndentor.user_id = loginedUserid?.id;
+      }
+
+      if (search?.graphType === "nodal") {
+        if (!search.crop_type) {
+          return response(res, status.BAD_REQUEST, 400, "Crop Type is required.");
+        }
+        whereConditionNodal.crop_code = { [Op.like]: `${search.crop_type}%` };
+      }
+
+      if (search?.graphType === "oil-seeds") {
+        whereConditionOilSeed.group_code = "A04";
+      }
+
+      if (search?.graphType === "pulses-seeds") {
+        whereConditionPulseSeed.group_code = "A03";
+      }
+
+      // ⭐ If group_code exists, fetch crop_codes first
+      if (search?.group_code) {
+        const crops = await db.cropModel.findAll({
+          attributes: ["crop_code"],
+          where: {
+            group_code: search.group_code,
+            is_active: 1,
+          },
+          raw: true,
+        });
+
+        const cropCodes = crops.map(row => row.crop_code);
+        if (cropCodes.length === 0) {
+          return response(res, status.DATA_AVAILABLE, 200, []); // No crops for this group_code
+        }
+
+        whereCondition.crop_code = { [Op.in]: cropCodes };
+      }
+
+      // ⭐ Step 1: Fetch bspPerformaBspOne ids and crop_codes
+      const bspOneData = await db.bspPerformaBspOne.findAll({
+        attributes: ["id", "crop_code"],
+        where: {
+          ...whereCondition,
+          ...whereConditionIndentor,
+          ...whereConditionNodal,
+        },
+        include: [
+          {
+            model: db.cropModel,
+            as: "m_crop",
+            required: true,
+            attributes: ["group_code"],
+            where: {
+              ...whereConditionOilSeed,
+              ...whereConditionPulseSeed
+            },
+          },
+        ],
+        raw: true,
+      });
+
+      const bspOneIds = bspOneData.map(row => row.id);
+      const allCropCodesSet = new Set(bspOneData.map(row => row.crop_code).filter(code => !!code));
+
+      if (bspOneIds.length === 0) {
+        return response(res, status.DATA_AVAILABLE, 200, {
+          total: 0,
+          completed: 0,
+          pending: 0,
+          completedInPercentage: 0,
+          pendingInPercentage: 0,
+        });
+      }
+
+      // ⭐ Step 2: Get bspc_proforma_1_id and bspc_id from bspProformaOneBspc
+      const bspcMappings = await db.bspProformaOneBspc.findAll({
+        attributes: ["bspc_proforma_1_id", "bspc_id"],
+        where: {
+          bspc_proforma_1_id: { [Op.in]: bspOneIds },
+        },
+        raw: true,
+      });
+
+      // ⭐ Step 3: Build crop_code to bspc_id map
+      const cropToBspcIdsMap = new Map();
+      bspcMappings.forEach(row => {
+        const bspOne = bspOneData.find(b => b.id === row.bspc_proforma_1_id);
+        if (bspOne && bspOne.crop_code && row.bspc_id) {
+          if (!cropToBspcIdsMap.has(bspOne.crop_code)) {
+            cropToBspcIdsMap.set(bspOne.crop_code, new Set());
+          }
+          cropToBspcIdsMap.get(bspOne.crop_code).add(row.bspc_id);
+        }
+      });
+
+      // ⭐ Step 4: Fetch availabilityOfBreederSeedModel rows for these bspc_ids and crop_codes
+      const availabilityData = await db.availabilityOfBreederSeedModel.findAll({
+        attributes: ["crop_code", "user_id", "is_final_submit"],
+        where: {
+          crop_code: { [Op.in]: Array.from(cropToBspcIdsMap.keys()) },
+          user_id: { [Op.in]: Array.from(new Set([].concat(...Array.from(cropToBspcIdsMap.values()).map(set => Array.from(set))))) },
+        },
+        raw: true,
+      });
+
+      // ⭐ Step 5: Group by crop_code and check if all rows have is_final_submit = 1
+      const cropCompletionStatus = new Map();
+
+      availabilityData.forEach(row => {
+        const status = cropCompletionStatus.get(row.crop_code);
+        if (status === "pending") return; // already marked pending
+        if (row.is_final_submit === 0) {
+          cropCompletionStatus.set(row.crop_code, "pending");
+        } else if (!status) {
+          cropCompletionStatus.set(row.crop_code, "completed");
+        }
+      });
+
+      // ⭐ Step 6: Calculate counts
+      const total = cropToBspcIdsMap.size;
+      let completed = 0;
+      let pending = 0;
+
+      cropToBspcIdsMap.forEach((_, cropCode) => {
+        if (cropCompletionStatus.get(cropCode) === "completed") {
+          completed++;
+        } else {
+          pending++;
+        }
+      });
+
+      const completedInPercentage = total > 0 ? parseFloat(((completed / total) * 100).toFixed(2)) : 0;
+      const pendingInPercentage = total > 0 ? parseFloat(((pending / total) * 100).toFixed(2)) : 0;
+
+      const result = {
+        total,
+        completed,
+        pending,
+        completedInPercentage,
+        pendingInPercentage,
+      };
+
+      return response(res, status.DATA_AVAILABLE, 200, result);
+    } catch (error) {
+      console.error("getProductionDonutChartData error:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  };
+
+
+
+
+  static getAllocationDonutChartDataBackup = async (req, res) => {
+    try {
+      const { search, loginedUserid } = req.body;
+      console.log("--search?.crop_code-", search?.crop_code, search?.season, search?.year)
+
+      if (!search?.year || !search?.season) {
+        return response(res, { message: "Season, and year are required." }, 400, []);
+      }
+      const whereCondition = {};
+      const whereConditionIndentor = {};
+      const whereConditionNodal = {};
+      const whereConditionNodalFinalSubmit = {};
+      const whereConditionOilSeed = {};
+      // ✅ New: If group_code exists, fetch crop_codes first
+      if (search?.group_code) {
+        const crops = await db.cropModel.findAll({
+          attributes: ['crop_code'],
+          where: {
+            group_code: search.group_code,
+            is_active: 1 // ✅ Corrected syntax: use colon instead of equals
+          },
+          raw: true
+        });
+
+        const cropCodes = crops.map(row => row.crop_code);
+        if (cropCodes.length === 0) {
+          return response(res, status.DATA_AVAILABLE, 200, []); // No crops for this group_code, return empty
+        }
+
+        whereCondition.crop_code = { [Op.in]: cropCodes };
+      }
+
+      if (search?.year) whereCondition.year = search.year;
+      if (search?.season) whereCondition.season = search.season;
+      if (search?.crop_code) whereCondition.crop_code = search.crop_code;
+
+      if (search?.graphType === 'indenter') {
+        whereConditionIndentor.user_id = loginedUserid?.id;
+      }
+      if (search?.graphType === 'nodal') {
+        if (!search.crop_type) {
+          return response(res, status.BAD_REQUEST, 400, 'Crop Type is required.');
+        }
+        whereConditionNodal.crop_code = { [Op.like]: `${search.crop_type}%` };
+        whereConditionNodalFinalSubmit.is_final_submit = 1;
+      }
+      if (search?.graphType === 'oil-seeds') {
+        whereConditionOilSeed.group_code = 'A04';
+      }
+
+      // For BSPC Work Is Pending
+
+      // if (search?.graphType === 'bspc') {
+      //   const bspcData = await bspProformaOneModel.findOne({
+      //     attributes: ['year', 'season', 'crop_code'],
+      //     include: [
+      //       {
+      //         model: bspProformaOneBspcModel,
+      //         where: { bspc_id: loginedUserid?.id || 601 }
+      //       }
+      //     ],
+      //     raw: false
+      //   });
+
+      //   return response(res, status.DATA_AVAILABLE, 200, bspcData);
+      // }
+
+      // Total crop_codes from availability
+
+
+      const totalCrops = await db.availabilityOfBreederSeedModel.findAll({
+        attributes: ['crop_code', 'is_final_submit'],
+        include: [
+          {
+            model: db.cropModel,
+            as: 'm_crop',
+            attributes: [],
+            where: {
+              ...(search?.graphType === 'oil-seeds' ? { group_code: 'A04' } : {})
+            }
+          }
+        ],
+
+        where: {
+          ...whereCondition,
+          ...whereConditionIndentor,
+          ...whereConditionNodal,
+          ...whereConditionNodalFinalSubmit
+        },
+        raw: true
+      });
+
+      const total = totalCrops.length;
+      // Completed crop_codes from allocation with join to cropModel
+      const completedCrops = await db.allocationToIndentorSeed.findAll({
+        attributes: ['crop_code'],
+        include: [
+          {
+            model: db.cropModel,
+            as: 'm_crop',
+            attributes: [],
+            where: {
+              ...(search?.graphType === 'oil-seeds' ? { group_code: 'A04' } : {})
+            }
+          }
+        ],
+        where: {
+          is_variety_submitted: 1,
+          ...whereCondition,
+          ...whereConditionIndentor,
+          ...whereConditionNodal
+        },
+        raw: true
+      });
+
+      const completed = completedCrops.length;
+      const pending = total - completed;
+
+      const completedInPercentage = total > 0 ? parseFloat(((completed / total) * 100).toFixed(2)) : 0;
+      const pendingInPercentage = total > 0 ? parseFloat(((pending / total) * 100).toFixed(2)) : 0;
+
+      const result = {
+        total,
+        completed,
+        pending,
+        completedInPercentage,
+        pendingInPercentage
+      };
+
+      return response(res, status.DATA_AVAILABLE, 200, result);
+    } catch (error) {
+      console.error("getAllocationDonutChartData error:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  };
+
+  static getAllocationDonutChartDataWOrking = async (req, res) => {
+    try {
+      const { search, loginedUserid } = req.body;
+      console.log("--search?.crop_code-", search?.crop_code, search?.season, search?.year);
+
+      if (!search?.year || !search?.season) {
+        return response(res, { message: "Season and year are required." }, 400, []);
+      }
+
+      const whereCondition = {
+        year: search.year,
+        season: search.season,
+        is_final_submit: 1
+      };
+      const whereConditionIndentor = {};
+      const whereConditionNodal = {};
+      const whereConditionNodalFinalSubmit = {};
+      const whereConditionOilSeed = {};
+
+      if (search?.group_code) {
+        const crops = await db.cropModel.findAll({
+          attributes: ['crop_code'],
+          where: {
+            group_code: search.group_code,
+            is_active: 1
+          },
+          raw: true
+        });
+
+        const cropCodes = crops.map(row => row.crop_code);
+        if (cropCodes.length === 0) {
+          return response(res, status.DATA_AVAILABLE, 200, []);
+        }
+
+        whereCondition.crop_code = { [Op.in]: cropCodes };
+      }
+
+      if (search?.crop_code) whereCondition.crop_code = search.crop_code;
+
+      if (search?.graphType === 'indenter') {
+        whereConditionIndentor.user_id = loginedUserid?.id;
+      }
+
+      if (search?.graphType === 'nodal') {
+        if (!search.crop_type) {
+          return response(res, status.BAD_REQUEST, 400, 'Crop Type is required.');
+        }
+        whereConditionNodal.crop_code = { [Op.like]: `${search.crop_type}%` };
+        whereConditionNodalFinalSubmit.is_final_submit = 1;
+      }
+
+      if (search?.graphType === 'oil-seeds') {
+        whereConditionOilSeed.group_code = 'A04';
+      }
+
+      // ✅ Step 1: Fetch availability data (Table 1)
+      const availabilityData = await db.availabilityOfBreederSeedModel.findAll({
+        attributes: ['crop_code', 'user_id'],
+        include: [
+          {
+            model: db.cropModel,
+            as: 'm_crop',
+            attributes: [],
+            where: {
+              ...(search?.graphType === 'oil-seeds' ? { group_code: 'A04' } : {})
+            }
+          }
+        ],
+        where: {
+          ...whereCondition,
+          ...whereConditionIndentor,
+          ...whereConditionNodal,
+          ...whereConditionNodalFinalSubmit
+        },
+        raw: true
+      });
+
+      const uniqueCropCodes = [...new Set(availabilityData.map(a => a.crop_code))];
+      const total = uniqueCropCodes.length;
+
+      let completed = 0;
+
+      // ✅ Step 2: For each crop_code, check ALL rows submitted
+      for (const crop_code of uniqueCropCodes) {
+        const usersForCrop = availabilityData
+          .filter(a => a.crop_code === crop_code)
+          .map(a => a.user_id);
+
+        let allRecordsSubmittedForCrop = true;
+
+        for (const user_id of usersForCrop) {
+          // 🔗 Table 2: allocationToIndentorProductionCenterSeed
+          const productionCenters = await db.allocationToIndentorProductionCenterSeed.findAll({
+            attributes: ['allocation_to_indentor_for_lifting_seed_id'],
+            where: { production_center_id: user_id },
+            raw: true
+          });
+
+          const allocationIds = productionCenters.map(p => p.allocation_to_indentor_for_lifting_seed_id);
+
+          if (allocationIds.length === 0) {
+            allRecordsSubmittedForCrop = false;
+            break;
+          }
+
+          // 🔗 Table 3: allocationToIndentorSeed
+          const allocations = await db.allocationToIndentorSeed.findAll({
+            attributes: ['is_variety_submitted'],
+            where: {
+              id: { [Op.in]: allocationIds },
+              crop_code,
+              year: search.year,
+              season: search.season
+            },
+            raw: true
+          });
+
+          if (allocations.length === 0) {
+            allRecordsSubmittedForCrop = false;
+            break;
+          }
+
+          // ✅ 🚨 Final required condition:
+          // If ANY record has is_variety_submitted = 0 ➔ mark as pending
+          const anyNotSubmitted = allocations.some(a => a.is_variety_submitted == 0);
+
+          if (anyNotSubmitted) {
+            allRecordsSubmittedForCrop = false;
+            break;
+          }
+        }
+
+        if (allRecordsSubmittedForCrop) completed++;
+      }
+
+      const pending = total - completed;
+
+      const completedInPercentage = total > 0 ? parseFloat(((completed / total) * 100).toFixed(2)) : 0;
+      const pendingInPercentage = total > 0 ? parseFloat(((pending / total) * 100).toFixed(2)) : 0;
+
+      const result = {
+        total,
+        completed,
+        pending,
+        completedInPercentage,
+        pendingInPercentage
+      };
+
+      return response(res, status.DATA_AVAILABLE, 200, result);
+
+    } catch (error) {
+      console.error("getAllocationDonutChartData error:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  };
+
+  static getAllocationDonutChartData = async (req, res) => {
+    try {
+      const { search, loginedUserid } = req.body;
+      console.log("--search?.crop_code-", search?.crop_code, search?.season, search?.year);
+
+      if (!search?.year || !search?.season) {
+        return response(res, { message: "Season and year are required." }, 400, []);
+      }
+
+      // ✅ Build where conditions
+      const whereCondition = {
+        year: search.year,
+        season: search.season,
+        is_final_submit: 1
+      };
+      const whereConditionIndentor = {};
+      const whereConditionNodal = {};
+      const whereConditionNodalFinalSubmit = {};
+
+      if (search?.group_code) {
+        const crops = await db.cropModel.findAll({
+          attributes: ['crop_code'],
+          where: {
+            group_code: search.group_code,
+            is_active: 1
+          },
+          raw: true
+        });
+
+        const cropCodes = crops.map(row => row.crop_code);
+        if (cropCodes.length === 0) {
+          return response(res, status.DATA_AVAILABLE, 200, []);
+        }
+
+        whereCondition.crop_code = { [Op.in]: cropCodes };
+      }
+
+      if (search?.crop_code) whereCondition.crop_code = search.crop_code;
+
+      if (search?.graphType === 'indenter') {
+        whereConditionIndentor.user_id = loginedUserid?.id;
+      }
+
+      if (search?.graphType === 'nodal') {
+        if (!search.crop_type) {
+          return response(res, status.BAD_REQUEST, 400, 'Crop Type is required.');
+        }
+        whereConditionNodal.crop_code = { [Op.like]: `${search.crop_type}%` };
+        whereConditionNodalFinalSubmit.is_final_submit = 1;
+      }
+
+      // ✅ Fetch availability data (Table 1) in one go
+      const availabilityData = await db.availabilityOfBreederSeedModel.findAll({
+        attributes: ['crop_code', 'user_id'],
+        include: [{
+          model: db.cropModel,
+          as: 'm_crop',
+          attributes: [],
+          where: search?.graphType === 'oil-seeds' ? { group_code: 'A04' } : 
+                search?.graphType === 'pulses-seeds' ? { group_code: 'A03' } : {}
+        }],
+        where: {
+          ...whereCondition,
+          ...whereConditionIndentor,
+          ...whereConditionNodal,
+          ...whereConditionNodalFinalSubmit
+        },
+        raw: true
+      });
+
+      const uniqueCropCodes = [...new Set(availabilityData.map(a => a.crop_code))];
+      const total = uniqueCropCodes.length;
+
+      // ✅ Fetch all production centers in one query
+      const userIds = availabilityData.map(a => a.user_id);
+      const productionCenters = await db.allocationToIndentorProductionCenterSeed.findAll({
+        attributes: ['production_center_id', 'allocation_to_indentor_for_lifting_seed_id'],
+        where: { production_center_id: { [Op.in]: userIds } },
+        raw: true
+      });
+
+      // ✅ Fetch all allocation records in one query
+      const allocationIds = productionCenters.map(p => p.allocation_to_indentor_for_lifting_seed_id);
+      const allocations = await db.allocationToIndentorSeed.findAll({
+        attributes: ['id', 'crop_code', 'is_variety_submitted'],
+        where: {
+          id: { [Op.in]: allocationIds },
+          year: search.year,
+          season: search.season
+        },
+        raw: true
+      });
+
+      // ✅ Group allocations by crop_code for easy lookup
+      const allocationMap = {};
+      allocations.forEach(a => {
+        if (!allocationMap[a.crop_code]) allocationMap[a.crop_code] = [];
+        allocationMap[a.crop_code].push(a.is_variety_submitted);
+      });
+
+      // ✅ Calculate completed count efficiently
+      let completed = 0;
+      uniqueCropCodes.forEach(crop_code => {
+        const submittedStatuses = allocationMap[crop_code] || [];
+        if (submittedStatuses.length > 0 && submittedStatuses.every(status => status == 1)) {
+          completed++;
+        }
+      });
+
+      const pending = total - completed;
+      const completedInPercentage = total > 0 ? parseFloat(((completed / total) * 100).toFixed(2)) : 0;
+      const pendingInPercentage = total > 0 ? parseFloat(((pending / total) * 100).toFixed(2)) : 0;
+
+      const result = {
+        total,
+        completed,
+        pending,
+        completedInPercentage,
+        pendingInPercentage
+      };
+
+      return response(res, status.DATA_AVAILABLE, 200, result);
+
+    } catch (error) {
+      console.error("getAllocationDonutChartData error:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  };
+
+
+  static getLiftingDonutChartData = async (req, res) => {
+    try {
+      const { search, loginedUserid } = req.body;
+
+      // ✅ Build filter conditions
+      const whereCondition = {};
+      const whereConditionIndentor = {};
+      const whereConditionNodal = {};
+      const whereConditionOilSeed = {};
+      const whereConditionPulseSeed = {};
+
+      if (search?.year) whereCondition.year = search.year;
+      if (search?.season) whereCondition.season = search.season;
+      if (search?.group_code) whereCondition.crop_group_code = search.group_code;
+
+      if (search?.group_code) {
+        const cropsGroup = await db.cropModel.findAll({
+          attributes: ['crop_code'],
+          where: {
+            group_code: search.group_code,
+            is_active: 1
+          },
+          raw: true
+        });
+
+        const cropCodes = cropsGroup.map(row => row.crop_code);
+        if (cropCodes.length === 0) {
+          return response(res, status.DATA_AVAILABLE, 200, []);
+        }
+
+        whereCondition.crop_code = { [Op.in]: cropCodes };
+      }
+
+      if (search?.graphType === 'indenter') {
+        whereConditionIndentor.bspc_id = loginedUserid?.id;
+      }
+
+      if (search?.graphType === 'nodal') {
+        if (!search.crop_type) {
+          return response(res, status.BAD_REQUEST, 400, 'Crop Type is required.');
+        }
+        whereConditionNodal.crop_code = { [Op.like]: `${search.crop_type}%` };
+      }
+
+      if (search?.graphType === 'oil-seeds') {
+        whereConditionOilSeed.crop_group_code = 'A04';
+      }
+
+      if (search?.graphType === 'pulses-seeds') {
+        whereConditionPulseSeed.crop_group_code = 'A03';
+      }
+
+      // ✅ Fetch crops with IDs
+      const crops = await db.allocationToSPASeed.findAll({
+        attributes: ['crop_code', 'id'],
+        where: {
+          ...whereCondition,
+          ...whereConditionIndentor,
+          ...whereConditionNodal,
+          ...whereConditionOilSeed,
+          ...whereConditionPulseSeed
+        },
+        raw: true
+      });
+
+
+      // ✅ Group IDs per crop_code
+      const cropIdMap = {};
+      for (const crop of crops) {
+        if (!cropIdMap[crop.crop_code]) cropIdMap[crop.crop_code] = [];
+        cropIdMap[crop.crop_code].push(crop.id);
+      }
+
+      let total = Object.keys(cropIdMap).length;
+      let completed = 0;
+      let pending = 0;
+
+      const completedCropCodes = [];
+      const pendingCropCodes = [];
+
+      // ✅ For each crop_code, fetch mapping data and validate in liftingSeedDetailsModel
+      for (const [cropCode, ids] of Object.entries(cropIdMap)) {
+        const mappings = await db.allocationToSPAProductionCenterSeed.findAll({
+          attributes: ['production_center_id', 'spa_code', 'state_code'],
+          where: {
+            allocation_to_spa_for_lifting_seed_id: { [Op.in]: ids }
+          },
+          raw: true
+        });
+
+        // 🔴 If no mappings at all, mark as pending and continue
+        if (!mappings || mappings.length === 0) {
+          pending += 1;
+          pendingCropCodes.push(cropCode);
+          continue;
+        }
+
+        // ✅ Get unique mappings
+        const uniqueMappings = [];
+        const seen = new Set();
+        for (const map of mappings) {
+          const key = `${map.production_center_id}-${map.spa_code}-${map.state_code}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            uniqueMappings.push(map);
+          }
+        }
+
+        let allMatched = true;
+
+        // ✅ Check each mapping in liftingSeedDetailsModel
+        for (const map of uniqueMappings) {
+          const exists = await db.liftingSeedDetailsModel.findOne({
+            where: {
+              user_id: map.production_center_id,
+              spa_code: map.spa_code,
+              spa_state_code: map.state_code,
+              crop_code: cropCode,
+              year: search.year,
+              season: search.season
+            },
+            raw: true
+          });
+
+          // 🔴 If liftingSeedDetailsModel record not found for mapping, mark as pending
+          if (!exists) {
+            allMatched = false;
+            break;
+          }
+        }
+
+        // ✅ Update counts and crop_codes list
+        if (allMatched) {
+          completed += 1;
+          completedCropCodes.push(cropCode);
+        } else {
+          pending += 1;
+          pendingCropCodes.push(cropCode);
+        }
+      }
+
+      // ✅ Calculate percentages with max 100%
+      let completedInPercentage = 0;
+      let pendingInPercentage = 0;
+
+      if (total > 0) {
+        completedInPercentage = parseFloat(((completed / total) * 100).toFixed(2));
+        pendingInPercentage = parseFloat(((pending / total) * 100).toFixed(2));
+
+        completedInPercentage = Math.min(completedInPercentage, 100);
+        pendingInPercentage = Math.min(pendingInPercentage, 100);
+
+      }
+
+      const result = {
+        total,
+        completed,
+        pending,
+        completedInPercentage,
+        pendingInPercentage,
+
+      };
+
+      return response(res, status.DATA_AVAILABLE, 200, result);
+
+    } catch (error) {
+      console.error("getLiftingDonutChartData error:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  static getState = async (req, res) => {
+    try {
+      const { year, season, group_code } = req.body.search || {};
+      const whereCondition = {};
+
+      // ⭐ Add year and season filters if provided
+      if (year) whereCondition.year = year;
+      if (season) whereCondition.season = season;
+
+      // ⭐ If group_code is provided, filter by its crops
+      if (group_code) {
+        const crops = await db.cropModel.findAll({
+          attributes: ['crop_code'],
+          where: {
+            group_code: group_code,
+            is_active: 1
+          },
+          raw: true
+        });
+
+        const cropCodes = crops.map(row => row.crop_code);
+
+        if (cropCodes.length === 0) {
+          return response(res, status.DATA_AVAILABLE, 200, []); // No crops for this group_code, return empty
+        }
+
+        whereCondition.crop_code = { [Op.in]: cropCodes };
+      }
+
+      // Fetch distinct state codes from bspPerformaBspTwo with filters
+      const stateCodes = await db.bspPerformaBspTwo.findAll({
+        attributes: [
+          [db.Sequelize.fn('DISTINCT', db.Sequelize.col('state_code')), 'state_code']
+        ],
+        where: whereCondition,
+        raw: true
+      });
+
+      const uniqueStateCodes = stateCodes.map(row => row.state_code).filter(code => code);
+
+      // Fetch state names for these codes from stateModel
+      const stateInfo = await db.stateModel.findAll({
+        attributes: ['state_code', 'state_name'],
+        where: {
+          state_code: { [Op.in]: uniqueStateCodes }
+        },
+        raw: true
+      });
+
+      // Format final response as [{ id, stateName }]
+      const stateData = stateInfo.map((state) => ({
+        id: state.state_code,
+        state_name: state.state_name
+      }));
+
+      return response(res, status.DATA_AVAILABLE, 200, stateData);
+
+    } catch (error) {
+      console.error("getState error:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  };
+
+  static getAreaSownByStateChartData = async (req, res) => {
+    try {
+      const { search, loginedUserid } = req.body;
+
+      const whereCondition = {};
+      const whereConditionIndentor = {};
+      const whereConditionNodal = {};
+      const whereConditionOilSeed = {};
+      const whereConditionPulsesSeed = {};
+
+      // ✅ New: If group_code exists, fetch crop_codes first
+      if (search?.group_code) {
+        const crops = await db.cropModel.findAll({
+          attributes: ['crop_code'],
+          where: {
+            group_code: search.group_code,
+            is_active: 1 // ✅ Corrected syntax: use colon instead of equals
+          },
+          raw: true
+        });
+
+        const cropCodes = crops.map(row => row.crop_code);
+        if (cropCodes.length === 0) {
+          return response(res, status.DATA_AVAILABLE, 200, []); // No crops for this group_code, return empty
+        }
+
+        whereCondition.crop_code = { [Op.in]: cropCodes };
+      }
+
+      // Common filters
+      if (search?.year) whereCondition.year = search.year;
+      if (search?.season) whereCondition.season = search.season;
+      if (search?.crop_code) whereCondition.crop_code = search.crop_code;
+      if (search?.state_code) whereCondition.state_code = search.state_code; // ✅ used as filter if passed
+
+      // Graph type specific filters
+      if (search?.graphType === 'indenter') {
+        whereConditionIndentor.user_id = loginedUserid?.id;
+      }
+
+      if (search?.graphType === 'nodal') {
+        if (!search.crop_type) {
+          return response(res, status.BAD_REQUEST, 400, 'Crop Type is required.');
+        }
+        whereConditionNodal.crop_code = { [Op.like]: `${search.crop_type}%` };
+      }
+
+      if (search?.graphType === 'oil-seeds') {
+        whereCondition.crop_code = { [Op.like]: `A04%` };
+      }
+
+      if (search?.graphType === 'pulses-seeds') {
+        whereConditionPulsesSeed.crop_code = { [Op.like]: `A03%` };
+      }
+
+      // Step 1: Get BSP2 data
+      const bspTwoData = await db.bspPerformaBspTwo.findAll({
+        attributes: ['id', 'state_code', 'crop_code', 'area_shown'],
+        where: {
+          ...whereCondition,
+          ...whereConditionIndentor,
+          ...whereConditionNodal,
+          ...whereConditionOilSeed,
+          ...whereConditionPulsesSeed
+        },
+        raw: true
+      });
+
+      const bspTwoIds = bspTwoData.map(row => row.id);
+
+      // Step 2: Create map from BSP2
+      const bspTwoMap = bspTwoData.reduce((map, row) => {
+        map[row.id] = {
+          state_code: row.state_code,
+          crop_code: row.crop_code,
+          area_shown: Number(row.area_shown) || 0
+        };
+        return map;
+      }, {});
+
+      // Step 3: Fetch BSP3 data
+      const bspThreeData = await db.bspPerformaBspThree.findAll({
+        attributes: ['bsp_proforma_2_id', 'rejected_area', 'inspected_area'],
+        where: {
+          bsp_proforma_2_id: { [Op.in]: bspTwoIds }
+        },
+        raw: true,
+        order: [['inspected_area', 'DESC']], // ✅ Sorting by inspected_area descending
+      });
+
+      // Step 4: Aggregate data
+
+      const isCropWise = !!search.state_code; // ✅ check if crop-wise needed
+
+      const aggMap = {};
+
+      for (const row of bspThreeData) {
+        const bsp2 = bspTwoMap[row.bsp_proforma_2_id];
+        if (!bsp2) continue;
+
+        const groupKey = isCropWise ? bsp2.crop_code : bsp2.state_code; // ⭐ dynamic grouping
+
+        const inspected = Number(row.inspected_area) || 0;
+        const rejected = Number(row.rejected_area) || 0;
+        const complete = bsp2.area_shown;
+
+        if (!aggMap[groupKey]) {
+          aggMap[groupKey] = {
+            complete_area: 0,
+            inspected_area: 0,
+            rejected_area: 0
+          };
+        }
+
+        aggMap[groupKey].complete_area += complete;
+        aggMap[groupKey].inspected_area += inspected;
+        aggMap[groupKey].rejected_area += rejected;
+      }
+
+      // Step 5: Fetch names (state or crop)
+      const uniqueKeys = Object.keys(aggMap);
+
+      let nameInfo = [];
+      let nameMap = {};
+
+      if (isCropWise) {
+        nameInfo = await db.cropModel.findAll({
+          attributes: ['crop_code', 'crop_name'],
+          where: { crop_code: { [Op.in]: uniqueKeys } },
+          raw: true
+        });
+        nameMap = nameInfo.reduce((map, row) => {
+          map[row.crop_code] = row.crop_name;
+          return map;
+        }, {});
+      } else {
+        nameInfo = await db.stateModel.findAll({
+          attributes: ['state_code', 'state_name'],
+          where: { state_code: { [Op.in]: uniqueKeys } },
+          raw: true
+        });
+        nameMap = nameInfo.reduce((map, row) => {
+          map[row.state_code] = row.state_name;
+          return map;
+        }, {});
+      }
+
+      // Step 6: Format final chart data
+      const chartData = Object.entries(aggMap).map(([key, data]) => {
+        const complete = data.complete_area || 1;
+        const inspected = data.inspected_area;
+        const rejected = data.rejected_area;
+        const pending = Math.max(data.complete_area - (inspected + rejected), 0);
+
+        if (isCropWise) {
+          return {
+            crop_code: key,
+            crop_name: nameMap[key] || key,
+            complete_area: data.complete_area,
+            inspected_area: inspected,
+            inspected_percentage: Number(((inspected / complete) * 100).toFixed(2)),
+            rejected_area: rejected,
+            rejected_percentage: Number(((rejected / complete) * 100).toFixed(2)),
+            pending_area: pending,
+            pending_percentage: Number(((pending / complete) * 100).toFixed(2))
+          };
+        } else {
+          return {
+            state_code: key,
+            state_name: nameMap[key] || key,
+            complete_area: data.complete_area,
+            inspected_area: inspected,
+            inspected_percentage: Number(((inspected / complete) * 100).toFixed(2)),
+            rejected_area: rejected,
+            rejected_percentage: Number(((rejected / complete) * 100).toFixed(2)),
+            pending_area: pending,
+            pending_percentage: Number(((pending / complete) * 100).toFixed(2))
+          };
+        }
+      });
+      chartData.sort((a, b) => b.inspected_area - a.inspected_area);
+
+      return response(res, status.DATA_AVAILABLE, 200, chartData);
+    } catch (error) {
+      console.error("getAreaSownByStateChartData error:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  };
+
+  static getYearFromVariety = async (req, res) => {
+    try {
+      let cropGroup;
+      if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+        cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+      }
+      const result = await varietyModel.findOne({
+        where: {
+          not_date: {
+            [sequelize.Op.and]: [
+              { [sequelize.Op.ne]: null },
+              sequelize.where(sequelize.fn('TRIM', sequelize.col('not_date')), { [sequelize.Op.ne]: '' }),
+              { [sequelize.Op.ne]: 'Invalid date' }
+            ],
+            ...cropGroup
+          }
+        },
+        attributes: ['not_date'],
+        order: [sequelize.literal(`CAST("not_date" AS DATE) ASC`)],
+        raw: true
+      });
+
+      if (!result || !result.not_date) {
+        return response(res, status.DATA_AVAILABLE, 200, []);
+      }
+
+      const startYear = new Date(result.not_date).getFullYear();
+      const currentYear = new Date().getFullYear();
+      const years = [];
+      for (let year = startYear; year <= currentYear; year++) {
+        years.push(year);
+      }
+      return response(res, status.DATA_AVAILABLE, 200, years);
+    } catch (error) {
+      console.error('Error in getYearRangeFromVariety:', error);
+      return response(res, status.DATA_NOT_AVAILABLE, 500, { error: error.message });
+    }
+  };
+
+  // static getDataGroupCodeWiseReportOne = async (req, res) => {
+  //   try {
+  //     const { search } = req.body;
+  //     let cropGroup;
+  //     if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+  //       cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+  //     }
+  //     if (req.body.loginedUserid.user_type === "PULSESSEEDADMIN") {
+  //       cropGroup = { crop_code: { [Op.like]: 'A03%' } };
+  //     }
+  //     const now = new Date();
+  //     let whereClause = {};
+  //     let whereClauseCrop = {};
+
+  //     if (search?.search_filter) {
+  //       whereClause.group_name = { [Op.iLike]: `%${search.search_filter}%` };
+  //     }
+  //     if (search?.year_from || search?.year_to) {
+  //       const fromDate = search.year_from ? new Date(`${search.year_from}-01-01T00:00:00`) : new Date('1900-01-01T00:00:00');
+  //       const toDate = search.year_to ? new Date(`${search.year_to}-12-31T23:59:59`) : now;
+  //       whereClause['$crops.m_crop_varieties.not_date$'] = { [Op.between]: [fromDate, toDate] };
+  //     }
+  //     const groupData = await cropGroupModel.findAll({
+  //       attributes: [
+  //         'group_code',
+  //         'group_name',
+  //         [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('crops.id'))), 'total_crop_count'],
+  //         [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('crops.m_crop_varieties.id'))), 'total_variety_count'],
+  //       ],
+  //       required: true,
+  //       include: [
+  //         {
+  //           model: cropModel,
+  //           as: 'crops',
+  //           attributes: [],
+  //           required: true,
+  //           where: 
+  //             {
+  //               whereClauseCrop 
+  //             },
+  //           include: [
+  //             {
+  //               model: varietyModel,
+  //               attributes: [],
+  //               required: false,
+  //               where:
+  //               {
+  //                 ...cropGroup
+  //               }
+  //             }
+  //           ]
+  //         }
+  //       ],
+  //       where:
+  //               {
+  //                 whereClause,
+  //                 // ...cropGroup
+  //               }  ,
+  //       group: ['m_crop_groups.group_code', 'm_crop_groups.group_name'],
+  //       raw: true,
+  //     });
+
+  //     // Grand totals
+  //     let grandTotalCropCount = 0;
+  //     let grandTotalVarietyCount = 0;
+
+  //     groupData.forEach(item => {
+  //       grandTotalCropCount += parseInt(item.total_crop_count || 0);
+  //       grandTotalVarietyCount += parseInt(item.total_variety_count || 0);
+  //     });
+
+  //     const responseData = {
+  //       total_crop_count: grandTotalCropCount,
+  //       total_variety_count: grandTotalVarietyCount,
+  //       data: groupData,
+  //     };
+
+  //     response(res, status.DATA_AVAILABLE, 200, responseData);
+  //   } catch (error) {
+  //     console.error('Error in getDataGroupCodeWise:', error);
+  //     response(res, status.DATA_NOT_AVAILABLE, 500);
+  //   }
+  // };
+  static getDataGroupCodeWiseReportOne = async (req, res) => {
+  try {
+    const { search } = req.body;
+
+    // Determine crop group filter based on user_type
+    let cropGroupLike = null;
+    if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+      cropGroupLike = 'A04%';
+    }
+    if (req.body.loginedUserid.user_type === "PULSESSEEDADMIN") {
+      cropGroupLike = 'A03%';
+    }
+
+    const now = new Date();
+    let whereClause = {};
+
+    if (search?.search_filter) {
+      whereClause.group_name = { [Op.iLike]: `%${search.search_filter}%` };
+    }
+
+    if (search?.year_from || search?.year_to) {
+      const fromDate = search.year_from
+        ? new Date(`${search.year_from}-01-01T00:00:00`)
+        : new Date('1900-01-01T00:00:00');
+      const toDate = search.year_to
+        ? new Date(`${search.year_to}-12-31T23:59:59`)
+        : now;
+      whereClause['$crops.m_crop_varieties.not_date$'] = {
+        [Op.between]: [fromDate, toDate],
+      };
+    }
+
+    const groupData = await cropGroupModel.findAll({
+      attributes: [
+        'group_code',
+        'group_name',
+        [
+          sequelize.fn(
+            'COUNT',
+            sequelize.fn('DISTINCT', sequelize.col('crops.id'))
+          ),
+          'total_crop_count',
+        ],
+        [
+          sequelize.fn(
+            'COUNT',
+            sequelize.fn('DISTINCT', sequelize.col('crops.m_crop_varieties.id'))
+          ),
+          'total_variety_count',
+        ],
+      ],
+      include: [
+        {
+          model: cropModel,
+          as: 'crops',
+          attributes: [],
+          required: true, // INNER JOIN crops
+          include: [
+            {
+              model: varietyModel,
+              attributes: [],
+              required: false, // LEFT JOIN varieties
+              on: cropGroupLike
+                ? {
+                    [Op.and]: [
+                      sequelize.where(
+                        sequelize.col('crops->m_crop_varieties.crop_code'),
+                        { [Op.like]: cropGroupLike }
+                      ),
+                    ],
+                  }
+                : undefined,
+            },
+          ],
+        },
+      ],
+      where: {
+        ...whereClause,
+        ...(cropGroupLike === 'A03%' && { group_code: 'A03' }),
+        ...(cropGroupLike === 'A04%' && { group_code: 'A04' }),
+      },
+      group: ['m_crop_groups.group_code', 'm_crop_groups.group_name'],
+      raw: true,
+    });
+
+    // Grand totals
+    let grandTotalCropCount = 0;
+    let grandTotalVarietyCount = 0;
+
+    groupData.forEach((item) => {
+      grandTotalCropCount += parseInt(item.total_crop_count || 0);
+      grandTotalVarietyCount += parseInt(item.total_variety_count || 0);
+    });
+
+    const responseData = {
+      total_crop_count: grandTotalCropCount,
+      total_variety_count: grandTotalVarietyCount,
+      data: groupData,
+    };
+
+    response(res, status.DATA_AVAILABLE, 200, responseData);
+  } catch (error) {
+    console.error('Error in getDataGroupCodeWiseReportOne:', error);
+    response(res, status.DATA_NOT_AVAILABLE, 500);
+  }
+};
+
+  static getDataCropWiseReportOne = async (req, res) => {
+    try {
+      const { search } = req.body;
+      const now = new Date();
+      let whereClause = {};
+
+      if (!search?.group_code) {
+        return response(res, 'Group code is required', 400, null);
+      }
+      if (search?.search_filter) {
+        whereClause.crop_name = { [Op.iLike]: `%${search.search_filter}%` };
+      }
+      if (search?.year_from || search?.year_to) {
+        const fromDate = search.year_from ? new Date(`${search.year_from}-01-01T00:00:00`) : new Date('1900-01-01T00:00:00');
+        const toDate = search.year_to ? new Date(`${search.year_to}-12-31T23:59:59`) : now;
+        whereClause['$m_crop_varieties.not_date$'] = { [Op.between]: [fromDate, toDate] };
+      }
+      whereClause.group_code = search.group_code;
+
+      const cropData = await cropModel.findAll({
+        attributes: [
+          'crop_code',
+          'crop_name',
+          [sequelize.fn('MIN', sequelize.col('m_crop_group.group_name')), 'group_name'],
+          [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('m_crop_varieties.id'))), 'total_variety_count'],
+        ],
+        include: [
+          {
+            model: varietyModel,
+            attributes: [],
+            // required: true,
+            required: false,
+          },
+          {
+            model: cropGroupModel,
+            attributes: [],
+            required: true,
+          }
+        ],
+        where: whereClause,
+        group: ['m_crop.crop_code', 'm_crop.crop_name'],
+        raw: true,
+      });
+      // Grand totals
+      let total_variety_count = 0;
+
+      cropData.forEach(item => {
+        total_variety_count += parseInt(item.total_variety_count || 0);
+      });
+
+      const responseData = {
+        total_variety_count,
+        data: cropData,
+      };
+
+      response(res, status.DATA_AVAILABLE, 200, responseData);
+    } catch (error) {
+      console.error('Error in getDataGroupCodeWise:', error);
+      response(res, status.DATA_NOT_AVAILABLE, 500);
+    }
+  };
+
+  static getDataVarietyWiseReportOne = async (req, res) => {
+    try {
+      const { search } = req.body;
+      const now = new Date();
+      let whereClause = {};
+      if (search?.group_code) {
+        whereClause.crop_code = { [Op.like]: `${search.group_code}%` };
+      }
+      if (search?.crop_code) {
+        whereClause.crop_code = search.crop_code;
+      }
+      if (search?.search_filter) {
+        whereClause.variety_name = { [Op.iLike]: `%${search.search_filter}%` };
+      }
+      if (search?.year_from || search?.year_to) {
+        const fromDate = search.year_from ? new Date(`${search.year_from}-01-01T00:00:00`) : new Date('1900-01-01T00:00:00');
+        const toDate = search.year_to ? new Date(`${search.year_to}-12-31T23:59:59`) : now;
+        whereClause.not_date = {
+          [Op.between]: [fromDate, toDate]
+        };
+      }
+
+      const varietyData = await varietyModel.findAll({
+        attributes: [
+          'crop_code',
+          'variety_code',
+          'variety_name',
+          ['not_number', 'notification_number'],
+          ['not_date', 'notification_date'],
+          [sequelize.col('m_crop.m_crop_group.group_name'), 'group_name'],
+          [sequelize.col('m_crop.crop_name'), 'crop_name'],
+        ],
+        required: true,
+        where: whereClause,
+        include: [
+          {
+            model: cropModel,
+            attributes: [],
+            required: true,
+            include: [
+              {
+                model: cropGroupModel,
+                attributes: [],
+                required: true,
+              }
+            ]
+          }
+        ],
+        raw: true,
+      });
+
+      response(res, status.DATA_AVAILABLE, 200, varietyData);
+    } catch (error) {
+      console.error('Error in getDataGroupCodeWise:', error);
+      response(res, status.DATA_NOT_AVAILABLE, 500);
+    }
+  };
+
+  static getStateDataStateWiseReportTwo = async (req, res) => {
+    try {
+      const { search } = req.body;
+      let whereClause = {};
+      let whereClauseForState = {};
+
+      if (search?.search_filter) {
+        whereClauseForState.state_name = { [Op.iLike]: `%${search.search_filter}%` };
+      }
+      if (search?.group_code) {
+        whereClause['$m_crop.m_crop_group.group_code$'] = search.group_code;
+      }
+      console.log("----req.body.loginedUserid.user_type", req.body.loginedUserid.user_type)
+      if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+        // cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+        whereClause['$m_variety_characteristics.crop_code$'] = {
+          [Op.like]: 'A04%'
+        }
+      };
+      if (req.body.loginedUserid.user_type === "PULSESSEEDADMIN") {
+        // cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+        whereClause['$m_variety_characteristics.crop_code$'] = {
+          [Op.like]: 'A03%'
+        }
+      };
+      const groupData = await cropCharactersticsModel.findAll({
+        attributes: [
+          [sequelize.col('m_state.state_name'), 'state_name'],
+          [sequelize.col('m_state.state_code'), 'state_code'],
+          [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('m_crop.m_crop_group.id'))), 'total_crop_group_count'],
+          [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('m_variety_characteristics.crop_code'))), 'total_crop_count'],
+          [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('m_variety_characteristics.variety_id'))), 'total_variety_count']
+        ],
+        include: [
+          {
+            model: stateModel,
+            attributes: [],
+            required: true,
+            where: whereClauseForState,
+            on: sequelize.literal(`CAST("m_variety_characteristics"."state_id" AS INTEGER) = "m_state"."state_code"`)
+          },
+          {
+            model: cropModel,
+            attributes: [],
+            required: true,
+            include: [
+              {
+                model: cropGroupModel,
+                attributes: [],
+                required: true,
+              }
+            ]
+          },
+          {
+            model: varietyModel,
+            attributes: [],
+            required: true,
+            where: {
+              // ...cropGroup
+            }
+          },
+        ],
+        where: whereClause,
+        group: ['m_state.state_name', 'm_state.state_code'],
+        raw: true,
+      });
+      response(res, status.DATA_AVAILABLE, 200, groupData);
+    } catch (error) {
+      console.error('Error in getDataGroupCodeWise:', error);
+      response(res, status.DATA_NOT_AVAILABLE, 500);
+    }
+  };
+
+  static getStateDataCropGroupWiseReportTwo = async (req, res) => {
+    try {
+      const { search } = req.body;
+      let whereClause = {};
+      let whereClauseForCropGroup = {};
+
+      if (!search?.state_code) {
+        return response(res, 'State code is required', 400, null);
+      }
+
+      if (search?.search_filter) {
+        whereClauseForCropGroup.group_name = { [Op.iLike]: `%${search.search_filter}%` };
+      }
+      whereClause.state_id = String(search.state_code);
+
+      if (req.body.loginedUserid?.user_type === "OILSEEDADMIN") {
+        whereClause['$m_variety_characteristics.crop_code$'] = {
+          [Op.like]: 'A04%'
+        }
+      }
+     
+
+      const groupData = await cropCharactersticsModel.findAll({
+        attributes: [
+          [sequelize.col('m_crop.m_crop_group.group_name'), 'group_name'],
+          [sequelize.col('m_crop.m_crop_group.group_code'), 'group_code'],
+          [sequelize.fn('MIN', sequelize.col('m_state.state_name')), 'state_name'],
+          [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('m_variety_characteristics.crop_code'))), 'total_crop_count'],
+          [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('m_variety_characteristics.variety_id'))), 'total_variety_count']
+        ],
+        include: [
+          {
+            model: stateModel,
+            attributes: [],
+            required: true,
+            on: sequelize.literal(`CAST("m_variety_characteristics"."state_id" AS INTEGER) = "m_state"."state_code"`)
+          },
+          {
+            model: cropModel,
+            attributes: [],
+            required: true,
+            include: [
+              {
+                model: cropGroupModel,
+                attributes: [],
+                required: true,
+                where: whereClauseForCropGroup,
+              },
+            ]
+          },
+          {
+            model: varietyModel,
+            attributes: [],
+            required: true,
+          },
+        ],
+        where: whereClause,
+        group: ['m_crop.m_crop_group.group_name', 'm_crop.m_crop_group.group_code'],
+        raw: true,
+      });
+      response(res, status.DATA_AVAILABLE, 200, groupData);
+    } catch (error) {
+      console.error('Error in getDataGroupCodeWise:', error);
+      response(res, status.DATA_NOT_AVAILABLE, 500);
+    }
+  };
+
+  static getCropDataCropGroupWiseReportTwo = async (req, res) => {
+    try {
+      const { search } = req.body;
+
+      let whereClause = {};
+
+      if (search?.search_filter) {
+        whereClause.group_name = { [Op.iLike]: `%${search.search_filter}%` };
+      }
+      if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+        // cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+        whereClause['$m_variety_characteristics.crop_code$'] = {
+          [Op.like]: 'A04%'
+        }
+      };
+      if (req.body.loginedUserid.user_type === "PULSESSEEDADMIN") {
+        // cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+        whereClause['$m_variety_characteristics.crop_code$'] = {
+          [Op.like]: 'A03%'
+        }
+      };
+
+      const groupData = await cropCharactersticsModel.findAll({
+        attributes: [
+          [sequelize.col('m_crop.m_crop_group.group_name'), 'group_name'],
+          [sequelize.col('m_crop.m_crop_group.group_code'), 'group_code'],
+          [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('m_variety_characteristics.state_id'))), 'total_state_count'],
+          [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('m_variety_characteristics.crop_code'))), 'total_crop_count'],
+          [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('m_variety_characteristics.variety_id'))), 'total_variety_count']
+        ],
+        include: [
+          {
+            model: stateModel,
+            attributes: [],
+            required: true,
+            on: sequelize.literal(`CAST("m_variety_characteristics"."state_id" AS INTEGER) = "m_state"."state_code"`)
+          },
+          {
+            model: cropModel,
+            attributes: [],
+            required: true,
+            include: [
+              {
+                model: cropGroupModel,
+                attributes: [],
+                required: true,
+                where: whereClause,
+              },
+            ]
+          },
+          {
+            model: varietyModel,
+            attributes: [],
+            required: true,
+          },
+        ],
+        group: ['m_crop.m_crop_group.group_code', 'm_crop.m_crop_group.group_name'],
+        raw: true,
+      });
+      response(res, status.DATA_AVAILABLE, 200, groupData);
+    } catch (error) {
+      console.error('Error in getDataGroupCodeWise:', error);
+      response(res, status.DATA_NOT_AVAILABLE, 500);
+    }
+  };
+
+  static getCropDataStateWiseReportTwo = async (req, res) => {
+    try {
+      const { search } = req.body;
+      let whereClause = {};
+      let whereClauseForState = {};
+
+      if (search?.search_filter) {
+        whereClauseForState.state_name = { [Op.iLike]: `%${search.search_filter}%` };
+      }
+      if (search?.group_code) {
+        whereClause['$m_crop.m_crop_group.group_code$'] = search.group_code;
+      }
+
+      const groupData = await cropCharactersticsModel.findAll({
+        attributes: [
+          [sequelize.col('m_state.state_name'), 'state_name'],
+          [sequelize.col('m_state.state_code'), 'state_code'],
+          [sequelize.fn('MIN', sequelize.col('m_crop.m_crop_group.group_code')), 'group_code'],
+          [sequelize.fn('MIN', sequelize.col('m_crop.m_crop_group.group_name')), 'group_name'],
+          [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('m_variety_characteristics.crop_group_id'))), 'total_crop_group_count'],
+          [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('m_variety_characteristics.crop_code'))), 'total_crop_count'],
+          [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('m_variety_characteristics.variety_id'))), 'total_variety_count']
+        ],
+        include: [
+          {
+            model: stateModel,
+            attributes: [],
+            required: true,
+            where: whereClauseForState,
+            on: sequelize.literal(`CAST("m_variety_characteristics"."state_id" AS INTEGER) = "m_state"."state_code"`)
+          },
+          {
+            model: cropModel,
+            attributes: [],
+            required: true,
+            include: [
+              {
+                model: cropGroupModel,
+                attributes: [],
+                required: true,
+              }
+            ]
+          },
+          {
+            model: varietyModel,
+            attributes: [],
+            required: true,
+          },
+        ],
+        where: whereClause,
+        group: ['m_state.state_code', 'm_state.state_name'],
+        raw: true,
+      });
+      response(res, status.DATA_AVAILABLE, 200, groupData);
+    } catch (error) {
+      console.error('Error in getDataGroupCodeWise:', error);
+      response(res, status.DATA_NOT_AVAILABLE, 500);
+    }
+  };
+
+  static getDataCropWiseReportTwo = async (req, res) => {
+    try {
+      const { search } = req.body;
+      let whereClause = {};
+      let whereClauseForCrop = {};
+
+      if (search?.state_code) {
+        whereClause.state_id = String(search.state_code);
+      }
+
+      if (search?.group_code) {
+        whereClause['$m_crop.m_crop_group.group_code$'] = search.group_code;
+      }
+
+      if (search?.search_filter) {
+        whereClauseForCrop.crop_name = { [Op.iLike]: `%${search.search_filter}%` };
+      }
+
+      if (req.body.loginedUserid?.user_type === "OILSEEDADMIN") {
+        whereClause['$m_variety_characteristics.crop_code$'] = {
+          [Op.like]: 'A04%'
+        }
+      }
+
+      const groupData = await cropCharactersticsModel.findAll({
+        attributes: [
+          [sequelize.fn('MIN', sequelize.col('m_state.state_name')), 'state_name'],
+          [sequelize.fn('MIN', sequelize.col('m_crop.m_crop_group.group_name')), 'group_name'],
+          [sequelize.col('m_crop.crop_name'), 'crop_name'],
+          [sequelize.col('m_crop.crop_code'), 'crop_code'],
+          [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('m_variety_characteristics.variety_id'))), 'total_variety_count']
+        ],
+        include: [
+          {
+            model: stateModel,
+            attributes: [],
+            required: true,
+            on: sequelize.literal(`CAST("m_variety_characteristics"."state_id" AS INTEGER) = "m_state"."state_code"`)
+          },
+          {
+            model: cropModel,
+            attributes: [],
+            where: whereClauseForCrop,
+            required: true,
+            include: [
+              {
+                model: cropGroupModel,
+                attributes: [],
+                required: true,
+              }
+            ]
+          },
+          {
+            model: varietyModel,
+            attributes: [],
+            required: true,
+          },
+        ],
+        where: whereClause,
+        group: ['m_crop.crop_name', 'm_crop.crop_code'],
+        raw: true,
+      });
+      response(res, status.DATA_AVAILABLE, 200, groupData);
+    } catch (error) {
+      console.error('Error in getDataGroupCodeWise:', error);
+      response(res, status.DATA_NOT_AVAILABLE, 500);
+    }
+  };
+
+  static getDataVarietyWiseReportTwo = async (req, res) => {
+    try {
+      const { search } = req.body;
+      const now = new Date();
+      let whereClause = {};
+      let whereClauseForVariety = {};
+
+      if (search?.state_code) {
+        whereClause.state_id = String(search.state_code);
+      }
+      if (search?.group_code) {
+        whereClause['$m_crop.m_crop_group.group_code$'] = search.group_code;
+      }
+      if (search?.crop_code) {
+        whereClause.crop_code = search.crop_code;
+      }
+      if (search?.year_from || search?.year_to) {
+        const fromDate = search.year_from ? new Date(`${search.year_from}-01-01T00:00:00`) : new Date('1900-01-01T00:00:00');
+        const toDate = search.year_to ? new Date(`${search.year_to}-12-31T23:59:59`) : now;
+        whereClauseForVariety.not_date = {
+          [Op.between]: [fromDate, toDate]
+        };
+      }
+
+      if (search?.search_filter) {
+        whereClauseForVariety.variety_name = { [Op.iLike]: `%${search.search_filter}%` };
+      }
+      
+
+      if (req.body.loginedUserid?.user_type === "OILSEEDADMIN") {
+        whereClause['$m_crop.crop_code$'] = {
+          [Op.like]: 'A04%'
+        };
+      }
   
+
+      const groupData = await cropCharactersticsModel.findAll({
+        attributes: [
+          [sequelize.col('m_crop_variety.variety_code'), 'variety_code'],
+          [sequelize.col('m_crop_variety.variety_name'), 'variety_name'],
+          [sequelize.col('m_crop_variety.not_date'), 'notification_date'],
+          [sequelize.col('m_crop_variety.not_number'), 'notification_number'],
+          [sequelize.col('m_state.state_name'), 'state_name'],
+          [sequelize.col('m_crop.m_crop_group.group_name'), 'group_name'],
+          [sequelize.col('m_crop.crop_name'), 'crop_name'],
+        ],
+        include: [
+          {
+            model: stateModel,
+            attributes: [],
+            required: true,
+            on: sequelize.literal(`CAST("m_variety_characteristics"."state_id" AS INTEGER) = "m_state"."state_code"`)
+          },
+          {
+            model: cropModel,
+            attributes: [],
+            required: true,
+            include: [
+              {
+                model: cropGroupModel,
+                attributes: [],
+                required: true,
+              }
+            ]
+          },
+          {
+            model: varietyModel,
+            attributes: [],
+            where: whereClauseForVariety,
+            required: true,
+          },
+        ],
+        where: whereClause,
+        raw: true,
+      });
+      response(res, status.DATA_AVAILABLE, 200, groupData);
+    } catch (error) {
+      console.error('Error in getDataGroupCodeWise:', error);
+      response(res, status.DATA_NOT_AVAILABLE, 500);
+    }
+  };
+
+  static getAllVarietyDetails = async (req, res) => {
+    try {
+      const { search } = req.body;
+      let whereClause = {};
+
+      if (!search?.variety_code) {
+        return response(res, 'Variety code is required', 400, null);
+      }
+      whereClause.variety_code = search.variety_code;
+
+      const groupData = await varietyModel.findOne({
+        attributes: [
+          'variety_code',
+          'variety_name',
+          ['developed_by', 'developed_by'],
+          ['is_notified', 'is_notified'],
+          ['status', 'select_type'],
+          ['type', 'released_by'],
+          ['introduce_year', 'year_of_introduction'],
+          ['meeting_number', 'meeting_number'],
+          ['not_date', 'notification_date'],
+          ['not_number', 'notification_number'],
+          [sequelize.col('m_crop.crop_name'), 'crop_name'],
+          [sequelize.col('m_crop.botanic_name'), 'botanic_name'],
+          [sequelize.col('m_crop.hindi_name'), 'crop_name_hindi'],
+          [sequelize.col('m_crop.m_crop_group.group_name'), 'group_name'],
+          [sequelize.col('m_variety_characteristic.average_yeild_from'), 'average_yeild_from'],
+          [sequelize.col('m_variety_characteristic.average_yeild_to'), 'average_yeild_to'],
+          [sequelize.col('m_variety_characteristic.ip_protected_reg_no'), 'ip_protected'],
+          [sequelize.col('m_variety_characteristic.gi_tagged_reg_no'), 'ig_tagged'],
+          [sequelize.col('m_variety_characteristic.state_data'), 'states_for_cultivation'],
+          [sequelize.col('m_variety_characteristic.climate_resilience_json'), 'climate_resilience'],
+          [sequelize.col('m_variety_characteristic.reaction_to_pets_json'), 'reaction_insect_pests'],
+          [sequelize.col('m_variety_characteristic.reaction_major_diseases_json'), 'reaction_major_diseases'],
+          [sequelize.col('m_variety_characteristic.m_state.state_name'), 'state_name'],
+          [sequelize.col('m_variety_characteristic.m_agro_logical_region_state.m_agro_ecological_region.regions_name'), 'agro_ecological_regions'],
+        ],
+        include: [
+          {
+            model: cropModel,
+            attributes: [],
+            required: true,
+            include: [
+              {
+                model: cropGroupModel,
+                attributes: [],
+                required: true,
+              }
+            ]
+          },
+          {
+            model: cropCharactersticsModel,
+            attributes: [],
+            required: false,
+            include: [
+              {
+                model: stateModel,
+                attributes: [],
+                required: true,
+                on: sequelize.literal(`CAST("m_variety_characteristic"."state_id" AS INTEGER) = "m_variety_characteristic->m_state"."state_code"`)
+              },
+              {
+                model: mAgroLogicalRegionstatesModel,
+                attributes: [],
+                required: true,
+                on: sequelize.literal(`CAST("m_variety_characteristic"."state_id" AS INTEGER) = "m_variety_characteristic->m_agro_logical_region_state"."state_code"`),
+                include: [
+                  {
+                    model: mAgroEcologicalRegionsModel,
+                    attributes: [],
+                    required: true,
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        where: whereClause,
+        raw: true,
+      });
+
+      response(res, status.DATA_AVAILABLE, 200, groupData);
+    } catch (error) {
+      console.error('Error in getAllVarietyDetails:', error);
+      response(res, status.DATA_NOT_AVAILABLE, 500);
+    }
+  };
+
+  static getAllVarietyDetailsForExcel = async (req, res) => {
+    try {
+      const { search } = req.body;
+      const now = new Date();
+      let whereClause = {};
+
+      if (search?.group_code) {
+        whereClause['$m_crop.m_crop_group.group_code$'] = search.group_code;
+      }
+      if (search?.state_code) {
+        whereClause['$m_variety_characteristic.state_id$'] = String(search.state_code);
+      }
+      if (search?.crop_code) {
+        whereClause.crop_code = search.crop_code;
+      }
+      if (search?.variety_code) {
+        whereClause.variety_code = search.variety_code;
+      }
+      if (search?.search_filter) {
+        whereClause.variety_name = { [Op.iLike]: `%${search.search_filter}%` };
+      }
+      if (search?.year_from || search?.year_to) {
+        const fromDate = search.year_from ? new Date(`${search.year_from}-01-01T00:00:00`) : new Date('1900-01-01T00:00:00');
+        const toDate = search.year_to ? new Date(`${search.year_to}-12-31T23:59:59`) : now;
+        whereClause.not_date = {
+          [Op.between]: [fromDate, toDate]
+        };
+      }
+
+      const groupData = await varietyModel.findAll({
+        attributes: [
+          'variety_code',
+          'variety_name',
+          ['developed_by', 'developed_by'],
+          ['is_active', 'is_active'],
+          ['is_notified', 'is_notified'],
+          ['status', 'select_type'],
+          ['type', 'released_by'],
+          ['introduce_year', 'year_of_introduction'],
+          ['meeting_number', 'meeting_number'],
+          ['not_date', 'notification_date'],
+          ['not_number', 'notification_number'],
+          [sequelize.col('m_variety_characteristic.average_yeild_from'), 'average_yeild_from'],
+          [sequelize.col('m_variety_characteristic.average_yeild_to'), 'average_yeild_to'],
+          [sequelize.col('m_variety_characteristic.generic_morphological'), 'generic_morphological'],
+          [sequelize.col('m_variety_characteristic.specific_morphological'), 'specific_morphological'],
+          [sequelize.col('m_variety_characteristic.agronomic_features'), 'agronomic_features'],
+          [sequelize.col('m_variety_characteristic.fertilizer_dosage'), 'fertilizer_dosage'],
+          [sequelize.col('m_variety_characteristic.adoptation'), 'adoptation_ecology'],
+          [sequelize.col('m_variety_characteristic.state_data'), 'states_for_cultivation'],
+          [sequelize.col('m_variety_characteristic.climate_resilience_json'), 'climate_resilience'],
+          [sequelize.col('m_variety_characteristic.reaction_to_pets_json'), 'reaction_insect_pests'],
+          [sequelize.col('m_variety_characteristic.reaction_major_diseases_json'), 'reaction_major_diseases'],
+          [sequelize.col('m_variety_characteristic.m_state.state_name'), 'state_name'],
+          [sequelize.col('m_crop.crop_name'), 'crop_name'],
+          [sequelize.col('m_crop.m_crop_group.group_name'), 'group_name'],
+        ],
+        include: [
+          {
+            model: cropCharactersticsModel,
+            attributes: [],
+            required: search.crop_characterstic_require,
+            include: [
+              {
+                model: stateModel,
+                attributes: [],
+                required: true,
+                on: sequelize.literal(`CAST("m_variety_characteristic"."state_id" AS INTEGER) = "m_variety_characteristic->m_state"."state_code"`)
+              }
+            ]
+          },
+          {
+            model: cropModel,
+            attributes: [],
+            required: true,
+            include: [
+              {
+                model: cropGroupModel,
+                attributes: [],
+                required: true,
+              }
+            ]
+          }
+        ],
+        where: whereClause,
+        raw: true,
+      });
+
+      response(res, status.DATA_AVAILABLE, 200, groupData);
+    } catch (error) {
+      console.error('Error in getAllVarietyDetailsForExcel:', error);
+      response(res, status.DATA_NOT_AVAILABLE, 500);
+    }
+  };
 }
 
 module.exports = SeedController;

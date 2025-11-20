@@ -18,7 +18,7 @@ import Swal from 'sweetalert2';
 import { MasterService } from 'src/app/services/master/master.service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+//pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 
 
@@ -34,6 +34,15 @@ export class SeedTestingLaboratoryReportComponent implements OnInit {
   cropGroupData;
   statename = [];
   identor = [];
+  tableData: any[] = [];
+filteredData: any[] = [];
+selected_state: string = '';
+selected_district: string = '';
+ allData: any[] = [];
+  totalIndenters: number = 0;
+  searchText: string = '';
+  showFilter: boolean = false;
+
   ngForm!: FormGroup;
   seasonList: any = [];
   response_crop_group: any = [];
@@ -42,8 +51,6 @@ export class SeedTestingLaboratoryReportComponent implements OnInit {
   custom_array: any[];
   finalData: any[];
   fileName = 'seed-testing-laboratory-report.xlsx';
-  allData: any;
-
   stateData: any;
 
   year: any;
@@ -54,16 +61,16 @@ export class SeedTestingLaboratoryReportComponent implements OnInit {
   tableId: any[];
   DistrictData: any[];
   exportdata: any[];
-  selected_state: any;
-  selected_district: any;
   disabledfield=true;
   stateDataSecond: any;
   DistrictDataSecond: any[];
+  masterData: any[];
+  completeData: any[];
   constructor(private masterService: MasterService, private fb: FormBuilder, private service: SeedServiceService, private router: Router) { this.createEnrollForm(); }
   createEnrollForm() {
     this.ngForm = this.fb.group({
-      state: ['',],
-      district: ['',],
+        state: [''],
+  district: [''],
       state_text:[''],
       district_text:[''],
     });
@@ -76,45 +83,160 @@ export class SeedTestingLaboratoryReportComponent implements OnInit {
       }
 
     })
-    this.ngForm.controls['state_text'].valueChanges.subscribe(newValue => {
-      if (newValue) {
-        this.stateData =this.stateDataSecond
-        let response= this.stateData.filter(x=>x.state_name.toLowerCase().startsWith(newValue.toLowerCase()))      
-        this.stateData=response;  
-      }
-      else{
-        this.getState()       
-      }
-    });
-    
-    this.ngForm.controls['district_text'].valueChanges.subscribe(newValue => {
-      if (newValue ) {
-        this.DistrictData =this.DistrictDataSecond
-        let response= this.DistrictData.filter(x=>x['m_district.district_name'].toLowerCase().startsWith(newValue.toLowerCase()))    
-        this.DistrictData=response
-      }
-      else{
-        this.getDistrict(this.ngForm.controls['state'].value)       
-      }
-    });
-  }
-  ngOnInit(): void {
-    // localStorage.setItem('logined_user', "Seed");
-    // if (!localStorage.getItem('foo')) {
-    //   localStorage.setItem('foo', 'no reload')
-    //   location.reload()
-    // } else {
-    //   localStorage.removeItem('foo')
-    // }
+    // this.ngForm.controls['state_text'].valueChanges.subscribe(newValue => {
+    //   if (newValue) {
+    //     this.stateData =this.stateDataSecond
+    //     let response= this.stateData.filter(x=>x.state_name.toLowerCase().startsWith(newValue.toLowerCase()))      
+    //     this.stateData=response;  
+    //   }
+    //   else{
+    //     this.getState()       
+    //   }
+    // });
 
-    this.getPageData();
-    this.getState();
-    this.runExcelApi();
-    // this.shortStatename();
-    // this.getCroupCroupList();
-    // this.getSeasonData();
-    // this.submitindentor();
+      this.ngForm.controls['state_text'].valueChanges.subscribe(newValue => {
+    if (newValue) {
+      this.stateData = this.stateDataSecond; // full copy
+      let response = this.stateData.filter(
+        x => x.state_name.toLowerCase().includes(newValue.toLowerCase())   
+      );
+      this.stateData = response;
+    } else {
+      this.getState();
+    }
+  });
+    
+    // this.ngForm.controls['district_text'].valueChanges.subscribe(newValue => {
+    //   if (newValue ) {
+    //     this.DistrictData =this.DistrictDataSecond
+    //     let response= this.DistrictData.filter(x=>x['m_district.district_name'].toLowerCase().startsWith(newValue.toLowerCase()))    
+    //     this.DistrictData=response
+    //   }
+    //   else{
+    //     this.getDistrict(this.ngForm.controls['state'].value)       
+    //   }
+    // });
+     this.ngForm.controls['district_text'].valueChanges.subscribe(newValue => {
+    if (newValue) {
+      this.DistrictData = this.DistrictDataSecond; 
+      let response = this.DistrictData.filter(
+        x =>
+          x['m_district.district_name']
+            .toLowerCase()
+            .includes(newValue.toLowerCase()) 
+      );
+      this.DistrictData = response;
+    } else {
+      this.getDistrict(this.ngForm.controls['state'].value);
+    }
+  });
   }
+
+  ngOnInit(): void {
+    this.fetchData();
+      this.ngForm.controls['state'].valueChanges.subscribe(() => {
+    this.applyFilter();
+  });
+
+  this.ngForm.controls['district'].valueChanges.subscribe(() => {
+    this.applyFilter();
+  });
+  this.getPageData();
+  this.getState();
+  this.runExcelApi();
+
+
+  setTimeout(() => {
+    if (this.allData) {
+      this.filteredData = this.allData;
+
+    }
+  }, 500);
+}
+applyFilter() {
+  this.filteredData = this.allData.filter(item => {
+    const stateMatch = (this.selected_state === 'ALL' || !this.selected_state) ? true : item.m_district?.state_code === this.selected_state;
+    const districtMatch = (this.selected_district === 'ALL' || !this.selected_district) ? true : item.m_district?.district_code === this.selected_district;
+    return stateMatch && districtMatch;
+  });
+
+  this.filterPaginateSearch.itemList = [...this.filteredData];
+  this.totalIndenters = this.filteredData.length;
+}
+
+  fetchData() {
+  this.service.postRequestCreator("getSeedTestingLabDataforReports").subscribe((apiResponse: any) => {
+    if (apiResponse?.EncryptedResponse?.status_code === 200) {
+      // All data set
+      this.allData = apiResponse.EncryptedResponse.data.rows || [];
+
+      // Filtered data initially full data
+      this.filteredData = [...this.allData];
+
+      // Total indenters count
+      this.totalIndenters = this.filteredData.length;
+
+      // Pagination object update
+      this.filterPaginateSearch.itemList = [...this.filteredData];
+      this.filterPaginateSearch.Init(this.allData, this, "getPageData", undefined, apiResponse.EncryptedResponse.data.count, true);
+
+      // Pagination init
+      this.initSearchAndPagination();
+    }
+  });
+}
+
+
+onSearch1() {
+  const search = this.searchText.trim().toLowerCase();
+
+  if (!search) {
+    this.filteredData = [...this.allData];
+  } else {
+    this.filteredData = this.allData.filter(item =>
+      (item.lab_name && item.lab_name.toLowerCase().includes(search)) ||
+      (item.short_name && item.short_name.toLowerCase().includes(search)) ||
+      (item.address && item.address.toLowerCase().includes(search)) ||
+      (item.contact_person_name && item.contact_person_name.toLowerCase().includes(search)) ||
+      (item.m_designation && item.m_designation.name && item.m_designation.name.toLowerCase().includes(search)) ||
+      (item.mobile_number && item.mobile_number.toLowerCase().includes(search)) ||
+      (item.email && item.email.toLowerCase().includes(search)) ||
+      (item.m_district && item.m_district.state_name && item.m_district.state_name.toLowerCase().includes(search)) ||
+      (item.m_district && item.m_district.district_name && item.m_district.district_name.toLowerCase().includes(search))
+    );
+  }
+
+ 
+  this.filterPaginateSearch.itemList = [...this.filteredData];
+  this.totalIndenters = this.filteredData.length;
+}
+
+onSearch(): void {
+  if (!this.searchText || this.searchText.trim() === '') {
+    // ✅ Reset data if search is empty
+    this.completeData = [...this.masterData];
+  } else {
+    const lower = this.searchText.toLowerCase();
+
+    this.completeData = this.masterData.filter(item => {
+      const agency = item.agency_detail || {};
+
+      return (
+
+        (item.lab_name && item.lab_name.toLowerCase().includes(lower)) ||
+      (item.short_name && item.short_name.toLowerCase().includes(lower)) ||
+      (item.address && item.address.toLowerCase().includes(lower)) ||
+      (item.contact_person_name && item.contact_person_name.toLowerCase().includes(lower)) ||
+      (item.m_designation && item.m_designation.name && item.m_designation.name.toLowerCase().includes(lower)) ||
+      (item.mobile_number && item.mobile_number.toLowerCase().includes(lower)) ||
+      (item.email && item.email.toLowerCase().includes(lower)) ||
+      (item.m_district && item.m_district.state_name && item.m_district.state_name.toLowerCase().includes(lower)) ||
+      (item.m_district && item.m_district.district_name && item.m_district.district_name.toLowerCase().includes(lower))
+
+      );
+    });
+  }
+}
 
   getState() {
     this.stateData = [];
@@ -142,7 +264,6 @@ export class SeedTestingLaboratoryReportComponent implements OnInit {
   }
 
   getPageData(loadPageNumberData: number = 1, searchData: any | undefined = undefined) {
-
     searchData = {
       isSearch: true,
     }
@@ -157,6 +278,7 @@ export class SeedTestingLaboratoryReportComponent implements OnInit {
           state_id:this.ngForm.controls['state'].value,
           district:this.ngForm.controls['district'].value,
           isSearch: true,
+          isReport : true,
         }
       })
       .subscribe((apiResponse: any) => {
@@ -165,10 +287,12 @@ export class SeedTestingLaboratoryReportComponent implements OnInit {
           && apiResponse.EncryptedResponse.status_code == 200) {
           this.filterPaginateSearch.itemListPageSize = 50;
           this.allData = apiResponse.EncryptedResponse.data.rows;
+          this.masterData = [...apiResponse.EncryptedResponse.data.rows];
+          this.completeData = [...apiResponse.EncryptedResponse.data.rows];
           if (this.allData === undefined) {
             this.allData = [];
           }
-          console.log(this.allData)
+          this.totalIndenters = apiResponse.EncryptedResponse.data.count;
           this.filterPaginateSearch.Init(this.allData, this, "getPageData", undefined, apiResponse.EncryptedResponse.data.count, true);
           this.initSearchAndPagination();
         }
@@ -213,11 +337,11 @@ export class SeedTestingLaboratoryReportComponent implements OnInit {
             if (this.allData === undefined) {
               this.allData = [];
             }
-            console.log(this.allData)
+              this.allData = apiResponse.EncryptedResponse.data.rows || [];
+      this.filteredData = [...this.allData];
+      this.totalIndenters = this.filteredData.length;
             this.filterPaginateSearch.Init(this.allData, this, "getPageData", undefined, apiResponse.EncryptedResponse.data.count, true);
             this.initSearchAndPagination();
-            // this.filterPaginateSearch.Init(this.allData, this, "getPageData", undefined, apiResponse.EncryptedResponse.data.count, true);
-            // this.initSearchAndPagination();
             this.runExcelApi()
           }
         });
@@ -246,153 +370,14 @@ export class SeedTestingLaboratoryReportComponent implements OnInit {
     this.runExcelApi();
     this.isSearch=false
     this.initSearchAndPagination();
+      this.selected_state = 'ALL';
+  
+  this.filteredData = [...this.allData];
   }
-
-  // cropGroup(data: string) { { } }
-  // async shortStatename() {
-  //   const route = 'get-state-list';
-  //   const result = await this.breederService.getRequestCreatorNew(route).subscribe((data: any) => {
-  //     this.statename = data && data['EncryptedResponse'] && data['EncryptedResponse'].data ? data['EncryptedResponse'].data : '';
-  //     // console.log('state======>',this.statename);
-
-  //   })
-  // }
-
-  // async submitindentor(loadPageNumberData: number = 1, searchData: any | undefined = undefined) {
-
-  //   const route = 'submit-indents-breeder-seeds-list';
-  //   const result = await this.breederService.postRequestCreator(route, null, {
-  //     page: loadPageNumberData,
-  //     pageSize: this.filterPaginateSearch.itemListPageSize || 10,
-  //     search: searchData
-  //   }).subscribe((apiResponse: any) => {
-  //     if (apiResponse !== undefined
-  //       && apiResponse.EncryptedResponse !== undefined
-  //       && apiResponse.EncryptedResponse.status_code == 200) {
-  //       this.identor = apiResponse.EncryptedResponse.data.data;
-  //       this.data1 = apiResponse.EncryptedResponse.data;
-  //       this.custom_array = [];
-  //       // console.log('this.identorthis.identor',this.identor);
-  //       // arr = arr.data
-  //       let varietyId = []
-  //       for (let value of this.identor) {
-  //         varietyId.push(value.m_crop_variety.variety_name)
-  //       }
-  //       varietyId = [...new Set(varietyId)]
-  //       let newObj = [];
-
-  //       for (let value of varietyId) {
-  //         let keyArr = [];
-  //         for (let val of this.identor) {
-  //           if (val.m_crop_variety.variety_name == value) {
-  //             let state = val.user.agency_detail.m_state.state_short_name;
-  //             keyArr.push({ "state": state, 'value': val.indent_quantity });
-  //           }
-  //         }
-  //         let variety_id = (value).toString();
-  //         newObj.push({ "variety_id": value, 'data': keyArr })
-  //       }
-
-  //       this.finalData = newObj;
-  //       console.log('this.idfinalDatantor', this.finalData);
-
-  //       this.tableId = [];
-  //       for (let id of this.identor) {
-  //         this.tableId.push(id.id);
-  //       }
-  //       // console.log('this.identorthis.identor', this.tableId);
-
-  //       const results = this.identor.filter(element => {
-  //         if (Object.keys(element).length !== 0) {
-  //           return true;
-  //         }
-
-  //         return false;
-  //       });
-  //       // console.log(results, 'resultssssssss');
-  //       if (this.identor === undefined) {
-  //         this.identor = [];
-  //       }
-  //       // let data =[];
-  //       const removeEmpty = (obj) => {
-  //         Object.entries(obj).forEach(([key, val]) =>
-  //           (val && typeof val === 'object') && removeEmpty(val) ||
-  //           (val === null || val === "") && delete obj[key]
-  //         );
-  //         return obj;
-  //       };
-  //       removeEmpty(this.identor)
-  //       this.filterPaginateSearch.Init(results, this, "getPageData", undefined, apiResponse.EncryptedResponse.data.count);
-  //       this.initSearchAndPagination();
-  //     }
-
-  //   });
-  // }
-
-  // freeze() {
-  //   const searchFilters = {
-  //     "search": {
-  //       "id": this.tableId
-  //     }
-  //   };
-  //   const route = "freeze-indent-breeder-seed-data";
-  //   this.service.postRequestCreator(route, null, searchFilters).subscribe((apiResponse: any) => {
-  //     if (apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.status_code
-  //       && apiResponse.EncryptedResponse.status_code == 200) {
-  //       Swal.fire({
-  //         toast: true,
-  //         icon: "success",
-  //         title: "Data Has Been Successfully Updated",
-  //         position: "center",
-  //         showConfirmButton: false,
-  //         showCancelButton: false,
-  //         timer: 2000
-  //       }).then(x => {
-
-  //         this.router.navigate(['/seed-testing-laboratory-report']);
-  //       })
-  //     }
-  //     else {
-
-  //       Swal.fire({
-  //         toast: true,
-  //         icon: "error",
-  //         title: "An error occured",
-  //         position: "center",
-  //         showConfirmButton: false,
-  //         showCancelButton: false,
-  //         timer: 2000
-  //       })
-  //     }
-
-  //   });
-  // }
-
-  // getSeasonData() {
-  //   const route = "get-season-details";
-  //   const result = this.service.postRequestCreator(route, null).subscribe(data => {
-  //     this.seasonList = data && data.EncryptedResponse && data.EncryptedResponse.data ? data.EncryptedResponse.data : '';
-  //     // console.log(this.seasonList);
-  //   })
-  // }
-  // getCroupCroupList() {
-  //   const route = "crop-group";
-  //   const result = this.service.getPlansInfo(route).then((data: any) => {
-  //     this.response_crop_group = data && data['EncryptedResponse'] && data['EncryptedResponse'].data && data['EncryptedResponse'].data ? data['EncryptedResponse'].data : '';
-  //   })
-  // }
-  // initSearchAndPagination() {
-  //   this.paginationUiComponent.Init(this.filterPaginateSearch);
-  //   if (this.paginationUiComponent === undefined) {
-
-
-  //     setTimeout(() => {
-  //       this.initSearchAndPagination();
-  //     }, 300);
-  //     return;
-  //   }
-  //   // this.indentBreederSeedAllocationSearchComponent.Init(this.filterPaginateSearch);
-  // }
+  clear2(){
+      this.selected_district = 'ALL';
+  this.filteredData = [...this.allData];
+  }
 
   myFunction() {
     document.getElementById("myDropdown").classList.toggle("show");
@@ -414,6 +399,7 @@ export class SeedTestingLaboratoryReportComponent implements OnInit {
   runExcelApi(loadPageNumberData: number = 1, searchData: any | undefined = undefined){
     searchData = {
       isSearch: this.isSearch,
+      isReport: true
     }
     this.ngForm.controls['state'].value ? (searchData['state_id'] = this.ngForm.controls['state'].value) : '';
       this.ngForm.controls['district'].value ? (searchData['district'] = this.ngForm.controls['district'].value) : '';
@@ -434,7 +420,6 @@ export class SeedTestingLaboratoryReportComponent implements OnInit {
           if (this.exportdata === undefined) {
             this.exportdata = [];
           }
-          console.log(this.exportdata)
           this.filterPaginateSearch.Init(this.exportdata, this, "getPageData", undefined, apiResponse.EncryptedResponse.data.count, true);
           this.initSearchAndPagination();
         }
@@ -455,22 +440,7 @@ export class SeedTestingLaboratoryReportComponent implements OnInit {
 
   }
 
-  // download() {
-  //   const name = 'seed-testing-laboratory-report';
-  //   const element = document.getElementById('excel-table');
-  //   const options = {
-  //     filename: `${name}.pdf`,
-  //     image: { type: 'jpeg', quality: 1 },
-  //     html2canvas: {
-  //       dpi: 192,
-  //       scale: 4,
-  //       letterRendering: true,
-  //       useCORS: true
-  //     },
-  //     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  //   };
-  //   html2PDF().set(options).from(element).toPdf().save();
-  // }
+
   download() {  
     let reportDataHeader = [
       { text: 'S/N', bold: true },
@@ -487,7 +457,7 @@ export class SeedTestingLaboratoryReportComponent implements OnInit {
      { text: 'Status', bold: true },
                           ]
 
-    let reportData = this.exportdata.map((element, index) => {   
+    let reportData = this.completeData.map((element, index) => {   
  
     let reportData =  [
             index+1,
@@ -514,18 +484,18 @@ export class SeedTestingLaboratoryReportComponent implements OnInit {
  
     const docDefinition = {
       pageOrientation: 'landscape',
-      // pageSize: {
-      //   width: 1800,
-      //   height: 600,
-      // },
 
       content: [
         { text: 'List of Seed Testing Laboratory', style: 'header' },
-        { text: `State :  ${this.selected_state}       District:   ${this.selected_district}`, style: 'custom' },
+        // { text: `State :  ${this.selected_state}       District:   ${this.selected_district}`, style: 'custom' },
+        { 
+  text: `State : ${this.selected_state ? this.selected_state : 'NA'}   District : ${this.selected_district ? this.selected_district : 'NA'}`,  
+},
+
         {
           style: 'indenterTable',
           table: {
-            // widths: [5,15,10,10,10,10,10,10,10,10],
+          
             body: 
               reportData,
           },
@@ -560,25 +530,78 @@ export class SeedTestingLaboratoryReportComponent implements OnInit {
         },
       },
     };
-    pdfMake.createPdf(docDefinition).download('list-of-breeders-report.pdf');
-  }
-  state_select(data){
-    this.selected_state = data && data.state_name ? data.state_name :'';
-    this.ngForm.controls['state'].setValue(data && data.state_code ? data.state_code :'');
-    this.ngForm.controls['state_text'].setValue("");
+    pdfMake.createPdf(docDefinition).download('List-of-Seed-Testing-Laboratory.pdf');
   }
 
   cnClick() {
     document.getElementById('state').click();
   }
-  district_select(data){
-    this.selected_district = data && data['m_district.district_name'] ? data['m_district.district_name']:'';
-    this.ngForm.controls['district'].setValue(data && data['m_district.district_code'] ? data['m_district.district_code'] :'')
 
-    this.ngForm.controls['district_text'].setValue("");
-    
-  }
   cdClick() {
     document.getElementById('district').click();
   }
+  toggleFilter() {
+  this.showFilter = !this.showFilter;
+}
+state_select(data){
+  this.selected_state = data.state_name || '';
+  this.ngForm.controls['state'].setValue(data.state_code || '');
+
+  if(data.state_code === 'ALL'){
+    this.disabledfield = false;
+    this.selected_district = '';
+    this.ngForm.controls['district'].setValue('');
+    this.searchText = ''
+  } else {
+    this.searchText = ''
+    this.disabledfield = false;
+    this.ngForm.controls['district'].setValue('');
+    this.selected_district = '';
+    this.getDistrict(data.state_code);
+  }
+
+  this.getPageData(); 
+}
+district_select(data){
+  this.selected_district = data['m_district.district_name'] || '';
+  this.ngForm.controls['district'].setValue(data['m_district.district_code'] || '');
+
+  this.getPageData(); 
+}
+
+
+// applyFilter() {
+//   if ((this.selected_state === 'ALL' || !this.selected_state) &&
+//       (this.selected_district === 'ALL' || !this.selected_district)) {
+
+//     this.filteredData = [...this.allData];
+//     return;
+//   }
+
+//   this.filteredData = this.allData.filter(item => {
+//     let stateMatch = (this.selected_state === 'ALL' || !this.selected_state) ? true : item.state_id === this.selected_state;
+//     let districtMatch = (this.selected_district === 'ALL' || !this.selected_district) ? true : item.district_code === this.selected_district;
+//     return stateMatch && districtMatch;
+//   });
+// }
+
+filterTableData(searchData: any) {
+  if (Object.keys(searchData).length === 1 && searchData.isSearch) {
+    this.filteredData = this.tableData;
+  } else {
+    this.filteredData = this.tableData.filter(item => {
+      let match = true;
+      if (searchData.state_id) {
+        match = match && item.state_id === searchData.state_id;
+      }
+      if (searchData.district) {
+        match = match && item.district === searchData.district;
+      }
+      return match;
+    });
+  }
+}
+
+
+
 }

@@ -252,9 +252,9 @@
                                         </button>
                                     </div>
                                     <div class="col-12 col-md-6 col-xl-6 pb-1" *ngIf="isEdit">
-                                        <button
+                                        <button (click)="save(ngForm)"
                                             class="w-100 py-2 mt-2 text-white btn-inventory1 bspc_text d-inline-flex justify-content-center verticle-content-middle mb-3 mt-1">
-                                            <span class="text-white" (click)="save(ngForm)">Update</span>
+                                            <span class="text-white" >Update</span>
                                         </button>
                                     </div>
                                 </div>

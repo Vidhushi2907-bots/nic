@@ -1,435 +1,235 @@
 <div class="row my-4 w-100 mx-0">
     <div class="col-12 d-flex justify-content-center verticle-content-middle">
-        <div class="main-content-form-wrapper px-0 py-2">
-            <div class="row">
-                <div class="w-100">
-                    <form [formGroup]="ngForm">
-                        <div class="col-12 px-4 mt-2">
-                            <div class="row">
-                                <div class="col-md-4 pl-4 pb-2">
-                                    <span class="heading_notofied">Seed Multiplication Ratio</span>
-                                </div>
-                                <div class="col-md-4 pl-4 pb-2"
-                                    style="font: normal normal 600 20px/30px Poppins; letter-spacing: 0px; color: #1C1C1C;">
-                                </div>
-                                <div class="col-md-4 pl-4 pb-2"
-                                    style="font: normal normal 600 20px/30px Poppins; letter-spacing: 0px; color: #1C1C1C;">
-                                </div>
-                                <!-- <div class="col-md-6 mt-3">
-                                <div class="col-md-12">
-                                    <label for="" class="left-heading">Year</label>
-                                </div>
-                                <div _ngcontent-cvx-c131="" class="col-md-12">
-                                    <select class="form-control" formControlName="year">
-                                        <option value="">Select Year</option>
-                                        <option *ngFor="let data of yearOfIndent" value="{{data.value}}">{{data.name}}
-                                        </option>
-                                    </select>
-                                </div>
-                            </div> -->
-
-
-                                <div class="col-md-4 pl-0 mt-2 pl-2 pr-md-0" (click)="myFunction1()" >
-                                    <div class="col-md-12">
-                                        <label for="Crop Name" class="search_txt">Crop Group</label>
-                                    </div>
-                                    <div class="col-12 pr-2 pr-md-0">
-                                        <div ngbDropdown class="d-inline-block w-100">
-
-                                            <button class="btn takeplacholder w-100 crop toggle-button" id="crop_group"
-                                                ngbDropdownToggle style="text-align: left;" aria-disabled="true">
-
-                                                {{crop_groups && (crop_groups.length>30) ?
-                                                (crop_groups.substring(0,30)+'...'):crop_groups?crop_groups :'Select
-                                                Crop Group'}}
-                                            </button>
-
-                                            <div class="dropdown-menu w-100" ngbDropdownMenu="crop_group"
-                                                aria-labelledby="sortMenu">
-
-
-                                                <input type="text" class="form-control px-4"
-                                                    formControlName="crop_text">
-                                                <button class="dropdown-item" *ngFor="let data of seasonList "
-                                                    value="{{data.crop_group_code}}" (click)="cropGroup(data)"
-                                                    #dropdownItem [attr.data-parent-name]="'cropGroup'">
-                                                    {{data.group_name}}
-                                                </button>
-                                            </div>
-
-
-                                        </div>
-                                        <div class="pl-0 toggle-button" ngbDropdown id="crop_group">
-                                            <i class="fa-solid fa-angle-down downicon" (click)="cgClick()"></i>
-                                        </div>
-                                        <!-- <select class="form-select form-control" aria-label="Default select example"
-                                        formControlName="season" (change)="onChangeCropGroup(ngForm)">
-                                        <option value="">Select Crop Group</option>
-                                        <option *ngFor="let data of seasonList" value="{{data.group_code}}">
-                                            {{data.group_name}}
-                                        </option>
-                                    </select> -->
-                                        <!-- <div class="pl-0 toggle-button" ngbDropdown>
-                                        <img src="assets/images/16.svg" alt="" srcset="">
-                                    </div> -->
-                                    </div>
-
-                                </div>
-                                <div class="col-md-4 pl-0 mt-2 pl-2 pl-md-0 pr-md-0" (click)="myFunction1()">
-                                    <div class="col-md-12">
-                                        <label for="Crop Name" class="search_txt">Crop Name</label>
-                                    </div>
-                                    <div class="col-12 pr-2">
-                                        <div ngbDropdown class="d-inline-block w-100 "
-                                            [ngClass]=" disabledfieldcropName  ? 'disabledfield' : ''">
-                                            <button class="btn takeplacholder w-100 crop toggle-button" id="crop_name"
-                                                ngbDropdownToggle style="text-align: left;">{{crop_names &&
-                                                (crop_names.length>30) ? (crop_names.substring(0,30)+'...'):crop_names?
-                                                crop_names :'Select Crop
-                                                Name'}}</button>
-
-                                            <div class="dropdown-menu w-100" ngbDropdownMenu="crop_name"
-                                                aria-labelledby="sortMenu">
-                                                <input type="text" class="form-control px-4"
-                                                    formControlName="crop_name_text">
-                                                <button class="dropdown-item" *ngFor="let data of response_crop_group"
-                                                    (click)="cropNames(data)" #dropdownItem
-                                                    [attr.data-parent-name]="'crop_name'">
-                                                    {{data && data['m_crop.crop_name'] ? data['m_crop.crop_name'] :''}}
-
-                                                </button>
-
-                                            </div>
-
-                                        </div>
-                                        <div class="pl-0 toggle-button" ngbDropdown
-                                            [ngClass]=" disabledfieldcropName  ? 'disabledfield' : ''">
-                                            <i class="fa-solid fa-angle-down downicon" (click)="cnClick()"></i>
-                                        </div>
-                                        <!-- <select class="form-select form-control" aria-label="Default select example"
-                                        formControlName="crop">
-                                        <option value="">Select Crop</option>
-                                        <option *ngFor="let data of response_crop_group" value="{{data && data['m_crop.crop_code'] ? data['m_crop.crop_code'] :''}}">
-                                            {{data && data['m_crop.crop_name'] ? data['m_crop.crop_name'] :''}}</option>
-                                    </select>
-                                    <div class="pl-0 toggle-button" ngbDropdown>
-                                        <img src="assets/images/16.svg" alt="" srcset="">
-                                    </div> -->
-                                    </div>
-
-                                </div>
-
-                                <div class="col-12 mt-0 search-cancle-button buttons-phone pt-4">
-                                    <button _ngcontent-cvx-c131=""
-                                        class="form-button search ml-2 d-inline-flex justify-content-center verticle-content-middle mb-3 mx-2"
-                                        (click)="submit()"> Search </button>
-                                    <button _ngcontent-cvx-c131="" (click)="clear()"
-                                        class="clear-form-button ml-2 d-inline-flex justify-content-center verticle-content-middle mb-3">
-                                        Clear
-                                    </button>
-
-
-                                    <div class="dropdown float-right export_dropdown">
-                                        <button (click)="myFunction()"
-                                            class="form-button  search ml-2 d-inline-flex justify-content-center verticle-content-middle mb-2 mx-2"
-                                            style="font-size: 87%;">Export To &nbsp;<i class="fa fa-angle-down"
-                                                aria-hidden="true"> </i></button>
-                                        <div id="myDropdown" class="dropdown-content">
-                                            <a (click)="download()"> <img src="assets\icons\pdf-icon.png" alt=""
-                                                    width="20px" height="20px"> PDF</a>
-                                            <a (click)="exportexcel()"> <img src="assets\icons\excel.jpg" alt=""
-                                                    width="20px" alt=""> Excel</a>
-                                        </div>
-                                    </div>
-
-                                </div>
-                                <!-- <div _ngcontent-cvx-c131="" class="col-8 mt-0">
-
-
-                                <div class="dropdown float-right">
-                                    <button (click)="myFunction()"
-                                        class="form-button  search ml-2 d-inline-flex justify-content-center verticle-content-middle mb-2 mx-3"
-                                        style="font-size: 87%;">Export To &nbsp;<i class="fa fa-angle-down"
-                                            aria-hidden="true"> </i></button>
-                                    <div id="myDropdown" class="dropdown-content">
-                                        <a (click)="download()"> <img src="assets\icons\pdf-icon.png" alt=""
-                                                width="20px" height="20px"> PDF</a>
-                                        <a (click)="exportexcel()"> <img src="assets\icons\excel.jpg" alt=""
-                                                width="20px" alt=""> Excel</a>
-                                    </div>
-                                </div>
-
-                            </div> -->
-
-
-                                <div _ngcontent-cvx-c131="" class="col-12 px-4">
-                                    <hr _ngcontent-cvx-c131="" class="separator m-0">
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <!-- table for exel Download start -->
-                <table id="excel-table" style="display: none;">
-                    <tr>
-                        <th>Seed Multiplication Ratio</th>
-                    </tr>
-                    <thead>
-                        <tr>
-
-                            <th>Crop Group</th>
-                            <th>Crop Name</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>{{crop_groups ? crop_groups :''}}</td>
-                            <td>{{crop_names ? crop_names :''}}</td>
-                        </tr>
-                    </tbody>
-                    <thead>
-                        <tr>
-                            <th scope="col" class="col-md-1 py-3 sn-report">S/N</th>
-                            <th scope="col" class="col-md-3 py-3">Crop Group</th>
-                            <th scope="col" class="col-md-3 py-3">Crop Name</th>
-                            <th scope="col" class="col-md-2 py-3">Nucleus to Breeder</th>
-                            <th scope="col" class="col-md-2 py-3">Breeder to Foundation I
-                            </th>
-                            <th scope="col" class="col-md-2 py-3">Foundation I to
-                                Foundation
-                                II</th>
-                            <th scope="col" class="col-md-2 py-3">Foundation
-                                II to Certified</th>
-                        </tr>
-                    </thead>
-                    <tbody *ngFor="let data of exportdata; let dataIndex=index">
-                        <tr>
-                            <td>
-                                <span>{{ dataIndex + 1}}.</span>
-                            </td>
-                            <td>
-                                <span style="cursor: pointer;" data-toggle="tooltip"
-                                    data-placement="bottom">{{(data.m_crop && data.m_crop.m_crop_group &&
-                                    data.m_crop.m_crop_group.group_name) ?
-                                    data.m_crop.m_crop_group.group_name :
-                                    'NA'}}</span>
-                            </td>
-                            <td>
-
-                                <span style="cursor: pointer;" data-toggle="tooltip"
-                                    data-placement="bottom">{{(data.m_crop && data.m_crop.crop_name) ?
-                                   ( data.m_crop.crop_name|uppercase):
-                                    'NA'}}</span>
-                            </td>
-
-                            <td>
-
-                                <span style="cursor: pointer;" data-toggle="tooltip"
-                                    data-placement="bottom">{{data.nucleus_to_breeder ?
-                                    data.nucleus_to_breeder :
-                                    'NA'}}</span>
-                            </td>
-                            <td>
-
-                                <span style="cursor: pointer;" data-toggle="tooltip"
-                                    data-placement="bottom">{{data.breeder_to_foundation ?
-                                    data.breeder_to_foundation :
-                                    'NA'}}</span>
-                            </td>
-                            <td>
-                                <span style="cursor: pointer;" data-toggle="tooltip"
-                                    data-placement="bottom">{{data.foundation_1_to_2 ?
-                                    data.foundation_1_to_2 :
-                                    'NA'}}</span>
-                            </td>
-                            <td>
-                                <span style="cursor: pointer;" data-toggle="tooltip"
-                                    data-placement="bottom">{{data.foundation_2_to_cert ?
-                                    data.foundation_2_to_cert
-                                    :
-                                    'NA'}}</span>
-                            </td>
-
-
-                        </tr>
-                    </tbody>
-                </table>
-                <!-- table for exel Download end -->
-
-                <div class="col-12 px-4">
-                    <!-- <app-dynamic-fields [fieldsList]="fieldsList" [formGroup]="formGroup"></app-dynamic-fields> -->
-                    <div class="list-wrapper px-4 py-3">
-                        <div class="row d-md-flex data-row-header extra-header">
-                            <!-- <div class="col-6 col-md-4 py-3 d-flex verticle-content-middle">
-                            </div> -->
-                            <div class="col-12 col-md-12 py-3 d-flex justify-content-center"><span>Seed Multiplication
-                                    Ratio</span>
-                            </div>
-                            <!-- <div class="col-6 col-md-4 py-3 d-flex verticle-content-middle">
-                            </div> -->
-                        </div>
-                        <br>
-
-                        <!-- <div class="row d-md-flex data-row-header">
-                            <div class="col-4 col-md-4 py-3 d-flex verticle-content-middle">Crop Group :
-                                {{year?year:'2022'}}</div>
-                            
-
-
-                            <div class="col-4 col-md-4 py-3 d-flex verticle-content-middle">Crop :
-                                {{crop?crop:'BULB VEGETABLES'}}</div>
-                            <div class="col-4 col-md-4 py-3 d-flex justify-content-end">As on Date: {{todayData
-                                | date:"dd-MM-YYYY"}}</div>
-
-                        </div>
-                        <div class="middle_line"></div> -->
-
-                        <div class="row data-row">
-                            <table class="table table-bordered table-responsive">
-                                <thead>
-                                    <tr class="data-row-header">
-                                        <th scope="col" class="col-md-0 sn-report">S/N</th>
-                                        <th scope="col" class="col-md-2">Crop Group</th>
-                                        <th scope="col" class="col-md-2">Crop Name</th>
-                                        <th scope="col" class="col-md-2">Nucleus to Breeder</th>
-                                        <th scope="col" class="col-md-2">Breeder to Foundation I
-                                        </th>
-                                        <th scope="col" class="col-md-3">Foundation I to
-                                            Foundation
-                                            II</th>
-                                        <th scope="col" class="col-md-3">Foundation
-                                            II to Certified</th>
-
-
-                                    </tr>
-                                </thead>
-                                <tbody *ngFor="let data of filterPaginateSearch.itemList; let dataIndex=index">
-                                    <tr>
-                                        <td>
-                                            <span>{{ (filterPaginateSearch.itemListCurrentPage - 1) *
-                                                filterPaginateSearch.itemListPageSize + dataIndex + 1}}.</span>
-                                        </td>
-                                        <td>
-
-                                            <span style="cursor: pointer;" data-toggle="tooltip"
-                                                data-placement="bottom">{{(data.m_crop && data.m_crop.m_crop_group &&
-                                                data.m_crop.m_crop_group.group_name) ?
-                                                data.m_crop.m_crop_group.group_name :
-                                                'NA'}}</span>
-                                        </td>
-                                        <td>
-
-                                            <span style="cursor: pointer;" data-toggle="tooltip"
-                                                data-placement="bottom">{{(data.m_crop && data.m_crop.crop_name) ?
-                                                (data.m_crop.crop_name|uppercase) :
-                                                'NA'}}</span>
-                                        </td>
-
-                                        <td>
-
-                                            <span style="cursor: pointer;" data-toggle="tooltip"
-                                                data-placement="bottom">{{data.nucleus_to_breeder ?
-                                                data.nucleus_to_breeder :
-                                                'NA'}}</span>
-                                        </td>
-                                        <td>
-
-                                            <span style="cursor: pointer;" data-toggle="tooltip"
-                                                data-placement="bottom">{{data.breeder_to_foundation ?
-                                                data.breeder_to_foundation :
-                                                'NA'}}</span>
-                                        </td>
-                                        <td>
-                                            <span style="cursor: pointer;" data-toggle="tooltip"
-                                                data-placement="bottom">{{data.foundation_1_to_2 ?
-                                                data.foundation_1_to_2 :
-                                                'NA'}}</span>
-                                        </td>
-                                        <td>
-                                            <span style="cursor: pointer;" data-toggle="tooltip"
-                                                data-placement="bottom">{{data.foundation_2_to_cert ?
-                                                data.foundation_2_to_cert
-                                                :
-                                                'NA'}}</span>
-                                        </td>
-
-
-                                    </tr>
-
-                                </tbody>
-                            </table>
-                        </div>
-                        <!-- 
-                        <div class="row data-row"
-                            *ngFor="let data of filterPaginateSearch.itemList; let dataIndex=index">
-                            <div class="col-6 col-md-2 py-1 d-flex verticle-content-middle">
-                                <div class="w-fit-content">
-                                    <label class="d-md-none" class="d-md-none">S/N:&nbsp;</label>
-                                    <span>{{ (filterPaginateSearch.itemListCurrentPage - 1) *
-                                        filterPaginateSearch.itemListPageSize + dataIndex + 1}}.</span>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-2 py-1 d-flex verticle-content-middle">
-                                <div class="w-fit-content">
-                                    <label class="d-md-none">Crop Name:&nbsp;</label>
-
-                                    <span style="cursor: pointer;" data-toggle="tooltip"
-                                        data-placement="bottom">{{(data.m_crop && data.m_crop.crop_name) ?
-                                        data.m_crop.crop_name :
-                                        'NA'}}</span>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-2 py-1 d-flex verticle-content-middle">
-                                <div class="w-fit-content">
-                                    <label class="d-md-none">Nucleus to Breeder:&nbsp;</label>
-
-                                    <span style="cursor: pointer;" data-toggle="tooltip"
-                                        data-placement="bottom">{{data.nucleus_to_breeder ? data.nucleus_to_breeder :
-                                        'NA'}}</span>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-2 py-1 d-flex verticle-content-middle">
-                                <div class="w-fit-content">
-                                    <label class="d-md-none">Breeder to Foundation:&nbsp;</label>
-
-                                    <span style="cursor: pointer;" data-toggle="tooltip"
-                                        data-placement="bottom">{{data.breeder_to_foundation ?
-                                        data.breeder_to_foundation :
-                                        'NA'}}</span>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-2 py-3 d-flex verticle-content-middle">
-                                <div class="w-fit-content">
-                                    <label class="d-md-none">Foundation I to Foundation II:&nbsp;</label>
-                                    <span style="cursor: pointer;" data-toggle="tooltip"
-                                        data-placement="bottom">{{data.foundation_1_to_2 ? data.foundation_1_to_2 :
-                                        'NA'}}</span>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-2 py-3 d-flex verticle-content-middle">
-                                <div class="w-fit-content">
-                                    <label class="d-md-none">Foundation II to Certified:&nbsp;</label>
-                                    <span style="cursor: pointer;" data-toggle="tooltip"
-                                        data-placement="bottom">{{data.foundation_2_to_cert ? data.foundation_2_to_cert
-                                        :
-                                        'NA'}}</span>
-                                </div>
-                            </div>
-
-                        </div> -->
-                    </div>
-                </div>
-                <div class="col-12 px-4 px-md-3 py-3">
-                    <app-pagination-ui></app-pagination-ui>
-                </div>
-                <div *ngIf="filterPaginateSearch && filterPaginateSearch.initialized &&(!filterPaginateSearch.itemList || filterPaginateSearch.itemList.length < 1)"
-                    class="px-2 py-3 w-100" style="height: 50px;">
-
-                    <div class="d-flex verticle-content-middle justify-content-center w-100">
-                        No Data Found.
-                    </div>
-                </div>
-            </div>
+      <div class="main-content-form-wrapper px-0 py-2">
+        <div class="col-md-12">
+          <!-- <span class="heading_notofied">Seed Multiplication Ratio</span> -->
         </div>
+  
+        <div class="col-12 d-flex justify-content-start mb-0 filting">
+          <button class="filter-btn" (click)="toggleFilter()">
+            <i class="fa fa-filter"></i> Filter Options
+          </button>
+        </div>
+  
+        <div class="row">
+          <div *ngIf="showFilter" class="w-100">
+            <form [formGroup]="ngForm">
+              <div class="col-12 px-4 mt-2">
+                <div class="row">
+                  <div class="col-md-4 pl-4 pb-2"></div>
+                  <div class="col-md-4 pl-4 pb-2"
+                    style="font: normal normal 600 20px/30px Poppins; letter-spacing: 0px; color: #1C1C1C;">
+                  </div>
+                  <div class="col-md-4 pl-4 pb-2"
+                    style="font: normal normal 600 20px/30px Poppins; letter-spacing: 0px; color: #1C1C1C;">
+                  </div>
+  
+                  <!-- Crop Group -->
+                  <div class="col-md-4 pl-0 mt-2 pl-2 pr-md-0" (click)="myFunction1()">
+                    <div class="col-md-12">
+                      <label for="Crop Name" class="search_txt">Crop Group</label>
+                    </div>
+                    <div class="col-12 pr-2 pr-md-0">
+                      <div ngbDropdown class="d-inline-block w-100">
+                        <button class="btn takeplacholder w-100 crop toggle-button" id="crop_group"
+                          ngbDropdownToggle style="text-align: left;" aria-disabled="true">
+                          {{crop_groups && (crop_groups.length>30) ? (crop_groups.substring(0,30)+'...'):crop_groups?crop_groups :'Select Crop Group'}}
+                        </button>
+  
+                        <div class="dropdown-menu w-100" ngbDropdownMenu="crop_group" aria-labelledby="sortMenu">
+                          <input type="text" class="form-control px-4" formControlName="crop_text">
+                          <button class="dropdown-item" (click)="cropGroup('all')">All</button>
+                          <button class="dropdown-item" *ngFor="let data of seasonList "
+                            value="{{data.crop_group_code}}" (click)="cropGroup(data)"
+                            #dropdownItem [attr.data-parent-name]="'cropGroup'">
+                            {{data.group_name}}
+                          </button>
+                        </div>
+                      </div>
+                      <div class="pl-0 toggle-button" ngbDropdown id="crop_group">
+                        <i class="fa-solid fa-angle-down downicon" (click)="cgClick()"></i>
+                      </div>
+                    </div>
+                  </div>
+  
+                  <!-- Crop Name -->
+                  <div class="col-md-4 pl-0 mt-2 pl-2 pl-md-0 pr-md-0" (click)="myFunction1()">
+                    <div class="col-md-12">
+                      <label for="Crop Name" class="search_txt">Crop Name</label>
+                    </div>
+                    <div class="col-12 pr-2">
+                      <div ngbDropdown class="d-inline-block w-100 "
+                        [ngClass]=" disabledfieldcropName  ? 'disabledfield' : ''">
+                        <button class="btn takeplacholder w-100 crop toggle-button" id="crop_name"
+                          ngbDropdownToggle style="text-align: left;">
+                          {{crop_names && (crop_names.length>30) ? (crop_names.substring(0,30)+'...'):crop_names? crop_names :'Select Crop Name'}}
+                        </button>
+  
+                        <div class="dropdown-menu w-100" ngbDropdownMenu="crop_name" aria-labelledby="sortMenu">
+                          <input type="text" class="form-control px-4" formControlName="crop_name_text">
+  
+                          <!-- All option -->
+                          <button class="dropdown-item" (click)="cropNames('all')">All</button>
+  
+                          <button class="dropdown-item" *ngFor="let data of response_crop_group"
+                            (click)="cropNames(data)" #dropdownItem [attr.data-parent-name]="'crop_name'">
+                            {{data && data['m_crop.crop_name'] ? data['m_crop.crop_name'] :''}}
+                          </button>
+                        </div>
+                      </div>
+                      <div class="pl-0 toggle-button" ngbDropdown [ngClass]=" disabledfieldcropName  ? 'disabledfield' : ''">
+                        <i class="fa-solid fa-angle-down downicon" (click)="cnClick()"></i>
+                      </div>
+                    </div>
+                  </div>
+  
+                  <!-- Search & Clear -->
+                  <!-- <div class="col-12 mt-0 search-cancle-button buttons-phone pt-4">
+                    <button class="form-button search ml-2 d-inline-flex justify-content-center verticle-content-middle mb-3 mx-2"
+                      (click)="submit()"> Search </button>
+                    <button (click)="clear()"
+                      class="clear-form-button ml-2 d-inline-flex justify-content-center verticle-content-middle mb-3">
+                      Clear
+                    </button>
+                  </div> -->
+  
+                  <!-- <div class="col-12 px-4">
+                    <hr class="separator m-0">
+                  </div> -->
+                </div>
+              </div>
+            </form>
+          </div>
+  
+          <!-- table for exel Download start -->
+          <table id="excel-table" style="display: none;">
+            <tr>
+              <th>Seed Multiplication Ratio</th>
+            </tr>
+            <thead>
+              <tr>
+                <th>Crop Group</th>
+                <th>Crop Name</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{crop_groups ? crop_groups :''}}</td>
+                <td>{{crop_names ? crop_names :''}}</td>
+              </tr>
+            </tbody>
+            <thead>
+              <tr>
+                <th scope="col" class="col-md-1 py-3 sn-report">S/N</th>
+                <th scope="col" class="col-md-3 py-3">Crop Group</th>
+                <th scope="col" class="col-md-3 py-3">Crop Name</th>
+                <th scope="col" class="col-md-2 py-3">Nucleus to Breeder</th>
+                <th scope="col" class="col-md-2 py-3">Breeder to Foundation I</th>
+                <th scope="col" class="col-md-2 py-3">Foundation I to Foundation II</th>
+                <th scope="col" class="col-md-2 py-3">Foundation II to Certified</th>
+              </tr>
+            </thead>
+            <tbody *ngFor="let data of completeData; let dataIndex=index">
+              <tr>
+                <td><span>{{ dataIndex + 1}}.</span></td>
+                <td>
+                  <span style="cursor: pointer;" data-toggle="tooltip" data-placement="bottom">
+                    {{(data.m_crop && data.m_crop.m_crop_group && data.m_crop.m_crop_group.group_name) ? data.m_crop.m_crop_group.group_name : 'NA'}}
+                  </span>
+                </td>
+                <td>
+                  <span style="cursor: pointer;" data-toggle="tooltip" data-placement="bottom">
+                    {{(data.m_crop && data.m_crop.crop_name) ? ( data.m_crop.crop_name|uppercase) : 'NA'}}
+                  </span>
+                </td>
+                <td><span>{{data.nucleus_to_breeder ? data.nucleus_to_breeder : 'NA'}}</span></td>
+                <td><span>{{data.breeder_to_foundation ? data.breeder_to_foundation : 'NA'}}</span></td>
+                <td><span>{{data.foundation_1_to_2 ? data.foundation_1_to_2 : 'NA'}}</span></td>
+                <td><span>{{data.foundation_2_to_cert ? data.foundation_2_to_cert : 'NA'}}</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <!-- table for exel Download end -->
+  
+          <div class="col-12 px-4">
+            <div class="list-wrapper px-4 py-3">
+              <div class="row d-md-flex data-row-header extra-header">
+                <div class="col-12 col-md-12 py-3 d-flex justify-content-between align-items-center text-white">
+                  <div class="mx-auto">Seed Multiplication Ratio</div>
+                  <div>(Total: {{ totalIndenters }})</div>
+                </div>
+              </div>
+  
+              <div class="col-12 col-sm-12 col-md-12 col-lg-12 pt-3">
+                <div class="search-export-container mb-2">
+                  <input type="text" class="form-control search-input input1"
+                    placeholder="Search" [(ngModel)]="searchText" (input)="onSearch()" />
+  
+                  <div class="dropdown float-right export_dropdown drop1">
+                    <button type="button" (click)="myFunction()"
+                      class="form-button search ml-1 d-inline-flex justify-content-center verticle-content-middle mb-2 mx-0"
+                      style="font-size: 87%;">Export To &nbsp;<i class="fa fa-angle-down" aria-hidden="true"></i>
+                    </button>
+                    <div id="myDropdown" class="dropdown-content">
+                      <a (click)="download()">
+                        <img src="assets\icons\pdf-icon.png" width="20px" height="20px"> PDF
+                      </a>
+                      <a (click)="exportexcel()">
+                        <img src="assets\icons\excel.jpg" width="20px"> Excel
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+  
+              <br>
+  
+              <!-- Main Table -->
+              <div class="row data-row">
+                <table class="table table-bordered table-responsive">
+                  <thead>
+                    <tr class="data-row-header">
+                      <th scope="col" class="col-md-0 sn-report">S/N</th>
+                      <th scope="col" class="col-md-2">Crop Group</th>
+                      <th scope="col" class="col-md-2">Crop Name</th>
+                      <th scope="col" class="col-md-2">Nucleus to Breeder</th>
+                      <th scope="col" class="col-md-2">Breeder to Foundation I</th>
+                      <th scope="col" class="col-md-3">Foundation I to Foundation II</th>
+                      <th scope="col" class="col-md-3">Foundation II to Certified</th>
+                    </tr>
+                  </thead>
+                  <tbody *ngFor="let data of completeData; let dataIndex=index">
+                    <tr>
+                      <td><span>{{ dataIndex + 1}}.</span></td>
+                      <td>
+                        <span>{{(data.m_crop && data.m_crop.m_crop_group && data.m_crop.m_crop_group.group_name) ? data.m_crop.m_crop_group.group_name : 'NA'}}</span>
+                      </td>
+                      <td>
+                        <span>{{(data.m_crop && data.m_crop.crop_name) ? (data.m_crop.crop_name|uppercase) : 'NA'}}</span>
+                      </td>
+                      <td><span>{{data.nucleus_to_breeder ? data.nucleus_to_breeder : 'NA'}}</span></td>
+                      <td><span>{{data.breeder_to_foundation ? data.breeder_to_foundation : 'NA'}}</span></td>
+                      <td><span>{{data.foundation_1_to_2 ? data.foundation_1_to_2 : 'NA'}}</span></td>
+                      <td><span>{{data.foundation_2_to_cert ? data.foundation_2_to_cert : 'NA'}}</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+  
+          <div class="col-12 px-4 px-md-3 py-3">
+            <!-- <app-pagination-ui></app-pagination-ui> -->
+          </div>
+  
+          <div *ngIf="completeData && completeData.length < 1"
+            class="px-2 py-3 w-100" style="height: 50px;">
+            <div class="d-flex verticle-content-middle justify-content-center w-100">
+              No Data Found.
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
+  

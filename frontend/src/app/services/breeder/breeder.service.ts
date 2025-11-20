@@ -79,4 +79,14 @@ export class BreederService {
     const otherHeader = header.append('Authorization', 'Bearer ' + token);
     return this.http.get(this.endpoint + 'utils/file-download?file='+ fileName, { headers: otherHeader });
   }
+
+  getMaximumLotSizeForEachCropReport(): Observable<any> {
+  const currentUser = JSON.parse(localStorage.getItem('BHTCurrentUser'));
+  const token = currentUser ? currentUser.token : '';
+  const header = new HttpHeaders();
+  const otherHeader = header.append('Authorization', 'Bearer ' + token);
+
+  return this.http.get<any>(this.endpoint + 'maximumLotSizeReport', { headers: otherHeader });
+}
+
 }

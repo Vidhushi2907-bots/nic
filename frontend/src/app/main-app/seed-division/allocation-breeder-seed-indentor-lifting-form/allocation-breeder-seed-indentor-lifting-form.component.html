@@ -12,18 +12,6 @@
 					<app-dynamic-fields [fieldsList]="fieldsList" [isLabelControlParallel]="false"
 						[formGroup]="IstPartFormGroup" [isView]="isView"></app-dynamic-fields>
 				</div>
-				<!-- <div class="col-sm-1 col-12 pt-5 mt-1" style="text-align: right;">
-					<div *ngIf="items.length" class="resp_btn">
-						<a href="javascript:void(0)"
-							class="form-button submit_btn ml-3 d-inline-flex justify-content-center verticle-content-middle mb-3 mr-1"
-							(click)="exportexcel()">
-							<img src="assets\icons\icons8-excel_white.svg" alt="" width="20px" alt=""> &nbsp;
-							Excel
-						</a>
-					</div>
-				</div>  -->
-
-
 
 				<div class="col-sm-2 col-12 pt-5 mt-1" style="display: inline-flex;">
 					<div class="resp_btn">
@@ -32,7 +20,7 @@
 							Search
 						</a>
 					</div>
-					<div *ngIf="items.length" class="resp_btn">
+					<div *ngIf=" ( varietyDropdownData.length == 0) && dataToDisplay.length" class="resp_btn">
 						<a href="javascript:void(0)"
 							class="form-buttons submit_btn ml-3 d-inline-flex justify-content-center verticle-content-middle mb-3 mr-1"
 							(click)="exportexcel()">
@@ -56,17 +44,22 @@
 				<!-- <div class="resp_btn">
 					<a href="javascript:void(0)" (click)="exportexcel()"><img src="assets\icons\excel.jpg" alt="" width="20px" alt=""> Excel</a>
 				</div> -->
-				<table *ngIf="items.length" class="table table-bordered table-responsive" id="excel-table"
-					style="display:none">
+				<table class="table table-bordered table-responsive" id="excel-table" style="display:none">
 					<thead>
 						<tr>
-							<th> <b>Year of indent: {{reportHeader && reportHeader['year'] ?
+							<th> <b>Year of indent: {{IstPartFormGroupControls["yearofIndent"].value.value}}-{{(IstPartFormGroupControls["yearofIndent"].value.value-2000)+1}}
+								<!-- {{reportHeader && reportHeader['year'] ?
 									reportHeader['year']+'-'+(reportHeader['year']-1999) :
-									'NA'}}</b></th>
-							<th><b>Season: {{reportHeader && reportHeader['season'] ? (reportHeader['season'] =='R' ?
-									'Rabi':'Kharif' ) : 'NA'}}</b></th>
-							<th> <b>Crop: {{reportHeader && reportHeader['crop_name'] ? reportHeader['crop_name'] :
-									'NA'}}</b></th>
+									'NA'}} -->
+								</b></th>
+							<th><b>Season: {{IstPartFormGroupControls["season"].value["value"]?(IstPartFormGroupControls["season"].value["value"]=='R'?'Rabi':'Kharif'):'NA'}}
+								<!-- {{reportHeader && reportHeader['season'] ? (reportHeader['season'] =='R' ?
+									'Rabi':'Kharif' ) : 'NA'}} -->
+								</b></th>
+							<th> <b>Crop:{{IstPartFormGroupControls['cropName'].value['name']}} 
+								<!-- {{reportHeader && reportHeader['crop_name'] ? reportHeader['crop_name'] :
+									'NA'}} -->
+								</b></th>
 						</tr>
 						<tr class="data-row-header col-12">
 							<th scope="col" class="col-md-2 text-center">Variety Name</th>
@@ -101,12 +94,12 @@
 												[attr.rowspan]="data.totalVarietyLength">
 												<span *ngIf="this.varietyForm.controls['variety_id'].value">{{data
 													&& data.variety_id ? getVarietyName(data.variety_id): data
-													&& data.variety_name ? data.variety_name :'NA'}}</span>
+													&& data.variety_name ? data.variety_name :'NA'}}ooooo</span>
 												<span
-													*ngIf="(this.editVarietyForm.controls['variety_id'].value && this.editVarietyForm.controls['variety_id'].value[0] && this.editVarietyForm.controls['variety_id'].value[0].value) || isCropSubmitted">
+													*ngIf="(this.editVarietyForm.controls['variety_id'].value && this.editVarietyForm.controls['variety_id'].value[0] && this.editVarietyForm.controls['variety_id'].value[0].value) || isCropSubmittedNew">
 													{{data && data.variety_id ?
 													getVarietyName2(data.variety_id)
-													: 'NA'}}
+													: 'NA'}}ppp
 												</span>
 												<br>
 												<span>Parental Line:{{data && data.line_name ?
@@ -155,7 +148,7 @@
 						</ng-container>
 
 					</tbody>
-
+<!-- totalData &&  -->
 					<tr *ngIf="totalData" style="font-weight: 700;">
 						<td>
 							{{totalData.name}}
@@ -182,7 +175,8 @@
 					</div>
 				</ng-template>
 
-				<div class="col-12 mt-1" *ngIf="upperRowDisplay">
+				<!-- letest d-none implement 2/09/2025 by shubham -->
+				<div class="col-12 mt-1 d-none" *ngIf="upperRowDisplay">
 					<div class="row px-2">
 						<div class="col-sm-3 col-12">
 							<label class="bold-label ">Total Number of Variety :
@@ -205,7 +199,7 @@
 								getQuantityOfSeedProduced(verietyListDetails.totalProduction) : 'N/A' }} {{
 								searhedData && IstPartFormGroupControls['cropName'].value &&
 								IstPartFormGroupControls['cropName'].value.value ?
-								getQuantityMeasure(IstPartFormGroupControls['cropName'].value.value):''}} 
+								getQuantityMeasure(IstPartFormGroupControls['cropName'].value.value):''}}
 
 							</label>
 						</div>
@@ -245,20 +239,20 @@
 
 
 				<div class="col-12 mt-1" *ngIf="varietyDataload">
-					<div class="row" *ngIf="!isCropSubmitted"> 
-							<div class="col-md-3 col-sm-12" *ngIf="varietyDropdownData && varietyDropdownData.length >0">
-								<form [formGroup]="varietyForm"> 
-									<label for="year" class="label-inventory required">Select Variety</label> 
-									<ng-multiselect-dropdown class="seed-division-variety" formControlName="variety_id"
-										[placeholder]="'Select Variety'" [settings]="dropdownSettings"
-										(onSelect)="onSelectVariety($event)"
-										[data]="varietyDropdownDatasecond">
-									</ng-multiselect-dropdown>
-	
-								</form>
-							</div>
-						 
-						<div class="col-3" *ngIf="!isCropSubmitted && varietyLine && varietyLine.length>0">
+					<div class="row" *ngIf="!isCropSubmittedNew && isCropSubmitted">
+						<div class="col-md-3 col-sm-12" *ngIf="varietyDropdownData && varietyDropdownData.length >0">
+							<form [formGroup]="varietyForm">
+								<label for="year" class="label-inventory required">Select Variety</label>
+								<ng-multiselect-dropdown class="seed-division-variety" formControlName="variety_id"
+									[placeholder]="'Select Variety'" [settings]="dropdownSettings"
+									(onSelect)="onSelectVariety($event)" [data]="varietyDropdownDatasecond">
+								</ng-multiselect-dropdown>
+
+							</form>
+						</div>
+
+						<div class="col-3"
+							*ngIf="!isCropSubmittedNew && isCropSubmitted && varietyLine && varietyLine.length>0">
 							<form [formGroup]="varietyForm">
 
 								<ng-multiselect-dropdown class="seed-division-variety" formControlName="variety_line"
@@ -269,9 +263,9 @@
 							</form>
 						</div>
 						<div class="col-3"
-						*ngIf="!isCropSubmitted && editVarietyDropdown && editVarietyDropdown.length>0 && (varietyDropdownData && varietyDropdownData.length ==0)">
-							<form [formGroup]="editVarietyForm"> 
-								<label for="year" class="label-inventory required">Select Variety for Edit</label> 
+							*ngIf="!isCropSubmittedNew && isCropSubmitted && editVarietyDropdown && editVarietyDropdown.length>0 && (varietyDropdownData && varietyDropdownData.length ==0)">
+							<form [formGroup]="editVarietyForm">
+								<label for="year" class="label-inventory required">Select Variety for Edit</label>
 								<ng-multiselect-dropdown class="seed-division-variety" formControlName="variety_id"
 									[placeholder]="'Select Variety for Edit'" [settings]="dropdownSettings"
 									(onSelect)="onSelectEditVariety($event)" [data]="editVarietyDropdown">
@@ -279,7 +273,7 @@
 							</form>
 						</div>
 						<div class="col-3 pt-2"
-							*ngIf="!isCropSubmitted && varietyLineedit && varietyLineedit.length > 0">
+							*ngIf="!isCropSubmittedNew && isCropSubmitted && varietyLineedit && varietyLineedit.length > 0">
 							<form [formGroup]="editVarietyForm">
 								<ng-multiselect-dropdown class="seed-division-variety" formControlName="variety_line"
 									[placeholder]="'Select Parental Line for Edit'" [settings]="dropdownSettings1"
@@ -349,10 +343,13 @@
 											*ngFor="let data of selectedVerietyDetail.productionCenters; let dataIndex=index">
 											<td>{{data && data.agency_detail && data.agency_detail.agency_name ?
 												data.agency_detail.agency_name :'NA'}}</td>
-											<td>{{data && data.quantityProduced ? data.quantityProduced :'NA'}}</td>
-											<td>{{data && data.quantityAllocated ?
+											<td style="background-color: rgb(255, 211, 161);">{{data &&
+												data.quantityProduced ? data.quantityProduced :'NA'}}</td>
+											<td style="background-color: rgb(172, 255, 191);">{{data &&
+												data.quantityAllocated ?
 												getQuantityOfSeedProduced(data.quantityAllocated):''}}</td>
-											<td>{{data && data.quantityProduced && data.quantityAllocated &&
+											<td style="background-color: rgb(253, 164, 164);">{{data &&
+												data.quantityProduced && data.quantityAllocated &&
 												((data.quantityProduced - data.quantityAllocated) < 0 ) ? 0 :
 													getQuantityOfSeedProduced(data.quantityProduced -
 													data.quantityAllocated)}}</td>
@@ -394,18 +391,23 @@
 					</div>
 
 					<div class="row" *ngIf="selectedVerietyDetail && indentorLoad && indentors && indentors.length > 0">
-						
+
 						<div class="col">
 							<div class="table-responsive">
 								<table class="table">
 									<thead class="thead">
 										<tr>
-											<th scope="col " class="col-md-3 text-center indenterName">Name of Indenters</th>
-											<th scope="col" class="col-md-2 text-center indentorQuantity">Indented Quantity</th>
-											<th scope="col" class="col-md-2 text-center allocationQuantity">Allocation for
+											<th scope="col " class="col-md-3 text-center indenterName">Name of Indenters
+											</th>
+											<th scope="col" class="col-md-2 text-center indentorQuantity">Indented
+												Quantity</th>
+											<th scope="col" class="col-md-2 text-center allocationQuantity">Allocation
+												for
 												Lifting</th>
-											<th scope="col" class="col-md-1 text-center indentorQuantity">Allocated Quantity</th>
-											<th scope="col" class="col-md-1 text-center indentorQuantity">Quantity Left for
+											<th scope="col" class="col-md-1 text-center indentorQuantity">Allocated
+												Quantity</th>
+											<th scope="col" class="col-md-1 text-center indentorQuantity">Quantity Left
+												for
 												Allocation</th>
 											<th scope="col" class="col-md-1 text-center indentorQuantity">Action</th>
 
@@ -665,9 +667,11 @@
 
 					<!-- *ngIf="dataToDisplay && dataToDisplay.length > 0" -->
 					<!-- *ngIf="isTableVisible || (dataToDisplay && dataToDisplay.length > 0)" -->
+					<!-- *ngIf="dataToDisplay && dataToDisplay.length > 0" -->
 					<div class="row">
-						<div class="col" *ngIf="dataToDisplay && dataToDisplay.length > 0">
-							<div class="table-responsive">
+
+						<div class="col">
+							<div class="table-responsive" *ngIf="dataToDisplay && dataToDisplay.length > 0">
 								<table class="table table-bordered">
 									<thead class="thead">
 										<tr>
@@ -676,20 +680,24 @@
 											<th scope="col" class="text-center">Indented Quantity({{
 												searhedData && IstPartFormGroupControls['cropName'].value &&
 												IstPartFormGroupControls['cropName'].value.value ?
-												getQuantityMeasure(IstPartFormGroupControls['cropName'].value.value):''}})</th>
+												getQuantityMeasure(IstPartFormGroupControls['cropName'].value.value):''}})
+											</th>
 											<th scope="col" class="text-center">Name of BSPC</th>
 											<th scope="col" class="text-center">Allocated Quantity of BSPC ({{
 												searhedData && IstPartFormGroupControls['cropName'].value &&
 												IstPartFormGroupControls['cropName'].value.value ?
-												getQuantityMeasure(IstPartFormGroupControls['cropName'].value.value):''}})</th>
+												getQuantityMeasure(IstPartFormGroupControls['cropName'].value.value):''}})
+											</th>
 											<th scope="col" class="text-center">Total Allocated Quantity ({{
 												searhedData && IstPartFormGroupControls['cropName'].value &&
 												IstPartFormGroupControls['cropName'].value.value ?
-												getQuantityMeasure(IstPartFormGroupControls['cropName'].value.value):''}})</th>
+												getQuantityMeasure(IstPartFormGroupControls['cropName'].value.value):''}})
+											</th>
 											<th scope="col" class="text-center">Quantity Left for Allocation({{
 												searhedData && IstPartFormGroupControls['cropName'].value &&
 												IstPartFormGroupControls['cropName'].value.value ?
-												getQuantityMeasure(IstPartFormGroupControls['cropName'].value.value):''}})</th>
+												getQuantityMeasure(IstPartFormGroupControls['cropName'].value.value):''}})
+											</th>
 											<!-- <th scope="col" class="text-center">Action</th> -->
 
 										</tr>
@@ -705,9 +713,12 @@
 														<tr>
 															<td *ngIf="spaIndex === 0 && varietyIndex === 0"
 																[attr.rowspan]="data.totalVarietyLength">
-																<span *ngIf="this.varietyForm.controls['variety_id'].value">{{data
-															        && data.variety_id ? getVarietyName(data.variety_id): data
-															        && data.variety_name ? data.variety_name :'NA'}}</span>
+																<span
+																	*ngIf="this.varietyForm.controls['variety_id'].value && !isCropSubmitted">{{data
+																	&& data.variety_id ?
+																	getVarietyName(data.variety_id): data
+																	&& data.variety_name ? data.variety_name
+																	:'NA'}}</span>
 																<span
 																	*ngIf="(this.editVarietyForm.controls['variety_id'].value && this.editVarietyForm.controls['variety_id'].value[0] && this.editVarietyForm.controls['variety_id'].value[0].value) || isCropSubmitted">
 																	{{data && data.variety_id ?
@@ -761,12 +772,14 @@
 										</ng-container>
 
 									</tbody>
-
-									<tr *ngIf="totalData" style="font-weight: 700;">
+                                   <!-- totalData && dataToDisplay.length && varietyDropdownData && ( varietyDropdownData.length == 0) -->
+									<tr *ngIf="showgrid1 && totalData && dataToDisplay.length && varietyDropdownData && ( varietyDropdownData.length === 0) && !(this.editVarietyForm.controls['variety_id'].value && this.editVarietyForm.controls['variety_id'].value[0] && this.editVarietyForm.controls['variety_id'].value[0].value)"
+										style="font-weight: 700;">
+										
+										<td></td>
 										<td>
 											{{totalData.name}}
-										</td>
-										<td></td>
+										</td> 
 										<td class="text-center">
 											{{getQuantityOfSeedProduced(totalData.indent_quantity) ?? '0'}}
 										</td>
@@ -796,9 +809,10 @@
 					<div class="row my-2">
 						<div class="col">
 
-							<div class="row" *ngIf="!isCropSubmitted">
+							<div class="row" *ngIf="!isCropSubmittedNew && isCropSubmitted">
 								<div class="col">
-									<button *ngIf="isEditingVariety" class="btn submitButtons "  type="button" (click)="cancelEdit()">
+									<button *ngIf="isEditingVariety" class="btn submitButtons " type="button"
+										(click)="cancelEdit()">
 										Cancel
 									</button>
 

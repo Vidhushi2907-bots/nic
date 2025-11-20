@@ -23,23 +23,23 @@
                     <div class="col-12 ">
                         <div class="row">   
                             <div class="col-12 col-md-6 col-lg-6 pl-1 col-sm-12   ">
-                                <p class=" ">Bill No:<b class="font-weight-bold" [innerText]="billNo"></b>     <br> Invoice No: 123abABC321</p>  
+                                <p class=" ">Bill No: <b class="font-weight-bold" [innerText]="billNo"></b>     <br> Invoice No: 123abABC321</p>  
                                 <p class=" "><i class="buy">Buyer Details:</i> </p>  
-                                <p class=" ">SPA Name:<b class="font-weight-bold" [innerText]="spaDetails && spaDetails.agency_name ? spaDetails.agency_name:''"> </b> </p> 
-                                <p class=" ">SPA Address:<b class="font-weight-bold" [innerText]="spaDetails && spaDetails.address ? spaDetails.address:''"> </b> </p>  
-                                <p class=" ">SPA Contact No:<b class="font-weight-bold" [innerText]="spaDetails && spaDetails.contact_person_mobile ? spaDetails.contact_person_mobile:''"> </b> </p>  
+                                <p class=" ">SPA Name: <b class="font-weight-bold" [innerText]="spaDetails && spaDetails.agency_name ? spaDetails.agency_name:''"> </b> </p> 
+                                <p class=" ">SPA Address: <b class="font-weight-bold" [innerText]="spaDetails && spaDetails.address ? spaDetails.address:''"> </b> </p>  
+                                <p class=" ">SPA Contact No: <b class="font-weight-bold" [innerText]="spaDetails && spaDetails.contact_person_mobile ? spaDetails.contact_person_mobile:''"> </b> </p>  
                             </div> 
                             <div class="col-12 col-md-6 col-lg-6 pl-1 col-sm-12   ">
-                                <p class=" ">Date:<b class="font-weight-bold" [innerText]="Seller.value1"> </b>  </p>  <br>
+                                <p class=" ">Date:<b class="font-weight-bold">&nbsp;{{formattedDate}}</b></p><br>
                                 <p class=" "><i class="buy">Seller Details:</i> </p>  
-                                <p class=" ">Bspc Name:<b class="font-weight-bold" [innerText]="liftingbspcData && liftingbspcData.agency_name ? liftingbspcData.agency_name:''"> </b> </p> 
-                                <p class=" ">Bspc Address:<b class="font-weight-bold" [innerText]="liftingbspcData && liftingbspcData.address ? liftingbspcData.address:''"> </b> </p>  
-                                <p class=" ">Bspc Contact No:<b class="font-weight-bold" [innerText]="liftingbspcData && liftingbspcData.contact_person_mobile ? liftingbspcData.contact_person_mobile:''"> </b> </p>   
+                                <p class=" ">Bspc Name: <b class="font-weight-bold" [innerText]="liftingbspcData && liftingbspcData.agency_name ? liftingbspcData.agency_name:''"> </b> </p> 
+                                <p class=" ">Bspc Address: <b class="font-weight-bold" [innerText]="liftingbspcData && liftingbspcData.address ? liftingbspcData.address:''"> </b> </p>  
+                                <p class=" ">Bspc Contact No: <b class="font-weight-bold" [innerText]="liftingbspcData && liftingbspcData.contact_person_mobile ? liftingbspcData.contact_person_mobile:''"> </b> </p>   
                             </div>    
                         </div> 
                     </div>
                         <div class="row data-row p-0 ">
-                            <table class="table border-top-0 pt-2 col-12 col-sm-6 col-md-12 col-lg-12 col-xl-12 pl-0 pr-0 m-0 ">
+                            <table class="table table-responsive border-top-0 pt-2 col-12 col-sm-6 col-md-12 col-lg-12 col-xl-12 pl-0 pr-0 m-0 ">
                                 <thead class=" w-100 pl-0 table-bordered">
                                     <tr class="data-row-header">
                                         <th scope="col"  class="col-md-1 py-2 text-white verticle-content-middle heading bill">S.No</th>
@@ -63,13 +63,14 @@
                                         <td scope="col" class="col-md-2 py-2 verticle-content-middle">{{data.bag_weight ? data.bag_weight:'NA'}}</td>
                                         <td scope="col" class="col-md-2 py-2 verticle-content-middle">{{data.no_of_bag ? data.no_of_bag:'NA'}}</td>
                                         <td scope="col" class="col-md-2 py-2 verticle-content-middle">{{data.per_unit_price ? data.per_unit_price:'NA'}}</td>  
-                                        <td scope="col" class="col-md-2 py-2 verticle-content-middle">{{data.total_price ? data.total_price:'NA'}}</td>   
+                                        <td scope="col" class="col-md-2 py-2 verticle-content-middle"> {{ ( (data.total_price && totalAfterApplyGst !== undefined) ? (data.total_price - totalAfterApplyGst - GSt1)   : 'NA' ) | number:'1.2-2' }} </td>   
                                     </tr> 
                                 </tbody>  
                             </table>
-                            <div class="col-12 w-100 pl-0 d-flex justify-content-between hn pt-0">
-                                <p class=" text-white data-row-header1 pt-2 pb-1"><span class="price1 text-white"> </span> <b class="text-white price">Grand Total:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{(liftingDataValue | sum:'total_price' | number:'1.2-2')}}</b> </p> 
-                            </div> 
+                            <div class="col-12 col-md-12 col-lg-12 pl-1 col-sm-12 w-100 pl-0 d-flex justify-content-between hn pt-0 ">
+                                <!-- {{(liftingDataValue | sum:'total_price' | number:'1.2-2')}} -->
+                                <p class=" text-white data-row-header2 pt-2 pb-1"><span class="price1 text-white align-items-end"> </span> <b class="text-white price">Gst:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{( GSt1 | number:'1.2-2')}}</b>  <b class="text-white price">Grand Total:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{( grandTotal | number:'1.2-2')}}</b> </p> 
+                            </div>
                             <div class="col-12 pt-2">
                                 <div class="row">   
                                     <div class="col-12 col-md-6 col-lg-6 pl-1 col-sm-12   ">
@@ -92,7 +93,10 @@
                                                 <hr class="custom-line w-100">
                                                 <div class="d-flex justify-content-between mb-1 w-100">
                                                     <p style="color: #B64B1D;">Total Bill Amount:&nbsp;&nbsp;&nbsp;&nbsp;</p>
-                                                    <b style="color: #B64B1D;" class="font-weight-bold" [innerText]="">{{calculateData(((liftingDataValue | sum:'total_price')),((liftingAdditionalChargesValue | sum:'after_apply_gst' ))) | number:'1.2-2'}}</b>
+                                                    <b style="color: #B64B1D;" class="font-weight-bold" [innerText]="">
+                                                        {{(liftingDataValue | sum:'total_price' | number:'1.2-2')}} 
+                                                        <!-- {{calculateData(((liftingDataValue | sum:'total_price')),((liftingAdditionalChargesValue | sum:'after_apply_gst' ))) | number:'1.2-2'}} -->
+                                                    </b>
                                                 </div>
                                                 <!-- <div class="d-flex justify-content-between mb-1 w-100">
                                                     <p class="">Previously Paid Amount:&nbsp;&nbsp;&nbsp;&nbsp;</p>
@@ -101,7 +105,10 @@
                                                 <hr class="custom-line1 w-100">
                                                 <div class="d-flex justify-content-between  mb-1 w-100">
                                                     <p style="color: #B64B1D;">Final Payable Amount(Balance): &nbsp;&nbsp;&nbsp;&nbsp;</p>
-                                                    <b style="color: #B64B1D;"  class="font-weight-bold" [innerText]="">{{calculateData(((liftingDataValue | sum:'total_price')),((liftingAdditionalChargesValue | sum:'after_apply_gst' ))) | number:'1.2-2'}}</b>
+                                                    <b style="color: #B64B1D;"  class="font-weight-bold" [innerText]="">
+                                                        {{(liftingDataValue | sum:'total_price' | number:'1.2-2')}} 
+                                                        <!-- {{calculateData(((liftingDataValue | sum:'total_price')),((liftingAdditionalChargesValue | sum:'after_apply_gst' ))) | number:'1.2-2'}} -->
+                                                    </b>
                                                 </div>
                                             </div>
                                         </div> 

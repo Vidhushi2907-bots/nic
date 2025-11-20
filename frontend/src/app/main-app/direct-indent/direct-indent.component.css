@@ -167,6 +167,10 @@
           border-top-right-radius: 15px;
           border-top-left-radius: 15px;
           margin: 0.2%;
+          width: 100%;
+          display: flex;
+          justify-content: space-between; /* Adjust spacing for child elements */
+          align-items: center;
           /* padding: 2%; */
       }
       
@@ -189,6 +193,10 @@
           background-color: #FFFFFF;
           margin: 0.2%;
           margin-bottom: none !important;
+          width: 100%;
+          display: flex;
+          justify-content: space-between; /* Adjust spacing for child elements */
+          align-items: center;
       }
       
       .data-row * {

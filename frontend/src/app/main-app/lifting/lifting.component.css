@@ -223,6 +223,15 @@ thead .table-bordered  {
     outline: none;
     background: #B64B1D;
 } 
+.btn-inventory2 { 
+    border-radius: 5px;
+    color: white;
+    border: none;
+    height: 37px;
+    outline: none;
+    background: #B64B1D;
+    width: 70% !important;
+} 
 .btn-disabled {
     background-color: #d3d3d3; 
     color: rgb(54, 53, 53) !important; 
@@ -566,4 +575,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .txt{
     font-size: 15px;
     font-weight: 500;
+}
+.disabledbtn{
+    background: gainsboro;
+    pointer-events: none;
+    cursor:none;
 }

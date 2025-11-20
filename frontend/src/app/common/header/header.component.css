@@ -84,7 +84,7 @@
 }
 
 .header-right-side-section-1 {
-    border-right: 1px solid #FFFFFF;
+    /* border-right: 1px solid #FFFFFF; */
     text-align: left;
     font: normal Poppins 16px/20px;
     letter-spacing: 0px;
@@ -208,7 +208,8 @@
 
     #header-right-side-container {
         flex: 1 0 64%;
-        max-width: 67%;
+        /* max-width: 67%; */
+        max-width: 100%;
     }
 
     .main-logo {
@@ -229,7 +230,8 @@
 
     #header-right-side-container {
         flex: 1 0 63%;
-        max-width: 75%;
+        /* max-width: 75%; */
+        max-width: 100%;
     }
 
     .main-logo {
@@ -247,7 +249,8 @@
 
     #header-right-side-container {
         flex: 1 0 65%;
-        max-width: 88%;
+        /* max-width: 88%; */
+        max-width: 100%;
     }
 
     .main-logo {
@@ -425,4 +428,34 @@ div.text_wrapper{
 }
 .disableEdit{
     pointer-events: none;
+}
+
+/* Custom Oil Seed Button Styling */
+.btn-oil-seed {
+  background-color: #d86d2c;     /* match your original orange */
+  color: white;
+  font-weight: bold;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-oil-seed:hover {
+  background-color: #ba581d;
+  color: white;
+}
+
+/* Responsive position and size for small screens */
+@media (max-width: 768px) {
+  .header-button-wrapper {
+    text-align: center;
+    margin-top: 10px;
+  }
+
+  .btn-oil-seed {
+    width: 100%;
+    font-size: 16px;
+    padding: 8px 0;
+  }
 }

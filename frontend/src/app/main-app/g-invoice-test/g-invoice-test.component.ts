@@ -7,7 +7,7 @@ import { SeedServiceService } from 'src/app/services/seed-service.service';
 import Swal from 'sweetalert2';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+//pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as XLSX from 'xlsx';
 import * as html2PDF from 'html2pdf.js';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -43,91 +43,76 @@ export class GInvoiceTestComponent implements OnInit {
   grandTotal: any;
   encryptedData: string;
   gst: any;
-  constructor(private service: SeedServiceService, private router: Router, private productionCenterService: ProductioncenterService, private fb: FormBuilder, private route: ActivatedRoute) {
-  }
+  encryptedId:any;
+  constructor(private service: SeedServiceService, private router: Router,private productionCenterService: ProductioncenterService, private fb: FormBuilder, private route: ActivatedRoute) {
+  }  
+  
   ngOnInit(): void {
     // Retrieve encryptedId from route params
     this.route.params.subscribe(params => {
-      const encryptedId = params['submissionid'];
-
-      console.log("From URL", encryptedId)
-
-      if (encryptedId) {
-        // Decrypt the encryptedId
-        const decryptedBytes = CryptoJS.AES.decrypt(decodeURIComponent(encryptedId), this.AESKey);
-        this.decryptedId = JSON.parse(decryptedBytes.toString(CryptoJS.enc.Utf8)).id;
-        const encryptedForm = CryptoJS.AES.encrypt(JSON.stringify({ encryptedId }), this.AESKey).toString();
-        this.encryptedData = encodeURIComponent(decodeURIComponent(encryptedId));
-      }
-    });
-    this.getInvoceData(this.decryptedId);
-  }
-
-
-  getInvoceData(id: any) {
-    const param = {
-      id: this.decryptedId,
-    };
-
-    this.productionCenterService.postRequestCreator("spa-generate-invoice", param).subscribe((data: any) => {
-      if (data && data.EncryptedResponse && data.EncryptedResponse.status_code === 200) {
-        console.log("Encrypted Response Data:", data.EncryptedResponse.data); 
-
-        try {
-          // Decrypt the EncryptedResponse
-          const decryptedBytes = CryptoJS.AES.decrypt(
-            decodeURIComponent(data.EncryptedResponse.data), // Decrypt encrypted data
-            this.AESKey
-          );
-
-          const decryptedString = decryptedBytes.toString(CryptoJS.enc.Utf8);
-
-          if (!decryptedString) {
-            throw new Error('Decryption failed. Empty response.');
-          }
-
-          // Parse the decrypted JSON
-          const decryptedResponse = JSON.parse(decryptedString);
-          console.log("Decrypted String:", decryptedString);
-          console.log("Decrypted Response Object:", decryptedResponse);
-
-          // Extract necessary data
-          this.indenterinvoiceData = decryptedResponse[0]?.indenter_details[0];
-          this.spainvoiceData = this.indenterinvoiceData?.spa_details[0];
-
-          if (this.indenterinvoiceData?.spa_details?.length > 0) {
-            this.indenterinvoiceData.spa_details.forEach((spaDetail: any) => {
-              this.spaDetails.push(spaDetail);
-            });
-
-            // Calculate GST and Grand Total
-            this.grandTotal = 0;
-            this.gst = 0;
-            this.spaDetails.forEach((spa: any) => {
-              this.gst += (spa.grand_total * spa.seed_amount_gst) / 100; 
-            });
+     const encryptedId = params['submissionid'];
+     this.encryptedId = encryptedId;
+     
+     if (encryptedId) {
+       // Decrypt the encryptedId
+       const decryptedBytes = CryptoJS.AES.decrypt(decodeURIComponent(encryptedId), this.AESKey);
+       this.decryptedId = JSON.parse(decryptedBytes.toString(CryptoJS.enc.Utf8)).id;
+       const encryptedForm = CryptoJS.AES.encrypt(JSON.stringify({ encryptedId }), this.AESKey).toString();
+       this.encryptedData =  encodeURIComponent (decodeURIComponent(encryptedId));
+       }
+   });
+   this.getInvoceData(this.encryptedId);     
+ }
  
-          }
-        } catch (error) {
-          console.error('Decryption Error:', error);
+  getInvoceData(encryptedId:any)
+  {
+    const param = {
+      id: encryptedId,
+    }
+    this.productionCenterService.postRequestCreator("spa-generate-invoice", param).subscribe((data: any) => {
+        if(data && data.EncryptedResponse && data.EncryptedResponse.status_code == 200)
+        {
+            const decodedData = decodeURIComponent(data.EncryptedResponse.data);
+            const decryptedBytes = CryptoJS.AES.decrypt(decodedData, this.AESKey);
+            const decryptedText = decryptedBytes.toString(CryptoJS.enc.Utf8);
+            const decryptedData = JSON.parse(decryptedText);
+            this.indenterinvoiceData =decryptedData[0].indenter_details[0]
+            this.spainvoiceData =decryptedData[0].indenter_details[0].spa_details[0]        
+           
+            if (this.indenterinvoiceData && this.indenterinvoiceData.spa_details && this.indenterinvoiceData.spa_details.length > 0) {
+              this.indenterinvoiceData.spa_details.forEach((spaDetail: any) => {
+                this.spaDetails.push(spaDetail);
+              });
+              this.grandTotal = 0;
+              this.gst = 0 ;
+              this.spaDetails.forEach((spa: any) => {
+ 
+                this.gst = spa.grand_total * spa.seed_amount_gst / 100
+                console.log("spa.grand_total",spa.grand_total)
+                console.log("spa.seed_amount_gst",spa.seed_amount_gst)
+ 
+                // spa.bag_details.forEach((bag: any) =>
+                // {
+                //   // this.grandTotal += bag.no_of_bags * bag.per_qnt_mrp;
+                //   this.grandTotal += bag.number_of_bag * bag.bag_price;
+                // });
+              });
+            }
+        }
+        else
+        {
           Swal.fire({
             title: 'Oops',
-            text: 'Failed to process invoice data. Please try again.',
+            text: 'Invoice Not Found.',
             icon: 'error',
-            confirmButtonText: 'OK',
-            confirmButtonColor: '#E97E15',
-          });
+            confirmButtonText:
+              'OK',
+            confirmButtonColor: '#E97E15'
+          })
+          // this.router.navigate(['generate-invoices']);
         }
-      } else {
-        Swal.fire({
-          title: 'Oops',
-          text: 'Invoice Not Found.',
-          icon: 'error',
-          confirmButtonText: 'OK',
-          confirmButtonColor: '#E97E15',
-        });
-      }
-    });
+      // }
+    })
   }
 
   // getInvoceData(id:any)
@@ -188,6 +173,19 @@ export class GInvoiceTestComponent implements OnInit {
       html2PDF().from(element).set(opt).save();
     }
   }
-
+  convertDates(dateString: any) {
+    try {
+      if (!dateString) {
+        return '';
+      }
+      const date = new Date(dateString);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}-${month}-${year}`;
+    } catch (error) {
+      console.error("Date conversion error:", error);
+      return '';
+    }
+  }
 }
-

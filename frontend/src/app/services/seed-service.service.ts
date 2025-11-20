@@ -50,6 +50,58 @@ export class SeedServiceService {
            });
      });
    }
+  
+// getCropDataByGroupCode(groupCode: string): Observable<any> {
+//   const currentUser = JSON.parse(localStorage.getItem('BHTCurrentUser'));
+//   const token = currentUser ? currentUser.token : '';
+//   const header = new HttpHeaders();
+//   const otherHeader = header.append('Authorization', 'Bearer ' + token);
+
+  
+//   return this.http.post<any>(
+//     this.endpoint + 'getCropDataByGroupCode',
+//     { cropGroupCode: groupCode },
+//     { headers: otherHeader }
+//   );
+// }
+
+
+// getCropDataByGroupCode(groupCode: string): Observable<any> {
+//   const currentUser = JSON.parse(localStorage.getItem('BHTCurrentUser'));
+//   const token = currentUser ? currentUser.token : '';
+//   const headers = new HttpHeaders().set('Authorization', 'Bearer ' + token);
+
+//   return this.http.post<any>(
+//     this.endpoint + 'getCropDataByGroupCode',
+//     { group_code: groupCode }, 
+//     { headers: headers }
+//   );
+// }
+
+//  getCropDataByGroupCode(groupCode: string): Observable<any> {
+//     const currentUser = JSON.parse(localStorage.getItem('BHTCurrentUser') || '{}');
+//     const token = currentUser ? currentUser.token : '';
+//     const headers = new HttpHeaders().set('Authorization', 'Bearer ' + token);
+
+//     return this.http.post<any>(
+//       this.endpoint + 'getCropDataByGroupCode',
+//       { group_code: groupCode },
+//       { headers }
+//     );
+//   }
+getCropDataByGroupCode(groupCode: string = 'ALL'): Observable<any> {
+  const currentUser = JSON.parse(localStorage.getItem('BHTCurrentUser') || '{}');
+  const token = currentUser?.token || '';
+  const headers = new HttpHeaders().set('Authorization', 'Bearer ' + token);
+
+  return this.http.post<any>(
+    this.endpoint + 'getCropDataByGroupCode',
+    { group_code: groupCode },  // 'ALL' bhejne par backend sab rows return karega
+    { headers }
+  );
+}
+
+
   getRequestCreator<T>(FromPath: string, token: any='', DataRow: any={},): Observable<any> {
     const header = new HttpHeaders();
 

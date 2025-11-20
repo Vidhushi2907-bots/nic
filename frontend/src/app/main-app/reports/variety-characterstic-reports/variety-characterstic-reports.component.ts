@@ -29,6 +29,7 @@ export class VarietyCharactersticReportsComponent implements OnInit {
   croupGroupList: any = [];
   croupGroup: any;
   submissionid: any | null;
+  defaultVarietyName: string = '';
   crop_name_list: any;
   selectCrop_group: any;
   cropVarietyData: any;
@@ -53,6 +54,7 @@ export class VarietyCharactersticReportsComponent implements OnInit {
   cropNotDateDatasecond: any;
   cropNotDateData: any;
   loadpageNo: any;
+  userType: any;
   constructor(private restService: RestService, private fb: FormBuilder, private route: ActivatedRoute, private service: SeedServiceService) {
     this.createEnrollForm();
   }
@@ -88,7 +90,6 @@ export class VarietyCharactersticReportsComponent implements OnInit {
     });
     this.ngForm.controls['crop_text'].valueChanges.subscribe(newValue => {
       if (newValue) {
-        console.log(newValue)
         this.croupGroupList = this.croupGroupListSecond
         let response = this.croupGroupList.filter(x => x.group_name.toLowerCase().includes(newValue.toLowerCase()))
 
@@ -117,16 +118,8 @@ export class VarietyCharactersticReportsComponent implements OnInit {
       if (newValue) {
         this.cropVarietyData = this.cropVarietyDatasecond
         let response = this.cropVarietyData.filter(x => x['variety_name'].toLowerCase().includes(newValue.toLowerCase()))
-        console.log(newValue, response, this.cropVarietyData)
 
         this.cropVarietyData = response
-
-        // this.cropVarietyData =this.cropVarietyDatasecond
-        // console.log(this.cropVarietyData)
-        // let response= this.cropVarietyData.filter(x=>x.variety_name.toLowerCase().includes(newValue.toLowerCase()))
-
-        // this.cropVarietyData=response
-
 
       }
       else {
@@ -134,21 +127,117 @@ export class VarietyCharactersticReportsComponent implements OnInit {
       }
     });
   }
-  ngOnInit(): void {
-    let user = localStorage.getItem('BHTCurrentUser');
-    this.userId = JSON.parse(user);
-    this.getCroupCroupList();
-    this.getCropNotDateData();
-    this.getPageData();
+  // ngOnInit(): void {
+  //   let user = localStorage.getItem('BHTCurrentUser');
+  //   this.userId = JSON.parse(user);
+  //   this.getCroupCroupList();
+  //   this.getCropNotDateData();
+  //   this.getPageData();
    
-    this.ngForm.controls['crop_name'].disable();
-    this.ngForm.controls['variety_name'].disable();
-    // this.getCroupNameList();
-    // this.getCropVarietyData();
-    // this.delete(this.deletedId)
-    //get user id from localstorage
+  //   this.ngForm.controls['crop_name'].disable();
+  //   this.ngForm.controls['variety_name'].disable();
 
+  // }
+
+// ngOnInit(): void {
+//   let user = localStorage.getItem('BHTCurrentUser');
+//   this.userId = JSON.parse(user);
+
+//   this.getCroupCroupList().then(() => {
+//     if (this.userId && this.userId.username === 'OILSEEDADMIN') {
+//       this.ngForm.controls['crop_group'].setValue('A04');
+//       this.crop_grops = 'OILSEEDS';
+//       this.getCropNameList('A04');
+//     }
+//   });
+
+//   this.ngForm.get('crop_group')?.valueChanges.subscribe((groupId: string) => {
+//     if (groupId) {
+//       this.getCropNameList(groupId);
+//       this.ngForm.controls['crop_name'].setValue('');
+//     }
+//   });
+// }
+ngOnInit(): void {
+  // 1️⃣ Current user fetch करो
+  let user = localStorage.getItem('BHTCurrentUser');
+  
+  this.userId = JSON.parse(user);
+
+  // 2️⃣ Crop Group list fetch करो
+  this.getCroupCroupList().then(() => {
+    if (this.userId && this.userId.user_type === 'OILSEEDADMIN') {
+      // OILSEEDS by default set करो
+      this.ngForm.controls['crop_group'].setValue('A04');
+      this.crop_grops = 'OILSEEDS';    
+      // Crop Name list fetch करो
+      this.getCropNameList('A04');
+    }
+  });
+
+  this.getCroupCroupList().then(() => {
+    if (this.userId && this.userId.user_type === 'PULSESSEEDADMIN') {
+      // OILSEEDS by default set करो
+      this.ngForm.controls['crop_group'].setValue('A03');
+      this.crop_grops = 'PULSES';
+      // Crop Name list fetch करो
+      this.getCropNameList('A03');
+    }
+  });
+
+  // 3️⃣ Crop Group value change पर Crop Name reset और new list load करो
+  this.ngForm.get('crop_group')?.valueChanges.subscribe((groupId: string) => {
+    if (groupId) {
+      this.getCropNameList(groupId);
+      this.ngForm.controls['crop_name'].setValue(null);
+    }
+  });
+}
+
+async getCropNameList(newValue: string) {
+  if (newValue) {
+    const searchFilters = {
+      search: {
+        group_code: newValue
+      }
+    };
+
+    this.service
+      .postRequestCreator("get-distrinct-crop-name-characterstics", null, searchFilters)
+      .subscribe((apiResponse: any) => {
+        if (apiResponse?.EncryptedResponse?.status_code === 200) {
+          this.crop_name_list = apiResponse.EncryptedResponse.data;
+
+          // Alphabetical order में sort करो
+          this.crop_name_list.sort((a, b) =>
+            a.m_crop.crop_name.localeCompare(b.m_crop.crop_name)
+          );
+
+          this.crop_name_list_second = this.crop_name_list;
+
+
+          // Crop Name reset
+          this.ngForm.controls['crop_name'].setValue(null);
+
+          // ✅ OILSEEDADMIN के लिए by default first crop name set करो
+          if (this.userId?.username === 'OILSEEDADMIN' && newValue === 'A04' && this.crop_name_list.length > 0) {
+            this.ngForm.controls['crop_name'].setValue(this.crop_name_list[0].m_crop.crop_name);
+            this.crop_names = this.crop_name_list[0].m_crop.crop_name; // UI में दिखाने के लिए
+          }
+
+        } else {
+          // अगर कोई data ना आये तो crop_name_list खाली करो
+          this.crop_name_list = [];
+          this.ngForm.controls['crop_name'].setValue(null);
+        }
+      });
+  } else {
+    this.crop_name_list = [];
+    this.ngForm.controls['crop_name'].setValue(null);
   }
+}
+
+
   getCropNotDateData() {
     this.service.postRequestCreator("get-no-year-character-data", null, null).subscribe((apiResponse: any) => {
         if (apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.status_code
@@ -173,17 +262,15 @@ export class VarietyCharactersticReportsComponent implements OnInit {
         user_id: this.userId.id,
         notification_date: this.ngForm.controls["not_date"].value ? this.ngForm.controls["not_date"].value:'',
         notification_no: this.ngForm.controls["not_no"].value ? this.ngForm.controls["not_no"].value:'',
+        user_type :this.userId.user_type
       }
     }).subscribe((apiResponse: any) => {
-      console.log(apiResponse);
       if (apiResponse !== undefined
         && apiResponse.EncryptedResponse !== undefined
         && apiResponse.EncryptedResponse.status_code == 200) {
         this.filterPaginateSearch.itemListPageSize = 50;
-        console.log(apiResponse);
 
         this.allData = apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.data && apiResponse.EncryptedResponse.data.rows ? apiResponse.EncryptedResponse.data.rows : '';
-        // console.log(this.allData[0].m_crop);
       
         if (this.allData === undefined) {
           this.allData = [];
@@ -233,50 +320,52 @@ export class VarietyCharactersticReportsComponent implements OnInit {
   }
 
 
-  async getCropNameList(newValue) {
-    const res = this.croupGroupList.filter(x => x.group_code == newValue);
-    console.log(res);
+  // async getCropNameList(newValue) {
+  //   const res = this.croupGroupList.filter(x => x.group_code == newValue);
 
 
-    if (newValue) {
-      const searchFilters = {
-        "search": {
-          "group_code": newValue
-        }
-      };
-      this.service
-        .postRequestCreator("get-distrinct-crop-name-characterstics", null, searchFilters)
-        .subscribe((apiResponse: any) => {
-          if (apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.status_code
-            && apiResponse.EncryptedResponse.status_code == 200) {
-            this.crop_name_list = apiResponse.EncryptedResponse.data;
-            this.crop_name_list = this.crop_name_list.sort((a, b) => a.m_crop.crop_name.localeCompare(b.m_crop.crop_name));
-            this.crop_name_list_second = this.crop_name_list
-            console.log("crop name list", this.crop_name_list);
-          }
-          else {
-            this.crop_name_list = [];
+  //   if (newValue) {
+  //     const searchFilters = {
+  //       "search": {
+  //         "group_code": newValue
+  //       }
+  //     };
+  //     this.service
+  //       .postRequestCreator("get-distrinct-crop-name-characterstics", null, searchFilters)
+  //       .subscribe((apiResponse: any) => {
+  //         if (apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.status_code
+  //           && apiResponse.EncryptedResponse.status_code == 200) {
+  //           this.crop_name_list = apiResponse.EncryptedResponse.data;
+  //           this.crop_name_list = this.crop_name_list.sort((a, b) => a.m_crop.crop_name.localeCompare(b.m_crop.crop_name));
+  //           this.crop_name_list_second = this.crop_name_list
+  //           console.log("crop name list", this.crop_name_list);
+  //         }
+  //         else {
+  //           this.crop_name_list = [];
 
-          }
-        });
-    }
+  //         }
+  //       });
+  //   }
 
-  }
+  // }
 
-  getCroupCroupList() {
-    const route = "crop-group";
-    const result = this.service.getPlansInfo(route).then((data: any) => {
-      this.croupGroupList = data && data['EncryptedResponse'] && data['EncryptedResponse'].data && data['EncryptedResponse'].data ? data['EncryptedResponse'].data : '';
-      this.croupGroupListSecond = this.croupGroupList
-    })
-  }
 
-  // getCroupNameList() {
-  //   const route = "filter-data";
+
+  // getCroupCroupList() {
+  //   const route = "crop-group";
   //   const result = this.service.getPlansInfo(route).then((data: any) => {
-  //     this.crop_name_list = data && data['EncryptedResponse'] && data['EncryptedResponse'].data && data['EncryptedResponse'].data ? data['EncryptedResponse'].data : '';
+  //     this.croupGroupList = data && data['EncryptedResponse'] && data['EncryptedResponse'].data && data['EncryptedResponse'].data ? data['EncryptedResponse'].data : '';
+  //     this.croupGroupListSecond = this.croupGroupList
   //   })
   // }
+getCroupCroupList(): Promise<any> {
+  const route = "crop-group";
+  return this.service.getPlansInfo(route).then((data: any) => {
+    this.croupGroupList = data?.EncryptedResponse?.data || [];
+    this.croupGroupListSecond = this.croupGroupList;
+
+  });
+}
 
 
 
@@ -333,7 +422,26 @@ export class VarietyCharactersticReportsComponent implements OnInit {
 
   clear() {
 
-    this.ngForm.controls["crop_group"].setValue("");
+    this.getCroupCroupList().then(() => {
+      if (this.userId && this.userId.user_type === 'OILSEEDADMIN') {
+        // OILSEEDS by default set करो
+        this.ngForm.controls['crop_group'].setValue('A04');
+        this.crop_grops = 'OILSEEDS';    
+        // Crop Name list fetch करो
+        this.getCropNameList('A04');
+      }
+    });
+  
+    this.getCroupCroupList().then(() => {
+      if (this.userId && this.userId.user_type === 'PULSESSEEDADMIN') {
+        // OILSEEDS by default set करो
+        this.ngForm.controls['crop_group'].setValue('A03');
+        this.crop_grops = 'PULSES';
+        // Crop Name list fetch करो
+        this.getCropNameList('A03');
+      }
+    });
+
     this.ngForm.controls["crop_name"].setValue("");
     this.ngForm.controls["variety_name"].setValue("");
     this.ngForm.controls['crop_text'].setValue('')
@@ -356,27 +464,8 @@ export class VarietyCharactersticReportsComponent implements OnInit {
     this.ngForm.controls['variety_name'].disable();
     this.filterPaginateSearch.itemListCurrentPage = 1;
     this.getPageData();
-    // this.filterPaginateSearch.Init(response, this, "getPageData");
     this.initSearchAndPagination();
   }
-  // searches(){
-  //   const searchFilters = {
-  //     search: {
-  //       crop_group:(this.ngForm.controls["crop_group"].value),
-  //       // crop_name:(this.ngForm.controls["crop_name"].value),
-  //       // agencyName:this.ngForm.controls["agencyName"].value
-  //     }
-  //   };
-  //   const result = this.service.postRequestCreator("", null,searchFilters).subscribe((data: any) => {
-  //     let response = data && data['EncryptedResponse'] && data['EncryptedResponse'].data && data['EncryptedResponse'].data.data ? data['EncryptedResponse'].data.data : '';
-  //     this.filterPaginateSearch.itemListPageSize = 10;
-
-  //     this.filterPaginateSearch.Init(response, this, "getPageData");
-  //     this.initSearchAndPagination();
-  //   })
-
-
-  // }
   notifiedvalue(value) {
 
     this.ngForm.controls["crop_group"].setValue("");
@@ -407,7 +496,6 @@ export class VarietyCharactersticReportsComponent implements OnInit {
       this.disableFiledsByYear = true
       this.filterPaginateSearch.itemListCurrentPage = 1;
       this.getPageData();
-      // this.filterPaginateSearch.Init(response, this, "getPageData");
       this.initSearchAndPagination();
     }
 
@@ -465,18 +553,6 @@ export class VarietyCharactersticReportsComponent implements OnInit {
             }
           }
           this.VarietyCharactersticViewFormComponent.search(paramData);
-          // const result = this.service.getPlansInfo(route, param).then((data: any) => {
-          //   let response = data && data['EncryptedResponse'] && data['EncryptedResponse'].data   && data['EncryptedResponse'].data.rows ? data['EncryptedResponse'].data.rows : '';
-  
-          //   console.log(response)
-          //   this.filterPaginateSearch.Init(response, this, "getPageData",);
-  
-          // this.filterPaginateSearch.itemListCurrentPage = 1;
-          // this.filterPaginateSearch.Init(response, this, "getPageData", undefined, response['EncryptedResponse'].data.count, true);
-          // this.initSearchAndPagination();
-          // this.initSearchAndPagination();
-          // this.filterPaginateSearch.Init(response, this, "getPageData");
-          // });
         }
       }
       else {
@@ -488,7 +564,6 @@ export class VarietyCharactersticReportsComponent implements OnInit {
             crop_group: (this.ngForm.controls["crop_group"].value),
             crop_name: this.ngForm.controls["crop_name"].value,
             variety_name: this.ngForm.controls["variety_name"].value,
-            // notification_date: this.ngForm.controls["not_date"].value,
           }
   
         }
@@ -507,18 +582,6 @@ export class VarietyCharactersticReportsComponent implements OnInit {
           }
         }
         this.VarietyCharactersticViewFormComponent.search(paramData);
-        // const result = this.service.getPlansInfo(route, param).then((data: any) => {
-        //   let response = data && data['EncryptedResponse'] && data['EncryptedResponse'].data   && data['EncryptedResponse'].data.rows ? data['EncryptedResponse'].data.rows : '';
-  
-        //   console.log(response)
-        //   this.filterPaginateSearch.Init(response, this, "getPageData",);
-  
-        // this.filterPaginateSearch.itemListCurrentPage = 1;
-        // this.filterPaginateSearch.Init(response, this, "getPageData", undefined, response['EncryptedResponse'].data.count, true);
-        // this.initSearchAndPagination();
-        // this.initSearchAndPagination();
-        // this.filterPaginateSearch.Init(response, this, "getPageData");
-        // });
       }
     }else {
 
@@ -548,18 +611,6 @@ export class VarietyCharactersticReportsComponent implements OnInit {
         }
       }
       this.VarietyCharactersticViewFormComponent.search(paramData);
-      // const result = this.service.getPlansInfo(route, param).then((data: any) => {
-      //   let response = data && data['EncryptedResponse'] && data['EncryptedResponse'].data   && data['EncryptedResponse'].data.rows ? data['EncryptedResponse'].data.rows : '';
-
-      //   console.log(response)
-      //   this.filterPaginateSearch.Init(response, this, "getPageData",);
-
-      // this.filterPaginateSearch.itemListCurrentPage = 1;
-      // this.filterPaginateSearch.Init(response, this, "getPageData", undefined, response['EncryptedResponse'].data.count, true);
-      // this.initSearchAndPagination();
-      // this.initSearchAndPagination();
-      // this.filterPaginateSearch.Init(response, this, "getPageData");
-      // });
     }
 
 
@@ -594,7 +645,6 @@ export class VarietyCharactersticReportsComponent implements OnInit {
 
 
   crop(data) {
-    console.log(data)
     this.crop_grops = data && data.group_name ? data.group_name : '';
     this.ngForm.controls['crop_group'].setValue(data && data.group_code ? data.group_code : '')
     this.croupGroupList = this.croupGroupListSecond
@@ -604,7 +654,6 @@ export class VarietyCharactersticReportsComponent implements OnInit {
     document.getElementById('crop_group').click();
   }
   cropName(data) {
-    console.log(data)
     this.crop_names = data && data.m_crop && data.m_crop.crop_name ? data.m_crop.crop_name : '';
     this.ngForm.controls['crop_name'].setValue(data && data.m_crop.crop_code ? data.m_crop.crop_code : '')
     this.crop_name_list = this.crop_name_list_second

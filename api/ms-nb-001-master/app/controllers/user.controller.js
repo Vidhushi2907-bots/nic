@@ -33,15 +33,16 @@ const activitiesModel = db.activitiesModel;
 const blockModel = db.blockModel;
 const centralModel = db.centralModel
 const alloallocationToIndentorProductionCenterSeed = db.allocationToIndentorProductionCenterSeed
-const indentorLiftingModel = db.allocationtoIndentorliftingseeds
 const { allocationToSPASeed, allocationToSPAProductionCenterSeed, indenterSPAModel, indentOfBrseedDirectLineModel, sectorModel, deleteIndenteOfSpaModel, deleteIndenteOfBreederSeedModel, bspPerformaBspTwo, bspPerformaBspThree, bspPerformaBspOne, bspProformaOneBspc, monitoringTeamOfBspcMember, monitoringTeamOfBspc, seedInventory, seedClassModel, stageModel, seedInventoryTag, seedInventoryTagDetail, bspPerformaBspTwoSeed, varietyLineModel, mVarietyLinesModel } = require('../models');
 const seedLabTestModel = db.seedLabTestModel;
 const bpctoPlant = db.bspctoplantModel;
 const generatBillsModel = db.generateBills;
 const assignCropNewFlow = db.assignCropNewFlow;
 const assignBspcCropNewFlow = db.assignBspcCropNewFlow;
-const breederCropModel = db.breederCropModel;
-const breederCropsVerietiesModel = db.breederCropsVerietiesModel;
+const allocationToIndentorProductionCenterSeed = db.allocationToIndentorProductionCenterSeed
+const allocationToIndentorSeed = db.allocationtoIndentorliftingseeds;
+const seedProcessingRegisterModel = db.seedProcessingRegister;
+const liftingSeedDetailsModel = db.liftingSeedDetailsModel;
 
 const SeedUserManagement = require('../_helpers/create-user')
 const labelNumberForBreederseed = db.labelNumberForBreederseed
@@ -53,8 +54,10 @@ require('dotenv').config()
 const Token = db.tokens;
 
 const jwt = require('jsonwebtoken');
+const axios = require('axios').default;
 
 const sequelize = require('sequelize');
+const sequelizer = require("../models/db");
 const ConditionCreator = require('../_helpers/condition-creator');
 const { where, QueryTypes } = require('sequelize');
 const { condition } = require('sequelize');
@@ -63,6 +66,8 @@ const AES = require('../_helpers/AES');
 const sendSms = require('../_helpers/sms')
 const paginateResponseRaw = require("../_utility/generate-otp");
 const moment = require("moment");
+const crypto = require("crypto");
+const https = require("https");
 const Op = require('sequelize').Op;
 class UserController {
   static addState = async (req, res) => {
@@ -120,8 +125,11 @@ class UserController {
   static login = async (req, res) => {
     try {
       //console.log("fsdfdsf");
-      const loginToken = req.header('Authorization').replace('Bearer ', '')
-      // const loginToken = req.cookies['token'];
+      let loginToken = req.header('Authorization').replace('Bearer ', '')
+      if (process.env.ENVIRONMENT == 'NIC') {
+        loginToken = req.cookies['token'];
+
+      }
       const secretKey = process.env.JWT_SECRET;
       const jwtData = JWT.verify(loginToken, secretKey);
       console.log("jwtData", jwtData);
@@ -1754,7 +1762,7 @@ class UserController {
 
 
       let condition = {};
-      if (req.body.id) {
+      if (req.body && req.body.search && req.body.search.radio_type == 'national-temp') {
         condition = {
           include: [
             {
@@ -1783,66 +1791,119 @@ class UserController {
               attributes: [],
               where: {
                 user_type: 'IN'
-              }
+              },
+              include: [
+                {
+                  model: indentOfBreederseedModel,
+                  attributes: [],
+                  where: {}
+                }
+              ]
             },
           ],
           where: {
-            // id: req.body.id,
             // created_by: req.body.search.created_by,
-
-            // created_by: 1
-
-            is_active: 1
           }
         };
       } else {
-        condition = {
-          include: [
-            {
-              model: designationModel,
-              left: true,
-              attributes: ['name']
-            },
-            {
-              model: stateModel,
-              left: true,
-              attributes: ['state_name'],
-            },
-            {
-              model: districtModel,
-              left: true,
-              attributes: ['district_name'],
-            },
-            // {
-            //   model:categoryModel,
-            //   left: true,
-            //   attributes: ['category_name']
-            // },
-            {
-              model: userModel,
-              left: true,
-              attributes: [],
-              where: {
-                user_type: 'IN'
-              }
-            },
-          ],
-          where: {
-            // created_by: req.body.search.created_by,
-          }
-        };
+        if (req.body.id) {
+          condition = {
+            include: [
+              {
+                model: designationModel,
+                left: true,
+                attributes: ['name']
+              },
+              {
+                model: stateModel,
+                left: true,
+                attributes: ['state_name'],
+              },
+              {
+                model: districtModel,
+                left: true,
+                attributes: ['district_name'],
+              },
+              // {
+              //   model:categoryModel,
+              //   left: true,
+              //   attributes: ['category_name']
+              // },
+              {
+                model: userModel,
+                left: true,
+                attributes: [],
+                where: {
+                  user_type: 'IN'
+                }
+              },
+            ],
+            where: {
+              // id: req.body.id,
+              // created_by: req.body.search.created_by,
+
+              // created_by: 1
+
+              is_active: 1
+            }
+          };
+        } else {
+          condition = {
+            include: [
+              {
+                model: designationModel,
+                left: true,
+                attributes: ['name']
+              },
+              {
+                model: stateModel,
+                left: true,
+                attributes: ['state_name'],
+              },
+              {
+                model: districtModel,
+                left: true,
+                attributes: ['district_name'],
+              },
+              // {
+              //   model:categoryModel,
+              //   left: true,
+              //   attributes: ['category_name']
+              // },
+              {
+                model: userModel,
+                left: true,
+                attributes: [],
+                where: {
+                  user_type: 'IN'
+                }
+              },
+            ],
+            where: {
+              // created_by: req.body.search.created_by,
+            }
+          };
+        }
       }
+
 
       let { page, pageSize, search } = req.body;
-      if (page === undefined) page = 1;
-      if (pageSize === undefined) pageSize = 10; // set pageSize to -1 to prevent sizing
+      let sortOrder;
+      let sortDirection;
+      if (search && search.is_self == false) {
+        if (page === undefined) page = 1;
+        if (pageSize === undefined) pageSize = 10; // set pageSize to -1 to prevent sizing
 
-      if (page > 0 && pageSize > 0) {
-        condition.limit = pageSize;
-        condition.offset = (page * pageSize) - pageSize;
+        if (page > 0 && pageSize > 0) {
+          condition.limit = pageSize;
+          condition.offset = (page * pageSize) - pageSize;
+        }
+        sortOrder = req.body.sort ? req.body.sort : 'id';
+        sortDirection = req.body.order ? req.body.order : 'DESC';
+      } else {
+        sortOrder = req.body.sort ? req.body.sort : 'agency_name';
+        sortDirection = req.body.order ? req.body.order : 'ASC';
       }
-      const sortOrder = req.body.sort ? req.body.sort : 'id';
-      const sortDirection = req.body.order ? req.body.order : 'DESC';
 
 
       condition.order = [['agency_name', 'ASC'], ['short_name', 'ASC'], [sequelize.col('m_district.district_name'), 'ASC'], [sequelize.col('m_state.state_name'), 'ASC']];
@@ -1856,6 +1917,20 @@ class UserController {
         }
         if (req.body.search.agency_id) {
           condition.where.id = (req.body.search.agency_id);
+        }
+        if (req.body.search.radio_type == 'national-temp') {
+          if (req.body.search.year) {
+            condition.include[3].include[0].where.year = (req.body.search.year);
+          }
+          if (req.body.search.season) {
+            condition.include[3].include[0].where.season = (req.body.search.season);
+          }
+          if (req.body.search.crop_code) {
+            condition.include[3].include[0].where.crop_code = (req.body.search.crop_code);
+          }
+          if (req.body.search.variety_code) {
+            condition.include[3].include[0].where.variety_code = (req.body.search.variety_code);
+          }
         }
       }
 
@@ -5681,9 +5756,9 @@ class UserController {
 
   static getListOfBreederSeedProductionforReports = async (req, res) => {
     try {
-
       const usertype = req.query.usertype;
-      console.log(usertype)
+      let { page, pageSize, searchData } = req.body;
+
       let condition = {
         where: {
           user_type: usertype
@@ -5696,8 +5771,8 @@ class UserController {
             raw: false,
             where: {},
             attributes: ['agency_name', 'address', 'short_name', 'contact_person_name', 'contact_person_designation', 'phone_number', 'bank_name', 'bank_branch_name', 'bank_ifsc_code', 'bank_account_number', 'latitude', 'longitude', 'crop_data', 'is_active'],
-
-            include: [{
+            include: [
+            {
               model: districtModel,
               attributes: ['district_name']
             },
@@ -5711,23 +5786,34 @@ class UserController {
             }
             ]
           },
-
+          {
+            model: cropModel,
+            attributes: ['crop_code']
+          }
         ],
       }
 
-      let { page, pageSize, searchData } = req.body;
-      console.log('search data=====', searchData);
+      // if (req.body.page) {
+      //   if (page === undefined) page = 1;
+      //   if (pageSize === undefined) pageSize = 50;
+      //   if (page > 0 && pageSize > 0) {
+      //     condition.limit = pageSize;
+      //     condition.offset = (page * pageSize) - pageSize;
+      //   }
+      // }
 
-      if (req.body.page) {
+      if (!searchData?.isReport) {
         if (page === undefined) page = 1;
         if (pageSize === undefined) pageSize = 50;
+  
         if (page > 0 && pageSize > 0) {
           condition.limit = pageSize;
           condition.offset = (page * pageSize) - pageSize;
         }
       }
-
-
+      else
+      {
+      }
 
       if ((searchData && searchData.isSearch === true) && (usertype == 'BPC')) {
 
@@ -5748,9 +5834,10 @@ class UserController {
       }
 
       if ((searchData && searchData.isSearch === true) && (usertype == 'BR')) {
-        console.log("Breeder")
         if (searchData.category_code) {
-          condition.include[0].where['category'] = searchData.category_code;
+          // condition.include[0].where['category'] = searchData.category_code;
+          condition.include[0].where['id'] = searchData.category_code;
+
         }
         if (searchData.agency_id) {
           condition.include[0].where['id'] = searchData.agency_id;
@@ -5759,39 +5846,51 @@ class UserController {
         if (searchData.state_code) {
           condition.include[0].where['state_id'] = searchData.state_code;
         }
-        if (req.body.searchData.type == 'reporticar') {
-          if (req.body.searchData.user_type == 'ICAR') {
-            condition.where.crop_code = {
-              [Op.or]: [
-                { [Op.like]: 'A' + "%" },
-              ]
-            }
+        // if (req.body.searchData.type == 'reporticar') {
+        //   if (req.body.searchData.user_type == 'ICAR') {
+        //     condition.where.crop_code = {
+        //       [Op.or]: [
+        //         { [Op.like]: 'A' + "%" },
+        //       ]
+        //     }
 
-          } if (req.body.searchData.user_type == 'HICAR') {
-            condition.where.crop_code = {
-              [Op.or]: [
-                { [Op.like]: 'H' + "%" },
-              ]
-            }
+        //   } 
+        //   if (req.body.searchData.user_type == 'HICAR') {
+        //     condition.where.crop_code = {
+        //       [Op.or]: [
+        //         { [Op.like]: 'H' + "%" },
+        //       ]
+        //     }
+        //   }
+        //   if (req.body.searchData.user_type == 'OILSEEDADMIN') {
+        //     condition.where = { crop_code: { [Op.like]: 'A04%' } };
+        //   }
+        //   condition.where.crop_group = (req.body.search.crop_name_data);
+        // }
+      }
+      if (req.body.searchData.type == 'reporticar') {
+          if (req.body.searchData.user_type == 'ICAR') {
+           condition.where['$m_crops.crop_code$'] = { [Op.like]: 'A%' };
+          } 
+          if (req.body.searchData.user_type == 'HICAR') {
+           condition.where['$m_crops.crop_code$'] = { [Op.like]: 'H%' };
           }
 
-          // condition.where.crop_group = (req.body.search.crop_name_data);
-        }
+          if (req.body.searchData.user_type == 'OILSEEDADMIN') {
+           condition.where['$m_crops.crop_code$'] = { [Op.like]: 'A04%' };
+          }
+          if (req.body.searchData.user_type == 'PULSESSEEDADMIN') {
+            condition.where['$m_crops.crop_code$'] = { [Op.like]: 'A03%' };
+           }
       }
 
-      // const sortOrder = req.body.sort ? req.body.sort : 'id';
-      // const sortDirection = req.body.order ? req.body.order : 'DESC';
-
-      // condition.order = [[sortOrder, sortDirection]];
-
+      condition.subQuery = false;
       condition.order = [(sequelize.col('agency_detail.agency_name', 'ASC')),
       (sequelize.col('agency_detail.short_name', 'ASC')),
       (sequelize.col('agency_detail->m_state.state_name', 'ASC')),
       (sequelize.col('agency_detail->m_district.district_name', 'ASC')),
       (sequelize.col('agency_detail.latitude', 'ASC')),
       (sequelize.col('agency_detail.longitude', 'ASC')),
-        // (sequelize.col('agency_detail.longitute', 'ASC'))
-
       ];
 
       let data = await userModel.findAndCountAll(condition);
@@ -6294,8 +6393,9 @@ class UserController {
         { 'name': 'NDDB', 'state_code': 209 },
         { 'name': 'NFL', 'state_code': 210 },
         { 'name': 'NHRDF', 'state_code': 211 },
-        { 'name': 'SOPA', 'state_code': 212 },
+        { 'name': 'SOPA PRIVATE', 'state_code': 212 },
         { 'name': 'PRIVATE', 'state_code': 213 },
+        { 'name': 'INDIVIDUAL', 'state_code': 213 },
         { 'name': 'NSAI', 'state_code': 213 },
         { 'name': 'PRIVATE COMPANY', 'state_code': 213 },
         { 'name': 'BBSSL', 'state_code': 214 }
@@ -6350,7 +6450,7 @@ class UserController {
           [sequelize.col('indent_of_spas.crop_type'), 'crop_type'],
           [sequelize.col('indent_of_spas.spa_code'), 'spa_code'],
           [sequelize.col('indent_of_spas.variety_notification_year'), 'variety_notification_year'],
-          [sequelize.literal("ROUND('indent_of_spas.indent_quantity',2)"), 'indent_quantity'],
+          [sequelize.literal('ROUND(indent_of_spas.indent_quantity::NUMERIC, 2)'), 'indent_quantity'],
           // [sequelize.literal("ROUND('indent_of_spas.indent_quantity',2)"), 'indent_quantity'],
           [sequelize.col('indent_of_spas.unit'), 'unit'],
           [sequelize.col('indent_of_spas.is_active'), 'is_active'],
@@ -6434,8 +6534,9 @@ class UserController {
         { 'name': 'NDDB', 'state_code': 209 },
         { 'name': 'NFL', 'state_code': 210 },
         { 'name': 'NHRDF', 'state_code': 211 },
-        { 'name': 'SOPA', 'state_code': 212 },
+        { 'name': 'SOPA PRIVATE', 'state_code': 212 },
         { 'name': 'PRIVATE', 'state_code': 213 },
+        { 'name': 'INDIVIDUAL', 'state_code': 213 },
         { 'name': 'NSAI', 'state_code': 213 },
         { 'name': 'PRIVATE COMPANY', 'state_code': 213 },
         { 'name': 'BBSSL', 'state_code': 214 },
@@ -7064,8 +7165,11 @@ class UserController {
         "password": data.password
       }
 
-      // const result = await SeedUserManagement.updateUser(object);
-      const result = 1;
+      let result = 1;
+
+      if (process.env.ENVIRONMENT == 'NIC') {
+        result = await SeedUserManagement.updateUser(object);
+      }
       console.log(result)
 
       return response(res, status.DATA_AVAILABLE, 200, {
@@ -7537,7 +7641,7 @@ class UserController {
         const apiResponse = await SeedUserManagement.createUser(seedUserData, 'SPA');
         //console.log(apiResponse.spaId, 'apiResponseapiResponseapiResponse')
         //Here req.body.spa_name has value of sector
-        if (req.body && (req.body.spa_name.toUpperCase() == 'PRIVATE' || req.body.spa_name.toUpperCase() == 'PRIVATE COMPANY' || req.body.spa_name.toUpperCase() == 'NSAI')) {
+        if (req.body && (req.body.spa_name.toUpperCase() == 'PRIVATE' || req.body.spa_name.toUpperCase() == 'PRIVATE COMPANY' || req.body.spa_name.toUpperCase() == 'INDIVIDUAL' || req.body.spa_name.toUpperCase() == 'NSAI')) {
           usersData = {
             ...usersData, state_id: 213, district_id: 20013, block_id: 300013,
             "actual_state_code": req.body.state ? req.body.state : '',
@@ -7550,7 +7654,7 @@ class UserController {
           const data = agencyDetailModel.build(usersData);
           const insertData = await data.save();
           let spaCode = apiResponse && apiResponse.spaId ? apiResponse.spaId.toString() : ''
-          if (req.body && (req.body.spa_name.toUpperCase() == 'PRIVATE' || req.body.spa_name.toUpperCase() == 'PRIVATE COMPANY' || req.body.spa_name.toUpperCase() == 'NSAI')) {
+          if (req.body && (req.body.spa_name.toUpperCase() == 'PRIVATE' || req.body.spa_name.toUpperCase() == 'PRIVATE COMPANY' || req.body.spa_name.toUpperCase() == 'INDIVIDUAL' || req.body.spa_name.toUpperCase() == 'NSAI')) {
             spaCode = apiResponse && apiResponse.spaId ? req.body.state.toString() + apiResponse.spaId.toString() : ''
 
           }
@@ -8319,7 +8423,6 @@ class UserController {
 
   static freezeTimelineFilter = async (req, res) => {
     try {
-
       let condition = {
         attributes: ['id', 'start_date', 'end_date', 'year_of_indent', 'season_name'],
         where: {
@@ -9225,11 +9328,11 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
                 "variety_count": 1,
                 "varieties": [
                   {
-                    "name": el.m_crop_variety.variety_name,
-                    "variety_id": el.variety_id,
-                    "variety_code": el.variety_code,
-                    "not_date": el.m_crop_variety.not_date,
-                    "indent_qunatity": el.indent_quantity,
+                    "name": el && el.m_crop_variety && el.m_crop_variety.variety_name ? el.m_crop_variety.variety_name : '',
+                    "variety_id": el && el.variety_id ? el.variety_id : '',
+                    "variety_code": el && el.variety_code ? el.variety_code : '',
+                    "not_date": el && el.m_crop_variety && el.m_crop_variety.not_date ? el.m_crop_variety.not_date : '',
+                    "indent_qunatity": el && el.indent_quantity ? el.indent_quantity : '',
                   }
                 ]
               }
@@ -9249,11 +9352,11 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
 
             filteredData[spaIndex].crops[cropIndex].varieties.push(
               {
-                "name": el.m_crop_variety.variety_name,
-                "variety_id": el.variety_id,
-                "variety_code": el.variety_code,
-                "indent_qunatity": el.indent_quantity,
-                "not_date": el.m_crop_variety.not_date,
+                "name": el && el.m_crop_variety && el.m_crop_variety.variety_name ? el.m_crop_variety.variety_name : '',
+                "variety_id": el && el.variety_id ? el.variety_id : '',
+                "variety_code": el && el.variety_code ? el.variety_code : '',
+                "not_date": el && el.m_crop_variety && el.m_crop_variety.not_date ? el.m_crop_variety.not_date : '',
+                "indent_qunatity": el && el.indent_quantity ? el.indent_quantity : '',
               }
             );
           } else {
@@ -9273,11 +9376,11 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
 
               "varieties": [
                 {
-                  "name": el.m_crop_variety.variety_name,
-                  "variety_id": el.variety_id,
-                  "variety_code": el.variety_code,
-                  "indent_qunatity": el.indent_quantity,
-                  "not_date": el.m_crop_variety.not_date,
+                  "name": el && el.m_crop_variety && el.m_crop_variety.variety_name ? el.m_crop_variety.variety_name : '',
+                  "variety_id": el && el.variety_id ? el.variety_id : '',
+                  "variety_code": el && el.variety_code ? el.variety_code : '',
+                  "not_date": el && el.m_crop_variety && el.m_crop_variety.not_date ? el.m_crop_variety.not_date : '',
+                  "indent_qunatity": el && el.indent_quantity ? el.indent_quantity : '',
                 }
               ]
 
@@ -11654,8 +11757,12 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
             attributes: []
           },
           {
+            required: false,
             model: mVarietyLinesModel,
-            attributes: []
+            attributes: [],
+            where: {
+              variety_code: [sequelize.col('assign_crops.variety_code')]
+            }
           },
           {
             model: assignBspcCropNewFlow,
@@ -12174,140 +12281,280 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
       response(res, status.UNEXPECTED_ERROR, 500, returnResponse, internalCall);
     }
   }
+  // static getYearOfIndentSpaSecond = async (req, res) => {
+  //   let returnResponse = {};
+  //   const { internalCall } = req.body;
+  //   try {
+  //     let rules = {
+  //       'search.year': 'string',
+  //       'search.season': 'string',
+  //       'search.crop_code': 'string',
+  //       'search.state_code': 'string',
+  //     };
+
+  //     let validation = new Validator(req.body, rules);
+
+  //     const isValidData = validation.passes();
+
+  //     if (!isValidData) {
+  //       returnResponse = {};
+  //       for (let key in rules) {
+  //         const error = validation.errors.get(key);
+  //         if (error.length) {
+  //           returnResponse[key] = error;
+  //         }
+  //       }
+  //       return response(res, status.BAD_REQUEST, 400, returnResponse, internalCall);
+  //     }
+  //     let cropGroup;
+  //     if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+  //       cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+  //     }
+  //     if (req.body.loginedUserid.user_type === "PULSESSEEDADMIN") {
+  //       cropGroup = { crop_code: { [Op.like]: 'A03%' } };
+  //     }
+
+  //     let condition = {
+  //       where: {
+  //         // is_freeze:1
+  //       },
+  //       include: [
+  //         {
+  //           model: indentOfBreederseedModel,
+  //           attributes: [],
+  //           where: {
+  //             is_freeze: 1,
+  //             // icar_freeze: 1,
+  //             // is_indenter_freeze: 1
+  //             ...cropGroup
+  //           },
+  //         }
+  //       ],
+  //       raw: true,
+  //       attributes: [
+  //         [db.Sequelize.fn("Distinct", db.Sequelize.col("indent_of_spas.year")), "value"],
+  //         [db.Sequelize.col("indent_of_spas.year"), "year"]
+  //         // [sequelize.literal("concat(year, '-', RIGHT((Year+1)::VARCHAR, 2))"), 'display_text'],
+  //         // 'year'
+  //       ]
+  //     };
+  //     let condition2 = {
+  //       where: {
+  //         is_freeze: 1,
+  //         is_forward: 0,
+  //         ...cropGroup
+  //       },
+  //       raw: true,
+  //       attributes: [
+  //         [db.Sequelize.fn("Distinct", db.Sequelize.col("year")), "value"],
+  //         // [sequelize.literal("concat(year, '-', RIGHT((Year+1)::VARCHAR, 2))"), 'display_text'],
+  //         'year'
+  //       ]
+  //     };
+
+  //     if (req.body.search) {
+  //       if (req.body.search.year) {
+  //         condition.where.year = {
+  //           [Op.in]: req.body.search.year.toString().split(',')
+  //         };
+  //         condition2.where.year = {
+  //           [Op.in]: req.body.search.year.toString().split(',')
+  //         };
+  //       }
+  //       if (req.body.search.season) {
+  //         condition.where.season = {
+  //           [Op.in]: req.body.search.season.toString().split(',')
+  //         };
+  //         condition2.where.season = {
+  //           [Op.in]: req.body.search.season.toString().split(',')
+  //         };
+
+  //       }
+  //       if (req.body.search.crop_code) {
+  //         condition.where.crop_code = {
+  //           [Op.in]: req.body.search.crop_code.toString().split(',')
+  //         };
+  //         condition2.where.crop_code = {
+  //           [Op.in]: req.body.search.crop_code.toString().split(',')
+  //         };
+  //       }
+  //       if (req.body.search.state_code) {
+  //         condition.where.state_code = {
+  //           [Op.in]: req.body.search.state_code.toString().split(',')
+  //         };
+  //         condition2.where.state_code = {
+  //           [Op.in]: req.body.search.state_code.toString().split(',')
+  //         };
+  //       }
+  //     }
+
+  //     condition.order = [['year', 'desc']];
+  //     condition2.order = [['year', 'desc']];
+  //     returnResponse = await indenterSPAModel.findAll(condition);
+
+  //     let returnResponse2 = await indentOfBreederseedModel.findAll(condition2);
+  //     console.log(returnResponse2)
+  //     console.log(returnResponse)
+  //     let returnSpayear = [];
+  //     let indentYear = []
+  //     if (returnResponse && returnResponse.length > 0) {
+  //       returnResponse.forEach((el, i) => {
+  //         returnSpayear.push(el && el.value ? el.value : '');
+  //       })
+  //     }
+  //     if (returnResponse2 && returnResponse2.length > 0) {
+  //       returnResponse2.forEach((el, i) => {
+  //         indentYear.push(el && el.value ? el.value : '');
+  //       })
+  //     }
+
+  //     let retunArr = [...indentYear, ...returnSpayear];
+  //     let totalyearArr = []
+  //     if (retunArr && retunArr.length > 0) {
+  //       retunArr.forEach((el) => {
+  //         totalyearArr.push({ year: el ? el : '' })
+  //       })
+  //     }
+  //     response(res, status.DATA_AVAILABLE, 200, totalyearArr, internalCall);
+  //   } catch (error) {
+  //     returnResponse = {
+  //       error: error.message
+  //     }
+  //     console.log(returnResponse);
+  //     response(res, status.UNEXPECTED_ERROR, 500, returnResponse, internalCall);
+  //   }
+  // }
   static getYearOfIndentSpaSecond = async (req, res) => {
-    let returnResponse = {};
-    const { internalCall } = req.body;
-    try {
-      let rules = {
-        'search.year': 'string',
-        'search.season': 'string',
-        'search.crop_code': 'string',
-        'search.state_code': 'string',
-      };
+  let returnResponse = {};
+  const { internalCall } = req.body;
 
-      let validation = new Validator(req.body, rules);
+  try {
+    let rules = {
+      'search.year': 'string',
+      'search.season': 'string',
+      'search.crop_code': 'string',
+      'search.state_code': 'string',
+    };
 
-      const isValidData = validation.passes();
+    let validation = new Validator(req.body, rules);
+    const isValidData = validation.passes();
 
-      if (!isValidData) {
-        returnResponse = {};
-        for (let key in rules) {
-          const error = validation.errors.get(key);
-          if (error.length) {
-            returnResponse[key] = error;
-          }
-        }
-        return response(res, status.BAD_REQUEST, 400, returnResponse, internalCall);
-      }
-
-      let condition = {
-        where: {
-          // is_freeze:1
-        },
-        include: [
-          {
-            model: indentOfBreederseedModel,
-            attributes: [],
-            where: {
-              is_freeze: 1,
-              // icar_freeze: 1,
-              // is_indenter_freeze: 1
-            },
-          }
-        ],
-        raw: true,
-        attributes: [
-          [db.Sequelize.fn("Distinct", db.Sequelize.col("indent_of_spas.year")), "value"],
-          [db.Sequelize.col("indent_of_spas.year"), "year"]
-          // [sequelize.literal("concat(year, '-', RIGHT((Year+1)::VARCHAR, 2))"), 'display_text'],
-          // 'year'
-        ]
-      };
-      let condition2 = {
-        where: {
-          is_freeze: 1,
-          is_forward: 0
-        },
-        raw: true,
-        attributes: [
-          [db.Sequelize.fn("Distinct", db.Sequelize.col("year")), "value"],
-          // [sequelize.literal("concat(year, '-', RIGHT((Year+1)::VARCHAR, 2))"), 'display_text'],
-          'year'
-        ]
-      };
-
-      if (req.body.search) {
-        if (req.body.search.year) {
-          condition.where.year = {
-            [Op.in]: req.body.search.year.toString().split(',')
-          };
-          condition2.where.year = {
-            [Op.in]: req.body.search.year.toString().split(',')
-          };
-        }
-        if (req.body.search.season) {
-          condition.where.season = {
-            [Op.in]: req.body.search.season.toString().split(',')
-          };
-          condition2.where.season = {
-            [Op.in]: req.body.search.season.toString().split(',')
-          };
-
-        }
-        if (req.body.search.crop_code) {
-          condition.where.crop_code = {
-            [Op.in]: req.body.search.crop_code.toString().split(',')
-          };
-          condition2.where.crop_code = {
-            [Op.in]: req.body.search.crop_code.toString().split(',')
-          };
-        }
-        if (req.body.search.state_code) {
-          condition.where.state_code = {
-            [Op.in]: req.body.search.state_code.toString().split(',')
-          };
-          condition2.where.state_code = {
-            [Op.in]: req.body.search.state_code.toString().split(',')
-          };
+    if (!isValidData) {
+      returnResponse = {};
+      for (let key in rules) {
+        const error = validation.errors.get(key);
+        if (error.length) {
+          returnResponse[key] = error;
         }
       }
-
-      condition.order = [['year', 'desc']];
-      condition2.order = [['year', 'desc']];
-      returnResponse = await indenterSPAModel.findAll(condition);
-
-      let returnResponse2 = await indentOfBreederseedModel.findAll(condition2);
-      console.log(returnResponse2)
-      console.log(returnResponse)
-      let returnSpayear = [];
-      let indentYear = []
-      if (returnResponse && returnResponse.length > 0) {
-        returnResponse.forEach((el, i) => {
-          returnSpayear.push(el && el.value ? el.value : '');
-        })
-      }
-      if (returnResponse2 && returnResponse2.length > 0) {
-        returnResponse2.forEach((el, i) => {
-          indentYear.push(el && el.value ? el.value : '');
-        })
-      }
-
-      let retunArr = [...indentYear, ...returnSpayear];
-      let totalyearArr = []
-      if (retunArr && retunArr.length > 0) {
-        retunArr.forEach((el) => {
-          totalyearArr.push({ year: el ? el : '' })
-        })
-      }
-      response(res, status.DATA_AVAILABLE, 200, totalyearArr, internalCall);
-    } catch (error) {
-      returnResponse = {
-        error: error.message
-      }
-      console.log(returnResponse);
-      response(res, status.UNEXPECTED_ERROR, 500, returnResponse, internalCall);
+      return response(res, status.BAD_REQUEST, 400, returnResponse, internalCall);
     }
+
+    // ✅ filter based on user type
+    let cropGroup = {};
+    if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+      cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+    }
+    if (req.body.loginedUserid.user_type === "PULSESSEEDADMIN") {
+      cropGroup = { crop_code: { [Op.like]: 'A03%' } };
+    }
+
+    // ✅ First condition (SPA indent)
+    let condition = {
+      where: {},
+      include: [
+        {
+          model: indentOfBreederseedModel,
+          attributes: [],
+          where: {
+            is_freeze: 1,
+            ...cropGroup
+          },
+        }
+      ],
+      raw: true,
+      attributes: [
+        [db.Sequelize.fn("Distinct", db.Sequelize.col("indent_of_spas.year")), "value"],
+        [db.Sequelize.col("indent_of_spas.year"), "year"]
+      ],
+      order: [['year', 'desc']]
+    };
+
+    // ✅ Second condition (Indent breederseed)
+    let condition2 = {
+      where: {
+        is_freeze: 1,
+        is_forward: 0,
+        ...cropGroup
+      },
+      raw: true,
+      attributes: [
+        [db.Sequelize.fn("Distinct", db.Sequelize.col("year")), "value"],
+        'year'
+      ],
+      order: [['year', 'desc']]
+    };
+
+    // ✅ Apply filters if provided
+    if (req.body.search) {
+      if (req.body.search.year) {
+        condition.where.year = {
+          [Op.in]: req.body.search.year.toString().split(',')
+        };
+        condition2.where.year = {
+          [Op.in]: req.body.search.year.toString().split(',')
+        };
+      }
+      if (req.body.search.season) {
+        condition.where.season = {
+          [Op.in]: req.body.search.season.toString().split(',')
+        };
+        condition2.where.season = {
+          [Op.in]: req.body.search.season.toString().split(',')
+        };
+      }
+      if (req.body.search.crop_code) {
+        condition.where.crop_code = {
+          [Op.in]: req.body.search.crop_code.toString().split(',')
+        };
+        condition2.where.crop_code = {
+          [Op.in]: req.body.search.crop_code.toString().split(',')
+        };
+      }
+      if (req.body.search.state_code) {
+        condition.where.state_code = {
+          [Op.in]: req.body.search.state_code.toString().split(',')
+        };
+        condition2.where.state_code = {
+          [Op.in]: req.body.search.state_code.toString().split(',')
+        };
+      }
+    }
+
+    // ✅ Fetch results
+    let returnResponse1 = await indenterSPAModel.findAll(condition);
+    let returnResponse2 = await indentOfBreederseedModel.findAll(condition2);
+
+    let returnSpayear = returnResponse1.map(el => el?.value || '');
+    let indentYear = returnResponse2.map(el => el?.value || '');
+
+    // ✅ Merge, dedupe, sort
+    let retunArr = [...indentYear, ...returnSpayear];
+    let uniqueYears = [...new Set(retunArr)]
+      .filter(y => y) // remove empty/null
+      .sort((a, b) => b - a); // descending sort
+
+    let totalyearArr = uniqueYears.map(y => ({ year: y }));
+
+    response(res, status.DATA_AVAILABLE, 200, totalyearArr, internalCall);
+
+  } catch (error) {
+    returnResponse = { error: error.message };
+    console.log(returnResponse);
+    response(res, status.UNEXPECTED_ERROR, 500, returnResponse, internalCall);
   }
+};
+
 
   static getSeasonOfIndentSpa = async (req, res) => {
     let returnResponse = {};
@@ -12334,10 +12581,14 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
         }
         return response(res, status.BAD_REQUEST, 400, returnResponse, internalCall);
       }
-
+      let cropGroup;
+      if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+        cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+      }
       let condition = {
         where: {
           // is_freeze:1
+          ...cropGroup
         },
         raw: false,
         attributes: [
@@ -12407,6 +12658,13 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
         }
         return response(res, status.BAD_REQUEST, 400, returnResponse, internalCall);
       }
+      let cropGroup;
+      if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+        cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+      }
+      if (req.body.loginedUserid.user_type === "PULSESSEEDADMIN") {
+        cropGroup = { crop_code: { [Op.like]: 'A03%' } };
+      }
 
       let condition = {
         where: {
@@ -12418,7 +12676,8 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
           where: {
             is_freeze: 1,
             icar_freeze: 1,
-            is_indenter_freeze: 1
+            is_indenter_freeze: 1,
+            ...cropGroup
           }
 
         }],
@@ -12432,7 +12691,8 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
       let condition2 = {
         where: {
           is_freeze: 1,
-          is_forward: 0
+          is_forward: 0,
+          ...cropGroup
           // is_freeze:1
         },
         raw: true,
@@ -12537,6 +12797,11 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
         return response(res, status.BAD_REQUEST, 400, returnResponse, internalCall);
       }
 
+      let cropGroup;
+      if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+        cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+      }
+
       let condition = {
         include: [
           {
@@ -12547,6 +12812,7 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
         ],
         where: {
           // is_freeze:1
+          ...cropGroup
         },
         raw: true,
         attributes: [
@@ -12616,7 +12882,13 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
         }
         return response(res, status.BAD_REQUEST, 400, returnResponse, internalCall);
       }
-
+      let cropGroup;
+      if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+        cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+      }
+      if (req.body.loginedUserid.user_type === "PULSESSEEDADMIN") {
+        cropGroup = { crop_code: { [Op.like]: 'A03%' } };
+      }
       let condition = {
         include: [
           {
@@ -12631,7 +12903,8 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
             where: {
               is_freeze: 1,
               icar_freeze: 1,
-              is_indenter_freeze: 1
+              is_indenter_freeze: 1,
+              ...cropGroup
             }
 
           }
@@ -12639,6 +12912,7 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
         ],
         where: {
           // is_freeze:1
+          ...cropGroup
         },
         raw: true,
         attributes: [
@@ -12657,8 +12931,9 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
         ],
         where: {
           is_freeze: 1,
-          is_forward: 0
-          // is_freeze:1
+          is_forward: 0,
+          // is_freeze:1,
+          ...cropGroup
         },
         raw: true,
         attributes: [
@@ -12715,7 +12990,7 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
         returnResponse.forEach((el => {
           cropData.push(
             {
-              crop_code: el && el.crop_code ? el.crop_code : '',
+              value: el && el.value ? el.value : '',
               display_text: el && el.display_text ? el.display_text : ''
             }
           )
@@ -12731,14 +13006,17 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
           )
         }))
       }
-
-
-      let returnSpaCrop = [];
-      let indentCrop = []
-
-
-
-      response(res, status.DATA_AVAILABLE, 200, cropData, internalCall);
+      const uniqueData = Object.values(
+        cropData.reduce((acc, curr) => {
+          acc[curr.value] = curr; // Override if duplicate
+          return acc;
+        }, {})
+      );
+      if (uniqueData && uniqueData.length) {
+        response(res, status.DATA_AVAILABLE, 200, uniqueData, internalCall);
+      } else {
+        response(res, status.DATA_NOT_AVAILABLE, 201, [], internalCall);
+      }
     } catch (error) {
       returnResponse = {
         error: error.message
@@ -12774,6 +13052,11 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
         return response(res, status.BAD_REQUEST, 400, returnResponse, internalCall);
       }
 
+      let cropGroup;
+      if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+        cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+      }
+
       let condition = {
         include: [
           {
@@ -12784,6 +13067,7 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
         ],
         where: {
           // is_freeze:1
+          ...cropGroup
         },
         raw: true,
         attributes: [
@@ -12853,7 +13137,13 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
         }
         return response(res, status.BAD_REQUEST, 400, returnResponse, internalCall);
       }
-
+      let cropGroup;
+      if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+        cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+      }
+      if (req.body.loginedUserid.user_type === "PULSESSEEDADMIN") {
+        cropGroup = { crop_code: { [Op.like]: 'A03%' } };
+      }
       let condition = {
         include: [
           {
@@ -12866,7 +13156,8 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
             where: {
               is_freeze: 1,
               icar_freeze: 1,
-              is_indenter_freeze: 1
+              is_indenter_freeze: 1,
+              ...cropGroup
               // is_freeze:1
             },
             required: true,
@@ -12897,7 +13188,8 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
         where: {
           is_freeze: 1,
           is_forward: 0,
-          year: req.body.search.year
+          year: req.body.search.year,
+          ...cropGroup
           // is_freeze:1
         },
         raw: true,
@@ -13491,6 +13783,7 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
           // "inner join bsp_proforma_1s on bsp_proforma_1s.id = bsp_proforma_1_bspcs.bspc_proforma_1_id and bsp_proforma_1s.year = bsp_proforma_2s.year and bsp_proforma_1s.season = bsp_proforma_2s.season and bsp_proforma_1s.crop_code = bsp_proforma_2s.crop_code and bsp_proforma_1s.variety_code = bsp_proforma_2s.variety_code and bsp_proforma_1s.is_active = 1 " +
           "INNER Join monitoring_team_of_bspc on monitoring_team_of_bspc.year = bsp_proforma_2s.year and monitoring_team_of_bspc.season = bsp_proforma_2s.season and monitoring_team_of_bspc.crop_code = bsp_proforma_2s.crop_code and monitoring_team_of_bspc.user_id = bsp_proforma_2s.user_id and monitoring_team_of_bspc.is_active=1 " +
           "inner join monitoring_team_of_bspc_members on monitoring_team_of_bspc_members.monitoring_team_of_bspc_id = monitoring_team_of_bspc.id and monitoring_team_of_bspc_members.is_active = 1 " +
+          "inner join monitoring_team_of_bspc_plots on monitoring_team_of_bspc_plots.monitoring_team_of_id = monitoring_team_of_bspc_members.monitoring_team_of_bspc_id and bsp_proforma_2s.field_code = monitoring_team_of_bspc_plots.plots " +
           "inner join users on users.id = bsp_proforma_2s.user_id " +
           "inner join agency_details on agency_details.user_id = bsp_proforma_2s.user_id " +
           "inner join m_crops on m_crops.crop_code = bsp_proforma_2s.crop_code " +
@@ -13724,11 +14017,11 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
       } else {
 
         const teamLeadData = await db.sequelize.query(
-            "Select got_monitoring_team_members.id, got_monitoring_team_members.got_monitoring_team_id from got_monitoring_team_members where lower(got_monitoring_team_members.user_name) = lower(:userName) and lower(encode(digest(got_monitoring_team_members.pin_code::VARCHAR, 'sha256'), 'hex')) = lower(:pinCode) and got_monitoring_team_members.is_team_lead = true",
-            {
-              replacements: { userName: req.body.userId, pinCode: req.body.pinCode },
-              type: QueryTypes.SELECT
-            }
+          "Select got_monitoring_team_members.id, got_monitoring_team_members.got_monitoring_team_id from got_monitoring_team_members where lower(got_monitoring_team_members.user_name) = lower(:userName) and lower(encode(digest(got_monitoring_team_members.pin_code::VARCHAR, 'sha256'), 'hex')) = lower(:pinCode) and got_monitoring_team_members.is_team_lead = true",
+          {
+            replacements: { userName: req.body.userId, pinCode: req.body.pinCode },
+            type: QueryTypes.SELECT
+          }
         );
 
         if (!(teamLeadData && teamLeadData.length && teamLeadData[0])) {
@@ -13743,35 +14036,48 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
           const sortDirection = req.body.order ? req.body.order : 'DESC';
 
           const mid_query = "from got_testing " +
-              "inner join got_showing_details on got_showing_details.got_testing_id = got_testing.id and got_showing_details.user_id = got_testing.user_id " +
-              "inner join got_monitoring_team_members on got_monitoring_team_members.got_monitoring_team_id = got_testing.got_monitoring_team_id and got_monitoring_team_members.is_team_lead = true " +
-              "inner join agency_details on agency_details.user_id = got_testing.bspc_id " +
-              "inner join m_crops on m_crops.crop_code = got_testing.crop_code " +
-              "inner join m_crop_varieties on m_crop_varieties.variety_code = got_testing.variety_code " +
-              "left join m_variety_lines on m_variety_lines.variety_code = got_testing.variety_code and m_variety_lines.line_variety_code = got_testing.variety_line_code " +
-              "inner join m_states on m_states.state_code = got_showing_details.state_code " +
-              "inner join m_districts on m_districts.district_code = got_showing_details.district_code " +
-              "where got_monitoring_team_members.id = :gotMonTeamMemId ";
+            "inner join got_showing_details on got_showing_details.got_testing_id = got_testing.id and got_showing_details.user_id = got_testing.bspc_id " +
+            "inner join got_monitoring_team_members on got_monitoring_team_members.got_monitoring_team_id = got_testing.got_monitoring_team_id and got_monitoring_team_members.is_team_lead = true " +
+            "inner join agency_details on agency_details.user_id = got_testing.bspc_id " +
+            "inner join m_crops on m_crops.crop_code = got_testing.crop_code " +
+            "inner join m_crop_varieties on m_crop_varieties.variety_code = got_testing.variety_code " +
+            "left join m_variety_lines on m_variety_lines.variety_code = got_testing.variety_code and m_variety_lines.line_variety_code = got_testing.variety_line_code " +
+            "inner join m_states on m_states.state_code = got_showing_details.state_code " +
+            "inner join m_districts on m_districts.district_code = got_showing_details.district_code " +
+            "where got_monitoring_team_members.id = :gotMonTeamMemId ";
 
-          const select = `Select 'OCT23-13-099-205' AS "intakeLotNum", m_crops.crop_name AS "cropName", got_testing.crop_code AS "cropCode", agency_details.agency_name AS "testingLab", got_testing.bspc_id AS "testingLabCode", 'forwardedToLAB' AS "status", m_crop_varieties.variety_name AS "varietyName", got_testing.variety_code AS "varietyCode", 'BREEDER' AS "sourceClass", 'FOUNDATION I' AS "destinationClass", got_testing.unique_code AS "uniqueCode", got_testing.created_at AS "samplingDate", got_testing.updated_at AS "generationDate", '1572' AS "spaCode", 'MSSCL OSMANABAD' AS "spaName", '13-099' AS "sppCode", 'MSSCL OSMANABAD' AS "sppName", CONCAT(got_testing.year, '-', RIGHT((got_testing.year + 1)::VARCHAR, 2)) AS "finyear", CASE     WHEN got_testing.season = 'R' THEN 'Rabi'    WHEN got_testing.season = 'K' THEN 'Kharif'     ELSE got_testing.season END AS "season", 'K23-10-2229' AS "cropRegCode", 'GOT' AS "test", agency_details.state_id AS "stateCode", got_testing.id AS "sLSerial", got_testing.consignment_number AS "letterNo", 'RCVD' AS "recieveStatus", got_testing.bspc_id AS "recievedBy", got_testing.test_number AS "showTestNo", got_testing.test_number AS "testNo", got_testing.bspc_id AS "testNoGeneratedBy", 'BPC' AS "userType" `;
+          const select = `Select 'OCT23-13-099-205' AS "intakeLotNum", m_crops.crop_name AS "cropName", got_testing.crop_code AS "cropCode", agency_details.agency_name AS "testingLab", got_testing.bspc_id AS "testingLabCode", 'forwardedToLAB' AS "status", m_crop_varieties.variety_name AS "varietyName", got_testing.variety_code AS "varietyCode", 'BREEDER' AS "sourceClass", 'FOUNDATION I' AS "destinationClass", got_testing.unique_code AS "uniqueCode", got_testing.created_at AS "samplingDate", got_showing_details.date_of_showing AS "showingDate", got_testing.updated_at AS "generationDate", '1572' AS "spaCode", 'MSSCL OSMANABAD' AS "spaName", '13-099' AS "sppCode", 'MSSCL OSMANABAD' AS "sppName", CONCAT(got_testing.year, '-', RIGHT((got_testing.year + 1)::VARCHAR, 2)) AS "finyear", CASE     WHEN got_testing.season = 'R' THEN 'Rabi'    WHEN got_testing.season = 'K' THEN 'Kharif'     ELSE got_testing.season END AS "season", 'K23-10-2229' AS "cropRegCode", 'GOT' AS "test", agency_details.state_id AS "stateCode", got_testing.id AS "sLSerial", got_testing.consignment_number AS "letterNo", 'RCVD' AS "recieveStatus", got_testing.bspc_id AS "recievedBy", got_testing.test_number AS "showTestNo", got_testing.test_number AS "testNo", got_testing.bspc_id AS "testNoGeneratedBy", 'BPC' AS "userType" `;
 
           let data = await db.sequelize.query(
-              select +
-              mid_query +
-              "group by m_crops.crop_name, got_testing.crop_code, agency_details.agency_name, got_testing.bspc_id, m_crop_varieties.variety_name, got_testing.variety_code, got_testing.unique_code, got_testing.created_at, got_testing.updated_at,got_testing.year, got_testing.season, agency_details.state_id, got_testing.id, got_testing.consignment_number, got_testing.bspc_id, got_testing.test_number " +
-              "order by " + sortOrder + " " + sortDirection + " " + ";",
-              {
-                replacements: { gotMonTeamMemId: gotMonTeamMemId },
-                type: QueryTypes.SELECT
-              }
+            select +
+            mid_query +
+            "group by m_crops.crop_name, got_testing.crop_code, agency_details.agency_name, got_testing.bspc_id, m_crop_varieties.variety_name, got_testing.variety_code, got_testing.unique_code, got_testing.created_at, got_showing_details.date_of_showing, got_testing.updated_at,got_testing.year, got_testing.season, agency_details.state_id, got_testing.id, got_testing.consignment_number, got_testing.bspc_id, got_testing.test_number " +
+            "order by " + sortOrder + " " + sortDirection + " " + ";",
+            {
+              replacements: { gotMonTeamMemId: gotMonTeamMemId },
+              type: QueryTypes.SELECT
+            }
           );
 
           const promises = [];
           for (const key in data) {
-            data[key]['recieveDateByLAB'] = data[key]['sampleForwardToLabOn'] = {'$date': data[key]['samplingDate']};
+            data[key]['recieveDateByLAB'] = data[key]['sampleForwardToLabOn'] = { '$date': data[key]['samplingDate'] };
 
-            data[key]['testNoGenerationDate'] = {'$date': data[key]['generationDate']};
+            data[key]['testNoGenerationDate'] = { '$date': data[key]['generationDate'] };
             delete data[key]['generationDate'];
+
+            const teamMemberData = await db.sequelize.query(
+              'Select got_monitoring_team_members.id, got_monitoring_team_members.name, got_monitoring_team_members.mobile_number as "mobileNumber", got_monitoring_team_members.email_id as "emailId", m_designations.name as designation ' +
+              "from got_monitoring_team_members " +
+              "left join m_designations on m_designations.id = got_monitoring_team_members.designation_id " +
+              "where got_monitoring_team_members.got_monitoring_team_id = :gotMonTeamId",
+              {
+                replacements: { gotMonTeamId: gotMonTeamId },
+                type: QueryTypes.SELECT
+              }
+            );
+
+            data[key]['teamData'] = (teamMemberData && teamMemberData.length) ? teamMemberData : [];
 
             const promise = new Promise((resolve) => {
               resolve(key);
@@ -13794,6 +14100,253 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
       }
       console.log(returnResponse);
       response(res, status.UNEXPECTED_ERROR, 500, returnResponse, internalCall);
+    }
+  }
+
+  static syncLabData = async (req, res) => {
+    console.log('syncLabData API Starts');
+    const { internalCall } = req.body;
+    let returnResponse = {};
+    try {
+      let rules = {
+      };
+
+      let validation = new Validator(req.body, rules);
+
+      const isValidData = validation.passes();
+
+      if (!isValidData) {
+        returnResponse = {};
+        for (let key in rules) {
+          const error = validation.errors.get(key);
+          if (error.length) {
+            returnResponse[key] = error;
+          }
+        }
+        return response(res, status.BAD_REQUEST, 400, returnResponse, internalCall);
+      } else {
+
+        const stateList = await stateModel.findAll({
+          where: {
+            is_state: 1
+          },
+          raw: false,
+          order: [['state_code', 'asc']],
+          attributes: [[sequelize.fn('DISTINCT', sequelize.col('state_code')), 'state_code']]
+        });
+
+        console.log('stateList: ', stateList);
+        if (stateList && stateList.length) {
+
+          const promises = [];
+          for (const key in stateList) {
+
+            const stateCode = stateList[key]['dataValues']['state_code'] ?? '';
+
+            const url = process.env.LAB_DATA_API_URL ?? '';
+            const method = 'GET';
+            const dataSet = {
+              stateCode: stateCode,
+              apiKey: process.env.LAB_DATA_API_KEY ?? ''
+            };
+
+            console.log('url: ', url);
+            console.log('method: ', method);
+            console.log('stateCode: ', stateCode);
+            console.log('apiKey: ', dataSet.apiKey);
+            console.log('dataSet: ', dataSet);
+            console.log('dataSet Stringified: ', JSON.stringify(dataSet));
+
+            let axiosResponse = (await this.axiosFunction(dataSet, url, method));
+
+            console.log('axiosResponse: ', axiosResponse);
+            console.log('axiosResponse Stringified: ', JSON.stringify(axiosResponse));
+
+            if (parseInt(axiosResponse.status) === 200 && axiosResponse.result && axiosResponse.result.length) {
+              console.log('in');
+
+              const axiosResult = axiosResponse.result;
+
+              const uniqueAPILabNameArray = await (async () => [...new Set(axiosResult.map(lab => lab['labName']))])();
+
+              console.log('uniqueAPILabNameArray: ', uniqueAPILabNameArray);
+
+              const seedLabTestData = await seedLabTestModel.findAll({
+                where: {
+                  state_id: stateCode,
+                  stl_name: {
+                    [Op.in]: uniqueAPILabNameArray
+                  }
+                },
+                raw: false,
+                attributes: [[sequelize.fn('DISTINCT', sequelize.col('stl_name')), 'stl_name']]
+              });
+
+              console.log('seedLabTestData: ', seedLabTestData);
+
+              const uniqueDBLabNameArray = await (async () => [...new Set(seedLabTestData.map(lab => lab['stl_name']))])();
+
+              console.log('uniqueDBLabNameArray: ', uniqueDBLabNameArray);
+
+              const { existingLabs, newLabs } = await (async () => ({
+                existingLabs: axiosResult.filter(lab => uniqueDBLabNameArray.includes(lab.labName)),
+                newLabs: axiosResult.filter(lab => !uniqueDBLabNameArray.includes(lab.labName))
+              }))();
+
+              console.log('newLabs: ', newLabs);
+
+              if (newLabs && newLabs.length) {
+
+                let bulkInsertArray = [];
+
+                const promises2 = [];
+                for (const key2 in newLabs) {
+                  bulkInsertArray[key2] = {
+                    stl_name: newLabs[key2]['labName'] ?? '',
+                    short_name: newLabs[key2]['labName'] ?? '',
+                    lab_name: newLabs[key2]['labFullName'] ?? '',
+                    lab_code: newLabs[key2]['labId'] ?? '',
+                    address: newLabs[key2]['address'] ?? '',
+                    contact_person_name: newLabs[key2]['contactPerson'] ?? '',
+                    email: newLabs[key2]['email'] ?? '',
+                    mobile_number: newLabs[key2]['mobile'] ?? '',
+                    type: newLabs[key2]['type'] ?? '',
+                    state_id: stateCode,
+                  };
+
+                  const promise2 = new Promise((resolve) => {
+                    resolve(key2);
+                  });
+                  promises2.push(promise2);
+                }
+                await Promise.all(promises2);
+
+                console.log('bulkInsertArray: ', bulkInsertArray);
+
+                if (bulkInsertArray.length) {
+                  const transaction = await sequelizer.transaction();
+
+                  await seedLabTestModel.bulkCreate(bulkInsertArray, { transaction })
+                    .then(async function (item) {
+                      await transaction.commit();
+                      console.log('Data Inserted.');
+                    })
+                    .catch(async function (err) {
+                      console.log('DB Insert Error: ', err.message);
+                      await transaction.rollback();
+                    });
+
+                  const promise = new Promise((resolve) => {
+                    resolve(key);
+                  });
+                  promises.push(promise);
+                } else {
+
+                  const promise = new Promise((resolve) => {
+                    resolve(key);
+                  });
+                  promises.push(promise);
+                }
+              } else {
+                const promise = new Promise((resolve) => {
+                  resolve(key);
+                });
+                promises.push(promise);
+              }
+
+            } else {
+              console.log('out');
+
+              const promise = new Promise((resolve) => {
+                resolve(key);
+              });
+              promises.push(promise);
+            }
+          }
+          await Promise.all(promises);
+
+          return response(res, status.OK, 200, returnResponse, internalCall);
+        } else {
+          return response(res, status.DATA_NOT_AVAILABLE, 200, returnResponse, internalCall);
+        }
+      }
+    } catch (error) {
+      console.log('error: ', error.message);
+      returnResponse = {
+        error: error.message
+      }
+      return response(res, status.UNEXPECTED_ERROR, 500, returnResponse, internalCall);
+    }
+  }
+
+  static axiosFunction = async (dataSet = null, url, method = 'POST', token = "", headers = {}, contentType = '') => {
+    let returnResponse = {};
+    try {
+      if (token) {
+        headers['Authorization'] = 'Bearer ' + token;
+      }
+
+      const axiosOptions = {
+        method: method,
+        url: url,
+        headers: headers,
+        validateStatus: (status) => {
+          return true;
+        },
+      };
+
+      if (contentType && contentType === 'xml') {
+        axiosOptions['headers'] = {
+          'Content-Type': 'application/xml'
+        };
+        if (dataSet) {
+          axiosOptions['data'] = (dataSet);
+        }
+      } else {
+        if (method.trim().toLowerCase() !== 'get') {
+          if (dataSet) {
+            headers['Content-Type'] = 'application/json';
+            headers['Content-Length'] = JSON.stringify(dataSet).length;
+
+            axiosOptions.data = JSON.stringify(dataSet);
+          }
+        }
+        if (method.trim().toLowerCase() === 'get') {
+          if (dataSet) {
+            url = url + '?';
+            for (const key in dataSet) {
+              url += key + '=' + dataSet[key] + '&';
+            }
+            url = url.slice(0, -1);
+            axiosOptions.url = url;
+          }
+        }
+      }
+
+      const httpsAgentOptions = {
+        rejectUnauthorized: true,
+        secureOptions: crypto.constants.SSL_OP_LEGACY_SERVER_CONNECT,
+      };
+
+      // console.log('axiosOptions: ', axiosOptions);
+
+      axios.defaults.httpsAgent = new https.Agent(httpsAgentOptions);
+
+      const response = await axios(axiosOptions);
+
+      // console.log('axiosResponse: ', response);
+
+      return returnResponse = {
+        status: response.status,
+        message: response.statusText,
+        result: response.data
+      }
+    } catch (error) {
+      return returnResponse = {
+        status: 500,
+        message: error.message,
+        result: {}
+      }
     }
   }
 
@@ -15078,6 +15631,7 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
             [Op.in]: req.body.search.user_id.toString().split(',')
           };
         }
+
       }
 
       condition.order = [[sequelize.col('seed_inventries_tag.lot_number'), 'ASC']];
@@ -18710,56 +19264,7 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
     }
   }
 
-  static getTotalIndentQuantity = async (req, res) => {
-    try {
-      const { year, season, state_code } = req.query;
-      let whereCondition = {};
-
-      if (year) {
-        whereCondition.year = year;
-      }
-      if (season) {
-        const capitalizedSeason = season.charAt(0).toUpperCase();
-        whereCondition.season = capitalizedSeason;
-      }
-      if (state_code) {
-        whereCondition['$agencyDetails.state_id$'] = state_code;
-      }
-
-      const indentQuantities = await indentOfBreederseedModel.findAll({
-        attributes: [
-          'indent_quantity',
-          'unit',
-        ],
-        where: whereCondition,
-        include: [
-          {
-            model: agencyDetailModel,
-            attributes: [],
-            as: 'agencyDetails'
-          }
-        ]
-      });
-
-      let indent_quantity = 0;
-      indentQuantities.forEach((indent) => {
-        if (indent.unit === 'kilogram') {
-          indent_quantity += indent.indent_quantity / 100;
-        } else {
-          indent_quantity += indent.indent_quantity;
-        }
-      });
-      indent_quantity = parseFloat(indent_quantity.toFixed(2));
-      response(res, status.DATA_AVAILABLE, 200, { total_indent: indent_quantity });
-
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({
-        status: 'INTERNAL_SERVER_ERROR',
-        message: 'Error fetching total indent quantity'
-      });
-    }
-  };
+ 
   static editBspProforma2sDataSecond = async (req, res) => {
     let returnResponse = {};
     const { internalCall } = req.body;
@@ -18995,7 +19500,8 @@ LEFT OUTER JOIN "m_crop_varieties" AS "m_crop_variety" ON "indent_of_spas"."vari
         const updateDataofIndentor = {
           is_freeze: 0,
           is_indenter_freeze: 0,
-          icar_freeze: 0
+          icar_freeze: 0,
+          is_forward: 0
         };
         await db.indentOfBreederseedModel.update(updateDataofIndentor, {
           where: {

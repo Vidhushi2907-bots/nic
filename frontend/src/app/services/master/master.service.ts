@@ -11,6 +11,7 @@ export class MasterService {
   baseUrl: string = environment.ms_nb_01_master.baseUrl;
   apiBaseUrl: string = environment.ms_nb_01_master.apiBaseUrl;
   generateSampleData:any;
+  userBasicData = JSON.parse(localStorage.getItem('BHTCurrentUser'));
   constructor(private http: HttpClient) { }
 
   getPlansInfo(FromPath: string, token: any = '', DataRow: any={}){

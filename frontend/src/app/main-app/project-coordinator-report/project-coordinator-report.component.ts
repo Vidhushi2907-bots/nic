@@ -14,7 +14,7 @@ import Swal from 'sweetalert2';
 import { MasterService } from 'src/app/services/master/master.service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+//pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
   selector: 'app-project-coordinator-report',
@@ -27,15 +27,18 @@ export class ProjectCoordinatorReportComponent implements OnInit {
   cropGroupData;
   statename = [];
   identor = [];
+  allDataFull: any[] = [];
   ngForm!: FormGroup;
-
+  showFilter: boolean = false;
   finalData: any[];
   fileName = 'project-cordinator-report.xlsx';
 
   isSearch: boolean = false;
   tableId: any[];
   allData: any;
-
+  totalIndenters: number = 0;
+  filteredData: any[] = []; 
+  searchText: string = '';
   state_data: any = [];
   breeder_category_data: any = [];
   project_coordinatorData: any;
@@ -48,6 +51,10 @@ export class ProjectCoordinatorReportComponent implements OnInit {
   submitted=false;
   user_type: any;
 
+  countData: any;
+    masterData: any[] = [];
+    completeData: any[] = [];
+
   constructor(private breederService: BreederService, private fb: FormBuilder, private service: SeedServiceService, private router: Router, private masterService: MasterService) { this.createEnrollForm(); }
   createEnrollForm() {
     this.ngForm = this.fb.group({
@@ -55,6 +62,7 @@ export class ProjectCoordinatorReportComponent implements OnInit {
       state: [''],
       state_text:[''],
       agency_text:[''],
+      variety_search_filter: ['']
 
     });
     this.ngForm.controls['state'].valueChanges.subscribe(newValue=>{
@@ -67,39 +75,30 @@ export class ProjectCoordinatorReportComponent implements OnInit {
       }
     })
 
-    this.ngForm.controls['state_text'].valueChanges.subscribe(newValue => {
-      if (newValue ) {
-        console.log(newValue)
-        this.state_data =this.state_data_second
-        let response= this.state_data.filter(x=>x.state_name.toLowerCase().startsWith(newValue.toLowerCase()))      
-        this.state_data=response;       
-      }
-      else{
-        this.getState()       
-      }
-    });
-
-    this.ngForm.controls['agency_text'].valueChanges.subscribe(newValue => {
-      if (newValue ) {
-        console.log(newValue)
-        this.project_coordinatorData =this.project_coordinatorData_second
-        let response= this.project_coordinatorData.filter(x=>x.agency_name.toLowerCase().startsWith(newValue.toLowerCase()))      
-        this.project_coordinatorData=response       
-      }
-      else{
-        this.getProjectCoordinator(this.ngForm.controls['state'].value)
-       
-      }
-    });
+     this.ngForm.controls['state_text'].valueChanges.subscribe(newValue => {
+    if (newValue) {
+      this.state_data = this.state_data_second;
+      let response = this.state_data.filter(x =>
+        x.state_name.toLowerCase().includes(newValue.toLowerCase()) 
+      );
+      this.state_data = response;
+    } else {
+      this.getState();
+    }
+  });
+  //    this.ngForm.controls['agency_text'].valueChanges.subscribe(newValue => {
+  //   if (newValue) {
+  //     this.project_coordinatorData = this.project_coordinatorData_second;
+  //     let response = this.project_coordinatorData.filter(x =>
+  //       x.agency_name.toLowerCase().includes(newValue.toLowerCase())  
+  //     );
+  //     this.project_coordinatorData = response;
+  //   } else {
+  //     this.getProjectCoordinator(this.ngForm.controls['state'].value);
+  //   }
+  // });
   }
   ngOnInit(): void {
-    // localStorage.setItem('logined_user', "Seed");
-    // if (!localStorage.getItem('foo')) {
-    //   localStorage.setItem('foo', 'no reload')
-    //   location.reload()
-    // } else {
-    //   localStorage.removeItem('foo')
-    // }
     this.getState();
     this.getBreederCategory();
     this.getPageData();
@@ -107,7 +106,24 @@ export class ProjectCoordinatorReportComponent implements OnInit {
     const data = JSON.parse(userData);
     this.user_type = data.user_type
     this.runExcelApi();
+    this.filteredData = this.allData;
+
   }
+applyFilter() {
+  
+  this.filteredData = this.allData.filter((item) => {
+
+    let stateMatch =
+      this.selected_state === "All" ||
+      (item.state &&
+        item.state.trim().toLowerCase() ===
+          this.selected_state.trim().toLowerCase());
+
+    return stateMatch;
+  });
+
+}
+
 
   getState() {
     this.state_data = [];
@@ -120,9 +136,11 @@ export class ProjectCoordinatorReportComponent implements OnInit {
         }
       });
   }
+  toggleFilter() {
+  this.showFilter = !this.showFilter;
+}
 
   getProjectCoordinator(value) {
-    // this.state_data = [];
     const param={
       search:{
         state_id:value,
@@ -151,20 +169,42 @@ export class ProjectCoordinatorReportComponent implements OnInit {
       });
   }
 
-  getPageData(loadPageNumberData: number = 1, searchData: any | undefined = undefined) {
+  getAllDataForPDF() {
+  return new Promise((resolve, reject) => {
+    let route = "getAllIndentorsList";
+
+    let data = {
+      // Page aur pageSize mat bhejna
+      search: { state_code: this.ngForm.controls['state_id'].value }
+    };
+
+    this.service.postRequestCreator(route, null, data).subscribe((res: any) => {
+      if (res && res.EncryptedResponse && res.EncryptedResponse.status_code == 200) {
+        resolve(res.EncryptedResponse.data.rows); // pure data wapas karega
+      } else {
+        reject("API Error");
+      }
+    });
+  });
+}
+
+
+  getPageData1(loadPageNumberData: number = 1, searchData: any | undefined = undefined) {
     const userData = localStorage.getItem('BHTCurrentUser');
+
     const data = JSON.parse(userData);
     const user_type = data.user_type
     searchData = {
       isSearch: false,
       state_code: undefined,
       category_code: undefined,
-      user_type:user_type,
-      type:'reporticar'
+      user_type: user_type,
+      type:'reporticar',
+      isReport : true,
+
     }
 
-    this.masterService
-      .postRequestCreator("getListOfBreederSeedProductionforReports?usertype=BR", null, {
+    this.masterService.postRequestCreator("getListOfBreederSeedProductionforReports?usertype=BR", null, {
         page: loadPageNumberData,
         pageSize: this.filterPaginateSearch.itemListPageSize || 50,
         searchData: searchData
@@ -178,36 +218,88 @@ export class ProjectCoordinatorReportComponent implements OnInit {
           if (this.allData === undefined) {
             this.allData = [];
           }
-          console.log(this.allData)
+          this.totalIndenters = apiResponse.EncryptedResponse.data.count;
           this.filterPaginateSearch.Init(this.allData, this, "getPageData", undefined, apiResponse.EncryptedResponse.data.count, true);
-          this.initSearchAndPagination();
+          // this.initSearchAndPagination();
         }
       });
   }
 
-  initSearchAndPagination() {
-    if (this.paginationUiComponent === undefined) {
-      setTimeout(() => {
-        this.initSearchAndPagination();
-      }, 300);
-      return;
+  getPageData(loadPageNumberData: number = 1, searchData: any | undefined = undefined) {
+    const userData = localStorage.getItem('BHTCurrentUser');
+
+    const data = JSON.parse(userData);
+    const user_type = data.user_type
+    searchData = {
+      isSearch: true,
+      state_code: '',
+      category_code: '',
+      user_type: user_type,
+      type:'reporticar',
+      isReport : true,
+
     }
 
-    this.paginationUiComponent.Init(this.filterPaginateSearch);
+    this.masterService.postRequestCreator("getListOfBreederSeedProductionforReports?usertype=BR", null, {
+        page: loadPageNumberData,
+        pageSize: this.filterPaginateSearch.itemListPageSize || 50,
+        searchData: searchData
+      })
+      .subscribe((apiResponse: any) => {
+        if (apiResponse !== undefined
+          && apiResponse.EncryptedResponse !== undefined
+          && apiResponse.EncryptedResponse.status_code == 200) {
+
+            console.log("COmplete DAta", apiResponse.EncryptedResponse)
+            console.log("Alle DAta", this.allData)
+
+            
+          this.filterPaginateSearch.itemListPageSize = 50;
+          this.allData = apiResponse.EncryptedResponse.data.rows;
+          this.masterData = [...this.allData];
+          this.completeData = [...apiResponse.EncryptedResponse.data.rows]; 
+
+          // this.countData = data.EncryptedResponse.data.count;
+
+          if (this.allData === undefined) {
+            this.allData = [];
+          }
+          this.totalIndenters = apiResponse.EncryptedResponse.data.rows.length;
+          console.log("----COmpleteData", this.completeData)
+          this.filterPaginateSearch.Init(this.allData, this, "getPageData", undefined, apiResponse.EncryptedResponse.data.count, true);
+          // this.initSearchAndPagination();
+        }
+      });
   }
 
+  // initSearchAndPagination() {
+  //   if (this.paginationUiComponent === undefined) {
+  //     setTimeout(() => {
+  //       this.initSearchAndPagination();
+  //     }, 300);
+  //     return;
+  //   }
+
+  //   this.paginationUiComponent.Init(this.filterPaginateSearch);
+  // }
+
   submit(loadPageNumberData: number = 1, searchData: any | undefined = undefined) {
+    const userData = localStorage.getItem('BHTCurrentUser');
+    const data = JSON.parse(userData);
+    const user_type = data.user_type
+
     if (this.ngForm.controls['state'].value || this.ngForm.controls['breeder_category'].value) {
-
       searchData = {
-        isSearch: true
-      }
+      isSearch: true,
+      state_code: this.ngForm.controls['state'].value ? this.ngForm.controls['state'].value : '',
+      category_code: this.ngForm.controls['breeder_category'].value ? this.ngForm.controls['breeder_category'].value : '',
+      user_type:user_type,
+      type:'reporticar',
+      isReport : true,
 
-      this.ngForm.controls['state'].value ? (searchData['state_code'] = this.ngForm.controls['state'].value) : '';
-      this.ngForm.controls['breeder_category'].value ? (searchData['agency_id'] = this.ngForm.controls['breeder_category'].value) : '';
+    }
 
-      this.masterService
-        .postRequestCreator("getListOfBreederSeedProductionforReports?usertype=BR", null, {
+      this.masterService.postRequestCreator("getListOfBreederSeedProductionforReports?usertype=BR", null, {
           page: loadPageNumberData,
           pageSize: this.filterPaginateSearch.itemListPageSize || 10,
           searchData: searchData
@@ -222,9 +314,8 @@ export class ProjectCoordinatorReportComponent implements OnInit {
               this.allData = [];
             }
             this.submitted=true;
-            console.log(this.allData)
             this.filterPaginateSearch.Init(this.allData, this, "getPageData", undefined, apiResponse.EncryptedResponse.data.count, true);
-            this.initSearchAndPagination();
+            // this.initSearchAndPagination();
             this.runExcelApi()
           }
 
@@ -251,7 +342,7 @@ export class ProjectCoordinatorReportComponent implements OnInit {
     this.runExcelApi()
     this.filterPaginateSearch.itemListCurrentPage = 1;
     this.submitted=false;
-    this.initSearchAndPagination();
+    // this.initSearchAndPagination();
   }
 
   myFunction() {
@@ -271,69 +362,49 @@ export class ProjectCoordinatorReportComponent implements OnInit {
     }
   }
   runExcelApi(loadPageNumberData: number = 1, searchData: any | undefined = undefined){
-
-
-
+    const userData = localStorage.getItem('BHTCurrentUser');
+    const data = JSON.parse(userData);
+    const user_type = data.user_type
     searchData = {
-      isSearch: this.submitted,
-      state_code: undefined,
-      category_code: undefined
-    }
-    this.ngForm.controls['state'].value ? (searchData['state_code'] = this.ngForm.controls['state'].value) : '';
-    this.ngForm.controls['breeder_category'].value ? (searchData['agency_id'] = this.ngForm.controls['breeder_category'].value) : '';
+      isSearch: true,
+      state_code: this.ngForm.controls['state'].value ? this.ngForm.controls['state'].value : '',
+      category_code: this.ngForm.controls['breeder_category'].value ? this.ngForm.controls['breeder_category'].value : '',
+      user_type:user_type,
+      type:'reporticar',
+      isReport : true,
 
-    this.masterService
-      .postRequestCreator("getListOfBreederSeedProductionforReports?usertype=BR", null, {
-        // page: loadPageNumberData,
-        // pageSize: this.filterPaginateSearch.itemListPageSize || 10,
+    }
+
+    this.masterService.postRequestCreator("getListOfBreederSeedProductionforReports?usertype=BR", null, {
         searchData: searchData
       })
       .subscribe((apiResponse: any) => {
         if (apiResponse !== undefined
           && apiResponse.EncryptedResponse !== undefined
           && apiResponse.EncryptedResponse.status_code == 200) {
-          // this.filterPaginateSearch.itemListPageSize = 10;
           this.exportdata = apiResponse.EncryptedResponse.data.rows;
           if (this.exportdata === undefined) {
             this.exportdata = [];
+            this.allDataFull = [...this.exportdata];
           }
-          console.log(this.exportdata)
+          this.allDataFull = [...this.exportdata];
           this.filterPaginateSearch.Init(this.exportdata, this, "getPageData", undefined, apiResponse.EncryptedResponse.data.count, true);
-          this.initSearchAndPagination();
+          // this.initSearchAndPagination();
         }
     });
   }
 
   exportexcel(): void {
-    /* pass here the table id */
     let element = document.getElementById('excel-table');
     const ws: XLSX.WorkSheet = XLSX.utils.table_to_sheet(element);
 
-    /* generate workbook and add the worksheet */
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
 
-    /* save to file */
     XLSX.writeFile(wb, this.fileName);
 
   }
 
-  // download() {
-  //   const name = 'list-of-breeders-report';
-  //   const element = document.getElementById('excel-table');
-  //   const options = {
-  //     filename: `${name}.pdf`,
-  //     image: { type: 'jpeg', quality: 1 },
-  //     html2canvas: {
-  //       dpi: 192,
-  //       scale: 4,
-  //       letterRendering: true,
-  //       useCORS: true
-  //     },
-  //     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  //   };
-  //   html2PDF().set(options).from(element).toPdf().save();
-  // }
   download() {  
     let reportDataHeader = [{ text: 'S/N', bold: true },
     { text: 'Name of the Project Coordinator', bold: true },
@@ -349,7 +420,7 @@ export class ProjectCoordinatorReportComponent implements OnInit {
       { text: 'Status', bold: true },
                           ]
 
-    let reportData = this.exportdata.map((element, index) => {   
+    let reportData = this.completeData.map((element, index) => {   
   
     let reportData =  [
             index+1,
@@ -377,18 +448,17 @@ export class ProjectCoordinatorReportComponent implements OnInit {
  
     const docDefinition = {
       pageOrientation: 'landscape',
-      // pageSize: {
-      //   width: 1800,
-      //   height: 600,
-      // },
 
       content: [
         { text: 'List of Project Coordinators', style: 'header' },
-        { text: `State Name : ${this.selected_state}  Name of the Project Co-ordinator : ${this.selected_agency}`, style: 'custom' },
+
+        { 
+  text: `State Name : ${this.selected_state ? this.selected_state : 'NA'}   Name of the Project Co-ordinator : ${this.selected_agency ? this.selected_agency : 'NA'}`,  
+},
+
         {
           style: 'indenterTable',
           table: {
-            // widths: [5,15,10,10,10,10,10,10,10,10],
             body: 
               reportData,
           },
@@ -415,39 +485,63 @@ export class ProjectCoordinatorReportComponent implements OnInit {
     };
     pdfMake.createPdf(docDefinition).download('project-cordinater-report.pdf');
   }
-  state_select(data){
-
-    console.log(data)
-    this.selected_state =data && data.state_name ?  data.state_name :''
-    this.ngForm.controls['state'].setValue(data && data.state_code ? data.state_code :'')
-    this.ngForm.controls['state_text'].setValue('')
-
-  }
   cnClick() {
     document.getElementById('state').click();
-  }
-  agency_select(data){
-    console.log(data)
-    this.selected_agency = data && data.agency_name ? data.agency_name  :'';
-    this.ngForm.controls['breeder_category'].setValue( data && data.id ? data.id  :'')
-    this.ngForm.controls['agency_text'].setValue('')
   }
   caClick() {
     document.getElementById('agency').click();
   }
-  getCropNamefrommlist(crop){
-    let temp=[]
-    crop.forEach(obj=>{
-      if(obj.crop_name){
-        temp.push(obj.crop_name.split(' ') )
-      }
+  // getCropNamefrommlist(crop){
+  //   let temp=[]
+  //   crop.forEach(obj=>{
+  //     if(obj.crop_name){
+  //       temp.push(obj.crop_name.split(' ') )
+  //     }
 
 
-    })
-    console.log('te,m',temp.toString())
-    return temp.toString().length>30 ? temp.toString().substring(0,30) :temp.toString();
+  //   })
+  //   return temp.toString().length>30 ? temp.toString().substring(0,30) :temp.toString();
  
+  // }
+
+//   getCropNamefrommlist(crop) {
+//   if (!crop) return 'NA';
+
+
+//   if (Array.isArray(crop)) {
+//     return crop.map(obj => obj.crop_name).join(" ");
+//   }
+
+ 
+//   return crop;
+// }
+
+// getCropNameString(cropData: any[]): string {
+//   if (!cropData || !Array.isArray(cropData)) return '';
+//   return cropData.map(c => c.crop_name).join(',');
+// }
+
+getCropNamefrommlist(crop) {
+  if (!crop) return 'NA';
+
+  if (Array.isArray(crop)) {
+    return crop.map(obj => obj.crop_name).join(", ");
   }
+
+  return crop;
+}
+
+
+
+normalizeText(value: string): string {
+  return value
+    ?.toLowerCase()
+    .replace(/\s+/g, ' ')  
+    .replace(/[()\/]/g, '') 
+    .trim();
+}
+
+
   getCropNamefrommlistExcel(crop){
     let temp=[]
     crop.forEach(obj=>{
@@ -460,4 +554,132 @@ export class ProjectCoordinatorReportComponent implements OnInit {
     return temp.toString();
  
   }
+
+
+onSearch(): void {
+  if (!this.searchText || this.searchText.trim() === '') {
+    this.completeData = [...this.masterData];
+  } else {
+    const lower = this.normalizeText(this.searchText);
+    // const lower = this.searchText.toLowerCase();
+    this.completeData = this.masterData.filter(x =>
+      (x.agency_detail?.agency_name?.toLowerCase().includes(lower)) ||
+      (x.agency_detail?.short_name?.toLowerCase().includes(lower)) ||
+(this.normalizeText(this.getCropNamefrommlist(x.agency_detail?.crop_data)).includes(lower)) ||
+      (x.agency_detail?.m_state?.state_name?.toLowerCase().includes(lower)) ||
+      (x.agency_detail?.m_district?.district_name?.toLowerCase().includes(lower)) ||
+      (x.agency_detail?.address?.toLowerCase().includes(lower)) ||
+      (x.agency_detail?.contact_person_name?.toLowerCase().includes(lower)) ||
+      (x.agency_detail?.m_designation?.name?.toLowerCase().includes(lower)) ||
+      (x.mobile_number?.toLowerCase().includes(lower)) ||
+      (x.email_id?.toLowerCase().includes(lower))
+    );
+  }
+  
+  
+  console.log("------completeData----", this.completeData)
+}
+
+
+state_select(data) {
+  if (data === 'all') {
+    this.selected_state = '';
+    this.selected_agency = '';
+    this.ngForm.controls['state'].setValue('');
+    this.searchText = '';
+    this.ngForm.controls['agency_text'].setValue('');
+    this.ngForm.controls['breeder_category'].setValue('');
+    // this.getPageData()
+  } else {
+
+    this.selected_state = data && data.state_name ? data.state_name : '';
+    this.ngForm.controls['state'].setValue(data && data.state_code ? data.state_code : '');
+    this.ngForm.controls['agency_text'].setValue('');
+    this.ngForm.controls['agency_text'].disable;
+    this.searchText = '';
+    this.selected_agency = '';
+
+
+  }
+  this.ngForm.controls['state_text'].setValue('');
+  this.disabledfieldAgency = false;
+  this.autoFilter();
+}
+
+
+
+
+
+
+agency_select(data) {
+  if (data === 'all') {
+    this.selected_agency = 'All';
+    this.ngForm.controls['breeder_category'].setValue('');
+  } else {
+    this.selected_agency = data && data.agency_name ? data.agency_name : '';
+    this.ngForm.controls['breeder_category'].setValue(data && data.id ? data.id : '');
+  }
+  this.ngForm.controls['agency_text'].setValue('');
+  this.autoFilter();
+}
+
+autoFilter(loadPageNumberData: number = 1) {
+  const userData = localStorage.getItem('BHTCurrentUser');
+  const data = JSON.parse(userData);
+  const user_type = data.user_type;
+
+  const searchData = {
+    isSearch: true,
+    state_code: this.ngForm.controls['state'].value ? this.ngForm.controls['state'].value : '',
+    category_code: this.ngForm.controls['breeder_category'].value ? this.ngForm.controls['breeder_category'].value : '',
+    user_type: user_type,
+    type: 'reporticar',
+    isReport : true,
+
+  };
+  console.log("====searchData", searchData)
+  this.masterService.postRequestCreator("getListOfBreederSeedProductionforReports?usertype=BR", null, {
+    page: loadPageNumberData,
+    pageSize: this.filterPaginateSearch.itemListPageSize || 10,
+    searchData: searchData
+  }).subscribe((apiResponse: any) => {
+    if (apiResponse?.EncryptedResponse?.status_code == 200) {
+      this.allData = apiResponse.EncryptedResponse.data.rows || [];
+      this.masterData = [...this.allData];
+      this.completeData = [...apiResponse.EncryptedResponse.data.rows]; 
+      console.log("----completeData---", this.completeData)
+      this.totalIndenters = this.completeData.length
+      this.filterPaginateSearch.Init(this.allData, this, "getPageData", undefined, apiResponse.EncryptedResponse.data.count, true);
+      // this.initSearchAndPagination();
+    }
+  });
+}
+
+getProductionCentre() {
+  this.masterService
+    .postRequestCreator("getPlansInfo", "", this.ngForm.value)
+    .subscribe((response: any) => {
+
+      if (response?.EncryptedResponse?.status_code === 200) {
+        this.allData = response.EncryptedResponse.data.rows || [];
+        this.filteredData = [...this.allData];
+        this.exportdata = [...this.allData]; 
+        this.filterPaginateSearch.Init(
+          this.filteredData,
+          this,
+          "getPageData",
+          undefined,
+          this.filteredData.length,
+          true
+        );
+
+      } else {
+        this.allData = [];
+        this.filteredData = [];
+        this.exportdata = [];
+      }
+    });
+}
+
+
 }

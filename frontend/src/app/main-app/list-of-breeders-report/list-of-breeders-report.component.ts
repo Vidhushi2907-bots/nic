@@ -14,7 +14,7 @@ import Swal from 'sweetalert2';
 import { MasterService } from 'src/app/services/master/master.service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+//pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 
 @Component({

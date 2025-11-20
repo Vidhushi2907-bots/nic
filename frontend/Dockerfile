@@ -1,51 +1,12 @@
-# FROM node:18-alpine AS client_build
-# WORKDIR /app
-# COPY ./frontend/.. /app/
-# # RUN npm i
-
-# RUN npm install -g @angular/cli@14.1.1 npm install -g npm@8.19.1 && npm install
-# RUN ng build
-
-
-# RUN npm install --production
-# FROM alpine
-# WORKDIR /app
-# RUN apk add --no-cache nodejs
-# COPY --from=server_build /app  ./
-# EXPOSE 3006
-# CMD ["node", "server"]
-
-FROM node:18 as node
-# WORKDIR /app
-# WORKDIR /usr/src/app
-
-
-# COPY . .
-
-# # RUN unzip /app/node_modules.zip
-# # RUN unzip /usr/src/app/node_modules.zip
-# # RUN unzip /usr/src/app/dist.zip
-
-# FROM nginx as runtime
-# # COPY --from=build /app/dist/frontend /usr/share/nginx/html
-# # COPY --from=build /usr/src/app/dist/frontend /usr/share/nginx/html
-
-# RUN rm -rf /usr/share/nginx/html/* && rm -rf /etc/nginx/nginx.conf
-# COPY ./nginx.conf /etc/nginx/nginx.conf
-# # COPY --from=node /app/dist /usr/share/nginx/html
-# COPY --from=build /usr/src/app/dist/frontend /usr/share/nginx/html
-
-
-
+# FROM node:18 as node
+FROM node@sha256:c6ae79e38498325db67193d391e6ec1d224d96c693a8a4d943498556716d3783 as node
 # set working directory
 WORKDIR /app
-
 # install and cache app dependencies
 COPY . .
-# RUN npm install
-# RUN npm run build --prod
+# FROM nginx:alpine
+FROM nginx@sha256:d67ea0d64d518b1bb04acde3b00f722ac3e9764b3209a9b0a98924ba35e4b779
 
-FROM nginx:alpine
 RUN rm -rf /usr/share/nginx/html/* && rm -rf /etc/nginx/nginx.conf
 COPY ./nginx.conf /etc/nginx/nginx.conf
 COPY --from=node /app/dist/frontend /usr/share/nginx/html

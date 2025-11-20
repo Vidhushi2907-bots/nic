@@ -118,7 +118,10 @@ export class CompositionOfMonitoringTeamComponent implements OnInit {
         this.switchtype = false;
         this.showTab = false;
         this.teamName = '';
-        this.CompositionOfMonitoringTeamDirectDetailsComponent.resetFormSecond();
+        if (this.isDirect) {
+          this.CompositionOfMonitoringTeamDirectDetailsComponent.resetFormSecond();
+        }
+
         this.ngForm.controls['plots_array'].setValue('');
         this.ngForm.controls['id'].setValue('')
         this.getSeasonData();
@@ -135,7 +138,9 @@ export class CompositionOfMonitoringTeamComponent implements OnInit {
         this.teamName = '';
         this.ngForm.controls['plots_array'].setValue('');
         this.bspc.clear();
-        this.CompositionOfMonitoringTeamDirectDetailsComponent.resetFormSecond();
+        if (this.isDirect) {
+          this.CompositionOfMonitoringTeamDirectDetailsComponent.resetFormSecond();
+        }
         this.ngForm.controls['id'].setValue('')
         this.ngForm.controls['crop'].setValue('');
         this.ngForm.controls['crop'].enable();
@@ -160,7 +165,9 @@ export class CompositionOfMonitoringTeamComponent implements OnInit {
         this.selected_state = ''
         this.ngForm.controls['id'].setValue('')
         this.ngForm.controls['variety'].enable(); this.getUnit(newvalue); this.getVarietyDetails();
-        this.CompositionOfMonitoringTeamDirectDetailsComponent.resetFormSecond();
+        if (this.isDirect) {
+          this.CompositionOfMonitoringTeamDirectDetailsComponent.resetFormSecond();
+        }
       }
     });
     // this.ngForm.controls['plots_array'].valueChanges.subscribe(newvalue => {
@@ -334,6 +341,7 @@ export class CompositionOfMonitoringTeamComponent implements OnInit {
   }
 
   fetchQntInventryData(data: any, teamUserName) {
+    console.log('this.stateList====0', this.stateList);
     let route = "get-team-monotoring-team-all-data";
     let param = {
       search: {
@@ -388,10 +396,10 @@ export class CompositionOfMonitoringTeamComponent implements OnInit {
                 this.remove(i);
               }
               this.getStatelistSecond(i);
-              this.addMore(i);
               this.getDistrictList(ele.state_code, i);
               this.getDesignationList(i);
               this.getAgency(i);
+              this.addMore(i);
               this.ngForm.controls['bsp1Arr']['controls'][i].controls['designation'].setValue({ name: ele && ele.designation_name ? ele.designation_name : '', id: ele && ele.designation_id ? ele.designation_id : '' })
               this.ngForm.controls['bsp1Arr']['controls'][i].controls['agency'].setValue({ name: ele && ele.name ? ele.name : '', id: ele && ele.agency_id ? ele.agency_id : '' })
               this.ngForm.controls['bsp1Arr']['controls'][i].controls['state_code'].setValue({ state_code: ele && ele.state_code ? ele.state_code : '', state_name: ele && ele.state_name ? ele.state_name : '' });
@@ -417,39 +425,69 @@ export class CompositionOfMonitoringTeamComponent implements OnInit {
       }
     })
   }
-  getDesignationList(i) {
+  getDesignationListSecond() {
     this.master.postRequestCreator('get-designation-of-spp', null, {
       type: "MONITORING_TEAM"
     }).subscribe(data => {
       this.designationList = data && data.EncryptedResponse && data.EncryptedResponse.data ? data.EncryptedResponse.data : '';
+      // const formArray = this.ngForm.get('bsp1Arr') as FormArray;
+      // if (this.designationList) {
+      //   formArray.controls[i]['controls'].designation_id.patchValue(this.designationList);
+      // }
+      // if (formArray && formArray.controls && formArray.controls[i] && formArray.controls[i]['controls']
+      //   && formArray.controls[i]['controls'].designation_id
+      // ) {
+      //   formArray.controls[i]['controls'].designation_id.designationList = this.designationList ? this.designationList : '';
+      //   formArray.controls[i]['controls'].designation_id.designationListSecond = this.designationList ? this.designationList : ''
+      // }
+    })
+  }
+  getDesignationList(i) {
+    let designationListData = this.designationList;
+    console.log(designationListData);
+    // if (designationListData) {
       const formArray = this.ngForm.get('bsp1Arr') as FormArray;
-      if (this.designationList) {
-        formArray.controls[i]['controls'].designation_id.patchValue(this.designationList);
-      }
+      // if (designationListData) {
+      //   formArray.controls[i]['controls'].designation_id.patchValue(designationListData);
+      // }
       if (formArray && formArray.controls && formArray.controls[i] && formArray.controls[i]['controls']
         && formArray.controls[i]['controls'].designation_id
       ) {
-        formArray.controls[i]['controls'].designation_id.designationList = this.designationList ? this.designationList : '';
-        formArray.controls[i]['controls'].designation_id.designationListSecond = this.designationList ? this.designationList : ''
+        formArray.controls[i]['controls'].designation_id.designationList = designationListData ? designationListData : '';
+        formArray.controls[i]['controls'].designation_id.designationListSecond = designationListData ? designationListData : ''
       }
-    })
+    // }
   }
-
-  getAgency(i) {
+  // getAgencySecond(){}
+  getAgencySecond() {
     this.master.postRequestCreator('get-agency-type').subscribe(data => {
       this.agencylist = data && data.EncryptedResponse && data.EncryptedResponse.data ? data.EncryptedResponse.data : '';
-      const formArray = this.ngForm.get('bsp1Arr') as FormArray;
-      if (this.agencylist) {
-        formArray.controls[i]['controls'].agency_id.patchValue(this.agencylist);
-      }
+      // const formArray = this.ngForm.get('bsp1Arr') as FormArray;
+      // if (this.agencylist) {
+      //   formArray.controls[i]['controls'].agency_id.patchValue(this.agencylist);
+      // }
 
-      if (formArray && formArray.controls && formArray.controls[i] && formArray.controls[i]['controls']
-        && formArray.controls[i]['controls'].agency_id
-      ) {
-        formArray.controls[i]['controls'].agency_id.agencyList = this.agencylist ? this.agencylist : '';
-        formArray.controls[i]['controls'].agency_id.agencyListSecond = this.agencylist ? this.agencylist : ''
-      }
+      // if (formArray && formArray.controls && formArray.controls[i] && formArray.controls[i]['controls']
+      //   && formArray.controls[i]['controls'].agency_id
+      // ) {
+      //   formArray.controls[i]['controls'].agency_id.agencyList = this.agencylist ? this.agencylist : '';
+      //   formArray.controls[i]['controls'].agency_id.agencyListSecond = this.agencylist ? this.agencylist : ''
+      // }
     })
+  }
+  getAgency(i) {
+    let agencylistdata = this.agencylist
+    const formArray = this.ngForm.get('bsp1Arr') as FormArray;
+    // if (this.agencylist) {
+    //   formArray.controls[i]['controls'].agency_id.patchValue(agencylistdata);
+    // }
+
+    if (formArray && formArray.controls && formArray.controls[i] && formArray.controls[i]['controls']
+      && formArray.controls[i]['controls'].agency_id
+    ) {
+      formArray.controls[i]['controls'].agency_id.agencyList = agencylistdata ? agencylistdata : '';
+      formArray.controls[i]['controls'].agency_id.agencyListSecond = agencylistdata ? agencylistdata : ''
+    }
   }
 
   selectTeamData(event) {
@@ -597,7 +635,11 @@ export class CompositionOfMonitoringTeamComponent implements OnInit {
     this.isSearch = true;
     this.switchtype = true;
     this.autoSelect();
+    this.getStatelist();
+    this.getDesignationListSecond();
+    this.getAgencySecond();
   }
+
   autoSelect() {
     let param = {
       search: {
@@ -654,7 +696,7 @@ export class CompositionOfMonitoringTeamComponent implements OnInit {
       if (apiResponse !== undefined
         && apiResponse.EncryptedResponse !== undefined
         && apiResponse.EncryptedResponse.status_code == 200) {
-        this.filterPaginateSearch.itemListPageSize = 4;
+        // this.filterPaginateSearch.itemListPageSize = 4;
         this.allData = apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.data ? apiResponse.EncryptedResponse.data : '';
         if (this.allData === undefined) {
           this.allData = [];
@@ -714,9 +756,11 @@ export class CompositionOfMonitoringTeamComponent implements OnInit {
 
     }
   }
+
   onselect(event) {
     console.log('event', event);
   }
+
   saveForm() {
     console.log('selectedItems====', this.selectedItems);
     console.log('form===', this.ngForm.controls);
@@ -747,6 +791,9 @@ export class CompositionOfMonitoringTeamComponent implements OnInit {
       })
       return;
     }
+    console.log('plots===', this.ngForm.controls["plots_array"].value);
+    // return;
+    
     if (this.ngForm.invalid) {
       if (this.ngForm.controls['bsp1Arr'].value) {
         this.ngForm.controls['bsp1Arr'].value.forEach((el, i) => {
@@ -816,9 +863,8 @@ export class CompositionOfMonitoringTeamComponent implements OnInit {
       })
       return
     }
-    console.log('plots===', this.ngForm.controls["plots_array"].value);
-    // return;
-    if (this.ngForm.controls["plots_array"].value && this.ngForm.controls["plots_array"].value.length < 1) {
+
+    if (this.ngForm.controls["plots_array"].value.length ==0) {
       Swal.fire({
         toast: false,
         icon: "warning",
@@ -831,6 +877,7 @@ export class CompositionOfMonitoringTeamComponent implements OnInit {
       })
       return;
     }
+
     let formType = "";
 
     if (this.ngForm.controls["teams"].value == "create_team") {
@@ -924,36 +971,43 @@ export class CompositionOfMonitoringTeamComponent implements OnInit {
     }
 
   }
+
   cvClick(i) {
     document.getElementById('variety_name' + i).click();
   }
-  getStatelistSecond(i) {
+  async getStatelistSecond(i) {
     // get-state-list-v2
     const param = {
       is_state: 1
     }
-    this.master.postRequestCreator('get-all-state-list-data', null, param).subscribe(data => {
-      this.stateList = data && data.EncryptedResponse && data.EncryptedResponse.data && data.EncryptedResponse.data.rows ? data.EncryptedResponse.data.rows : '';
-      this.stateListSecond = this.stateList
-
-      // this.stateListData = data && data.EncryptedResponse && data.EncryptedResponse.data && data.EncryptedResponse.data.rows ? data.EncryptedResponse.data.rows : '';
-      // this.stateListForNestedAraay = this.stateList ? this.stateList : '';
-      const formArray = this.ngForm.get('bsp1Arr') as FormArray;
-
-      if (formArray && formArray.controls && formArray.controls[i] && formArray.controls[i]['controls']
-        && formArray.controls[i]['controls'].state
-
-        // && formArray.controls[i]['controls'].total_quantity.controls[skillIndex].controls.stage
-
-      ) {
-        formArray.controls[i]['controls'].state.stateList = this.stateList ? this.stateList : '';
-        formArray.controls[i]['controls'].state.stateListSecond = this.stateList ? this.stateList : ''
-        // formArray.controls[index]['controls'].total_quantity.controls[skillIndex].controls.stage.stageList = response ? response : []
-      }
-      // this.stateListForNestedAraaySecond = this.stateListForNestedAraay ? this.stateListForNestedAraay : ''
-
-    })
+    let statListData = this.stateList;
+    let stateListSecondData = this.stateList;
+    // if (i == 0) {
+    //   await this.master.postRequestCreator('get-all-state-list-data', null, param).subscribe(data => {
+    //     this.stateList = data && data.EncryptedResponse && data.EncryptedResponse.data && data.EncryptedResponse.data.rows ? data.EncryptedResponse.data.rows : '';
+    //     this.stateListSecond = this.stateList
+    //     statListData = this.stateList;
+    //     stateListSecondData = this.stateList;
+    //     console.log('statListData==1', statListData)
+    //     console.log('stateListSecondData==1', stateListSecondData)
+    //   })
+    // }
+    // if(i){
+    // this.stateListData = data && data.EncryptedResponse && data.EncryptedResponse.data && data.EncryptedResponse.data.rows ? data.EncryptedResponse.data.rows : '';
+    // this.stateListForNestedAraay = this.stateList ? this.stateList : '';
+    const formArray = this.ngForm.get('bsp1Arr') as FormArray;
+    if (formArray && formArray.controls && formArray.controls[i] && formArray.controls[i]['controls']
+      && formArray.controls[i]['controls'].state
+      // && formArray.controls[i]['controls'].total_quantity.controls[skillIndex].controls.stage
+    ) {
+      formArray.controls[i]['controls'].state.stateList = statListData ? statListData : '';
+      formArray.controls[i]['controls'].state.stateListSecond = statListData ? statListData : ''
+      // formArray.controls[index]['controls'].total_quantity.controls[skillIndex].controls.stage.stageList = response ? response : []
+    }
+    // this.stateListForNestedAraaySecond = this.stateListForNestedAraay ? this.stateListForNestedAraay : ''
+    // }
   }
+
   filterNestedStateName(e, i) {
     if (e) {
       this.ngForm.controls['bsp1Arr']['controls'][i]['controls'].state.stateList = this.ngForm.controls['bsp1Arr']['controls'][i]['controls'].state.stateListSecond;
@@ -989,8 +1043,8 @@ export class CompositionOfMonitoringTeamComponent implements OnInit {
     } else {
       this.getDesignationList(i)
     }
-
   }
+
   filterAgencyName(e, i) {
     if (e) {
       this.ngForm.controls['bsp1Arr']['controls'][i]['controls'].agency_id.agencyList = this.ngForm.controls['bsp1Arr']['controls'][i]['controls'].agency_id.agencyListSecond;
@@ -1001,6 +1055,7 @@ export class CompositionOfMonitoringTeamComponent implements OnInit {
       this.getAgency(i)
     }
   }
+
   VarieyName(data, index, $event) {
     this.ngForm.controls['bsp1Arr']['controls'][index].controls['district_code'].setValue(data);
     this.district_id = data && data.id ? data.id : '';
@@ -1009,6 +1064,7 @@ export class CompositionOfMonitoringTeamComponent implements OnInit {
 
     // this.getDistrictListSecond($event.target.value)
   }
+
   stateData(data, index, $event) {
     this.ngForm.controls['bsp1Arr']['controls'][index].controls['state_code'].setValue(data);
     this.ngForm.controls['bsp1Arr']['controls'][index].controls['stateData_text'].setValue('');
@@ -1017,11 +1073,13 @@ export class CompositionOfMonitoringTeamComponent implements OnInit {
     let stateId = data && data.state_code ? data.state_code : ''
     this.getDistrictList(stateId ? stateId : '', index)
   }
+
   district(data, index, $event) {
     this.ngForm.controls['bsp1Arr']['controls'][index].controls['district'].setValue(data);
     this.ngForm.controls['bsp1Arr']['controls'][index].controls['districtData_text'].setValue('');
     // let stateId = data && data.state_code ? data.state_code :''
   }
+
   // search filter implement 8 apr
   designation(data, index, $event) {
     this.ngForm.controls['bsp1Arr']['controls'][index].controls['designation'].setValue(data);
@@ -1050,12 +1108,13 @@ export class CompositionOfMonitoringTeamComponent implements OnInit {
             text: "Your data has been deleted.",
             icon: "success"
           });
+         
           this.isExits = false;
           this.is_update = false;
           this.bspc.clear();
           this.getPageData();
           this.getMonitoringTeampLotsData();
-          // this.resetForm();
+          this.resetForm();
         });
       }
     });

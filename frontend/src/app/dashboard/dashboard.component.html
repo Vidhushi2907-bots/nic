@@ -1,0 +1,183 @@
+
+
+  <div class="container-fluid responsive-wrapper">
+  <div class="container-fluid">
+    <!-- Top Stat Cards -->
+    <div class="row mb-3 ps-2">
+      <div class="mb-2" *ngFor="let stat of stats" style="width: 12%; min-width: 140px; margin-right: 6px;">
+        <div class="card d-flex flex-column justify-content-between p-2"
+             [ngStyle]="{ 'background-color': stat.color, 'height': '100px', 'border-radius': '10px' }">
+          <div class="text-start">
+            <h6 style="font-size: 14px; font-weight: 500; margin-bottom: 0;">{{ stat.label }}</h6>
+          </div>
+          <div class="text-start">
+            <h4 class="fw-bold"
+                [ngStyle]="{ 'color': getTextColor(stat.color), 'font-size': '20px', 'margin': '0', 'white-space': 'nowrap', 'overflow': 'hidden' }">
+              {{ stat.value }}
+            </h4>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Season Buttons -->
+    <div class="row mb-3 px-3 button">
+      <div class="col text-end">
+        <div class="d-inline-flex">
+          <button class="btn season-btn"
+                  *ngFor="let season of seasonButtons"
+                  [ngClass]="{ 'active-btn': activeSeason === season }"
+                  (click)="setActiveSeason(season)">
+            {{ season }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart + Cards + Pie Charts -->
+    <div class="row">
+      <!-- Crop-wise Chart -->
+      <div class="col-md-5 mb-3">
+        <div class="card p-3 h-100 chart">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="mb-0">Crop wise total indents and liftings</h6>
+            <select class="form-select form-select-sm w-auto filter" [formControl]="cropFilter">
+              <option value="">Select</option>
+              <option *ngFor="let crop of cropOptions" [value]="crop">{{ crop }}</option>
+            </select>
+          </div>
+          <div class="chart-scroll-container">
+            <canvas baseChart [data]="cropChartData" [type]="'bar'" [options]="chartOptions" style="height: 300px;"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Cards -->
+      <div class="col-md-7 mb-3">
+        <div class="row">
+          <div class="col-2 mb-2" *ngFor="let card of rightCards">
+            <div class="card p-2 text-center text-white"
+                 [ngStyle]="{ 'background': card.gradient, 'height': '120px', 'width': '95px' }">
+              <div class="text-start">
+                <h6 style="font-size: 14px; margin: 0;">{{ card.label }}</h6>
+              </div>
+              <div class="text-start">
+                <h5 style="font-size: 18px; font-weight: bold; white-space: pre-line; padding-top: 25px;">{{ card.value }}</h5>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pie Charts -->
+        <div class="d-flex justify-content-between flex-wrap">
+          <div class="card p-2" *ngFor="let pie of pieData"
+               style="width: 18%; min-width: 130px; height: 250px; padding-top: 20px; background-color: #F3F3F3;">
+            <h6 style="font-size: 14px;">{{ pie.label }}</h6>
+            <canvas baseChart
+                    [data]="{ datasets: [{ data: pie.data, backgroundColor: pie.colors }] }"
+                    [type]="'doughnut'"
+                    [options]="pieChartOptions">
+            </canvas>
+            <div class="custom-legend mt-4">
+              <div class="legend-item">
+                <span class="color-box" [ngStyle]="{ 'background-color': pie.colors[0] }"></span>
+                <span class="label-text">Pending</span>
+              </div>
+              <div class="legend-item">
+                <span class="color-box" [ngStyle]="{ 'background-color': pie.colors[1] }"></span>
+                <span class="label-text">Completed</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 3 Charts -->
+    <div class="row mt-3 charts">
+      <!-- BSPC Chart -->
+      <div class="mb-3 bspc">
+        <div class="card p-2 chart-card">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="mb-0">BSPC wise production summary</h6>
+            <select class="form-select form-select-sm w-auto filter" [formControl]="bspcFilter">
+              <option value="">Select</option>
+              <option *ngFor="let opt of bspcOptions" [value]="opt">{{ opt }}</option>
+            </select>
+          </div>
+          <div class="chart-scroll-container">
+            <canvas baseChart [data]="bspcChartData" [type]="'bar'" [options]="chartOptions"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Indenter Chart -->
+      <div class="mb-3 indenter">
+        <div class="card p-2 chart-card chart2">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="mb-0">Indenter wise total indents and lifting</h6>
+            <select class="form-select form-select-sm w-auto filter" [formControl]="indenterFilter">
+              <option value="">Select</option>
+              <option *ngFor="let opt of indenterOptions" [value]="opt">{{ opt }}</option>
+            </select>
+          </div>
+          <div class="chart-scroll-vertical">
+            <canvas baseChart [data]="indenterChartData" [type]="'bar'" [options]="horizontalOptions"
+                    style="height: 850px; width: 100%;"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Area Sown by State -->
+      <div class="mb-3 Area chart-wrapper">
+        <div class="card p-3 chart-card1">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="mb-0">Area sown by state</h6>
+            <select class="form-select form-select-sm w-auto filter" [formControl]="stateFilter">
+              <option value="">All States</option>
+              <option *ngFor="let opt of stateOptions" [value]="opt">{{ opt }}</option>
+            </select>
+          </div>
+
+          <div class="scroll-wrapper">
+            <div class="chart-scroll-container">
+              <canvas baseChart
+                      [type]="'bar'"
+                      [data]="stateChartData"
+                      class="chart-canvas"
+                      [options]="{
+                        responsive: false,
+                        plugins: {
+                          legend: {
+                            position: 'top',
+                            align: 'start',
+                            labels: {
+                              boxWidth: 14,
+                              boxHeight: 14,
+                              font: { size: 12 }
+                            }
+                          }
+                        },
+                        scales: {
+                          x: {
+                            stacked: true,
+                            grid: { display: true },
+                            ticks: { font: { size: 12 }, color: '#000' }
+                          },
+                          y: {
+                            stacked: true,
+                            beginAtZero: true,
+                            ticks: { stepSize: 20, font: { size: 10 }, color: '#000' }
+                          }
+                        },
+                        datasets: { bar: { barThickness: 24 } }
+                      }"
+                      style="width: 800px; height: 400px; background-color: #F3F3F3;">
+              </canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

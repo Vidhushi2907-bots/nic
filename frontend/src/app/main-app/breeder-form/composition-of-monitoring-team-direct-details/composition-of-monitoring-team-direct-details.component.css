@@ -273,6 +273,20 @@ table th:last-child {
     background: none;
     cursor: pointer;
 }
+.list-action-buttons-second1,
+.list-action-buttons-second1:focus,
+.list-action-buttons-second1:active {
+    width: 33px;
+    /* height: 39px; */
+    height: 35px;
+    outline: none;
+    border-radius: 10px;
+    border: none !important;
+    fill: #B64B1D !important;
+    background: none;
+    cursor: pointer;
+    margin-left: 5px;
+}
 
 .card-monitoring {
     width: auto;

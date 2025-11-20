@@ -1,0 +1,261 @@
+<div class="main-inventory">
+    <div class="row">
+        <div class="col-12 col-md-12 col-lg-12 title-inventory pl-2 pb-3 pt-0">
+            <span class="ml-3">
+                <!-- Seed Rolling Planing Variety Wise -->
+            </span>
+            <form [formGroup]="ngForm">
+
+                <!-- first card ui  -->
+                <div class="col-12">
+
+                    <!-- 🔹 Back Button on Top Left -->
+                    <div class="d-flex justify-content-start mb-2 " style="margin-left: -8px;">
+                        <button id="isSubmitBtn" (click)="goBack()"
+                            class="form-button btn-inventory search d-inline-flex align-items-center justify-content-center px-2 py-1"
+                            style="width: auto; min-width: unset; gap: 6px; font-size: 13px;">
+                            <i class="fa fa-arrow-left" style="font-size: 12px;"></i>
+                            Back
+                        </button>
+                    </div>
+
+                    <!-- 🔹 Card: Crop Details -->
+                    <!-- iterate through crop_wise_json -->
+                    <div *ngFor="let crop of crop_wise_json" class="mb-3">
+                        <div class="card card-inventory form-group"
+                            style="width: 102%; border: 1px solid rgba(0,0,0,0.1); border-radius: 6px; padding: 8px; margin-left: -12px;">
+                            <div class="card-body p-3">
+                                <h5 class="card-title fw-bold mb-3" style="font-size: 17px;">Crop Details</h5>
+
+                                <div class="row text-start mb-2" style="font-size: 15px;">
+                                    <div class="col-md-6 d-flex align-items-center">
+                                        <label class="label-inventory mb-0 me-2"><strong>Crop Name:</strong></label>
+                                        <span>{{ crop.crop_name }}</span>
+                                    </div>
+                                    <div class="col-md-6 d-flex align-items-center">
+                                        <label class="label-inventory mb-0 me-2"><strong>Total Area:</strong></label>
+                                        <span>{{ crop.total_area | number: '1.2-2' }} (Lakh Ha)</span>
+                                    </div>
+                                </div>
+
+                                <div class="row text-start" style="font-size: 15px;">
+                                    <div class="col-md-6 d-flex align-items-center">
+                                        <label class="label-inventory mb-0 me-2"><strong>Total Required
+                                                Seeds:</strong></label>
+                                        <span>{{ crop.total_required | number: '1.2-2' }} (qtls)</span>
+                                    </div>
+                                    <div class="col-md-6 d-flex align-items-center">
+                                        <label class="label-inventory mb-0 me-2"><strong>Remaining Required
+                                                Seeds:</strong></label>
+                                        <span class="fw-bold" [ngClass]="{
+              'text-danger': crop.rem_req_seeds > 0,
+              'text-success': crop.rem_req_seeds === 0
+            }">
+                                            {{ crop.rem_req_seeds | number: '1.2-2' }} (qtls)
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <ng-template #noData>
+                        <p class="text-muted">No crop data available.</p>
+                    </ng-template>
+
+                </div>
+
+                <!-- second ui  -->
+                <div class="col-12 col-md-12 col-lg-12 pt-3">
+                    <div class="row card-inventory form-group">
+                        <div class="col-12">
+                            <div class="row">
+                                <!-- Search and Filter Container -->
+                                <div
+                                    class="col-12 d-flex align-items-center justify-content-between flex-wrap mb-2 gap-3 pt-3">
+
+                                    <!-- Search Input -->
+                                    <div class="d-flex align-items-end gap-2 flex-wrap">
+                                        <input type="text" class="form-control search-input rounded-pill px-3"
+                                            placeholder="Search" formControlName="global_search"
+                                            style="max-width: 250px; border: 1px solid #c96a2b; height: 38px;" />
+                                    </div>
+
+                                    <!-- Filter Dropdown -->
+                                    <!-- <div class="d-flex align-items-center mb-2" style="gap: 6px;">
+                                        <label for="cropGroup" class="mb-0"
+                                            style="font-size: 13px; font-weight: 600; color: #000; white-space: nowrap;">
+                                            Filter by Crop Group
+                                        </label>
+                                        <select class="form-control input-inventory rounded-pill px-3 py-2"
+                                            formControlName="crop_group"
+                                            style="width: 100%; border: 1px solid #c96a2b; height: 40px;">
+                                            <option value="">All Crop Groups</option>
+                                            <option *ngFor="let crop of cropGroupList" [value]="crop.id">
+                                                {{ crop.name }}
+                                            </option>
+                                        </select>
+                                    </div> -->
+
+                                    <!-- Search Input -->
+                                    <!-- <div class="d-flex align-items-end gap-2 flex-wrap">
+                                        <input type="text" class="form-control search-input rounded-pill px-3"
+                                            placeholder="Search Keyword" formControlName="global_search"
+                                            style="max-width: 250px; border: 1px solid #c96a2b; height: 38px;" />
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--third ui -->
+                <div class="col-12 col-md-12 col-lg-12 pt-0">
+                    <div class=" row card-inventory form-group">
+                        <div class="col-12 col-md-12 col-lg-12 col-sm-12 col-xl-12">
+                            <!-- Header Row -->
+                            <div class="list-wrapper">
+                                <!-- Header Row -->
+                                <div class="row d-none d-md-flex data-row-header text-center fw-bold">
+                                    <div class="col-md-1 py-3">S.No.</div>
+                                    <div class="col-md-2 py-3">Variety</div>
+                                    <div class="col-md-2 py-3">Notification Year</div>
+                                    <div class="col-md-2 py-3">Required Qty of Certified Seeds</div>
+                                    <div class="col-md-2 py-3">Foundation Seed</div>
+                                    <div class="col-md-2 py-3">Breeder Seed</div>
+                                    <div class="col-md-0 py-3">Action</div>
+                                    <!-- <div class="col-8 col-md-1 py-3 text-center fw-bold" style="margin-top: -2px;">
+                                        Action
+                                    </div> -->
+                                    <!-- Pin Header Column -->
+                                    <!-- <div class="col-8 col-md-1 py-3 text-center fw-bold" style="margin-top: -2px;">
+                                        Pin
+                                    </div> -->
+                                </div>
+
+                                <div style="max-height: 350px; overflow-x: hidden;overflow-y: auto;
+                                border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;">
+                                    <!-- Dynamic Rows -->
+                                    <div formArrayName="bspc">
+                                        <ng-container *ngFor="let data of filteredBspc; let i = index">
+
+                                            <!-- ngIf must be on another wrapper -->
+                                            <div *ngIf="shouldShowRow(data)" [formGroupName]="i">
+
+                                                <!-- 🔹 Apply highlight background here -->
+                                                <div class="data-row align-items-center text-center d-flex flex-wrap w-100"
+                                                    [ngStyle]="{
+                                                'background-color': data.value.is_status_active == 1
+                                                 ? 'rgb(255 164 164 / 52%)'
+                                                 : '',
+                                                 'border-radius': '6px',
+                                                 'padding': '4px 0'
+                                                 }">
+
+                                                    <div class="col-md-1 py-2">{{ i + 1 }}</div>
+                                                    <div class="col-md-2 py-2">{{ data.get('variety_name')?.value }}
+                                                    </div>
+                                                    <div class="col-md-2 py-2">{{ data.get('notification_year')?.value
+                                                        }}
+                                                    </div>
+
+                                                    <div class="col-md-2 py-2">
+                                                        <input type="number"
+                                                            class="form-control form-control-sm text-center"
+                                                            formControlName="Req_Qty_of_breeder_seed"
+                                                            placeholder="Enter Qty"
+                                                            (input)="calculateTotalSeedRequired()"
+                                                            [disabled]="data.get('is_final_submit')?.value || data.get('is_active')?.value === false"
+                                                            [readonly]="data.get('is_final_submit')?.value" />
+                                                    </div>
+
+                                                    <div class="col-md-2 py-2">
+                                                        <input type="number"
+                                                            class="form-control form-control-sm text-center"
+                                                            formControlName="foundation_seed" readonly
+                                                            style="border:none; outline:none; box-shadow:none; background:transparent;" />
+                                                    </div>
+
+                                                    <div class="col-md-2 py-2">
+                                                        <input type="number"
+                                                            class="form-control form-control-sm text-center"
+                                                            formControlName="breeder_seed" readonly
+                                                            style="border:none; outline:none; box-shadow:none; background:transparent;" />
+                                                    </div>
+
+                                                    <!-- <div
+                                                    class="col-md-1 py-2 d-flex justify-content-center align-items-center">
+                                                    <input type="checkbox" id="toggle{{ data.value.id }}"
+                                                        [checked]="data.get('is_status_active')?.value == 1"
+                                                        (change)="toggleHighlight(data)" [disabled]="isSubmitted" />
+                                                </div> -->
+
+                                                    <!-- <label class="switch small-switch mb-0"
+                                                    *ngIf="data.get('id')?.value && data.get('is_draft')?.value == 1 && (data.get('Req_Qty_of_breeder_seed')?.value || 0) > 0">
+                                                    <input type="checkbox" formControlName="is_active"
+                                                        [checked]="data.get('is_active')?.value === true"
+                                                        (change)="onToggleActive(i, $event)" class="form-control" />
+                                                    <span class="slider round"></span>
+                                                </label> -->
+                                                    <div
+                                                        class="col-6 col-md-1 py-3 d-flex align-items-center justify-content-center">
+                                                        <label class="switch small-switch mb-0"
+                                                            *ngIf="data.get('id')?.value && data.get('is_final_submit')?.value != 1">
+
+                                                            <input type="checkbox" formControlName="is_active"
+                                                                [checked]="data.get('is_active')?.value"
+                                                                [disabled]="data.get('is_final_submit')?.value == 1"
+                                                                (change)="onToggleActive(i)"
+                                                                class="form-control target-input-field" />
+
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- No Data Message -->
+                        <div *ngIf="
+                      filterPaginateSearch &&
+                      filterPaginateSearch.initialized &&
+                      (!filterPaginateSearch.itemList ||
+                        filterPaginateSearch.itemList.length < 1)" class="px-2 py-3 w-100 text-center"
+                            style="height: 50px;">
+                            No Data Found.
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div class="col-12 pt-2">
+                    <div class="row justify-content-end">
+                        <div class="col-auto">
+                            <!-- <button [disabled]="isFinalSubmit"
+                                class="clear-form-button btn-inventory d-inline-flex justify-content-center align-items-center mb-3"
+                                (click)="revertDataCancelation()">
+                                Cancel
+                            </button> -->
+                        </div>
+                        <div class="col-auto" *ngIf="!disabledForm">
+                            <button [disabled]="isFinalSubmit" (click)="saveVariety('is_draft')"
+                                class="clear-form-button btn-inventory d-inline-flex justify-content-center align-items-center mb-3">
+                                Save as Draft
+                            </button>
+                        </div>
+                        <div class="col-auto" *ngIf="!disabledForm">
+                            <button (click)="saveVariety('is_final')"
+                                [disabled]="!crop_wise_json?.length || (crop_wise_json[0]?.rem_req_seeds ?? 0) > 0"
+                                class="clear-form-button btn-inventory d-inline-flex justify-content-center align-items-center mb-3">
+                                Submit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

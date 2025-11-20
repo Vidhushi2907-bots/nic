@@ -38,6 +38,7 @@ import { SeednetLoginComponent } from './seednet-login/seednet-login.component';
 import { SeedMultiplicationRatioUiFormComponent } from './common/seed-multiplication-ratio-ui-form/seed-multiplication-ratio-ui-form.component';
 import { LoginHomeComponent } from './common/login-home/login-home.component';
 import { WebLoginComponent } from './web-login/web-login.component';
+
 import { IndentorDashboardComponent } from './indentor-dashboard/indentor-dashboard.component';
 import { BreederDashboardComponent } from './breeder-dashboard/breeder-dashboard.component';
 import { AddFreezeTimelineComponent } from './add-freeze-timeline/add-freeze-timeline.component';
@@ -98,10 +99,22 @@ import { BillReceiptQrComponent } from './bill-receipt-qr/bill-receipt-qr.compon
 import { GenerateCardQrComponent } from './generate-card-qr/generate-card-qr.component';
 import { MobileAppComponent } from './mobile-app/mobile-app.component';
 import { TagNumberVerificationQrComponent } from './tag-number-verification-qr/tag-number-verification-qr.component';
-import { ZsrmbstofsComponent } from './main-app/indenters/zsrmbstofs/zsrmbstofs.component';
-import { SrpComponent } from './main-app/indenters/srp/srp.component';
+import { PrnDownloadComponent } from './prn-download/prn-download.component';
 // import { GenerateCardQrComponent } from './generate-card-qr/generate-card-qr.component';
 // import { NgxPrintModule } from 'ngx-print';
+import { TestPrinterComponent } from './test-printer/test-printer.component';
+import { VarietyCharactersticReportsComponent } from './common/variety-characterstic-reports/variety-characterstic-reports.component';
+import { VarietyCharactersticReportsViewFormComponent } from './common/variety-characterstic-reports-view-form/variety-characterstic-reports-view-form.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { NgChartsModule } from 'ng2-charts';
+// import { DashbordComponent } from './dashbord/dashbord.component';
+
+import { Chart } from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { BspProformaOneReportQrComponent } from './bsp-proforma-one-report-qr/bsp-proforma-one-report-qr.component';
+import { BspProformaOneReportQr1Component } from './bsp-proforma-one-report-qr1/bsp-proforma-one-report-qr1.component';
+
+Chart.register(ChartDataLabels);
 
 
 // import { NgChartsModule } from 'ng2-charts';
@@ -185,20 +198,26 @@ import { SrpComponent } from './main-app/indenters/srp/srp.component';
     BillReceiptQrComponent,
     MobileAppComponent,
     TagNumberVerificationQrComponent,
-    ZsrmbstofsComponent,
-    SrpComponent 
+    PrnDownloadComponent,
+    TestPrinterComponent,
+    VarietyCharactersticReportsComponent,
+    VarietyCharactersticReportsViewFormComponent,
+    BspProformaOneReportQrComponent,
+    BspProformaOneReportQr1Component,
     // GenerateCardQr
     // GenerateCardQrComponent
     // BspcWiseAssi
   ],
   imports: [
     CommonModule,
+    HttpClientModule,
     AppRoutingModule,
     FormsModule,
     QRCodeModule,
     ReactiveFormsModule,
     BrowserModule,
     BrowserAnimationsModule,
+    AppRoutingModule,
     MainAppModule,
     MatRadioModule,
     HttpClientJsonpModule,
@@ -208,8 +227,10 @@ import { SrpComponent } from './main-app/indenters/srp/srp.component';
     NgxUiLoaderModule,
     // GenerateCardQrComponent,
     NgxBarcodeModule,
+    NgChartsModule,
 
     NgMultiSelectDropDownModule,
+    DashboardComponent,
 
     
     NgxUiLoaderHttpModule.forRoot({

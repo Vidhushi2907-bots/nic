@@ -180,6 +180,7 @@ input[type='radio'] {
     background-color: #afb7bb !important;
     cursor: none;
     border-radius: 4px;
+    pointer-events: none;
 }
 
 .heading:first-child {
@@ -556,6 +557,7 @@ input {
   .disableButtonprint {
     background-color: #afb7bb !important;
     cursor: none;
+    pointer-events: none;
     border-radius: 4px;
     min-width: 175px!important;
 }

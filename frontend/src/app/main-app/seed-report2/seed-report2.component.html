@@ -1,0 +1,315 @@
+
+<div class="container-fluid report-container p-3 ">
+
+   <div class="header-row">
+    <div class="logo">Logo</div>
+    <div class="title">
+      <h3><b>BSPC TEST FOUR</b></h3>
+      <h3><B>AGRA, UTTAR PRADESH</B></h3>
+      <diV class="testing"> <h3><b>"Seed Testing Lab Report"</b></h3></diV>
+    </div>
+    <div class="qr1"><div class="row d-flex justify-content-end">
+  <div class="col-auto pt-3 pdf" title="download-pdf">
+    <button (click)="generatePdf()" class="btn p-0 border-0 bg-transparent">
+      <i class="fas fa-file-pdf" style="font-size:30px;color:red"></i>
+    </button>
+  </div>
+</div></div>
+     <!-- <div class="qr">
+  <img *ngIf="qrCodeDataUrl" [src]="qrCodeDataUrl" alt="QR Code" width="100" height="100" />
+</div> -->
+
+  </div>
+
+  <hr class="divider">
+
+  <div class="sub-header">
+     <div class="left">
+       Year of Indent: {{ reportData.year }} <br>
+       <div class="season">Season: {{ reportData.season }}</div>
+    </div>
+    <div class="center">
+        Crop: <b>{{ reportData.crop }}</b>
+    </div>
+    <div class="right">
+         <div class="date">
+       Date: <span>{{ reportData.date }}</span> <br>
+    </div>
+       <div class="season">Reference Number:<b>{{ reportData.refNumber }}</b></div>
+       
+    </div>
+
+  </div>
+ 
+                                <!-- <div class="row d-flex justify-content-end">
+  <div class="col-auto pt-3 pdf" title="download-pdf">
+    <button (click)="generatePdf()" class="btn p-0 border-0 bg-transparent">
+      <i class="fas fa-file-pdf" style="font-size:30px;color:red"></i>
+    </button>
+  </div>
+</div> -->
+
+
+
+  <div class="table-responsive">
+    
+    <table class="table custom-table">
+      <thead>
+        <tr>
+          <th rowspan="2">SNo.</th>
+          <th colspan="2">Sample Details</th>
+          <th colspan="2">Testing Details</th>
+          <th colspan="4">Physical Purity (% by Weight)</th>
+          <th colspan="4">Determination By (No./Kg)</th>
+          <th colspan="5">Germination (%)</th>
+          <th colspan="3">Seed Health</th>
+          <th colspan="2">Others</th>
+        </tr>
+        <tr>
+          <th>Variety</th>
+          <th>Lot No.</th>
+          <th>Lab Name</th>
+          <th>Date of Test</th>
+          <th>PS</th>
+          <th>WS(P)</th>
+          <th>OCS(P)</th>
+          <th>IM</th>
+          <th>WS</th>
+          <th>OWS</th>
+          <th>OCS</th>
+          <th>ODV</th>
+          <th>NS</th>
+          <th>AS</th>
+          <th>DS</th>
+          <th>HS</th>
+          <th>FS</th>
+          <th>ID</th>
+          <th>Disease</th>
+          <th>NG</th>
+          <th>Moisture</th>
+          <th>HS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of stlReportStatusData;let i=index;">
+          <td>{{ i+1 }}</td>
+          <td>{{data && data.m_crop_variety &&
+                                                data.m_crop_variety.variety_name ?
+                                                data.m_crop_variety.variety_name:"NA"}}</td>
+                                                <td>{{data && data.lot_no ? data.lot_no:"NA"}}</td>
+                                                <td>{{data && data.seedLabtest && data.seedLabtest.lab_name ?
+                                                data.seedLabtest.lab_name:"NA"}}</td>
+                                                <td>{{data.date_of_test}}</td>
+                                                <td>{{data && data.pure_seed ? data.pure_seed:"NA"}}</td>
+                                                <td>{{data && data.weed_seed_purity ? data.weed_seed_purity:"NA"}}</td>
+                                                <td>{{data && data.other_crop_purity ? data.other_crop_purity:"NA"}}</td>
+                                                <td>{{data && data.inert_matter ? data.inert_matter:"NA"}}</td>
+                                                <td>{{data && data.weed_seed ? data.weed_seed:"NA"}}</td>
+                                                <td>{{data && data.other_seed ? data.other_seed:"NA"}}</td>
+                                                <td>{{data && data.other_crop_seed ? data.other_crop_seed:"NA"}}</td>
+                                                <td>{{data && data.other_distinguisable_varieties ?
+                                            data.other_distinguisable_varieties:"NA"}}</td>
+                                            <td>{{data && data.normal_seeding ? data.normal_seeding:"NA"}}</td>
+                                            <td>{{data && data.abnormal_seeding ? data.abnormal_seeding:"NA"}}</td>
+                                            <td>{{data && data.dead_seed ? data.dead_seed:"NA"}}</td>
+                                            <td>{{data && data.hard_seed ? data.hard_seed:"NA"}}</td>
+                                            <td>{{data && data.fs ? data.fs:"NA"}}</td>
+                                            <td>{{data && data.insect_damage ? data.insect_damage:"NA"}}</td>
+                                            <td>NA</td>
+                                            <td>NA</td>
+                                            <td>{{data && data.m ? data.m:"NA"}}</td>
+                                            <td>{{data && data.husk ? data.husk:"NA"}}</td>
+
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+    <div class="footer">
+    <div class="signature">
+      <p><b>--SD--</b></p>
+      <p>(Dr. Parimal Tripathi)</p>
+      <p><b>Deputy Director</b></p>
+    </div>
+
+    <div class="legend">
+  <div class="legend-row">
+    <b>PS:</b> Pure Seed,&nbsp;&nbsp; 
+    <b>IM:</b> Inert Matter,&nbsp;&nbsp; 
+    <b>WS:</b> Weed Seed,&nbsp;&nbsp; 
+    <b>M:</b> Moisture,&nbsp;&nbsp; 
+    <b>OWS:</b> Objectionable Weed Seed (No/Kg),&nbsp;&nbsp; 
+    <b>OCSP:</b> Other Crop Seed Purity(%) &nbsp;&nbsp;
+    <b>AS:</b> Abnormal Seedling(%) &nbsp;&nbsp;
+    <b>DS:</b> Dead Seed(%)
+
+  </div>
+  <div class="legend-row">
+    <b>HS:</b> Hard Seed(%) &nbsp;&nbsp; 
+    <b>FS:</b> Fresh Ungerminated(%) &nbsp;&nbsp;
+        <b>D:</b> Disease(%) &nbsp;&nbsp; 
+    <b>ODV:</b> Other Distinguishable Varieties (Bio/No/Kg)
+  </div>
+</div>
+    <p class="note">
+      *Note: This is an electronically generated report and does not require signature.
+    </p>
+  </div>
+</div>
+<!-- //////////////////////////////////////////////// -->
+
+
+
+
+<div id="printSection" class="container-fluid report-container p-3 hidden-pdf">
+
+   <div class="header-row">
+    <div class="logo">Logo</div>
+    <div class="title">
+      <h3><b>BSPC TEST FOUR</b></h3>
+      <h3><B>AGRA, UTTAR PRADESH</B></h3>
+      <diV class="testing"> <h3><b>"Seed Testing Lab Report"</b></h3></diV>
+    </div>
+ 
+<div class="qr">
+  <img *ngIf="qrCodeDataUrl" [src]="qrCodeDataUrl" alt="QR Code" width="100" height="100" />
+</div>
+
+  </div>
+
+  <hr class="divider">
+
+  <div class="sub-header">
+     <div class="left">
+       Year of Indent: {{ reportData.year }} <br>
+       <div class="season">Season: {{ reportData.season }}</div>
+    </div>
+    <div class="center">
+        Crop: <b>{{ reportData.crop }}</b>
+    </div>
+    <div class="right">
+         <div class="date">
+       Date: <span>{{ reportData.date }}</span> <br>
+    </div>
+       <div class="season">Reference Number:<b>{{ reportData.refNumber }}</b></div>
+       
+    </div>
+
+  </div>
+      <!-- <div class="col-2 col-md-2 col-lg-2 pt-3 pdf" title="download-pdf">
+                                    <button (click)="generatePdf()"
+            
+                                        style="outline: none;background: none;border:none;float: right;"><i
+                                            class="fas fa-file-pdf" style="font-size:30px;color:red"></i>
+                                    </button>
+                
+                                </div> -->
+
+  <!-- Table -->
+  <div class="table-responsive">
+    
+    <table class="table custom-table">
+      <thead>
+        <tr>
+          <th rowspan="2">SNo.</th>
+          <th colspan="2">Sample Details</th>
+          <th colspan="2">Testing Details</th>
+          <th colspan="4">Physical Purity (% by Weight)</th>
+          <th colspan="4">Determination By (No./Kg)</th>
+          <th colspan="5">Germination (%)</th>
+          <th colspan="3">Seed Health</th>
+          <th colspan="2">Others</th>
+        </tr>
+        <tr>
+          <th>Variety</th>
+          <th>Lot No.</th>
+          <th>Lab Name</th>
+          <th>Date of Test</th>
+          <th>PS</th>
+          <th>WS(P)</th>
+          <th>OCS(P)</th>
+          <th>IM</th>
+          <th>WS</th>
+          <th>OWS</th>
+          <th>OCS</th>
+          <th>ODV</th>
+          <th>NS</th>
+          <th>AS</th>
+          <th>DS</th>
+          <th>HS</th>
+          <th>FS</th>
+          <th>ID</th>
+          <th>Disease</th>
+          <th>NG</th>
+          <th>Moisture</th>
+          <th>HS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of stlReportStatusData;let i=index;">
+          <td>{{ i+1 }}</td>
+          <td>{{data && data.m_crop_variety &&
+                                                data.m_crop_variety.variety_name ?
+                                                data.m_crop_variety.variety_name:"NA"}}</td>
+                                                <td>{{data && data.lot_no ? data.lot_no:"NA"}}</td>
+                                                <td>{{data && data.seedLabtest && data.seedLabtest.lab_name ?
+                                                data.seedLabtest.lab_name:"NA"}}</td>
+                                                <td>{{data.date_of_test}}</td>
+                                                <td>{{data && data.pure_seed ? data.pure_seed:"NA"}}</td>
+                                                <td>{{data && data.weed_seed_purity ? data.weed_seed_purity:"NA"}}</td>
+                                                <td>{{data && data.other_crop_purity ? data.other_crop_purity:"NA"}}</td>
+                                                <td>{{data && data.inert_matter ? data.inert_matter:"NA"}}</td>
+                                                <td>{{data && data.weed_seed ? data.weed_seed:"NA"}}</td>
+                                                <td>{{data && data.other_seed ? data.other_seed:"NA"}}</td>
+                                                <td>{{data && data.other_crop_seed ? data.other_crop_seed:"NA"}}</td>
+                                                <td>{{data && data.other_distinguisable_varieties ?
+                                            data.other_distinguisable_varieties:"NA"}}</td>
+                                            <td>{{data && data.normal_seeding ? data.normal_seeding:"NA"}}</td>
+                                            <td>{{data && data.abnormal_seeding ? data.abnormal_seeding:"NA"}}</td>
+                                            <td>{{data && data.dead_seed ? data.dead_seed:"NA"}}</td>
+                                            <td>{{data && data.hard_seed ? data.hard_seed:"NA"}}</td>
+                                            <td>{{data && data.fs ? data.fs:"NA"}}</td>
+                                            <td>{{data && data.insect_damage ? data.insect_damage:"NA"}}</td>
+                                            <td>NA</td>
+                                            <td>NA</td>
+                                            <td>{{data && data.m ? data.m:"NA"}}</td>
+                                            <td>{{data && data.husk ? data.husk:"NA"}}</td>
+
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+    <div class="footer">
+    <div class="signature">
+      <p><b>--SD--</b></p>
+      <p>(Dr. Parimal Tripathi)</p>
+      <p><b>Deputy Director</b></p>
+    </div>
+
+    <div class="legend">
+  <div class="legend-row">
+    <b>PS:</b> Pure Seed,&nbsp;&nbsp; 
+    <b>IM:</b> Inert Matter,&nbsp;&nbsp; 
+    <b>WS:</b> Weed Seed,&nbsp;&nbsp; 
+    <b>M:</b> Moisture,&nbsp;&nbsp; 
+    <b>OWS:</b> Objectionable Weed Seed (No/Kg),&nbsp;&nbsp; 
+    <b>OCSP:</b> Other Crop Seed Purity(%) &nbsp;&nbsp;
+    <b>AS:</b> Abnormal Seedling(%) &nbsp;&nbsp;
+    <b>DS:</b> Dead Seed(%)
+
+  </div>
+  <div class="legend-row">
+    <b>HS:</b> Hard Seed(%) &nbsp;&nbsp; 
+    <b>FS:</b> Fresh Ungerminated(%) &nbsp;&nbsp;
+        <b>D:</b> Disease(%) &nbsp;&nbsp; 
+    <b>ODV:</b> Other Distinguishable Varieties (Bio/No/Kg)
+  </div>
+</div>
+    <p class="note">
+      *Note: This is an electronically generated report and does not require signature.
+    </p>
+  </div>
+</div>

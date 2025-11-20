@@ -21,35 +21,35 @@
                                         <label for="Crop Group" class="search_text">Crop Group</label>
                                     </div>
                                     <div class="col-md-12 px-2 pr-md-0">
-                                    
-                                            <div ngbDropdown class="d-inline-block w-100"
-                                            >
-            
-                                            <button class="btn takeplacholder w-100 crop toggle-button"
-                                            id="crop_group" ngbDropdownToggle
-                                            style="text-align: left;" aria-disabled="true">
-                                          
-                                                {{crop_groups &&  (crop_groups.length>30) ? (crop_groups.substring(0,30)+'...'):crop_groups?crop_groups :'Select Crop Group'}}
+
+                                        <div ngbDropdown class="d-inline-block w-100">
+
+                                            <button class="btn takeplacholder w-100 crop toggle-button" id="crop_group"
+                                                ngbDropdownToggle style="text-align: left;" aria-disabled="true">
+
+                                                {{crop_groups && (crop_groups.length>30) ?
+                                                (crop_groups.substring(0,30)+'...'):crop_groups?crop_groups :'Select
+                                                Crop Group'}}
                                             </button>
-            
+
                                             <div class="dropdown-menu w-100" ngbDropdownMenu="crop_group"
                                                 aria-labelledby="sortMenu">
-                                               
 
-                                                <input type="text" class="form-control px-4"  formControlName="crop_text" >
-                                                <button class="dropdown-item" *ngFor="let data of cropData " 
-                                                value="{{data.crop_group_code}}" (click)="cropGroup(data)" #dropdownItem
-                                                [attr.data-parent-name]="'cropGroup'">
+
+                                                <input type="text" class="form-control px-4"
+                                                    formControlName="crop_text">
+                                                <button class="dropdown-item" *ngFor="let data of cropData "
+                                                    value="{{data.crop_group_code}}" (click)="cropGroup(data)"
+                                                    #dropdownItem [attr.data-parent-name]="'cropGroup'">
                                                     {{data.group_name}}
                                                 </button>
                                             </div>
-            
-            
+
+
                                         </div>
-                                        <div class="pl-0 toggle-button" ngbDropdown
-                                            id="crop_group">
+                                        <div class="pl-0 toggle-button" ngbDropdown id="crop_group">
                                             <i class="fa-solid fa-angle-down downicon" (click)="cgClick()"></i>
-                                        </div> 
+                                        </div>
                                         <!-- <select class="form-select form-control" aria-label="Default select example"
                                             formControlName="group_id">
                                             <option value="" disabled>Select Group </option>
@@ -70,25 +70,29 @@
                                         <label for="Crop Group" class="search_text">Crop Name</label>
                                     </div>
                                     <div class="col-12 ml-2 ml-md-0">
-                                        <div ngbDropdown class="d-inline-block w-100 "
-                            
-                                        >
+                                        <div ngbDropdown class="d-inline-block w-100 ">
                                             <button class="btn takeplacholder w-100 crop toggle-button"
-                                                [ngClass]=" disabledfieldcropName  ? 'disabledfield' : ''" id="crop_name" ngbDropdownToggle
-                                                style="text-align: left;">{{crop_names && (crop_names.length>30) ? (crop_names.substring(0,30)+'...'):crop_names? crop_names :'Select Crop
+                                                [ngClass]=" disabledfieldcropName  ? 'disabledfield' : ''"
+                                                id="crop_name" ngbDropdownToggle style="text-align: left;">{{crop_names
+                                                && (crop_names.length>30) ?
+                                                (crop_names.substring(0,30)+'...'):crop_names? crop_names :'Select Crop
                                                 Name'}}</button>
-            
-                                            <div class="dropdown-menu w-100" ngbDropdownMenu="crop_name" aria-labelledby="sortMenu">
-                                                <input type="text" class="form-control px-4"  formControlName="crop_name_text" >
+
+                                            <div class="dropdown-menu w-100" ngbDropdownMenu="crop_name"
+                                                aria-labelledby="sortMenu">
+                                                <input type="text" class="form-control px-4"
+                                                    formControlName="crop_name_text">
                                                 <button class="dropdown-item" *ngFor="let data of cropName"
-                                                    (click)="cropNames(data)" #dropdownItem [attr.data-parent-name]="'crop_name'">
-                                                    {{data && data.m_crop && data.m_crop.crop_name ? data.m_crop.crop_name
-                                                        :''}}
+                                                    (click)="cropNames(data)" #dropdownItem
+                                                    [attr.data-parent-name]="'crop_name'">
+                                                    {{data && data.m_crop && data.m_crop.crop_name ?
+                                                    data.m_crop.crop_name
+                                                    :''}}
                                                     <!-- <input type="hidden" formControlName="crop_code"> -->
                                                 </button>
-                                               
+
                                             </div>
-            
+
                                         </div>
                                         <div class="pl-0 toggle-button" ngbDropdown
                                             [ngClass]=" disabledfieldcropName ? 'disabledfield' : ''">
@@ -145,7 +149,8 @@
                             <div class="col-6 col-md-1 py-2 d-flex verticle-content-middle">Nucleus to Breeder</div>
                             <div class="col-6 col-md-2 py-2 d-flex verticle-content-middle">Breeder to Foundation I
                             </div>
-                            <div class="col-6 col-md-2 py-2 d-flex verticle-content-middle">Foundation I to Foundation II
+                            <div class="col-6 col-md-2 py-2 d-flex verticle-content-middle">Foundation I to Foundation
+                                II
                             </div>
                             <div class="col-6 col-md-2 py-2 d-flex verticle-content-middle">Foundation II to Certified
                             </div>
@@ -180,7 +185,8 @@
                                 <div class="w-fit-content">
                                     <label class="d-md-none"><b>Necleus To Breeder:</b>&nbsp;</label>
                                     <span style="text-transform: capitalize;cursor: pointer;" data-toggle="tooltip"
-                                        data-placement="bottom" title="{{data && data.nucleus_to_breeder ? data.nucleus_to_breeder:''}}">
+                                        data-placement="bottom"
+                                        title="{{data && data.nucleus_to_breeder ? data.nucleus_to_breeder:''}}">
                                         {{(data && data.nucleus_to_breeder ? (data.nucleus_to_breeder.length > 30) ?
                                         (data.nucleus_to_breeder.substring(0, 30) + "..."):(data.nucleus_to_breeder ?
                                         data.nucleus_to_breeder :'NA'):'NA')}}
@@ -192,7 +198,8 @@
                                 <div class="w-fit-content">
                                     <label class="d-md-none"><b>Breeder To Foundation 1:</b>&nbsp;</label>
                                     <span style="text-transform: capitalize;cursor: pointer;" data-toggle="tooltip"
-                                        data-placement="bottom" title="{{data && data.breeder_to_foundation ? data.breeder_to_foundation:''}}">
+                                        data-placement="bottom"
+                                        title="{{data && data.breeder_to_foundation ? data.breeder_to_foundation:''}}">
                                         {{(data && data.breeder_to_foundation && (data.breeder_to_foundation.length >
                                         30) ? (data.breeder_to_foundation.substring(0, 30) +
                                         "..."):(data && data.breeder_to_foundation? data.breeder_to_foundation:"NA"))}}
@@ -204,7 +211,8 @@
                                 <div class="w-fit-content">
                                     <label class="d-md-none"><b>Foundation 1 to Foundation 2:</b></label>
                                     <span style="text-transform: capitalize;cursor: pointer;" data-toggle="tooltip"
-                                        data-placement="bottom" title="{{data && data.foundation_1_to_2 ? data.foundation_1_to_2:''}}">{{data &&
+                                        data-placement="bottom"
+                                        title="{{data && data.foundation_1_to_2 ? data.foundation_1_to_2:''}}">{{data &&
                                         data.foundation_1_to_2 ? data.foundation_1_to_2 :'NA'}}</span>
                                 </div>
                             </div>
@@ -212,8 +220,10 @@
                                 <div class="w-fit-content">
                                     <label class="d-md-none" style="text-transform: capitalize;cursor: pointer;"
                                         data-toggle="tooltip" data-placement="bottom"
-                                        title="{{data && data.foundation_2_to_cert ? data.foundation_2_to_cert:''}}"><b>Foundation 2 To Certified:</b></label>
-                                    <span>{{ data && data.foundation_2_to_cert ? data.foundation_2_to_cert:'NA' }}</span>
+                                        title="{{data && data.foundation_2_to_cert ? data.foundation_2_to_cert:''}}"><b>Foundation
+                                            2 To Certified:</b></label>
+                                    <span>{{ data && data.foundation_2_to_cert ? data.foundation_2_to_cert:'NA'
+                                        }}</span>
                                 </div>
                             </div>
                             <div class="col-6 col-md-1 py-1 d-flex verticle-content-middle pl-lg-4">
@@ -236,12 +246,14 @@
                                     </button>
 
                                     <button class="list-action-buttons "
-                                    *ngIf="data && data.m_crop && data.m_crop.is_active && data.m_crop.is_active==1 "
+                                        *ngIf="data && data.m_crop && data.m_crop.is_active && data.m_crop.is_active==1 "
                                         [routerLink]="['/seed-multiplication-ratio/edit', data.id]">
                                         <img src="assets/images/edit.svg">
                                     </button>
 
-                                    <button class="list-action-buttons " (click)="delete(data.id)">
+                                    <button class="list-action-buttons " [disabled]="userType === 'SUPERADMIN'"
+                                        [ngClass]="{'btn-disabled': userType !== 'SUPERADMIN','btn-active': userType === 'SUPERADMIN'}"
+                                        (click)="delete(data.id)">
                                         <img src="assets/images/delete.svg">
                                     </button>
                                 </div>

@@ -174,9 +174,7 @@
                                             <span class="datalist" *ngIf="lotData && lotData.action==1">Godown No: <b
                                                     class="font-weight-bold">
                                                     {{lotData &&
-                                                    lotData.godownNoStack ?
-                                                    (convertToString(lotData.godownNoStack)?convertToString(lotData.godownNoStack):'NA')
-                                                    :'NA'}}
+                                                    lotData.godown_no_register ? lotData.godown_no_register:'NA'}}
                                                 </b></span><br *ngIf="lotData && lotData.action==1">
                                             <span class="datalist"
                                                 *ngIf="lotData && lotData.action && (lotData.action==2||lotData.action==3)">Godown
@@ -189,7 +187,7 @@
                                             <span class="datalist"
                                                 *ngIf="lotData &&lotData.action && lotData.action==1">Stack No: <b
                                                     class="font-weight-bold">{{lotData &&
-                                                    lotData.stack_no_stack ?convertToString(lotData.stack_no_stack):'NA'
+                                                    lotData.stack_no_register ?lotData.stack_no_register:'NA'
                                                     }}</b></span><br
                                                 *ngIf="lotData &&lotData.action && lotData.action==1">
                                             <span class="datalist"
@@ -502,17 +500,11 @@
                                         class="form-button btn-inventory search w-100 d-inline-flex justify-content-center verticle-content-middle print_tag"
                                         style="white-space: pre;">Test
                                         Print</button>
-
                                 </div>
                             </div>
-
                         </div>
-
-
                     </div>
                 </div>
-
-
             </form>
         </div>
         <div class="col-12 " *ngIf="showGrid">
@@ -616,7 +608,7 @@
                                                 <span *ngIf="item && item.action  && item.action==1">Godown No:
                                                     <b class="font-weight-bold">{{item &&
                                                         item.godownNoStack ?
-                                                        (convertToString(item.godownNoStack)?convertToString(item.godownNoStack):'NA')
+                                                        item.godown_no_register
                                                         :'NA'}}</b></span><br>
                                                 <span
                                                     *ngIf="item && item.action  && (item.action==2||item.action==3 )">Godown
@@ -627,7 +619,7 @@
                                                 <span class="datalist"
                                                     *ngIf="item && item.action  && item.action==1">Stack No: <b
                                                         class="font-weight-bold">{{item &&
-                                                        item.stack_no_stack ? convertToString(item.stack_no_stack)
+                                                        item.stack_no_register ? item.stack_no_register
                                                         :'NA'}}</b></span><br>
                                                 <span class="datalist"
                                                     *ngIf="item && item.action  && (item.action==2||item.action==3 )">Stack
@@ -639,17 +631,25 @@
                                                 <!-- disabled="prtintAllTag" -->
                                                 <!-- [ngClass]=" item && item.is_status && (item.is_status==1) ? 'disableButton form-button search w-100 d-inline-flex justify-content-center verticle-content-middle' : 'form-button text-white btn-inventory generateClass search w-100 d-inline-flex justify-content-center verticle-content-middle'"e -->
                                                 <button (click)="showLotPage(data,item)"
+                                                    [disabled]="item && item.is_status && (item.is_status==1) ? true :false"
                                                     [ngClass]=" item && item.is_status && (item.is_status==1) ? 'disableButton form-button search w-100 d-inline-flex justify-content-center verticle-content-middle' : 'form-button text-white btn-inventory generateClass search w-100 d-inline-flex justify-content-center verticle-content-middle'"
                                                     style="white-space:pre;">
                                                     Generate Tag Numbers</button>
                                                 <br>
                                                 <!-- disabled="prtintAllTag" -->
-                                        
-                                                
+
+
                                                 <button (click)="download(data,item)"
                                                     [ngClass]=" (item && !item.is_status)|| (item && item.rangeData && item.rangeData.length<1) ? ' disableButtonprint form-button search  d-inline-flex justify-content-center verticle-content-middle mt-2 btn-inventory' : 'form-button text-white btn-inventory generateClass mt-2 search w-100 d-inline-flex justify-content-center verticle-content-middle'"
                                                     style="white-space:pre;">
                                                     Print Tags</button>
+
+                                                <!-- [ngClass]="(item && !item.is_status)||(item && item.rangeData && item.rangeData.length<1)?'disableButtonprint':''" -->
+                                                <button type="button" *ngIf="!is_potato "
+                                                    class="form-button text-white btn-inventory generateClass mt-2 search w-100 d-inline-flex justify-content-center verticle-content-middle"
+                                                    (click)="openLotModal(data)">
+                                                    Update Lot Qty
+                                                </button>
                                             </td>
                                             <td class="pt-2">
                                         <tr *ngFor="let items of item.seed_tag_range;let indexes = index">
@@ -749,7 +749,8 @@
                                                 [title]="'A custom title attribute'" [width]="140">
                                               </qrcode> -->
 
-                                                <qrcode [qrdata]="baseUrl+ 'tag-number-verification?tagNo=' + item.tags"
+                                                <qrcode
+                                                    [qrdata]="baseUrl+ 'tag-number-verification?tagNo=' + item.tags + (previewTagtext ? '&isPreview=true' : '')"
                                                     [allowEmptyString]="true"
                                                     [ariaLabel]="'QR Code image with the following content...'"
                                                     [cssClass]="'top'" [colorDark]="'#000000ff'"
@@ -1222,9 +1223,54 @@
 
     </div>
 </div>
-<!-- <button type="button" class="btn btn-primary me-2" (click)="show(child['modal'])">
-    open child modal
-    </button> -->
+<!-- Modal implement-->
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{'display':displayStyle}">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="margin-bottom: -25px;">
+                <h5 class="modal-title" id="exampleModalLongTitle">Update lot Quantity</h5>
+                <button type="button" class="close" data-dismiss="modal" (click)="close()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form [formGroup]="lotForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="col-12">
+                                <label for="">No. of Bags</label>
+                            </div>
+                            <div class="col-12">
+                                <input type="text" class="form-control" formControlName="no_of_bags">
+                            </div>
+                        </div>
 
+                        <div class="col-4">
+                            <div class="col-12">
+                                <label for="">Bag Size(Kg)</label>
+                            </div>
+                            <div class="col-12">
+                                <input type="text" class="form-control" value="50" formControlName="bag_size">
+                            </div>
+                        </div>
 
-<!-- </div> -->
+                        <div class="col-4">
+                            <div class="col-12">
+                                <label for="">Quantity(Kg)</label>
+                            </div>
+                            <div class="col-12">
+                                <input type="text" class="form-control" formControlName="total_qty">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <button (click)="updateLot()"
+                                class="form-button text-white btn-inventory mt-2 search w-100 d-inline-flex justify-content-center verticle-content-middle">
+                                Update</button>
+                        </div>
+
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -33,18 +33,20 @@ export class AddPlantListComponent implements OnInit {
   agencyNameList: any;
   resultAgencyData: any;
   userId: any;
-  searchFilterData=false;
+  searchFilterData = false;
   districtList: any;
   selected_state;
   instituteList: any;
   stateListsecond: any;
   selected_district;
   selected_agency: any;
-  disabledfieldAgency=true
+  disabledfieldAgency = true
   districtListSecond: any;
   instituteListSecond: any;
-  Userdata:any;
-  disabledfielddistrict=true
+  Userdata: any;
+  disabledfielddistrict = true
+  userType: any;
+  isActionBtnDisable: boolean;
   constructor(
     private restService: RestService,
     private fb: FormBuilder,
@@ -54,7 +56,8 @@ export class AddPlantListComponent implements OnInit {
     private datePipe: DatePipe,
     private service: SeedServiceService) {
     this.createEnrollForm();
-
+    this.userType = this.masterService?.userBasicData?.user_type ?? 'NA';
+    this.isActionBtnDisable = this.userType === 'SUPERADMIN';
   }
 
   createEnrollForm() {
@@ -66,7 +69,7 @@ export class AddPlantListComponent implements OnInit {
       state_text: new FormControl(''),
       district_text: new FormControl(''),
       agency_text: new FormControl(''),
-      
+
 
     });
 
@@ -74,70 +77,70 @@ export class AddPlantListComponent implements OnInit {
       if (newValue) {
         this.ngForm.controls['district_id'].enable();
         this.getDistrictList(newValue)
-        this.disabledfielddistrict=false
-        this.searchFilterData=false;
-        this.selected_district='';
+        this.disabledfielddistrict = false
+        this.searchFilterData = false;
+        this.selected_district = '';
       }
     })
     this.ngForm.controls["district_id"].valueChanges.subscribe(newValue => {
       if (newValue) {
         this.ngForm.controls['institute_name'].enable();
         this.getInstituteList()
-        this.searchFilterData=false
-        this.disabledfieldAgency=false
+        this.searchFilterData = false
+        this.disabledfieldAgency = false
       }
     })
     this.ngForm.controls['state_text'].valueChanges.subscribe(newValue => {
       if (newValue) {
-        this.stateList =this.stateListsecond
-        let response= this.stateList.filter(x=>x.state_name.toLowerCase().includes(newValue.toLowerCase()))
-      
-        this.stateList=response
-       
+        this.stateList = this.stateListsecond
+        let response = this.stateList.filter(x => x.state_name.toLowerCase().includes(newValue.toLowerCase()))
+
+        this.stateList = response
+
       }
-      else{
+      else {
         this.getStateList()
-       
+
       }
     });
     this.ngForm.controls['district_text'].valueChanges.subscribe(newValue => {
-      if (newValue ) {
-        this.districtList =this.districtListSecond
-        let response= this.districtList.filter(x=>x.district_name.toLowerCase().includes(newValue.toLowerCase()))    
-        this.districtList=response       
+      if (newValue) {
+        this.districtList = this.districtListSecond
+        let response = this.districtList.filter(x => x.district_name.toLowerCase().includes(newValue.toLowerCase()))
+        this.districtList = response
       }
-      else{
+      else {
         this.getDistrictList(this.ngForm.controls['state_id'].value)
-       
+
       }
     });
     this.ngForm.controls['agency_text'].valueChanges.subscribe(newValue => {
       if (newValue) {
-        this.instituteList =this.instituteListSecond
-        let response= this.instituteList.filter(x=>x.plant_name.toLowerCase().includes(newValue.toLowerCase())) 
-        this.instituteList=response
-        if(this.instituteList){            
-          this.instituteList =  this.instituteList.sort((a, b) => a.plant_name.toLowerCase().localeCompare(b.plant_name.toLowerCase())
-          
+        this.instituteList = this.instituteListSecond
+        let response = this.instituteList.filter(x => x.plant_name.toLowerCase().includes(newValue.toLowerCase()))
+        this.instituteList = response
+        if (this.instituteList) {
+          this.instituteList = this.instituteList.sort((a, b) => a.plant_name.toLowerCase().localeCompare(b.plant_name.toLowerCase())
+
           );
         }
 
-       
+
       }
-      else{
+      else {
         this.getInstituteList()
-       
+
       }
     });
   }
 
-  logindata(){
+  logindata() {
     // console.log("okk");
     this.service.postRequestCreator('islastLogin', null, {
-      "user_type" : "SPP",
+      "user_type": "SPP",
     }).subscribe(res => {
-      this.Userdata=res;
-      console.log("valuedata",this.Userdata);
+      this.Userdata = res;
+      console.log("valuedata", this.Userdata);
     });
   }
 
@@ -188,15 +191,14 @@ export class AddPlantListComponent implements OnInit {
         if (apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.status_code
           && apiResponse.EncryptedResponse.status_code == 200) {
           this.districtList = apiResponse.EncryptedResponse.data.rows;
-          this.districtListSecond =this.districtList
+          this.districtListSecond = this.districtList
         }
       });
   }
-  setlastlogin(user_id)
-  {
-    
-    let lastlogin = this.Userdata.filter(item => item.user_id==user_id);
-    let lastlogin_time = lastlogin && lastlogin[0] && lastlogin[0].created_at ? lastlogin[0].created_at :"NA";
+  setlastlogin(user_id) {
+
+    let lastlogin = this.Userdata.filter(item => item.user_id == user_id);
+    let lastlogin_time = lastlogin && lastlogin[0] && lastlogin[0].created_at ? lastlogin[0].created_at : "NA";
     //console.log("lastlo9009",lastlogin_time);
     if (lastlogin_time !== 'NA') {
       let formattedDate = this.datePipe.transform(lastlogin_time, 'dd-MM-yyyy HH:mm:ss');
@@ -205,7 +207,7 @@ export class AddPlantListComponent implements OnInit {
     } else {
       return 'NA';
     }
-    
+
   }
   async getInstituteList() {
     let data = {
@@ -231,7 +233,7 @@ export class AddPlantListComponent implements OnInit {
   }
 
   getPageData(loadPageNumberData: number = 1, searchData: any | undefined = undefined) {
-    if(this.searchFilterData){
+    if (this.searchFilterData) {
 
       this.masterService
         .postRequestCreator("plant-list", null, {
@@ -249,19 +251,19 @@ export class AddPlantListComponent implements OnInit {
           if (apiResponse !== undefined
             && apiResponse.EncryptedResponse !== undefined
             && apiResponse.EncryptedResponse.status_code == 200) {
-              this.filterPaginateSearch.itemListPageSize = 50;
+            this.filterPaginateSearch.itemListPageSize = 50;
             let allData = apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.data && apiResponse.EncryptedResponse.data.rows ? apiResponse.EncryptedResponse.data.rows : "";
-  
-  
+
+
             if (allData === undefined) {
               allData = [];
             }
             if (allData.count == 0) {
               this.noData = true;
             }
-            
+
             // if(allData){
-            
+
             //   allData =  allData.sort((a, b) => a.plant_name.localeCompare(b.plant_name)
             //   || a.name_of_spa.localeCompare(b.name_of_spa) ||
             //   a.address.localeCompare(b.address)
@@ -272,7 +274,7 @@ export class AddPlantListComponent implements OnInit {
           }
         });
     }
-    else{
+    else {
       this.masterService
         .postRequestCreator("plant-list", null, {
           page: loadPageNumberData,
@@ -284,10 +286,10 @@ export class AddPlantListComponent implements OnInit {
           if (apiResponse !== undefined
             && apiResponse.EncryptedResponse !== undefined
             && apiResponse.EncryptedResponse.status_code == 200) {
-              this.filterPaginateSearch.itemListPageSize = 50;
+            this.filterPaginateSearch.itemListPageSize = 50;
             let allData = apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.data && apiResponse.EncryptedResponse.data.rows ? apiResponse.EncryptedResponse.data.rows : "";
-  
-  
+
+
             if (allData === undefined) {
               allData = [];
             }
@@ -343,8 +345,8 @@ export class AddPlantListComponent implements OnInit {
               icon: 'success',
               confirmButtonText:
                 'OK',
-                showCancelButton: false,
-                confirmButtonColor: '#E97E15'
+              showCancelButton: false,
+              confirmButtonColor: '#E97E15'
             })
           });
         }
@@ -369,11 +371,11 @@ export class AddPlantListComponent implements OnInit {
     // this.resultAgencyData=[];
     this.ngForm.controls['district_id'].disable();
     this.ngForm.controls['institute_name'].disable();
-    this.selected_agency='';
-    this.selected_district='';
-    this.selected_state='';
-    this.disabledfieldAgency=true;
-    this.disabledfielddistrict=true
+    this.selected_agency = '';
+    this.selected_district = '';
+    this.selected_state = '';
+    this.disabledfieldAgency = true;
+    this.disabledfielddistrict = true
 
     this.getPageData();
     this.filterPaginateSearch.itemListCurrentPage = 1;
@@ -398,7 +400,7 @@ export class AddPlantListComponent implements OnInit {
         icon: 'error',
         confirmButtonText:
           'OK',
-      confirmButtonColor: '#E97E15'
+        confirmButtonColor: '#E97E15'
       })
 
       return;
@@ -410,37 +412,37 @@ export class AddPlantListComponent implements OnInit {
         "agency_id": formData.agency_id,
       }
       this.filterPaginateSearch.itemListCurrentPage = 1;
-      this.searchFilterData=true;
+      this.searchFilterData = true;
       this.initSearchAndPagination();
       this.getPageData();
     }
   }
-  state_select(data){
+  state_select(data) {
 
-    this.selected_state = data && data['state_name'] ? data['state_name'] :'';
-    this.ngForm.controls['state_id'].setValue(data && data['state_code'] ? data['state_code'] :'');
-    this.ngForm.controls['state_text'].setValue("",{ emitEvent: false });
-    this.stateList =this.stateListsecond
+    this.selected_state = data && data['state_name'] ? data['state_name'] : '';
+    this.ngForm.controls['state_id'].setValue(data && data['state_code'] ? data['state_code'] : '');
+    this.ngForm.controls['state_text'].setValue("", { emitEvent: false });
+    this.stateList = this.stateListsecond
 
   }
   cnClick() {
     document.getElementById('state').click();
   }
-  district_select(data){
-    this.selected_district = data && data['district_name'] ? data['district_name'] :'';
-    this.ngForm.controls['district_id'].setValue(data && data['district_code'] ? data['district_code'] :'')
-    this.districtList =this.districtListSecond
-    this.ngForm.controls['district_text'].setValue("",{ emitEvent: false });
-    
+  district_select(data) {
+    this.selected_district = data && data['district_name'] ? data['district_name'] : '';
+    this.ngForm.controls['district_id'].setValue(data && data['district_code'] ? data['district_code'] : '')
+    this.districtList = this.districtListSecond
+    this.ngForm.controls['district_text'].setValue("", { emitEvent: false });
+
   }
   cdClick() {
     document.getElementById('district').click();
   }
-  agency_select(data){
-    this.selected_agency = data && data.plant_name ? data.plant_name  :'';
-    this.ngForm.controls['institute_name'].setValue(data && data.plant_name ? data.plant_name  :'')
-    this.ngForm.controls['agency_text'].setValue("",{ emitEvent: false });
-    this.instituteList =this.instituteListSecond
+  agency_select(data) {
+    this.selected_agency = data && data.plant_name ? data.plant_name : '';
+    this.ngForm.controls['institute_name'].setValue(data && data.plant_name ? data.plant_name : '')
+    this.ngForm.controls['agency_text'].setValue("", { emitEvent: false });
+    this.instituteList = this.instituteListSecond
 
   }
   caClick() {

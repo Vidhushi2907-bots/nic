@@ -7,7 +7,12 @@
         font-family: 'Inter var', sans-serif;
     }
 }
-
+.img1 {
+    width: 26px !important;
+    height: 37px !important;
+    vertical-align: middle;
+    border-style: none;
+}
 .main-inventory {
     background-color: #FFFFFF;
     border: 1px #D2D2D2;

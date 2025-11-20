@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { FilterPaginateSearch } from 'src/app/common/data/data-among-components/filter-paginate-search';
 import { MaximumLotSizeSearchComponent } from 'src/app/common/maximum-lot-size-search/maximum-lot-size-search.component';
 import { PaginationUiComponent } from 'src/app/common/pagination-ui/pagination-ui.component';
+import { MasterService } from 'src/app/services/master/master.service';
 // import { IndentBreederSeedAllocationSearchComponent } from 'src/app/common/indent-breeder-seed-allocation-search/indent-breeder-seed-allocation-search.component';
 // import { PaginationUiComponent } from 'src/app/common/pagination-ui/pagination-ui.component';
 
@@ -39,12 +40,17 @@ export class MaximumLotSizeListComponent implements OnInit {
   disabledfieldcropName=false;
   cropNameSecond: any;
   cropDataSecond: any;
+  userType: any;
+  isActionBtnDisable: boolean;
   constructor(private restService: RestService,
     private router: Router,
     private fb: FormBuilder,
+    private _master: MasterService,
     private _serviceSeed: SeedDivisionService
   ) {
     this.createEnrollForm();
+    this.userType = this._master?.userBasicData?.user_type ?? 'NA';
+    this.isActionBtnDisable = this.userType === 'SUPERADMIN';
   }
 
   createEnrollForm() {

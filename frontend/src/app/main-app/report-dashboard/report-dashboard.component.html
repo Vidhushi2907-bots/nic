@@ -1,0 +1,55 @@
+ <!-- Heading (Dynamic) -->
+<!-- <h4 class="section-heading text-brown mb-3">
+  {{ selectedReport === 'state' ? 'State-wise Crop Statistics' : 'Crop-wise Crop Statistics' }}
+</h4>
+
+<div class="report-toggle d-flex gap-4">
+  <label class="custom-radio">
+    <input
+      type="radio"
+      name="reportType"
+      value="state"
+      [(ngModel)]="selectedReport"
+    />
+    <span class="radio-btn">
+      <span class="checkmark"></span>
+      State- wise Data
+    </span>
+  </label>
+
+  <label class="custom-radio">
+    <input
+      type="radio"
+      name="reportType"
+      value="crop"
+      [(ngModel)]="selectedReport"
+    />
+    <span class="radio-btn">
+      <span class="checkmark"></span>
+      Crop-wise Data
+    </span>
+  </label>
+</div>
+
+<app-crop-wise-statistics *ngIf="selectedReport === 'crop'"></app-crop-wise-statistics>
+<app-state-wise-crop-statistics *ngIf="selectedReport === 'state'"></app-state-wise-crop-statistics> -->
+
+<!-- <app-state-wise-crop-statistics
+  *ngIf="selectedReport === 'state'"
+  (reportSwitched)="onReportSwitch($event)">
+</app-state-wise-crop-statistics>
+
+<app-crop-wise-statistics
+  *ngIf="selectedReport === 'crop'"
+  (reportSwitched)="onReportSwitch($event)">
+</app-crop-wise-statistics> -->
+
+<app-state-wise-crop-statistics
+  *ngIf="selectedReport === 'state'"
+  (reportSwitched)="onReportSwitch($event)">
+</app-state-wise-crop-statistics>
+
+<app-crop-wise-statistics
+  *ngIf="selectedReport === 'crop'"
+  (reportSwitched)="onReportSwitch($event)">
+</app-crop-wise-statistics>

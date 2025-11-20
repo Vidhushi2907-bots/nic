@@ -9,7 +9,7 @@ import { SeedDivisionService } from 'src/app/services/seed-division/seed-divisio
 import Swal from 'sweetalert2';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+//pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as XLSX from 'xlsx';
 
 
@@ -17,7 +17,7 @@ import * as XLSX from 'xlsx';
   selector: 'app-add-crop-notified-list',
   templateUrl: './add-crop-notified-list.component.html',
   styleUrls: ['./add-crop-notified-list.component.css']
-  
+
 })
 export class AddCropNotifiedListComponent implements OnInit {
 
@@ -61,17 +61,21 @@ export class AddCropNotifiedListComponent implements OnInit {
   isStatusActive: boolean | undefined;
   asc_icon: boolean = true;
   desc_icon: boolean = false;
-  sort_value : any;
+  sort_value: any;
   not_asc_icon: boolean = true;
   not_desc_icon: boolean = false;
-  not_sort_value : any;
+  not_sort_value: any;
   fileName = 'add-crop-notified-list-report.xlsx';
   exportdata: any[];
   selectCrop_group: any;
+  userType: any;
+  isActionBtnDisable: boolean;
   constructor(private restService: RestService, private fb: FormBuilder,
     private _service: SeedDivisionService,
-    private _masterService: MasterService) {
+    private _masterService: MasterService, private _master: MasterService) {
     this.createEnrollForm();
+    this.userType = this._master?.userBasicData?.user_type ?? 'NA';
+    this.isActionBtnDisable = this.userType === 'SUPERADMIN';
   }
 
   createEnrollForm() {
@@ -134,7 +138,7 @@ export class AddCropNotifiedListComponent implements OnInit {
     });
     this.ngForm.controls['crop_name_text'].valueChanges.subscribe(newValue => {
       if (newValue) {
-        
+
         this.cropNameList = this.cropNameListSecond;
         // this.cropNameList= this.cropNameList.filter(x=>x.crop_name!=null)
         let response = this.cropNameList.filter(x => x.crop_name.toLowerCase().includes(newValue.toLowerCase()))
@@ -150,7 +154,7 @@ export class AddCropNotifiedListComponent implements OnInit {
     });
     this.ngForm.controls['variety_name_text'].valueChanges.subscribe(newValue => {
       if (newValue) {
-        
+
         this.cropVarietyData = this.cropVarietyDatasecond
         let response = this.cropVarietyData.filter(x => x.variety_name.toLowerCase().includes(newValue.toLowerCase()))
         this.cropVarietyData = response
@@ -164,12 +168,12 @@ export class AddCropNotifiedListComponent implements OnInit {
     });
     this.ngForm.controls['variety_name_filter'].valueChanges.subscribe(newValue => {
       if (newValue) {
-        if(newValue.length >= 3){
+        if (newValue.length >= 3) {
           this.getPageData();
         }
       }
     });
-    
+
   }
   ngOnInit(): void {
     const currentUser = JSON.parse(localStorage.getItem('BHTCurrentUser'));
@@ -182,7 +186,7 @@ export class AddCropNotifiedListComponent implements OnInit {
     //   localStorage.removeItem('foo')
     // }
     this.filterPaginateSearch.itemListPageSize = 50;
-   
+
     this.getPageData();
     this.getCropData();
 
@@ -204,10 +208,10 @@ export class AddCropNotifiedListComponent implements OnInit {
           variety_code: this.ngForm.controls['variety_name'].value,
           variety_name: this.ngForm.controls['variety_name_filter'].value ? this.ngForm.controls['variety_name_filter'].value : '',
           user_id: this.currentUser.id,
-          is_status_active : this.ngForm.controls['status_check_filter'].value == 1 ? '1' : this.ngForm.controls['status_check_filter'].value == 2 ? '0' : null,
-          not_number : this.ngForm.controls['not_number'].value,
-          sort_value : this.sort_value,
-          not_sort_value : this.not_sort_value,
+          is_status_active: this.ngForm.controls['status_check_filter'].value == 1 ? '1' : this.ngForm.controls['status_check_filter'].value == 2 ? '0' : null,
+          not_number: this.ngForm.controls['not_number'].value,
+          sort_value: this.sort_value,
+          not_sort_value: this.not_sort_value,
         }
       })
       .subscribe((apiResponse: any) => {
@@ -248,7 +252,7 @@ export class AddCropNotifiedListComponent implements OnInit {
           this.initSearchAndPagination();
           // this.getCropNameLists();
           // this.datas = allData;
-          
+
         }
       });
   }
@@ -294,8 +298,8 @@ export class AddCropNotifiedListComponent implements OnInit {
           icon: 'success',
           confirmButtonText:
             'OK',
-            showCancelButton: false,
-            confirmButtonColor: '#E97E15'
+          showCancelButton: false,
+          confirmButtonColor: '#E97E15'
         })
       }
     })
@@ -331,7 +335,7 @@ export class AddCropNotifiedListComponent implements OnInit {
         icon: 'success',
         confirmButtonText:
           'OK',
-      confirmButtonColor: '#E97E15'
+        confirmButtonColor: '#E97E15'
       })
       return;
     }
@@ -341,30 +345,29 @@ export class AddCropNotifiedListComponent implements OnInit {
         icon: 'success',
         confirmButtonText:
           'OK',
-      confirmButtonColor: '#E97E15'
+        confirmButtonColor: '#E97E15'
       })
       return;
     }
     if (this.disableFileds) {
-      if(this.ngForm.controls['status_check_filter'].value || this.ngForm.controls['not_number'].value )
-      {
+      if (this.ngForm.controls['status_check_filter'].value || this.ngForm.controls['not_number'].value) {
         this.filterPaginateSearch.itemListCurrentPage = 1;
         this.initSearchAndPagination();
         this.getPageData();
         // this.runExcelApi()
       }
 
-     else if ((!this.ngForm.controls["crop_group"].value && !this.ngForm.controls["crop_name"].value && !this.ngForm.controls["variety_name"].value)) {
+      else if ((!this.ngForm.controls["crop_group"].value && !this.ngForm.controls["crop_name"].value && !this.ngForm.controls["variety_name"].value)) {
         Swal.fire({
           title: '<p style="font-size:25px;">Please Select Something.</p>',
           icon: 'error',
           confirmButtonText:
             'OK',
-        confirmButtonColor: '#E97E15'
+          confirmButtonColor: '#E97E15'
         })
 
         return;
-     }
+      }
       else {
         this.filterPaginateSearch.itemListCurrentPage = 1;
         this.initSearchAndPagination();
@@ -385,7 +388,7 @@ export class AddCropNotifiedListComponent implements OnInit {
     this.desc_icon = false;
     this.not_asc_icon = true;
     this.not_desc_icon = false;
-    this.sort_value = null ;
+    this.sort_value = null;
     this.not_sort_value = null;
 
     this.ngForm.controls['crop_text'].setValue('')
@@ -400,7 +403,7 @@ export class AddCropNotifiedListComponent implements OnInit {
       this.ngForm.controls["crop_name"].setValue("");
     if (this.ngForm.controls["variety_name"].value)
       this.ngForm.controls["variety_name"].setValue("");
-   
+
     this.variety_names = '';
     this.crop_names = '';
     this.crop_groups = '';
@@ -506,7 +509,7 @@ export class AddCropNotifiedListComponent implements OnInit {
   cropGroup(data) {
     this.crop_groups = data && data.group_name ? data.group_name : '';
     this.cropData = this.cropDataSecond;
-    this.ngForm.controls['crop_text'].setValue('',{ emitEvent: false })
+    this.ngForm.controls['crop_text'].setValue('', { emitEvent: false })
     this.ngForm.controls['crop_group'].setValue(data && data.group_code ? data.group_code : '')
 
   }
@@ -515,10 +518,10 @@ export class AddCropNotifiedListComponent implements OnInit {
   }
   cropNames(data) {
 
-    this.crop_names = data  && data.crop_name ? data.crop_name : '';
+    this.crop_names = data && data.crop_name ? data.crop_name : '';
     // { emitEvent: false }
     this.cropNameList = this.cropNameListSecond;
-    this.ngForm.controls['crop_name_text'].setValue('',{ emitEvent: false })
+    this.ngForm.controls['crop_name_text'].setValue('', { emitEvent: false })
     this.ngForm.controls['crop_name'].setValue(data && data.crop_code ? data.crop_code : '')
 
   }
@@ -528,16 +531,15 @@ export class AddCropNotifiedListComponent implements OnInit {
   cvClick() {
     document.getElementById('variety_name').click();
   }
-  varietyNames(data) {    
+  varietyNames(data) {
     this.variety_names = data && data.variety_name ? data.variety_name : '';
     this.cropVarietyData = this.cropVarietyDatasecond
-    this.ngForm.controls['variety_name_text'].setValue('',{ emitEvent: false })
+    this.ngForm.controls['variety_name_text'].setValue('', { emitEvent: false })
     this.ngForm.controls['variety_name'].setValue(data && data.variety_code ? data.variety_code : '')
   }
 
-  changeStatus( data:any) 
-  {
-    
+  changeStatus(data: any) {
+
     if (data.is_status_active == true) {
       data.is_status_active = false;
     } else {
@@ -546,52 +548,46 @@ export class AddCropNotifiedListComponent implements OnInit {
 
     let param = {
       id: data.id,
-      is_status_active: data.is_status_active == false ? 0  : 1
+      is_status_active: data.is_status_active == false ? 0 : 1
     };
     this._service
-    .postRequestCreator("isStatusUpdate", param, null)
-    .subscribe((apiResponse: any) => {
-      if (apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.status_code
-        && apiResponse.EncryptedResponse.status_code == 200) {
+      .postRequestCreator("isStatusUpdate", param, null)
+      .subscribe((apiResponse: any) => {
+        if (apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.status_code
+          && apiResponse.EncryptedResponse.status_code == 200) {
 
-        // this.cropVarietyData = apiResponse.EncryptedResponse.data.rows;
-        // this.cropVarietyData = this.cropVarietyData.sort((a, b) => a.variety_name.localeCompare(b.variety_name))
-        // this.cropVarietyDatasecond = this.cropVarietyData
-      }
-    });
-    
+          // this.cropVarietyData = apiResponse.EncryptedResponse.data.rows;
+          // this.cropVarietyData = this.cropVarietyData.sort((a, b) => a.variety_name.localeCompare(b.variety_name))
+          // this.cropVarietyDatasecond = this.cropVarietyData
+        }
+      });
 
-    
+
+
   }
 
 
-  short_data(value:any)
-  {
+  short_data(value: any) {
     this.sort_value = value;
     this.getPageData()
-    if(value== 'ASC')
-    {
+    if (value == 'ASC') {
       this.asc_icon = false
       this.desc_icon = true
     }
-    else
-    {
+    else {
       this.asc_icon = true
       this.desc_icon = false
     }
   }
 
-  not_short_data(value:any)
-  {
+  not_short_data(value: any) {
     this.not_sort_value = value;
     this.getPageData()
-    if(value== 'ASC')
-    {
+    if (value == 'ASC') {
       this.not_asc_icon = false
       this.not_desc_icon = true
     }
-    else
-    {
+    else {
       this.not_asc_icon = true
       this.not_desc_icon = false
     }
@@ -613,7 +609,7 @@ export class AddCropNotifiedListComponent implements OnInit {
     }
   }
 
- 
+
   runExcelApi() {
     this._service
       .postRequestCreator("get-crop-veriety-data", {
@@ -623,10 +619,10 @@ export class AddCropNotifiedListComponent implements OnInit {
           variety_code: this.ngForm.controls['variety_name'].value,
           variety_name: this.ngForm.controls['variety_name_filter'].value ? this.ngForm.controls['variety_name_filter'].value : '',
           user_id: this.currentUser.id,
-          is_status_active : this.ngForm.controls['status_check_filter'].value == 1 ? '1' : this.ngForm.controls['status_check_filter'].value == 2 ? '0' : null,
-          not_number : this.ngForm.controls['not_number'].value,
-          sort_value : this.sort_value,
-          not_sort_value : this.not_sort_value,
+          is_status_active: this.ngForm.controls['status_check_filter'].value == 1 ? '1' : this.ngForm.controls['status_check_filter'].value == 2 ? '0' : null,
+          not_number: this.ngForm.controls['not_number'].value,
+          sort_value: this.sort_value,
+          not_sort_value: this.not_sort_value,
           pageSize: this.filterPaginateSearch.itemListPageSize || 10,
 
         }
@@ -645,8 +641,8 @@ export class AddCropNotifiedListComponent implements OnInit {
 
           if (this.exportdata === undefined) {
             this.exportdata = [];
-          }   
-                    
+          }
+
         }
       });
   }
@@ -710,7 +706,7 @@ export class AddCropNotifiedListComponent implements OnInit {
 
       content: [
         { text: 'List of Crops', style: 'header' },
-        { text: `Crop Group : ${this.selectCrop}  Crop Name: ${this.selectCrop_group}`,  },
+        { text: `Crop Group : ${this.selectCrop}  Crop Name: ${this.selectCrop_group}`, },
 
         {
           style: 'indenterTable',

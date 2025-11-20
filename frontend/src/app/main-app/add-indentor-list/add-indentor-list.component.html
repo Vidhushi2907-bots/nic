@@ -298,8 +298,8 @@
                             <div class="col-6 col-md-1  py-1 d-flex verticle-content-middle w-100 pl-0">
                                 <span style="cursor: pointer; word-break: break-word;" class="statusValue"
                                     data-toggle="tooltip" data-placement="bottom">{{
-                                        data &&  data.user_id ? setlastlogin(data.user_id):"NA"}}</span>
-                             </div>
+                                    data && data.user_id ? setlastlogin(data.user_id):"NA"}}</span>
+                            </div>
 
 
 
@@ -315,7 +315,9 @@
                                         [routerLink]="['/add-indentor/submission/edit', data.id]">
                                         <img src="assets/images/edit.svg">
                                     </button>
-                                    <button class="list-action-buttons " (click)="delete(data.id, data.agency_name)">
+                                    <button class="list-action-buttons " [disabled]="userType === 'SUPERADMIN'"
+                                        [ngClass]="{'btn-disabled': userType !== 'SUPERADMIN','btn-active': userType === 'SUPERADMIN'}"
+                                        (click)="delete(data.id, data.agency_name)">
                                         <img src="assets/images/delete.svg">
                                     </button>
                                 </div>

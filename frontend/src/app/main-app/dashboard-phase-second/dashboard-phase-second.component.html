@@ -1,0 +1,521 @@
+<div class="container-fluid responsive-wrapper mt-3" style="overflow-y: hidden; overflow-x: hidden;">
+  <div class="mt-0">
+
+    <!-- ================= Top Stat Cards ================= -->
+    <!-- <div class="row mr-1 justify-content-center">
+      <div class="col-lg col-md-3 col-sm-4 col-6 p-1 mb-2" *ngFor="let stat of stats">
+        <div class="card d-flex flex-column justify-content-between p-2"
+          [ngStyle]="{ 'background-color': stat.color, 'height': '100px', 'border-radius': '10px' }">
+          <div class="text-start-label">
+            <h6 style="font-size: 17px; font-weight: 600; margin-bottom: 0;">{{ stat.label }}</h6>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <h4 class="fw-bold mb-0"
+              [ngStyle]="{ 'color': getTextColor(stat.color), 'font-size': '32px', 'white-space': 'nowrap', 'overflow': 'hidden' }">
+              <a href="{{stat && stat.link}}" target="_blank">{{ stat.value }}</a>
+            </h4>
+            <img [src]="'../../../assets/images/' + stat.img" alt="" class="img-fluid"
+              style="max-height: 30px; max-width: 30px; opacity: 1;">
+          </div>
+        </div>
+      </div>
+    </div> -->
+    <div class="row mr-1 justify-content-center">
+      <div class="col-lg col-md-3 col-sm-4 col-6 p-1 mb-2" *ngFor="let stat of stats">
+        <div class="card d-flex flex-column justify-content-between p-2" [ngStyle]="{ 
+        'background-color': stat.color, 
+        'height': '100px', 
+        'border-radius': '10px',
+        'cursor': stat.disabled ? 'not-allowed' : 'pointer'
+      }" (click)="openLink(stat.link, stat.disabled)">
+          <div class="text-start-label">
+            <h6 style="font-size: 17px; font-weight: 600; margin-bottom: 0;">{{ stat.label }}</h6>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <h4 class="fw-bold mb-0" [ngStyle]="{ 
+            'color': getTextColor(stat.color), 
+            'font-size': '32px', 
+            'white-space': 'nowrap', 
+            'overflow': 'hidden',
+            'pointer-events': stat.disabled ? 'none' : 'auto'
+          }">
+              {{ stat.value }}
+            </h4>
+            <img [src]="'../../../assets/images/' + stat.img" alt="" class="img-fluid"
+              style="max-height: 30px; max-width: 30px; opacity: 1;">
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ================= Season Buttons ================= -->
+    <div class="row mr-1 justify-content-center align-items-center mt-1" style="background-color: #81818108;">
+
+      <!-- Crop Group Dropdown -->
+      <div class="col-12 col-md-4 d-flex justify-content-center justify-content-md-start align-items-center">
+        <div class="col-md-12 col-sm-12 col-lg-5">
+          <label class="left-heading">Select Crop Group</label>
+        </div>
+        <div class="position-relative crop-group-dropdown-container" style="width: 160px; z-index: 1100;">
+
+          <div
+            class="form-control form-control-sm custom-black-border d-flex justify-content-between align-items-center"
+            (click)="toggleCropGroupDropdown()" [ngClass]="{'disabled-div': UserType || UserType1} "
+            [title]="selectedCropGroupName || 'Select Crop Group'"
+            style="height: 31px; padding: 4px 8px; font-size: 13px; cursor: pointer;">
+            <!-- {{ selectedCropGroupName?.length > 15 ? (selectedCropGroupName.substring(0,15) + '...') :
+            (selectedCropGroupName || (UserType ? 'OILSEEDS':'Select Crop Group') ) }} -->
+            {{ selectedCropGroupName?.length > 15 ? (selectedCropGroupName.substring(0,15) + '...') :
+            (selectedCropGroupName
+            || (UserType ? 'OILSEEDS' : (UserType1 ? 'PULSESSEEDS' : 'Select Crop Group')) ) }}
+            <i class="fa-solid fa-angle-down downicon" (click)="toggleCropGroupDropdown()"></i>
+          </div>
+
+          <div class="dropdown-menu show w-100 mt-1 shadow-sm" *ngIf="showCropGroupDropdown"
+            style="max-height: 250px; overflow-x: hidden; overflow-y: auto; position: absolute; z-index: 1200;">
+            <input type="text" class="form-control form-control-sm mb-1 custom-input" placeholder="Search Crop..."
+              style="height: 31px; font-size: 13px;" [formControl]="cropGroupSearchInput"
+              (click)="$event.stopPropagation()" autofocus>
+            <button type="button" class="dropdown-item py-1 px-2"
+              style="font-size: 13px; height: 31px; font-weight: bold; background-color: #eaeaea;;"
+              (click)="selectAllCropGroupOption()">
+              All
+            </button>
+            <button type="button" class="dropdown-item py-1 px-2" style="font-size: 13px; height: 31px;"
+              *ngFor="let group_name of filteredCropGroupOptions" (click)="group_select(group_name)">
+              {{ group_name.group_name }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Season Buttons -->
+      <div
+        class="col-12 col-md-8 d-flex justify-content-center justify-content-md-end align-items-center overflow-auto">
+        <div class="d-flex flex-wrap flex-md-nowrap gap-5px justify-content-center">
+          <button class="btn season-btn mb-1" *ngFor="let season of seasonButtons"
+            [ngClass]="{ 'active-btn': activeSeasonData === season }" (click)="setActiveSeason(season)">
+            {{ season }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- ================= Chart + Cards + Pie Charts ================= -->
+    <div class="row">
+      <!-- Crop wise total indents and liftings -->
+      <div class="col-md-5 p-1 mb-1 chart-res">
+        <div class="card p-3 h-100 chart">
+
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="mb-0">Crop wise total indents and liftings (Qt)</h6>
+            <div class="d-flex align-items-center gap-2">
+
+              <!-- Crop Dropdown -->
+              <div class="position-relative crop-dropdown-container" style="width: 160px;">
+                <!-- [title]="cropSearchInput.value || 'Select Crop'" -->
+
+                <div
+                  class="form-control form-control-sm custom-black-border d-flex justify-content-between align-items-center"
+                  (click)="toggleCropDropdown()" [title]="selectedCropName || 'Select Crop'"
+                  style="height: 31px; padding: 4px 8px; font-size: 13px; cursor: pointer;">
+                  {{ selectedCropName?.length > 15 ? (selectedCropName.substring(0,15) + '...') : (selectedCropName ||
+                  'Select Crop') }}
+                  <i class="fa-solid fa-angle-down downicon" (click)="toggleCropDropdown()"></i>
+                </div>
+
+                <div class="dropdown-menu show w-100 mt-1 shadow-sm" *ngIf="showCropDropdown"
+                  style="max-height: 250px; overflow-x: hidden; overflow-y: auto; position: absolute; z-index: 1000;">
+                  <input type="text" class="form-control form-control-sm mb-1 custom-input" placeholder="Search Crop..."
+                    style="height: 31px; font-size: 13px;" [formControl]="cropSearchInput"
+                    (click)="$event.stopPropagation()" autofocus>
+                  <button type="button" class="dropdown-item py-1 px-2"
+                    style="font-size: 13px; height: 31px; font-weight: bold; background-color: #eaeaea;;"
+                    (click)="selectAllCropOption()">
+                    All
+                  </button>
+                  <button type="button" class="dropdown-item py-1 px-2" style="font-size: 13px; height: 31px;"
+                    *ngFor="let crop of filteredCropOptions" (click)="selectCropOption(crop)">
+                    {{ crop.crop_name }}
+                  </button>
+                </div>
+              </div>
+              <button (click)="toggleFullscreen()" class="fullscreen-btn" title="Maximize">
+                <!-- ⛶ -->
+                <img [src]="'../../../assets/icons/maximize.svg'" alt="Fullscreen" class="img-fluid">
+              </button>
+            </div>
+          </div>
+          <div [ngClass]="isCropFullScreen === false ? 'chart-scroll-container' : 'chart-scroll-container-crop'"
+            id="chartContainer">
+            <h6 *ngIf="isCropFullScreen === true" class="mb-3 mt-2">
+              Crop wise total indents and liftings (Qt)
+            </h6>
+            <!-- <div  [style.width.px]="isCropFullScreen == false ?  getCropWiseChartCanvasWidth() : '' " #cropWiseAres> -->
+            <div class="chart-fixed-size"
+              [style.width.px]="!isCropFullScreen ? getCropWiseChartCanvasWidth() : getCropWiseChartCanvasWidthFullScreen()"
+              #cropWiseAres>
+
+              <canvas baseChart [data]="cropChartData" [type]="'bar'" [options]="chartOptions"
+                [ngStyle]="isCropFullScreen === false ? { height: '300px' } : {height: '900px'}">
+              </canvas>
+            </div>
+            <!-- Download Icon -->
+            <div class="icons-div download" #CropWisemenu>
+              <div class="dropdown" [ngClass]="{'show': showCropWiseDownloadMenu}" style="position: relative;">
+                <button class="btn btn-light download-hover" (click)="toggleCropDownloadMenu()"
+                  style="position: absolute; top: 0; right: 0; background-color: white;">
+                  &#9776;
+                </button>
+                <div class="dropdown-menu dropdown-menu-right show" *ngIf="showCropWiseDownloadMenu"
+                  style="display: block; margin-top: 30px;">
+                  <a class="dropdown-item" (click)="downloadCropWisePng()">Download PNG</a>
+                  <a class="dropdown-item" (click)="downloadCropWiseExcle()">Download EXCEL</a>
+                </div>
+              </div>
+            </div>
+            <button *ngIf="isCropFullScreen === true" (click)="toggleFullscreen()" class="fullscreen-btn-crop"
+              title="Minimize">
+              <img [src]="'../../../assets/icons/minimize.svg'" alt="Fullscreen" class="img-fluid">
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Cards -->
+      <div class="col-md-7 mb-1 pt-1 pl-0">
+        <div class="row gap-wrapper m-0">
+          <div class="col-2 pb-2 pl-1 pr-1" *ngFor="let card of rightCards">
+            <div class="card text-center text-white" style="align-items: center;"
+              [ngStyle]="{ 'background': card.gradient }">
+              <!-- Centered content -->
+              <div class="d-flex flex-column justify-content-center align-items-center" style="height: 100%;">
+                <h6 style="font-size: 14px;">{{ card.label }}</h6>
+                <h6 style="font-size: 14px;">{{ card.labelSecond }}</h6>
+                <h5 style="font-size: 20px; font-weight: bold; white-space: pre-line; padding-top: 25px;">
+                  {{ card.value }}
+                </h5>
+              </div>
+              <div class="text-start">
+                <h5 style="font-size: 20px; font-weight: bold; white-space: pre-line; padding-top: 25px;">
+                  {{ card.value }}
+                </h5>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pie Charts -->
+        <div class="row gap-wrapper m-0 pie-res">
+          <div class="col card m-1" *ngFor="let pie of pieData" style="background-color: #F3F3F3; text-align: center">
+            <h6 style="font-size: 11px;" class="pt-2">{{ pie.label }}</h6>
+            <!-- Pie Chart -->
+            <ng-container *ngIf="!pie.noData; else noDataTemplate">
+              <canvas baseChart width="200" height="200" style="max-width: 200px; width: 100%;"
+                [data]="{ labels: ['Pending', 'Completed'], datasets: [{ data: pie.data, backgroundColor: pie.colors }] }"
+                [options]="getPieChartOptions(pie)" [type]="'doughnut'">
+              </canvas>
+              <div class="custom-legend mt-3 pb-2">
+                <div class="legend-item" (click)="onLegendClick('Pending', pie)">
+                  <span class="color-box" [ngStyle]="{ 'background-color': pie.colors[0] }"></span>
+                  <span class="label-text">Pending</span>
+                </div>
+                <div class="legend-item" (click)="onLegendClick('Completed', pie)">
+                  <span class="color-box" [ngStyle]="{ 'background-color': pie.colors[1] }"></span>
+                  <span class="label-text">Completed</span>
+                </div>
+              </div>
+              <div *ngIf="clickedData[pie.label]" class="mt-2">
+                <strong>{{ clickedData[pie.label] }}</strong>
+              </div>
+            </ng-container>
+
+            <!-- No Data Template -->
+            <ng-template #noDataTemplate>
+              <div class="text-center">
+                <canvas baseChart width="200" height="200" style="max-width: 200px; width: 100%;"
+                  [data]="{ labels: ['No Data'], datasets: [{ data: [1], backgroundColor: ['#cccccc'] }] }"
+                  [options]="{ cutout: '40%', plugins: { tooltip: { enabled: false }, legend: { display: false }, datalabels: { display: false } } }"
+                  [type]="'doughnut'">
+                </canvas>
+                <div class="custom-legend mt-3 pb-2">
+                  <div class="legend-item" style="opacity: 0.5; cursor: not-allowed;">
+                    <span class="color-box" style="background-color: #cccccc;"></span>
+                    <span class="label-text">Pending</span>
+                  </div>
+                  <div class="legend-item" style="opacity: 0.5; cursor: not-allowed;">
+                    <span class="color-box" style="background-color: #cccccc;"></span>
+                    <span class="label-text">Completed</span>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+        <!-- //New Code -->
+      </div>
+    </div>
+
+    <!-- Bottom Charts -->
+    <div class="row">
+
+      <!-- ===================== Code for BSPC Chart Start ===================== -->
+      <div class="col-md-4 p-1 mb-2 chart-re">
+        <div class="card p-2 chart-card">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="mb-0">BSPC wise production summary (Qt)</h6>
+            <div class="d-flex align-items-center gap-2">
+              <!-- Custom searchable dropdown -->
+              <div class="position-relative bspc-dropdown-container" style="width: 160px;">
+                <div
+                  class="form-control form-control-sm custom-black-border d-flex justify-content-between align-items-center"
+                  (click)="toggleDropdown()" [title]="selectedBSPCName || 'Select BSPC'"
+                  style="height: 31px;  padding: 4px 8px; font-size: 13px; cursor: pointer;">
+                  {{ selectedBSPCName?.length > 15 ? (selectedBSPCName.substring(0,15) + '...') : (selectedBSPCName ||
+                  'Select BSPC') }}
+                  <i class="fa-solid fa-angle-down downicon" (click)="toggleDropdown()"></i>
+                </div>
+
+                <div class="dropdown-menu show w-100 mt-1 shadow-sm" style="overflow-x: hidden;" *ngIf="showDropdown">
+                  <input type="text" class="form-control form-control-sm mb-1 custom-input" placeholder="Search BSPC..."
+                    [formControl]="bspcSearchInput" (click)="$event.stopPropagation()" autofocus>
+                  <button type="button" class="dropdown-item py-1 px-2"
+                    style="font-size: 13px; height: 31px; font-weight: bold; background-color: #eaeaea;;"
+                    (click)="selectAllBspcOption()">
+                    All
+                  </button>
+                  <button type="button" class="dropdown-item py-1 px-2" style="font-size: 13px; height: 31px;"
+                    *ngFor="let bspc of filteredBspcOptions" (click)="selectBspcOption(bspc)">
+                    {{ bspc.bspc_name }}
+                  </button>
+                </div>
+              </div>
+              <!-- ⛶ -->
+              <button (click)="toggleBSPCFullscreen()" class="fullscreen-btn" title="Maximize">
+                <img [src]="'../../../assets/icons/maximize.svg'" alt="Fullscreen" class="img-fluid">
+              </button>
+            </div>
+          </div>
+          <!-- <div class="chart-scroll-container">
+            <div [style.width.px]="getChartCanvasWidth()">
+              <canvas baseChart [data]="bspcChartData" [type]="'bar'" [options]="bspcChartOptions"
+                style="max-height: 305px; height: 100%; width: 100%;">
+              </canvas>
+            </div>
+          </div> -->
+
+
+          <div [ngClass]="isBSPCFullScreen === false ? 'chart-scroll-container' : 'chart-scroll-container-crop'"
+            id="chartBSPCContainer">
+            <h6 *ngIf="isBSPCFullScreen === true" class="mb-3 mt-2">
+              BSPC wise production summary (Qt)
+            </h6>
+            <div [style.width.px]="!isCropFullScreen ? getChartCanvasWidth() : getChartCanvasWidthFullScreen()"
+              #BSPCWiseAres>
+              <canvas baseChart [data]="bspcChartData" [type]="'bar'" [options]="bspcChartOptions"
+                [ngStyle]="isBSPCFullScreen === false ? { 'max-height': '305px', height: '100%', width: '100%' } : {height: '900px'}">
+              </canvas>
+            </div>
+            <div class="icons-div download" #BSPCWisemenu>
+              <div class="dropdown" [ngClass]="{'show': showBSPCWiseDownloadMenu}" style="position: relative;">
+                <button class="btn btn-light download-hover" (click)="toggleBSPCDownloadMenu()"
+                  style="position: absolute; top: 0; right: 0; background-color: white;">
+                  &#9776;
+                </button>
+                <div class="dropdown-menu dropdown-menu-right show" *ngIf="showBSPCWiseDownloadMenu"
+                  style="display: block; margin-top: 30px;">
+                  <a class="dropdown-item" (click)="downloadBSPCWisePng()">Download PNG</a>
+                  <a class="dropdown-item" (click)="downloadBSPCWiseExcel()">Download EXCEL</a>
+                </div>
+              </div>
+            </div>
+            <button *ngIf="isBSPCFullScreen === true" (click)="toggleBSPCFullscreen()" class="fullscreen-btn-crop"
+              title="Minimize">
+              <img [src]="'../../../assets/icons/minimize.svg'" alt="Fullscreen" class="img-fluid">
+            </button>
+          </div>
+
+        </div>
+      </div>
+      <!-- ===================== Code for BSPC Chart Ends ===================== -->
+
+      <!-- ===================== Indenter wise total indents and lifting Start ===================== -->
+      <div class="col-md-4 p-1 mb-2 chart-res">
+        <div class="card p-2 chart-card chart2">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="mb-0">Indenter wise total indents and lifting (Qt)</h6>
+            <div class="d-flex align-items-center gap-2">
+              <!-- Custom searchable dropdown -->
+              <div class="position-relative indent-dropdown-container" style="width: 160px;">
+                <div
+                  class="form-control form-control-sm custom-black-border d-flex justify-content-between align-items-center"
+                  (click)="toggleIndenterDropdown()" [title]="selectedIndenterName || 'Select Indenter'"
+                  style="height: 31px; padding: 4px 8px; font-size: 13px; cursor: pointer;">
+                  {{ selectedIndenterName?.length > 15 ? (selectedIndenterName.substring(0,15) + '...') :
+                  (selectedIndenterName || 'Select Indenter') }}
+                  <i class="fa-solid fa-angle-down downicon" (click)="toggleIndenterDropdown()"></i>
+                </div>
+
+                <div class="dropdown-menu show w-100 mt-1 shadow-sm" style="overflow-x: hidden;"
+                  *ngIf="showIndenterDropdown">
+                  <input type="text" class="form-control form-control-sm mb-1 custom-input"
+                    placeholder="Search Indenter..." [formControl]="indenterSearchInput"
+                    (click)="$event.stopPropagation()" autofocus>
+                  <button type="button" class="dropdown-item py-1 px-2"
+                    style="font-size: 13px; height: 31px; font-weight: bold; background-color: #eaeaea;;"
+                    (click)="selectAllIndenterOption()">
+                    All
+                  </button>
+                  <button type="button" class="dropdown-item py-1 px-2" style="font-size: 13px; height: 31px;"
+                    *ngFor="let indentor of filteredIndenterOptions" (click)="selectIndenterOption(indentor)">
+                    {{ indentor.indentor_name }}
+                  </button>
+                </div>
+              </div>
+              <button (click)="toggleIndenterFullscreen()" class="fullscreen-btn" title="Maximize">
+                <img [src]="'../../../assets/icons/maximize.svg'" alt="Fullscreen" class="img-fluid">
+              </button>
+            </div>
+          </div>
+
+          <!-- <div class="chart-scroll-vertical" [style.overflow-y]="'auto'" [style.max-height.px]="300">
+            <div [style.width.px]="475">
+              <canvas baseChart [data]="indenterChartData" [type]="'bar'" [options]="horizontalOptions"
+                [style.height.px]="getIndenterChartCanvasHeight()" [style.width.px]="475" style="min-height: 300px;">
+              </canvas>
+            </div>
+          </div> -->
+
+          <div [ngClass]="isIndenterFullScreen === false ? 'chart-scroll-vertical' : 'chart-scroll-vertical-indenter'"
+            [ngStyle]="isIndenterFullScreen === false 
+          ? { 'max-height.px': 400 } 
+          : {}" id="chartIndenterContainer">
+            <h6 *ngIf="isIndenterFullScreen === true" class="mb-3 mt-2">
+              Indenter wise total indents and lifting (Qt)
+            </h6>
+            <div [ngStyle]="isIndenterFullScreen === false ? { 'width.px': 485 } : { width: 'auto' }" #IndenterAres>
+              <!-- <canvas baseChart [data]="indenterChartData" [type]="'bar'" [options]="horizontalOptions"
+                [style.height.px]="getIndenterChartCanvasHeight()" [ngStyle]="isIndenterFullScreen === false 
+                ? { 'min-height': '300px', height: '100%', width: '100%' }
+                : { 'min-height': '900px' }">
+              </canvas> -->
+              <canvas baseChart [data]="indenterChartData" [type]="'bar'" [options]="horizontalOptions"
+                [style.height.px]="!isIndenterFullScreen ? getIndenterChartCanvasHeight() : getIndenterChartCanvasHeightFullScreen() "
+                style="min-height: 300px;">
+              </canvas>
+            </div>
+            <div class="icons-div download" #Indentermenu>
+              <div class="dropdown" [ngClass]="{'show': showIndenterDownloadMenu}" style="position: relative;">
+                <button class="btn btn-light download-hover" (click)="toggleIndenterDownloadMenu()"
+                  style="position: absolute; top: 0; right: 0; background-color: white;">
+                  &#9776;
+                </button>
+                <div class="dropdown-menu dropdown-menu-right show" *ngIf="showIndenterDownloadMenu"
+                  style="display: block; margin-top: 30px;">
+                  <a class="dropdown-item" (click)="downloadIndenterPng()">Download PNG</a>
+                  <a class="dropdown-item" (click)="downloadIndenterExcel()">Download EXCEL</a>
+                </div>
+              </div>
+            </div>
+            <button *ngIf="isIndenterFullScreen === true" (click)="toggleIndenterFullscreen()"
+              class="fullscreen-btn-crop" title="Minimize">
+              <img [src]="'../../../assets/icons/minimize.svg'" alt="Fullscreen" class="img-fluid">
+            </button>
+          </div>
+
+        </div>
+      </div>
+      <!-- ===================== Indenter wise total indents and lifting Ends ===================== -->
+
+      <!-- ===================== Code for Area Sown by State Start ===================== -->
+      <div class="col-md-4 pl-1 pt-1 mb-2 chart-res" style="padding-right: 20px;">
+        <div class="card p-2 chart-card1">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="mb-0">Area sown by state (In Hectares)</h6>
+            <div class="d-flex align-items-center gap-2">
+
+              <div class="position-relative state-dropdown-container" style="width: 160px;">
+                <div
+                  class="form-control form-control-sm custom-black-border d-flex justify-content-between align-items-center"
+                  (click)="toggleStateDropdown()" [title]="selectedStateName || 'Select State'"
+                  style="height: 31px; padding: 4px 8px; font-size: 13px; cursor: pointer;">
+                  {{ selectedStateName?.length > 15 ? (selectedStateName.substring(0,15) + '...') : (selectedStateName
+                  ||
+                  'Select State') }}
+                  <i class="fa-solid fa-angle-down downicon" (click)="toggleStateDropdown()"></i>
+                </div>
+
+                <div class="dropdown-menu show w-100 mt-1 shadow-sm" style="overflow-x: hidden;"
+                  *ngIf="showStateDropdown">
+                  <input type="text" class="form-control form-control-sm mb-1 custom-input"
+                    placeholder="Search State..." [formControl]="stateSearchInput" (click)="$event.stopPropagation()"
+                    autofocus>
+                  <button type="button" class="dropdown-item py-1 px-2"
+                    style="font-size: 13px; height: 31px; font-weight: bold; background-color: #eaeaea;;"
+                    (click)="selectAllStateOption()">
+                    All
+                  </button>
+                  <button type="button" class="dropdown-item py-1 px-2" style="font-size: 13px; height: 31px;"
+                    *ngFor="let indentor of filteredStateOptions" (click)="selectStateOption(indentor)">
+                    {{ indentor.state_name }}
+                  </button>
+                </div>
+              </div>
+              <button (click)="toggleStateFullscreen()" class="fullscreen-btn" title="Maximize">
+                <img [src]="'../../../assets/icons/maximize.svg'" alt="Fullscreen" class="img-fluid">
+              </button>
+            </div>
+          </div>
+
+          <!-- <div class="chart-scroll-container">
+            <div [style.width.px]="getStateChartCanvasWidth()">
+              <canvas baseChart [data]="stateChartData" [options]="areaShownChartOptions" [type]="'bar'"
+                style="max-height: 305px; height: 100%; width: 100%;">
+              </canvas>
+            </div>
+          </div> -->
+
+          <div [ngClass]="isStateFullScreen === false ? 'chart-scroll-container' : 'chart-scroll-container-state'"
+            id="chartStateContainer">
+            <h6 *ngIf="isStateFullScreen === true" class="mb-3 mt-2">
+              Area sown by state (In Hectares)
+            </h6>
+            <div
+              [style.width.px]="!isCropFullScreen ? getStateChartCanvasWidth() : getStateChartCanvasWidthFullScreen() "
+              #StateAres>
+              <canvas baseChart [data]="stateChartData" [type]="'bar'" [options]="areaShownChartOptions"
+                [ngStyle]="isStateFullScreen === false ? { 'max-height': '305px', height: '100%', width: '100%' } : {height: '600px !important'}">
+              </canvas>
+            </div>
+            <div class="icons-div download" #Statemenu>
+              <div class="dropdown" [ngClass]="{'show': showStateDownloadMenu}" style="position: relative;">
+                <button class="btn btn-light download-hover" (click)="toggleStateDownloadMenu()"
+                  style="position: absolute; top: 0; right: 0; background-color: white;">
+                  &#9776;
+                </button>
+                <div class="dropdown-menu dropdown-menu-right show" *ngIf="showStateDownloadMenu"
+                  style="display: block; margin-top: 30px;">
+                  <a class="dropdown-item" (click)="downloadStatePng()">Download PNG</a>
+                  <a class="dropdown-item" (click)="downloadStateExcel()">Download EXCEL</a>
+                </div>
+              </div>
+            </div>
+
+            <button *ngIf="isStateFullScreen === true" (click)="toggleStateFullscreen()" class="fullscreen-btn-crop"
+              title="Minimize">
+              <img [src]="'../../../assets/icons/minimize.svg'" alt="Fullscreen" class="img-fluid">
+            </button>
+          </div>
+
+        </div>
+      </div>
+      <!-- ===================== Code for Area Sown by State Ends ===================== -->
+
+    </div>
+    <!-- End Bottom Charts -->
+
+  </div>
+</div>

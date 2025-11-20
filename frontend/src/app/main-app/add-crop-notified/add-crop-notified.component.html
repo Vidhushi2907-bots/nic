@@ -233,8 +233,9 @@
             <div class="col-sm-12 col-md-4 in_sel_box pr-4">
               <input type="text" class="form-control" formControlName="notification_number"
                 placeholder="Enter Notification Number" (keydown)="checkLength($event, 12)"
-                [ngClass]="disabledfield ? 'disabledfield' : ''" />
-              <!-- (paste)="onPasteNumber($event, 'notification_number', '12')" -->
+                [ngClass]="disabledfield ? 'disabledfield' : ''"
+                />
+                <!-- (paste)="onPasteNumber($event, 'notification_number', '12')" -->
               <div class="notification_number errorMessage" *ngIf="submitted">
                 <span [hidden]="ngForm.controls['notification_number'].value != ''">
                   Please Enter Notification Number.<br />
@@ -326,8 +327,9 @@
             <div class="col-lg-4 col-sm-12 col-md-4 pr-4">
               <input type="text" class="form-control" placeholder="Enter Meeting Number"
                 formControlName="meeting_number" (keydown)="checkLength($event, 12)" maxlength="12"
-                [ngClass]="disabledfield ? 'disabledfield' : ''" />
-              <!-- (paste)="onPasteNumber($event, 'meeting_number', '12')" -->
+                [ngClass]="disabledfield ? 'disabledfield' : ''"
+                 />
+                 <!-- (paste)="onPasteNumber($event, 'meeting_number', '12')" -->
               <!-- <div class="meeting_number errorMessage" *ngIf="submitted">
                 <span [hidden]="ngForm.controls['meeting_number'].value !== ''">
                   Please Enter Valid Meeting Number. <br />
@@ -394,7 +396,7 @@
         <div class="col-12 pt-1">
           <div class="row">
             <div class="col-sm-12 col-md-2 pl-4">
-              <label for="" class="left-heading">Seed</label>
+              <label for="" class="left-heading">Developed By</label>
             </div>
             <div class="col-sm-12 col-md-4 pr-0 ml-0 pl-4 col-lg-4">
               <div class="form-check form-check-inline no-gutters3">
@@ -425,8 +427,7 @@
                 </div>
               </div>
               <br />
-              <div class="developed_by errorMessage pt-2"
-                *ngIf="submitted || (ngForm.controls['developed_by'].invalid && (ngForm.controls['developed_by'].dirty || ngForm.controls['developed_by'].touched))">
+              <div class="developed_by errorMessage pt-2" *ngIf="submitted || (ngForm.controls['developed_by'].invalid && (ngForm.controls['developed_by'].dirty || ngForm.controls['developed_by'].touched))">
                 <span *ngIf=" ngForm.controls['developed_by'].errors?.['required']">
                   Please Select Developed By. <br />
                 </span>

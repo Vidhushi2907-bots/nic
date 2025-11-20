@@ -83,6 +83,19 @@ button, input, optgroup, select, textarea {
     justify-content: space-between; 
     
   }
+  .data-row-header2 {
+    color: #FFFFFF;
+    letter-spacing: 0px;
+    background: #B64B1D 0% 0% no-repeat padding-box;
+    margin: 0.2%;
+    min-width: 100%;  /* Ensure it extends fully */
+    display: flex;
+    justify-content: space-between;
+    white-space: nowrap;  /* Prevents text wrapping */
+    padding: 10px; /* Add padding for better visibility */
+    overflow-x: auto;
+}
+
   .price{
     padding-right: 70px;
   }

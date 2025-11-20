@@ -103,23 +103,12 @@ export class BspProformaOneFormNextComponent implements OnInit {
             });
             this.getBspcTeamData(i, this.ngForm.controls['bspc_team']['controls'][i].controls['state_code'].value);
           });
-          // for (let i = 0; i < this.bspsData.length; i++) {
-          //   // if (this.ngForm.controls['bspc_team'].value.length > 1) {
-          //   //   this.removeBspc(i);
-          //   // }
-          //   this.addBspc();
-          //   this.ngForm.controls['bspc_team']['controls'][i].patchValue({
-          //     production_center: [this.bspsData[i].bspc_name ? this.bspsData[i].bspc_name:'NA'],
-          //     team_id: '',
-          //     team_member_details:'',
-          //     bspc_id:[this.bspsData[i].id ? this.bspsData[i].id:'NA']
-          //   })
-          // }
         }
       }
     });
 
   }
+
   addBspc() {
     this.bspc_team.push(this.bspcTeamCreateForm());
   }
@@ -135,6 +124,7 @@ export class BspProformaOneFormNextComponent implements OnInit {
     }
     this.route.navigateByUrl('/breeder-bsp-profarma-one')
   }
+
   getBspcTeamData(index, state_code) {
     console.log('state_code', state_code);
     const route = "get-bsp-monitoring-team";
@@ -157,6 +147,7 @@ export class BspProformaOneFormNextComponent implements OnInit {
       }
     })
   }
+
   getBspcTeamData1(state_code, team_id) {
     const route = "get-bsp-monitoring-team";
     this.breeder.postRequestCreator(route, null, {

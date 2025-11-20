@@ -26,7 +26,8 @@
 								Clear
 							</a>
 						</div> -->
-						<a *ngIf="items.length" href="javascript:void(0)"
+						 <!-- *ngIf="varietyDropdownData && varietyDropdownData.length" -->
+						<a href="javascript:void(0)"
 							class="form-buttons submit_btn ml-1   d-inline-flex justify-content-center verticle-content-middle mb-3 mr-1 btn-aling"
 							(click)="exportexcel()">
 							<img src="assets\icons\icons8-excel_white.svg" alt="" width="20px" alt=""> &nbsp;
@@ -39,19 +40,7 @@
 
 				</div>
 
-				<!-- <div *ngIf="items.length" class="resp_btn">
-					<a href="javascript:void(0)"
-						class="form-button submit_btn ml-5 ml-md-3 d-inline-flex justify-content-center verticle-content-middle mb-3 mr-1 btn-aling"
-						(click)="exportexcel()">
-						<img src="assets\icons\icons8-excel_white.svg" alt="" width="20px" alt=""> &nbsp;
-						Excel
-					</a>
-				</div> -->
-				<!-- <div class="resp_btn">
-					<a href="javascript:void(0)" (click)="exportexcel()"><img src="assets\icons\excel.jpg" alt="" width="20px" alt=""> Excel</a>
-				</div> -->
-				<table *ngIf="items.length" class="table table-bordered table-responsive" id="excel-table"
-					style="display:none">
+				<table class="table table-bordered table-responsive" id="excel-table" style="display:none">
 					<thead>
 						<tr>
 							<th> <b>Year of indent: {{reportHeader && reportHeader['year'] ?
@@ -62,144 +51,183 @@
 							<th> <b>Crop: {{reportHeader && reportHeader['crop_name'] ? reportHeader['crop_name'] :
 									'NA'}}</b></th>
 						</tr>
-						<tr class="data-row-header">
-							<th scope="col" class="col-md-1 py-2">S/N</th>
-							<th scope="col" class="col-md-3 py-2">Variety</th>
-							<th scope="col" class="col-md-3 py-2">Notification Year</th>
-							<th scope="col" class="col-md-2 py-2">I/A</th>
-							<!-- <ng-container
-								*ngFor="let indentQuntityData of items[0].indenter;let indenterindex = index ">
-								<th scope="col" class="col-md-2 py-2">SPA{{indenterindex+1}}</th>
-							</ng-container> -->
+						<tr></tr>
+						<tr>
+							<th scope="col" class="text-center">Variety Name</th>
+							<th scope="col" class="text-center">Name of SPAs</th>
+							<th scope="col" class="text-center">Indented Quantity({{
+								searhedData && IstPartFormGroupControls['cropName'].value &&
+								IstPartFormGroupControls['cropName'].value.value ?
+								getQuantityMeasure(IstPartFormGroupControls['cropName'].value.value):''}})
+							</th>
+							<th scope="col" class="text-center">Name of BSPC</th>
+							<th scope="col" class="text-center">Allocated Quantity of BSPC({{
+								searhedData && IstPartFormGroupControls['cropName'].value &&
+								IstPartFormGroupControls['cropName'].value.value ?
+								getQuantityMeasure(IstPartFormGroupControls['cropName'].value.value):''}})
+							</th>
+							<th scope="col" class="text-center">Total Allocated Quantity({{
+								searhedData && IstPartFormGroupControls['cropName'].value &&
+								IstPartFormGroupControls['cropName'].value.value ?
+								getQuantityMeasure(IstPartFormGroupControls['cropName'].value.value):''}})
+							</th>
+							<th scope="col" class="text-center">Quantity Left for Allocation({{
+								searhedData && IstPartFormGroupControls['cropName'].value &&
+								IstPartFormGroupControls['cropName'].value.value ?
+								getQuantityMeasure(IstPartFormGroupControls['cropName'].value.value):''}})
+							</th>
 
-							<ng-container
-								*ngFor="let indentQuntityData of items[0].indenter;let indenterindex = index ">
-								<th scope="col" class="col-md-2 py-2" title="{{indentQuntityData.full_name}}">
-									{{indentQuntityData.name}}</th>
-							</ng-container>
-							<th scope="col" class="col-md-2 py-2">Total</th>
-							<th scope="col" class="col-md-2 py-2">BSPC</th>
-							<th scope="col" class="col-md-2 py-2">Total Produced</th>
-							<th scope="col" class="col-md-2 py-2">Dificit/Surplus</th>
 						</tr>
+
 					</thead>
 					<tbody>
-						<!-- <ng-container *ngFor="let data of items; let cropIndex = index"> -->
-						<ng-container *ngFor="let varietyData of items; let varietyIndex = index">
-							<!-- <ng-container *ngFor="let spaData of varietyData.spas; let spaIndex = index"> -->
-							<!-- <tr>
-								<td *ngIf="varietyIndex === 0||1" [attr.rowspan]="varietyData.allocation.length+3">{{
-									varietyIndex + 1 }}</td>
-								<td *ngIf="varietyIndex === 0||1" [attr.rowspan]="varietyData.allocation.length+3">{{
-									varietyData.variety_name ? varietyData.variety_name : 'NA' }}</td>
-								<td *ngIf="varietyIndex === 0||1" [attr.rowspan]="varietyData.allocation.length+3">{{
-									varietyData.notification_year? varietyData.notification_year : 'NA' }}</td>
-								<th scope="col" class="col-md-2 py-2"></th>
-								<ng-container *ngFor="let indenterData of varietyData.indenter; let spaIndex = index">
-									<th scope="col" class="col-md-2 py-2" title="{{indenterData.full_name}}">
-										{{indenterData.name}}</th>
-								</ng-container>
-								<th scope="col" class="col-md-2 py-2"></th>
-								<th scope="col" class="col-md-2 py-2"></th>
-								<th scope="col" class="col-md-2 py-2"></th>
-								<td *ngIf="varietyIndex === 0 || 1" [attr.rowspan]="varietyData.allocation.length+3">{{
-									varietyData.surplus_dificit? varietyData.surplus_dificit : 0 }}</td>
-							</tr>
-
-							<tr>
-								<th scope="col" class="col-md-2 py-2">I</th>
-								<ng-container *ngFor="let indentQuntityData of varietyData.indent_quantity; ">
-									<td scope="col" class="col-md-2 py-2">{{indentQuntityData.indent_quantity}}</td>
-								</ng-container>
-							</tr> -->
-
-							<tr>
-								<td *ngIf="varietyIndex === 0||1"
-									[attr.rowspan]="varietyData.allocation.length ? varietyData.allocation.length+2 : 3">
-									{{
-									varietyIndex + 1 }}</td>
-								<td *ngIf="varietyIndex === 0||1"
-									[attr.rowspan]="varietyData.allocation.length ? varietyData.allocation.length+2 : 3">
-									{{
-									varietyData.variety_name ? varietyData.variety_name : 'NA' }}</td>
-								<td *ngIf="varietyIndex === 0||1"
-									[attr.rowspan]="varietyData.allocation.length ? varietyData.allocation.length+2 : 3">
-									{{
-									varietyData.notification_year? varietyData.notification_year : 'NA' }}</td>
-
-								<th scope="col" class="col-md-2 py-2">I</th>
-								<ng-container *ngFor="let indentQuntityData of varietyData.indent_quantity; ">
-									<td scope="col" class="col-md-2 py-2">{{indentQuntityData.indent_quantity | number :
-										'1.2-2'}}</td>
-								</ng-container>
-								<th scope="col" class="col-md-2 py-2"></th>
-								<th scope="col" class="col-md-2 py-2"></th>
-								<td *ngIf="varietyIndex === 0 || 1"
-									[attr.rowspan]="varietyData.allocation.length ? varietyData.allocation.length+2 : 3">
-									{{
-									varietyData.surplus_dificit | number : '1.2-2'}}</td>
-							</tr>
-							<ng-container *ngIf="varietyData.allocation.length">
-								<ng-container *ngFor="let allocationData of varietyData.allocation;">
+						<ng-container *ngFor="let data of dataToDisplay; let cropIndex = index">
+							<ng-container *ngFor="let varietyData of data.indenter; let varietyIndex = index">
+								<ng-container *ngFor="let spaData of varietyData.productions; let spaIndex = index">
 									<tr>
-										<th scope="col" class="col-md-2 py-2">A</th>
-										<ng-container *ngFor="let value of allocationData.quantity;">
-											<td scope="col" class="col-md-2 py-2">{{value}}</td>
-										</ng-container>
-										<td scope="col" class="col-md-2 py-2">{{ allocationData.total_quantity | number
-											: '1.2-2'}}</td>
-										<td scope="col" class="col-md-2 py-2">{{allocationData.bspc_name}}</td>
-										<td scope="col" class="col-md-2 py-2">{{ allocationData.bspc_produced | number :
-											'1.2-2'}}</td>
+										<!-- First Column: Variety Details -->
+										<td *ngIf="spaIndex === 0 && varietyIndex === 0"
+											[attr.rowspan]="data.indenter.length * varietyData.productions.length">
+											<span
+												*ngIf="!isCropSubmittedNew && isCropSubmitted && varietyForm.controls['variety_id'].value">
+												{{ data.variety_id ? getVarietyName(data.variety_id) :
+												(data.variety_name || 'NA') }}
+											</span>
+											<span *ngIf="isCropSubmittedNew && isCropSubmitted">
+												{{ data.variety_name || 'NA' }}
+											</span>
+											<!-- <span>{{ data && data.variety_id ? getVarietyName(data.variety_id) :
+												' }}</span> -->
+											<span
+												*ngIf="editVarietyForm.controls['variety_id'].value?.[0]?.value && !isCropSubmittedNew && isCropSubmitted">
+												{{ editVarietyForm.controls['variety_id'].value[0].name || '' }}
+											</span>
+											<br />
+											<span *ngIf="data.line_variety_name">
+												{{ data.line_variety_name || 'NA' }}
+											</span>
+										</td>
+
+										<!-- Second Column: Indenter Name -->
+										<td class="text-center" *ngIf="spaIndex === 0"
+											[attr.rowspan]="varietyData.productions.length">
+											{{ varietyData.name || 'NA' }}
+										</td>
+
+										<!-- Third Column: Indent Quantity -->
+										<td class="text-center" *ngIf="spaIndex === 0"
+											[attr.rowspan]="varietyData.productions.length">
+											{{ varietyData.indent_quantity ?
+											getQuantityOfSeedProduced(varietyData.indent_quantity) : '0' }}
+										</td>
+
+										<!-- Fourth Column: SPA Data Agency Name -->
+										<td>
+											<span *ngIf="varietyForm.controls['variety_id'].value">
+												{{ spaData.agency_name || '0' }}
+											</span>
+											<span
+												*ngIf="editVarietyForm.controls['variety_id'].value?.[0]?.value || isCropSubmittedNew && isCropSubmitted">
+												{{ getUserData(spaData.name) || '0' }}
+											</span>
+										</td>
+
+										<!-- Fifth Column: Allocated Quantity -->
+										<td class="text-center">
+											<span
+												*ngIf="!isCropSubmittedNew && isCropSubmitted && varietyForm.controls['variety_id'].value">
+												<!-- {{varietyData.allocated_quantity ?
+															getQuantityOfSeedProduced(varietyData.allocated_quantity) :
+															'0'}} -->
+												{{spaData.quantity ? getQuantityOfSeedProduced(spaData.quantity)
+												: '0'}}
+											</span>
+											<span *ngIf="isCropSubmittedNew && isCropSubmitted">
+												{{ spaData.allocated_quantity ?
+												getQuantityOfSeedProduced(spaData.allocated_quantity) : '0' }}
+
+											</span>
+											<span
+												*ngIf="editVarietyForm.controls['variety_id'].value?.[0]?.value && !isCropSubmittedNew && isCropSubmitted">
+												{{spaData.quantity ? getQuantityOfSeedProduced(spaData.quantity)
+												: '0'}}
+											</span>
+										</td>
+
+										<!-- Sixth Column: Quantity -->
+										<td class="text-center" *ngIf="spaIndex === 0"
+											[attr.rowspan]="varietyData.productions.length">
+											<span
+												*ngIf="!isCropSubmittedNew && isCropSubmitted && varietyForm.controls['variety_id'].value">
+												<!-- {{spaData.quantity ? getQuantityOfSeedProduced(spaData.quantity)
+															: '0'}} -->
+												{{varietyData.allocated_quantity ?
+												getQuantityOfSeedProduced(varietyData.allocated_quantity) :
+												'0'}}
+											</span>
+											<span *ngIf="isCropSubmittedNew && isCropSubmitted">
+												{{ varietyData.quantity ?
+												getQuantityOfSeedProduced(varietyData.quantity) : '0' }}
+											</span>
+											<span
+												*ngIf="editVarietyForm.controls['variety_id'].value?.[0]?.value && !isCropSubmittedNew && isCropSubmitted">
+												{{varietyData.allocated_quantity ?
+												getQuantityOfSeedProduced(varietyData.allocated_quantity) :
+												'0'}}
+											</span>
+
+
+										</td>
+
+										<!-- Seventh Column: Quantity Left for Allocation -->
+										<td class="text-center" *ngIf="spaIndex === 0"
+											[attr.rowspan]="varietyData.productions.length">
+											<span
+												*ngIf="!isCropSubmittedNew && isCropSubmitted && varietyForm.controls['variety_id'].value">
+												{{varietyData.quantity_left_for_allocation ?
+												getQuantityOfSeedProduced(varietyData.quantity_left_for_allocation)
+												: '0'}}
+											</span>
+											<span *ngIf="isCropSubmittedNew && isCropSubmitted">
+												{{ spaData.quantity_left_for_allocation
+												? getQuantityOfSeedProduced(spaData.quantity_left_for_allocation)
+												: '0' }}
+											</span>
+											<span
+												*ngIf="editVarietyForm.controls['variety_id'].value?.[0]?.value && !isCropSubmittedNew && isCropSubmitted">
+												{{varietyData.quantity_left_for_allocation ?
+												getQuantityOfSeedProduced(varietyData.quantity_left_for_allocation)
+												: '0'}}
+											</span>
+
+										</td>
 									</tr>
 								</ng-container>
 							</ng-container>
-							<ng-container *ngIf="!varietyData.allocation.length">
-								<tr>
-									<th scope="col" class="col-md-2 py-2">A</th>
-									<ng-container *ngFor="let indentQuntityData of varietyData.indent_quantity; ">
-										<td scope="col" class="col-md-2 py-2"></td>
-									</ng-container>
-									<!-- <td scope="col" class="col-md-2 py-2"></td> -->
-									<td scope="col" class="col-md-2 py-2">No Production</td>
-									<td scope="col" class="col-md-2 py-2"></td>
-								</tr>
-							</ng-container>
-							<tr>
-								<th scope="col" class="col-md-2 py-2">Total Allocation</th>
-								<ng-container *ngFor="let totalAllocationData of varietyData.total_allocation; ">
-									<th scope="col" class="col-md-2 py-2">{{totalAllocationData.total_allocation |
-										number : '1.2-2'}}</th>
-								</ng-container>
-							</tr>
 						</ng-container>
-						<tr>
-							<th></th>
-							<th scope="col" rowspan="2" class="col-md-2 py-2">Grand Total</th>
-							<th></th>
-							<th scope="col" class="col-md-2 py-2">I</th>
 
-							<ng-container *ngFor="let totalAllocationData1 of grandIndent; ">
-								<th scope="col" class="col-md-2 py-2">{{totalAllocationData1.indent_quantity | number :
-									'1.2-2'}}</th>
-							</ng-container>
-							<th></th>
-							<th></th>
-							<th></th>
-						</tr>
-						<tr>
-							<th></th>
-							<th></th>
-							<th scope="col" class="col-md-2 py-2">A</th>
-							<ng-container *ngFor="let totalAllocationData1 of grandAllocation; ">
-								<th scope="col" class="col-md-2 py-2">{{totalAllocationData1.total_allocation | number :
-									'1.2-2'}}</th>
-							</ng-container>
-							<th></th>
-							<th>{{grandTotalProduction | number : '1.2-2'}}</th>
-							<th>{{totalDificit | number : '1.2-2'}}</th>
-						</tr>
 					</tbody>
+
+
+					<!-- Grand Total Row -->
+
+					<tr *ngIf="isCropSubmittedNew && isCropSubmitted">
+						<th></th>
+						<th>Grand Total</th>
+						<!-- <th></th> -->
+						<th class="text-center">
+							{{ totalIntentValue ? (totalIntentValue | number: '1.2-2') : 0 }}
+						</th>
+						<th></th>
+						<th></th>
+						<th class="text-center">
+							{{ totalAllocateValue ? (totalAllocateValue | number: '1.2-2') : 0 }}
+						</th>
+						<th class="text-center">
+							{{ totalleftValue ? (totalleftValue | number: '1.2-2') : 0 }}
+						</th>
+					</tr>
+
 				</table>
 				<ng-template #noVarietyData>
 					<div *ngIf="!items.length" style="text-align: center; width: 100%;">
@@ -215,34 +243,36 @@
 								verietyListDetails.totalNumberOfVariety : 'N/A' }}</label>
 						</div>
 						<div class="col-4 px-2">
-							<label class="bold-label">Total Indenting Quantity({{
+							<label class="bold-label">Total Indenting Quantity(
+								{{
 								searhedData && IstPartFormGroupControls['cropName'].value &&
 								IstPartFormGroupControls['cropName'].value.value ?
 								getQuantityMeasure(IstPartFormGroupControls['cropName'].value.value):''}}):
-								{{totalIndentQnt?this.totalIndentQnt:0}}
+								{{totalIndentQnt?totalIndentQnt:0}}
 								<!-- {{verietyListDetails.totalIndentQuantity ?
-								getQuantityOfSeedProduced(verietyListDetails.totalIndentQuantity) : 'N/A' }} -->
+								getQuantityOfSeedProduced(verietyListDetails.totalIndentQuantity) : 'N/A' }}) -->
 
 							</label>
 						</div>
 						<div class="col-4 pl-2">
-							<label class="bold-label">Total Allocation({{
+							<label class="bold-label">Total Allocation(
+								<!-- {{
 								searhedData && IstPartFormGroupControls['cropName'].value &&
 								IstPartFormGroupControls['cropName'].value.value ?
-								getQuantityMeasure(IstPartFormGroupControls['cropName'].value.value):''}}): {{verietyListDetails.totalAllocationQuantity
+								getQuantityMeasure(IstPartFormGroupControls['cropName'].value.value):''}}): -->
+								{{verietyListDetails.totalAllocationQuantity
 								?
-								getQuantityOfSeedProduced(verietyListDetails.totalAllocationQuantity) : 'N/A' }}
-
+								getQuantityOfSeedProduced(verietyListDetails.totalAllocationQuantity) : 'N/A' }})
 							</label>
 						</div>
 
 					</div>
 				</div>
 				<div class="col-12" *ngIf="varietyDataload">
-					<div class="row" *ngIf="!isCropSubmitted">
+					<div class="row" *ngIf="!isCropSubmittedNew && isCropSubmitted">
 						<div class="col-md-3 col-sm-12" *ngIf="varietyDropdownData && varietyDropdownData.length >0">
 							<form [formGroup]="varietyForm">
-								<label for="year" class="label-inventory required">Select Variety</label>  
+								<label for="year" class="label-inventory required">Select Variety</label>
 								<ng-multiselect-dropdown class="seed-division-variety" formControlName="variety_id"
 									[placeholder]="'Select Variety'" [settings]="dropdownSettings"
 									(onSelect)="onSelectVariety($event)"
@@ -250,7 +280,8 @@
 
 							</form>
 						</div>
-						<div class="col-3" *ngIf="!isCropSubmitted && varietLineData && varietLineData.length>0">
+						<div class="col-3"
+							*ngIf="!isCropSubmittedNew && isCropSubmitted && varietLineData && varietLineData.length>0">
 							<form [formGroup]="varietyForm">
 
 								<ng-multiselect-dropdown class="seed-division-variety" formControlName="variety_line"
@@ -260,9 +291,9 @@
 							</form>
 						</div>
 						<div class="col-3"
-							*ngIf="!isCropSubmitted && editVarietyDropdown && editVarietyDropdown.length>0 && (varietyDropdownData && varietyDropdownData.length ==0)">
-							<form [formGroup]="editVarietyForm"> 
-								<label for="year" class="label-inventory required">Select Variety for Edit</label> 
+							*ngIf="!isCropSubmittedNew && isCropSubmitted && editVarietyDropdown && editVarietyDropdown.length>0 && (varietyDropdownData && varietyDropdownData.length ==0)">
+							<form [formGroup]="editVarietyForm">
+								<label for="year" class="label-inventory required">Select Variety for Edit</label>
 								<ng-multiselect-dropdown class="seed-division-variety" formControlName="variety_id"
 									[placeholder]="'Select Variety for Edit'" [settings]="dropdownSettings"
 									(onSelect)="onSelectEditVariety($event)" [data]="editVarietyDropdown">
@@ -274,7 +305,8 @@
 											[data]="editVarietyDropdown">
 										</ng-multiselect-dropdown> -->
 						</div>
-						<div class="col-3" *ngIf="!isCropSubmitted && varietyLineEdit && varietyLineEdit.length>0">
+						<div class="col-3"
+							*ngIf="!isCropSubmittedNew && isCropSubmitted && varietyLineEdit && varietyLineEdit.length>0">
 							<form [formGroup]="editVarietyForm">
 								<ng-multiselect-dropdown class="seed-division-variety" formControlName="variety_line"
 									[placeholder]="'Select Parental Line for Edit'" [settings]="dropdownSettings"
@@ -285,15 +317,15 @@
 					</div>
 
 
-					<div class="row" *ngIf="!isCropSubmitted">
-						<div class="col-12 mt-2 pr-0 pl-2">
+					<div class="row" *ngIf="!isCropSubmittedNew && isCropSubmitted  && showgrid">
+						<div class="col-12 mt-2 pr-0 pl-2" *ngIf="selectedVerietyDetail || editSelectedVariety">
 							<div class="row mx-1 aloc_breeder_padding mt-3 p-1">
 								<div class="col-3 px-2">
 									<label class="bold-label">Total Indenting Quantity :
-										{{varietyWiseTotalIndentValue?varietyWiseTotalIndentValue:'N/A'}}
-										<!-- {{selectedVerietyDetail && selectedVerietyDetail.totalIndentQuantity ?
-										getQuantityOfSeedProduced(selectedVerietyDetail.totalIndentQuantity) : 'N/A' }} -->
-
+										<!-- {{varietyWiseTotalIndentValue}} -->
+										<!-- {{varietyWiseTotalIndentValue?varietyWiseTotalIndentValue:'N/A'}} -->
+										{{selectedVerietyDetail && selectedVerietyDetail.totalIndentQuantity ?
+										getQuantityOfSeedProduced(selectedVerietyDetail.totalIndentQuantity) : 'N/A' }}
 									</label>
 								</div>
 								<div class="col-3 px-2">
@@ -308,7 +340,7 @@
 								<div class="col-3 pl-2">
 									<label class="bold-label">Allocation Percentage :
 										{{getQuantityOfSeedProduced(((selectedVerietyDetail &&
-										selectedVerietyDetail.totalAllocationQuantity?selectedVerietyDetail.totalAllocationQuantity:0)/(varietyWiseTotalIndentValue?varietyWiseTotalIndentValue:0))*100)}}
+										selectedVerietyDetail.totalAllocationQuantity?selectedVerietyDetail.totalAllocationQuantity:0)/(selectedVerietyDetail && selectedVerietyDetail.totalIndentQuantity?selectedVerietyDetail.totalIndentQuantity:0))*100)}}
 										<!-- {{getQuantityOfSeedProduced(varietyWiseTotalIndentValue) || '0'}} -->
 
 									</label>
@@ -324,8 +356,8 @@
 							</div>
 						</div>
 					</div>
-
-					<div class="row" *ngIf="!isCropSubmitted">
+					<!--  -->
+					<div class="row" *ngIf="!isCropSubmittedNew && isCropSubmitted && showgrid">
 						<div class="col">
 							<div class="table-responsive" *ngIf="selectedVerietyDetail">
 
@@ -350,23 +382,26 @@
 												:'NA'}}</td>
 
 											<!-- <td>{{data && data.producedquantity ? data.producedquantity :'NA'}}</td> -->
-											<td>{{data && data.allocation_to_indentor_for_lifting_seed_production_cnters
+											<td style="background-color: rgb(255, 211, 161);">{{data &&
+												data.allocation_to_indentor_for_lifting_seed_production_cnters
 												&& data.allocation_to_indentor_for_lifting_seed_production_cnters.alloc
 												? data.allocation_to_indentor_for_lifting_seed_production_cnters.qty
 												:'NA'}}</td>
 											<!-- getQuantityOfSeedProduced() -->
-											<td>{{data && data.quantityAllocated ? data.quantityAllocated
+											<td style="background-color: rgb(172, 255, 191);">{{data &&
+												data.quantityAllocated ? data.quantityAllocated
 												:'0'}}</td>
 											<!-- <td>{{data.allocation_to_indentor_for_lifting_seed_production_cnters.alloc
 													}}</td> -->
-											<td *ngIf="data && data.producedquantity && data.quantityAllocated">{{data
+											<td style="background-color: rgb(253, 164, 164);"
+												*ngIf="data && data.producedquantity && data.quantityAllocated">{{data
 												&& data.allocation_to_indentor_for_lifting_seed_production_cnters &&
 												data.allocation_to_indentor_for_lifting_seed_production_cnters.alloc &&
 												((data.allocation_to_indentor_for_lifting_seed_production_cnters.qty -
 												data.quantityAllocated) < 0 ) ? 0 :
 													getQuantityOfSeedProduced(data.allocation_to_indentor_for_lifting_seed_production_cnters.qty
 													- data.quantityAllocated)}} </td>
-											<td
+											<td style="background-color: rgb(253, 164, 164);"
 												*ngIf="data && data.allocation_to_indentor_for_lifting_seed_production_cnters.alloc && !data.quantityAllocated">
 												{{data && data.allocation_to_indentor_for_lifting_seed_production_cnters
 												&& data.allocation_to_indentor_for_lifting_seed_production_cnters.qty
@@ -381,8 +416,8 @@
 					</div>
 
 					<div class="row" *ngIf="selectedVerietyDetail && indentors && indentors.length > 0">
-
-						<div class="col" *ngIf="!isCropSubmitted">
+						<!-- *ngIf="!isCropSubmittedNew && isCropSubmitted" -->
+						<div class="col">
 							<div class="table-responsive">
 								<table class="table">
 									<thead class="thead col-12">
@@ -418,11 +453,23 @@
 											</td>
 
 											<td class="text-center">
-												{{selectedIndentor && selectedIndentor.indent_quantity &&
-												getQuantityOfSeedProduced(selectedIndentor.indent_quantity) || 0}}
-												/
-												{{selectedIndentor && selectedIndentor.indent_quantity &&
-												getPercentage(selectedIndentor.indent_quantity) || 0}}
+												<span
+													*ngIf="!editVarietyForm.controls['variety_id'].value?.[0]?.value ">
+													{{selectedIndentor && selectedIndentor.indent_quantity &&
+													getQuantityOfSeedProduced(selectedIndentor.indent_quantity) || 0}}
+													/
+													{{selectedIndentor && selectedIndentor.indent_quantity &&
+													getQuantityOfSeedProduced(selectedIndentor.indent_quantity) || 0}}
+
+												</span>
+												<span
+													*ngIf="editVarietyForm.controls['variety_id'].value?.[0]?.value && !isCropSubmittedNew && isCropSubmitted">
+													{{selectedIndentor && selectedIndentor.indent_quantity &&
+													getQuantityOfSeedProduced(selectedIndentor.indent_quantity) || 0}}
+													/
+													{{selectedIndentor && selectedIndentor.indent_quantity || 0}}
+
+												</span>
 											</td>
 											<td class="text-center m-p-0">
 												<table class="table table-bordered">
@@ -477,9 +524,9 @@
 
 											<td class="tex-center">
 												<div class="resp_btn">
-													<a href="javascript:void(0)"
+													<a href="javascript:void(0)" type="submit"
 														class="form_submit_btn submit_btn ml-3 d-inline-flex justify-content-center verticle-content-middle mb-3 mr-1"
-														(click)="submitData(selectedIndentor)">
+														(click)="submitData(selectedIndentor )">
 														Save
 													</a>
 												</div>
@@ -492,10 +539,10 @@
 					</div>
 
 					<hr>
-
-					<div class="row my-2" *ngIf="dataToShow && dataToShow.length > 0 ">
+					<!-- -->
+					<div class="row my-2" *ngIf="!isCropSubmittedNew && isCropSubmitted">
 						<div class="col">
-							<div class="row" *ngIf="!isCropSubmitted">
+							<div class="row" *ngIf="dataToShow && dataToShow.length > 0 ">
 								<div class="col">
 									<div class="table-responsive" *ngIf="editSelectedVariety">
 										<table class="table">
@@ -712,276 +759,245 @@
 											<!-- <th scope="col" class="text-center">Action</th> -->
 
 										</tr>
-									</thead>
+									</thead> 
+									<!-- <tbody>
+											<ng-container *ngFor="let data of dataToDisplay; let cropIndex = index">
+  <ng-container *ngFor="let spaData of data.productionData; let spaIndex = index">
+    <tr>
+       
+      <td *ngIf="spaIndex === 0" [attr.rowspan]="data.productionData.length">
+        {{ data.variety_id ? getVarietyName(data.variety_id) : (data.variety_name || 'NA') }}
+        <br />
+        <span *ngIf="data.line_variety_name">
+          {{ data.line_variety_name || 'NA' }}
+        </span>
+      </td>
 
-									<ng-container *ngFor="let data of dataToDisplay; let cropIndex = index">
+       
+      <td class="text-center" *ngIf="spaIndex === 0" [attr.rowspan]="data.productionData.length">
+        {{ data.indenter[0]?.name || 'NA' }}
+      </td>
+
+     
+      <td class="text-center" *ngIf="spaIndex === 0" [attr.rowspan]="data.productionData.length">
+        {{ data.indenter[0]?.indent_quantity ? getQuantityOfSeedProduced(data.indenter[0].indent_quantity) : '0' }}
+      </td>
+
+      
+      <td>{{ spaData.agency_name || 'NA' }}</td>
+
+       
+      <td class="text-center">
+        {{ spaData.quantity ? getQuantityOfSeedProduced(spaData.quantity) : '0' }}
+      </td>
+
+       
+      <td class="text-center" *ngIf="spaIndex === 0" [attr.rowspan]="data.productionData.length">
+        {{ data.indenter[0]?.allocated_quantity ? getQuantityOfSeedProduced(data.indenter[0].allocated_quantity) : '0' }}
+      </td>
+
+       
+      <td class="text-center" *ngIf="spaIndex === 0" [attr.rowspan]="data.productionData.length">
+        {{ data.indenter[0]?.quantity_left_for_allocation ? getQuantityOfSeedProduced(data.indenter[0].quantity_left_for_allocation) : '0' }}
+      </td>
+    </tr>
+  </ng-container>
+</ng-container>
+
+									</tbody> -->
+								 
+<tbody>
+		<ng-container *ngFor="let data of dataToDisplay; let cropIndex = index">
 										<ng-container
 											*ngFor="let varietyData of data.indenter; let varietyIndex = index">
 											<ng-container
 												*ngFor="let spaData of varietyData.productions; let spaIndex = index">
 												<tr>
-													<td *ngIf="spaIndex === 0 && varietyIndex === 0"
+												 
+													<!-- <td *ngIf="spaIndex === 0 && varietyIndex === 0"
 														[attr.rowspan]="data.totalVarietyLength">
-
-														<!-- {{data && data.variety_name ? data.variety_name :'NA'}} -->
 														<span
-															*ngIf="this.varietyForm.controls['variety_id'].value && !isCropSubmitted">{{data
-															&& data.variety_id ? getVarietyName(data.variety_id): data
-															&& data.variety_name ? data.variety_name :'NA'}}</span>
-														<span *ngIf="isCropSubmitted">{{data
-															&& data.variety_name ? data.variety_name:'NA' }}</span>
-														<span
-															*ngIf="(editVarietyForm.controls['variety_id'].value && editVarietyForm.controls['variety_id'].value[0] && editVarietyForm.controls['variety_id'].value[0].value) && !isCropSubmitted">
-															{{editVarietyForm.controls['variety_id'].value[0].name?editVarietyForm.controls['variety_id'].value[0].name:''}}
+															*ngIf="!isCropSubmittedNew && isCropSubmitted && varietyForm.controls['variety_id'].value">
+														 
+															{{data && data.variety_id ? getVarietyName(data.variety_id) :
+															(data.variety_name || '') }}
 														</span>
-														<br>
-														<span *ngIf="data && data.line_variety_name">{{data &&
-															data.line_variety_name ? data.line_variety_name
-															:'NA'}}</span>
+														 
+														<span *ngIf="editVarietyForm.controls['variety_id'].value?.[0]?.value && !isCropSubmittedNew  ">
+														{{data && data.variety_id ? getVarietyName1(data.variety_id) :
+															(data.variety_name || '') }}
+														</span>
+														<span *ngIf="isCropSubmitted && !editVarietyForm.controls['variety_id'].value?.[0]?.value"
+															>
+															{{data && data.variety_id ? getVarietyName1(data.variety_id) :
+															(data.variety_name || '') }}
+															 
+														</span>
+														<br />
+														<span *ngIf="data.line_variety_name">
+															{{ data.line_variety_name || '' }}
+														</span>
+													</td> -->
+													<td *ngIf="spaIndex === 0 && varietyIndex === 0"
+                                                        [attr.rowspan]="data.totalVarietyLength">
 
+                                                    <ng-container [ngSwitch]="true">
+
+                                                     <!-- Case 1 -->
+                                                    <span *ngSwitchCase="!isCropSubmittedNew && isCropSubmitted && varietyForm.controls['variety_id'].value">
+                                                       {{ data?.variety_id ? getVarietyName(data.variety_id) : (data.variety_name || '') }}
+                                                    </span>
+
+                                                       <!-- Case 2 -->
+                                                    <span *ngSwitchCase="editVarietyForm.controls['variety_id'].value?.[0]?.value && !isCropSubmittedNew">
+                                                      {{ data?.variety_id ? getVarietyName1(data.variety_id) : (data.variety_name || '') }}
+                                                    </span>
+
+                                                    <!-- Case 3 -->
+                                                    <span *ngSwitchDefault>
+                                                    {{ data?.variety_id ? getVarietyName1(data.variety_id) : (data.variety_name || '') }}
+                                                       </span>
+
+                                                    </ng-container>
+  
+														<br />
+														<span *ngIf="data.line_variety_name">
+															{{ data.line_variety_name || '' }}
+														</span>
+
+                                                    </td>
+
+
+													 
+													<td class="text-center" *ngIf="spaIndex === 0 "
+														[attr.rowspan]="varietyData.productions.length">
+														{{ varietyData.name || '' }} 
 													</td>
 
-
+													 
 													<td class="text-center" *ngIf="spaIndex === 0"
-														[attr.rowspan]="varietyData.totalProductionlength">
-
-														{{varietyData && varietyData.name ? varietyData.name :
-														'NA'}}
-
+														[attr.rowspan]="varietyData.productions.length">
+														{{ varietyData.indent_quantity ?
+														getQuantityOfSeedProduced(varietyData.indent_quantity) : '' }}
 													</td>
-													<!-- [attr.rowspan]="varietyData.totalProductionlength" -->
+
+													 
+													<td>
+														<span *ngIf="varietyForm.controls['variety_id'].value">
+															{{ spaData.agency_name || '' }}
+														</span>
+														<span
+															*ngIf="editVarietyForm.controls['variety_id'].value?.[0]?.value || isCropSubmitted">
+															{{ getUserData(spaData.name) || '' }}
+														</span>
+													</td>
+
+													 
+													<td class="text-center">
+														<span
+															*ngIf="!isCropSubmittedNew && isCropSubmitted && varietyForm.controls['variety_id'].value  && !editVarietyForm.controls['variety_id'].value?.[0]?.value ">
+															 
+															{{spaData.quantity ?
+															getQuantityOfSeedProduced(spaData.quantity)
+															: ''}}
+														</span>
+														<span *ngIf="isCropSubmitted  && !editVarietyForm.controls['variety_id'].value?.[0]?.value ">
+															{{ spaData.allocated_quantity ?
+															getQuantityOfSeedProduced(spaData.allocated_quantity) : ''
+															}}
+
+														</span>
+														<span
+															*ngIf="editVarietyForm.controls['variety_id'].value?.[0]?.value && !isCropSubmittedNew ">
+															{{spaData.quantity ?
+															getQuantityOfSeedProduced(spaData.quantity)
+															: ''}}
+														</span>
+													</td>
+
+													 
 													<td class="text-center" *ngIf="spaIndex === 0"
-														[attr.rowspan]="varietyData.totalProductionlength">
-
-														{{varietyData.indent_quantity ?
-														getQuantityOfSeedProduced(varietyData.indent_quantity) : '0'}}
-
-													</td>
-													<!-- <td *ngIf="editVarietyForm.controls['variety_id'].value && editVarietyForm.controls['variety_id'].value[0] && editVarietyForm.controls['variety_id'].value[0].value">
-														{{spaData.production || '0'}}
-													</td> -->
-
-													<!-- name of bspc -->
-													<td>
+														[attr.rowspan]="varietyData.productions.length">
 														<span
-															*ngIf="this.varietyForm.controls['variety_id'].value">{{spaData.agency_name
-															|| '0'}}</span>
+															*ngIf="!isCropSubmittedNew && isCropSubmitted && varietyForm.controls['variety_id'].value   && !editVarietyForm.controls['variety_id'].value?.[0]?.value ">
+															 
+															{{varietyData.allocated_quantity ?
+															getQuantityOfSeedProduced(varietyData.allocated_quantity) :
+															''}}
+														</span>
+														<span *ngIf="isCropSubmitted  && !editVarietyForm.controls['variety_id'].value?.[0]?.value ">
+															{{ varietyData.quantity ?
+															getQuantityOfSeedProduced(varietyData.quantity) : '' }}
+														</span>
 														<span
-															*ngIf="(editVarietyForm.controls['variety_id'].value && editVarietyForm.controls['variety_id'].value[0] && editVarietyForm.controls['variety_id'].value[0].value) || isCropSubmitted">{{getUserData(spaData.name)
-															|| '0'}}</span>
-													</td>
-													<td *ngIf="spaIndex === 0"
-														[attr.rowspan]="varietyData.totalProductionlength">
+															*ngIf="editVarietyForm.controls['variety_id'].value?.[0]?.value && !isCropSubmittedNew ">
+															{{varietyData.allocated_quantity ?
+															getQuantityOfSeedProduced(varietyData.allocated_quantity) :
+															''}}
+														</span>
 
-														{{varietyData.allocated_quantity ?
-														getQuantityOfSeedProduced(varietyData.allocated_quantity) :
-														'0'}}
-													</td>
-													<td>
-														{{spaData.quantity ? getQuantityOfSeedProduced(spaData.quantity)
-														: '0'}}
-													</td>
-													
-													<td *ngIf="spaIndex === 0"
-														[attr.rowspan]="varietyData.totalProductionlength">
-														{{varietyData.quantity_left_for_allocation ?
-														getQuantityOfSeedProduced(varietyData.quantity_left_for_allocation)
-														: '0'}}
-													</td>
-													<!-- <td>
-														hii
-													</td> -->
-													<!-- <td class="text-center" *ngIf="spaIndex === 0"
-														[attr.rowspan]="varietyData.totalProductionlength">
-														{{varietyData.indent_quantity ? getQuantityOfSeedProduced(varietyData.indent_quantity) : '0'}}
 
 													</td>
-													<td>
-														{{spaData.name || '0'}}
-													</td>
 
-													<td>
-														{{spaData.quantity ? getQuantityOfSeedProduced(spaData.quantity) : '0'}}
-													</td>
-													
-													<td *ngIf="spaIndex === 0" [attr.rowspan]="varietyData.totalProductionlength">
+													 
+													<td class="text-center" *ngIf="spaIndex === 0"
+														[attr.rowspan]="varietyData.productions.length">
+														<span
+															*ngIf="!isCropSubmittedNew && isCropSubmitted && varietyForm.controls['variety_id'].value  && !editVarietyForm.controls['variety_id'].value?.[0]?.value ">
+															{{varietyData.quantity_left_for_allocation ?
+															getQuantityOfSeedProduced(varietyData.quantity_left_for_allocation)
+															: ''}}
+														</span>
+														<span *ngIf="isCropSubmitted   && !editVarietyForm.controls['variety_id'].value?.[0]?.value ">
+															{{ spaData.quantity_left_for_allocation
+															?
+															getQuantityOfSeedProduced(spaData.quantity_left_for_allocation)
+															: '' }}
+														</span>
+														<span
+															*ngIf="editVarietyForm.controls['variety_id'].value?.[0]?.value && !isCropSubmittedNew  ">
+															{{varietyData.quantity_left_for_allocation ?
+															getQuantityOfSeedProduced(varietyData.quantity_left_for_allocation)
+															: ''}}
+														</span>
 
-														{{varietyData.allocated_quantity ? getQuantityOfSeedProduced(varietyData.allocated_quantity) : '0'}}
 													</td>
-													
-													<td *ngIf="spaIndex === 0" [attr.rowspan]="varietyData.totalProductionlength">
-														{{varietyData.quantity_left_for_allocation ? getQuantityOfSeedProduced(varietyData.quantity_left_for_allocation) : '0'}}
-													</td> -->
-
 												</tr>
 											</ng-container>
 										</ng-container>
+									</ng-container> 
+</tbody>
+									 
+									 
+									 
 
-									</ng-container>
-
-									<ng-container>
-										<tr *ngIf="isCropSubmitted">
+									<!-- Grand Total Row --> 
+									 
+										<!-- *ngIf="editVarietyForm.controls['variety_id'].value || isCropSubmitted" -->
+										<tr *ngIf="showgrid1 && !editVarietyForm.controls['variety_id'].value && isCropSubmitted">
+											<th></th>
 											<th>Grand Total</th>
+											<!-- <th></th> -->
+											
+											<th class="text-center">
+												{{ totalIntentValue ? (totalIntentValue | number: '1.2-2') : 0 }}
+											</th>
 											<th></th>
-											<th>{{totalIntentValue ? (totalIntentValue |
-												number:'1.2-2'):0}}</th>
 											<th></th>
-											<th></th>
-											<th>{{totalAllocateValue ? (totalAllocateValue |
-												number:'1.2-2'):0}}</th>
-											<th>{{totalleftValue ? (totalleftValue |
-												number:'1.2-2'):0}}</th>
+											<th class="text-center">
+												{{ totalAllocateValue ? (totalAllocateValue | number: '1.2-2') : 0 }}
+											</th>
+											<th class="text-center">
+												{{ totalleftValue ? (totalleftValue | number: '1.2-2') : 0 }}
+											</th>
 										</tr>
-									</ng-container>
-									<!-- *ngIf="indentorsubmitted" -->
-									<!-- <tbody *ngIf="indentorsubmitted">
-										<ng-container *ngFor="let data of dataToDisplay; let cropIndex = index">
-											<ng-container
-												*ngFor="let varietyData of data.indenter; let varietyIndex = index">
-												<ng-container
-													*ngFor="let spaData of varietyData.productions; let spaIndex = index">
-													<tr>
-														<td *ngIf="spaIndex === 0 && varietyIndex === 0"
-															[attr.rowspan]="data.totalVarietyLength">
-															{{data && data.variety_id ? getVarietyName(data.variety_id)
-															: 'NA'}}
-
-														</td>
-														<td class="text-center" *ngIf="spaIndex === 0"
-															[attr.rowspan]="varietyData.totalProductionlength">
-															{{varietyData && varietyData.name ? varietyData.name :
-															'NA'}}
-
-														</td>
-														<td class="text-center" *ngIf="spaIndex === 0"
-															[attr.rowspan]="varietyData.totalProductionlength">
-															{{varietyData.indent_quantity ?
-															getQuantityOfSeedProduced(varietyData.indent_quantity) :
-															'0'}}
-
-														</td>
-														<td>
-															{{spaData.name || '0'}}
-														</td>
-														<td>
-															{{spaData.quantity ?
-															getQuantityOfSeedProduced(spaData.quantity) : '0'}}
-														</td>
-														<td *ngIf="spaIndex === 0"
-															[attr.rowspan]="varietyData.totalProductionlength">
-
-															{{varietyData.allocated_quantity ?
-															getQuantityOfSeedProduced(varietyData.allocated_quantity) :
-															'0'}}
-														</td>
-														<td *ngIf="spaIndex === 0"
-															[attr.rowspan]="varietyData.totalProductionlength">
-															{{varietyData.quantity_left_for_allocation ?
-															getQuantityOfSeedProduced(varietyData.quantity_left_for_allocation)
-															: '0'}}
-														</td>
-
-													</tr>
-												</ng-container>
-											</ng-container>
-
-										</ng-container>
-									</tbody> -->
-
-									<!-- <tbody *ngIf="!indentorsubmitted">
-										<ng-container *ngFor="let data of dataToDisplay; let cropIndex = index">
-											<ng-container
-												*ngFor="let varietyData of data.indenter; let varietyIndex = index">
-												<ng-container
-													*ngFor="let spaData of varietyData.productions; let spaIndex = index">
-													<tr>
-														<td *ngIf="spaIndex === 0 && varietyIndex === 0"
-															[attr.rowspan]="data.prodlength">
-															{{data && data.variety_id ? getVarietyName(data.variety_id)
-															: 'NA'}}
-
-														</td>
-														<td class="text-center" *ngIf="spaIndex === 0"
-															[attr.rowspan]="varietyData.totalProductionlength">
-															{{varietyData && varietyData.name ? varietyData.name :
-															'NA'}}
-
-														</td>
-														<td class="text-center" *ngIf="spaIndex === 0"
-															[attr.rowspan]="varietyData.totalProductionlength">
-															{{varietyData.indent_quantity ?
-															getQuantityOfSeedProduced(varietyData.indent_quantity) :
-															'0'}}
-
-														</td>
-														<td>
-															{{spaData.name || '0'}}
-														</td>
-														<td>
-															{{spaData.quantity ?
-															getQuantityOfSeedProduced(spaData.quantity) : '0'}}
-														</td>
-														<td *ngIf="spaIndex === 0"
-															[attr.rowspan]="varietyData.totalProductionlength">
-
-															{{varietyData.allocated_quantity ?
-															getQuantityOfSeedProduced(varietyData.allocated_quantity) :
-															'0'}}
-														</td>
-														<td *ngIf="spaIndex === 0"
-															[attr.rowspan]="varietyData.totalProductionlength">
-															{{varietyData.quantity_left_for_allocation ?
-															getQuantityOfSeedProduced(varietyData.quantity_left_for_allocation)
-															: '0'}}
-														</td>
-														
-
-													</tr>
-												</ng-container>
-											</ng-container>
-
-										</ng-container>
-									</tbody> -->
+									 
 								</table>
 							</div>
 						</div>
 					</div>
 
-					<!-- <div class="row my-2">
-						<div class="col">
 
-							<div class="row" *ngIf="!isCropSubmitted">
-								<div class="col">
-									<button *ngIf="(indentors && indentors.length == 0); else disableVarietyBtn"
-										class="btn submitButtons ml-5 ml-md-0" type="submit">Variety Wise
-										Submission</button>
-
-									<ng-template #disableVarietyBtn>
-										<button class="btn submitButtons disabled" disabled>Variety Wise
-											Submission</button>
-
-									</ng-template>
-									{{tempVerietyListDetails.length}} {{cropButtonEnable}}
-									<button
-										*ngIf="tempVerietyListDetails && cropButtonEnable && tempVerietyListDetails.length == 0; else disableCropBtn"
-										class="btn submitButtons ml-5 ml-md-2 mt-3 mt-md-0" type="button"
-										(click)="cropWiseSubmission()">Crop
-										Wise Final Submission</button>
-
-									<ng-template #disableCropBtn>
-										<button class="btn submitButtons disabled ml-5 ml-md-2 mt-3 mt-md-0"
-											disabled>Crop Wise Final
-											Submission</button>
-
-									</ng-template>
-								</div>
-
-
-							</div>
-
-						</div>
-
-					</div> -->
 					<ng-template #cropSubmitted>
 						<div class="row">
 							<div class="col" style="text-align: center;">
@@ -993,7 +1009,7 @@
 					<div class="row my-2">
 						<div class="col">
 
-							<div class="row" *ngIf="!isCropSubmitted">
+							<div class="row" *ngIf="!isCropSubmittedNew && isCropSubmitted ">
 								<div class="col">
 									<button *ngIf="isEditingVariety" class="btn submitButtons " type="button"
 										(click)="cancelEdit()">
@@ -1004,10 +1020,10 @@
 										class="btn submitButtons ml-2" type="submit">Variety Wise Submission</button>
 
 									<ng-template #disableVarietyBtn>
-										<button class="btn submitButtons disabled" disabled>Variety Wise
-											Submission</button>
+										<button class="btn submitButtons disabled" disabled>Variety Wise Submission</button>
 
 									</ng-template>
+									 
 
 									<button
 										*ngIf="!isEditingVariety && tempVerietyListDetails && cropButtonEnable && tempVerietyListDetails.length == 0; else disableCropBtn"
@@ -1029,460 +1045,3 @@
 		</div>
 	</div>
 </form>
-
-
-
-
-<!-- <form [formGroup]="formSuperGroup" (ngSubmit)="submitForm(formSuperGroup.value)">
-	<div class="row my-4 w-100 mx-0 form-child">
-		<div class="col-12 px-md-3 px-sm-3 px-0">
-			<div class="row mx-auto main-content-form-wrapper py-2">
-
-				<div class="col-12"
-					style="letter-spacing: 0px;color: #000000 !important; font-style: normal Poppins; font-weight: bold;font-size : 20px">
-					Allocation of Breeder Seed to SPAs for Lifting second
-				</div>
-
-				<div class="col-12 px-1">
-					<app-dynamic-fields [fieldsList]="fieldsList" [isLabelControlParallel]="false"
-						[formGroup]="IstPartFormGroup" [isView]="isView"></app-dynamic-fields>
-				</div>
-
-				<div class="col-12" style="display: inline-flex;">
-					<div class="resp_btn" *ngIf="!isView">
-						<a href="javascript:void(0)" (click)="search()"
-							class="form-button submit_btn d-inline-flex justify-content-center verticle-content-middle mb-3">
-							Search
-						</a>
-					</div>
-					<div class="resp_btn" *ngIf="!isView">
-						<a href="javascript:void(0)"
-							class="form-button submit_btn ml-3 d-inline-flex justify-content-center verticle-content-middle mb-3 mr-1"
-							(click)="clear()">
-							Clear
-						</a>
-					</div>
-				</div>
-
-				<div class="col-12 mt-1">
-					<div class="row">
-						<div class="col-4 pr-2">
-							<label class="bold-label ">Total Number of Variety :
-								{{verietyListDetails.totalNumberOfVariety ?
-								verietyListDetails.totalNumberOfVariety : 'N/A' }}</label>
-						</div>
-						<div class="col-4 px-2">
-							<label class="bold-label">Total Indenting Quantity:
-								{{verietyListDetails.totalIndentQuantity ?
-								getQuantityOfSeedProduced(verietyListDetails.totalIndentQuantity) : 'N/A' }}
-
-							</label>
-						</div>
-						<div class="col-4 pl-2">
-							<label class="bold-label">Total Production : {{verietyListDetails.totalAllocationQuantity ?
-								getQuantityOfSeedProduced(verietyListDetails.totalAllocationQuantity) : 'N/A' }}
-
-							</label>
-						</div>
-
-					</div>
-				</div>
-
-				<div class="col-12" *ngIf="varietyDataload ">
-					<div class="row">
-						<div class="col-4">
-							<form [formGroup]="varietyForm">
-
-								<ng-multiselect-dropdown class="seed-division-variety" formControlName="variety_id"
-									[placeholder]="'Select Variety'" [settings]="dropdownSettings"
-									(onSelect)="onSelectVariety($event)"
-									[data]="varietyDropdownData"></ng-multiselect-dropdown>
-
-							</form>
-						</div>
-					</div>
-
-					<div class="row">
-						<div class="col-12 mt-2 pr-0 pl-2">
-							<div class="row mx-1 aloc_breeder_padding mt-3 p-1">
-								<div class="col-3 px-2">
-									<label class="bold-label">Total Indenting Quantity :
-										{{selectedVerietyDetail && selectedVerietyDetail.totalIndentQuantity ?
-										getQuantityOfSeedProduced(selectedVerietyDetail.totalIndentQuantity) : 'N/A' }}
-
-									</label>
-								</div>
-								<div class="col-3 px-2">
-									<label class="bold-label">Total Production :
-										{{selectedVerietyDetail && selectedVerietyDetail.totalAllocationQuantity ?
-										getQuantityOfSeedProduced(selectedVerietyDetail.totalAllocationQuantity) : 'N/A'
-										}}
-
-									</label>
-								</div>
-
-								<div class="col-3 pl-2">
-									<label class="bold-label">Production Percentage :
-										{{getQuantityOfSeedProduced(productionPercentage) || '0'}}
-									</label>
-								</div>
-
-								<div class="col-3 pl-2">
-									<label class="bold-label">Quantity Unit : {{
-										searhedData && IstPartFormGroupControls['cropName'].value &&
-										IstPartFormGroupControls['cropName'].value.value ?
-										getQuantityMeasure(IstPartFormGroupControls['cropName'].value.value):''}}
-									</label>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div class="row">
-						<div class="col">
-							<div class="table-responsive" *ngIf="selectedVerietyDetail">
-								<table class="table">
-									<thead class="thead">
-										<tr>
-											<td scope="col" style="font-weight: 600;">Name of BSPCs</td>
-											<td class="bspcName" scope="col" style="font-weight: 600;"
-												*ngFor="let data of selectedVerietyDetail.productionCenters; let dataIndex=index">
-												{{data.user.name}}</td>
-										</tr>
-									</thead>
-
-									<tbody>
-										<tr>
-											<th scope="row">
-												Quantity Produced
-											</th>
-											<th class="bspcName" scope="col"
-												*ngFor="let data of selectedVerietyDetail.productionCenters; let dataIndex=index">
-												{{getQuantityOfSeedProduced(data.quantityProduced)}}
-											</th>
-
-										</tr>
-										<tr>
-											<th scope="row">
-												Quantity Allocated
-											</th>
-											<th class="bspcName" scope="col"
-												*ngFor="let data of selectedVerietyDetail.productionCenters; let dataIndex=index">
-												{{getQuantityOfSeedProduced(data.quantityAllocated)}}
-											</th>
-										</tr>
-										<tr>
-											<th scope="row">
-												Quantity Left
-											</th>
-											<th class="bspcName" scope="col"
-												*ngFor="let data of selectedVerietyDetail.productionCenters; let dataIndex=index">
-												{{data && data.quantityProduced && data.quantityAllocated &&
-												((data.quantityProduced - data.quantityAllocated) < 0 ) ? 0 :
-													getQuantityOfSeedProduced(data.quantityProduced -
-													data.quantityAllocated)}} </th>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-						</div>
-					</div>
-
-					<div class="row" *ngIf="selectedVerietyDetail">
-						<div class="col">
-							<div class="table-responsive">
-								<table class="table">
-									<thead class="thead">
-										<tr>
-											<th scope="col" class="text-center indenterName">Name of Spa</th>
-											<th scope="col" class="text-center indentorQuantity">Indented Quantity</th>
-											<th scope="col" class="text-center allocationQuantity">Allocation for
-												Lifting</th>
-											<th scope="col" class="text-center indentorQuantity">Allocated Quantity</th>
-											<th scope="col" class="text-center indentorQuantity">Quantity left for
-												Allocation</th>
-											<th scope="col" class="text-center indentorQuantity">Action</th>
-
-										</tr>
-									</thead>
-
-									<tbody>
-										<tr *ngIf="indentorLoad && indentors && indentors.length > 0">
-											<td>
-												<form [formGroup]="tempForm">
-													<ng-multiselect-dropdown class="seed-division-variety"
-														formControlName="selectedIndentorModel"
-														[placeholder]="'Select Indentor'" [settings]="dropdownSettings"
-														(onSelect)="onSelectIndentor($event)" [data]="indentors">
-													</ng-multiselect-dropdown>
-												</form>
-
-											</td>
-
-											<td class="text-center">
-												{{selectedIndentor && selectedIndentor.indent_quantity &&
-												getQuantityOfSeedProduced(selectedIndentor.indent_quantity) || 0}}
-												/
-												{{selectedIndentor && selectedIndentor.indent_quantity &&
-												getPercentage(selectedIndentor.indent_quantity) || 0}}
-											</td>
-											<td class="text-center m-p-0">
-												<table class="table table-bordered">
-													<tbody *ngIf="selectedIndentor && selectedIndentor.productions">
-														<tr
-															*ngFor="let production of selectedIndentor.productions; let productionIndex = index">
-															<td style="min-width: 150px;">{{production.name || 'N/A'}}
-															</td>
-															<td style="min-width: 150px;">
-																<div>
-																	<input class="qty-txt" type="text"
-																		(keypress)="isNumberKey($event)" step="0.01"
-																		(keyup)="qtyChanged($event, production, productionIndex)"
-																		[(value)]="production.quantity">
-																</div>
-
-															</td>
-
-														</tr>
-
-													</tbody>
-												</table>
-											</td>
-
-											<td class="text-center">
-												{{selectedIndentor && selectedIndentor.allocated_quantity &&
-												getQuantityOfSeedProduced(selectedIndentor.allocated_quantity)}}
-											</td>
-											<td class="text-center">
-												{{selectedIndentor && selectedIndentor.quantity_left_for_allocation &&
-												getQuantityOfSeedProduced(selectedIndentor.quantity_left_for_allocation)}}
-											</td>
-
-											<td class="tex-center">
-												<div class="resp_btn">
-													<a href="javascript:void(0)"
-														class="form-button submit_btn ml-3 d-inline-flex justify-content-center verticle-content-middle mb-3 mr-1"
-														(click)="submitData(selectedIndentor)">
-														Submit
-													</a>
-												</div>
-											</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-						</div>
-					</div>
-
-					<div class="row my-2" *ngIf="dataToShow && dataToShow.length > 0">
-						<div class="col">
-							<div class="row mb-2" *ngIf="editVarietyDropdown && editVarietyDropdown.length > 0">
-								<div class="col-sm-4">
-									<form [formGroup]="editVarietyForm">
-										<ng-multiselect-dropdown class="seed-division-variety"
-											formControlName="variety_id" [placeholder]="'Select Variety for edit'"
-											[settings]="dropdownSettings" (onSelect)="onSelectEditVariety($event)"
-											[data]="editVarietyDropdown">
-										</ng-multiselect-dropdown>
-									</form>
-								</div>
-							</div>
-
-							<div class="row" *ngIf="editSelectedVariety">
-								<div class="col">
-									<div class="table-responsive">
-										<table class="table">
-											<thead class="thead">
-												<tr>
-													<th scope="col" class="text-center indenterName">Name of indenters</th>
-													<th scope="col" class="text-center indentorQuantity">Indented Quantity</th>
-													<th scope="col" class="text-center allocationQuantity">Allocation for
-														Lifting</th>
-													<th scope="col" class="text-center indentorQuantity">Allocated Quantity</th>
-													<th scope="col" class="text-center indentorQuantity">Quantity left for
-														Allocation</th>
-													<th scope="col" class="text-center indentorQuantity">Action</th>
-		
-												</tr>
-											</thead>
-		
-											<tbody>
-												<tr>
-													<td>
-														<form [formGroup]="editTempForm">
-															<ng-multiselect-dropdown class="seed-division-variety"
-																formControlName="selectedIndentorModel"
-																[placeholder]="'Select Indentor'" [settings]="dropdownSettings"
-																(onSelect)="onEditIndentor($event)" [data]="editSelectedVariety.indenter">
-															</ng-multiselect-dropdown>
-														</form>
-		
-													</td>
-		
-													<td class="text-center">
-														{{editSelectedIndentor && editSelectedIndentor.indent_quantity &&
-														getQuantityOfSeedProduced(editSelectedIndentor.indent_quantity) || 0}}
-														/
-														{{editSelectedIndentor && editSelectedIndentor.indent_quantity &&
-														getPercentage(editSelectedIndentor.indent_quantity) || 0}}
-													</td>
-													<td class="text-center m-p-0">
-														<table class="table table-bordered">
-															<tbody *ngIf="editSelectedIndentor && editSelectedIndentor.productions">
-																<tr
-																	*ngFor="let production of editSelectedIndentor.productions; let productionIndex = index">
-																	<td style="min-width: 150px;">{{production.name || 'N/A'}}
-																	</td>
-																	<td style="min-width: 150px;">
-																		<div>
-																			<input class="qty-txt" type="text"
-																				(keypress)="isNumberKey($event)" step="0.01"
-																				(keyup)="editQtyChanged($event, production, productionIndex)"
-																				[(value)]="production.quantity">
-																		</div>
-		
-																	</td>
-		
-																</tr>
-		
-															</tbody>
-														</table>
-													</td>
-		
-													<td class="text-center">
-														{{editSelectedIndentor && editSelectedIndentor.allocated_quantity &&
-														getQuantityOfSeedProduced(editSelectedIndentor.allocated_quantity)}}
-													</td>
-													<td class="text-center">
-														{{editSelectedIndentor && editSelectedIndentor.quantity_left_for_allocation &&
-														getQuantityOfSeedProduced(editSelectedIndentor.quantity_left_for_allocation)}}
-													</td>
-		
-													<td class="tex-center">
-														<div class="resp_btn">
-															<a href="javascript:void(0)"
-																class="form-button submit_btn ml-3 d-inline-flex justify-content-center verticle-content-middle mb-3 mr-1"
-																(click)="updateVarietyData(editSelectedIndentor)">
-																update
-															</a>
-														</div>
-													</td>
-												</tr>
-											</tbody>
-										</table>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div class="row">
-						<div class="col">
-							<div class="table-responsive">
-								<table class="table">
-									<thead class="thead">
-										<tr>
-											<th scope="col" class="text-center">Variety Name</th>
-											<th scope="col" class="text-center">Name of indenters</th>
-											<th scope="col" class="text-center">Indented Quantity</th>
-											<th scope="col" class="text-center">Name of BSPC</th>
-											<th scope="col" class="text-center">Allocated Quantity</th>
-											<th scope="col" class="text-center">Quantity left for Allocation</th>
-
-										</tr>
-									</thead>
-
-									<tbody *ngIf="dataToShow && dataToShow.length > 0">
-										<tr *ngFor="let data of dataToShow; let i =index">
-											<td class="text-center">
-												{{data && data.variety_id ? getVarietyName(data.variety_id) : 'NA'}}
-
-											</td>
-
-											<td class="text-center">
-												<div *ngFor="let data1 of data['indenter']">
-													{{data1 && data1.name ? data1.name : 'NA'}}
-												</div>
-											</td>
-
-											<td class="text-center">
-												<div *ngFor="let data2 of data['indenter']">
-													{{data2.indent_quantity || '0'}}
-												</div>
-											</td>
-
-											<td class="text-center">
-												<div *ngFor="let data3 of data['indenter']">
-													<p *ngFor="let data4 of data3['productions']">
-														<span>
-															{{data4.name || 'NA'}}
-														</span>
-														<span>
-															{{data4.quantity || '0'}}
-														</span>
-													</p>
-												</div>
-											</td>
-
-											<td class="text-center">
-												<div *ngFor="let data5 of data['indenter']">
-													<p>
-														{{data5.allocated_quantity || '0'}}
-													</p>
-												</div>
-											</td>
-
-											<td class="text-center">
-												<div *ngFor="let data6 of data['indenter']">
-													<p>
-														{{data6.quantity_left_for_allocation || '0'}}
-													</p>
-												</div>
-											</td>
-
-										</tr>
-									</tbody>
-								</table>
-							</div>
-						</div>
-					</div>
-
-					<div class="row my-2">
-						<div class="col">
-
-							<div class="row" *ngIf="!isView">
-								<div class="col">
-									<button
-										*ngIf="indentors && indentors.length == 0; else disableVarietyBtn"
-										class="btn submitButtons" type="submit">Variety wise submission</button>
-
-									<ng-template #disableVarietyBtn>
-										<button class="btn submitButtons disabled" disabled>Variety wise
-											submission</button>
-
-									</ng-template>
-
-									<button
-										*ngIf="tempVerietyListDetails && cropButtonEnable && tempVerietyListDetails.length == 0; else disableCropBtn"
-										class="btn submitButtons ml-2" type="button" (click)="cropWiseSubmission()">Crop
-										Wise Final Submission</button>
-
-									<ng-template #disableCropBtn>
-										<button class="btn submitButtons disabled ml-2" disabled>Crop Wise Final
-											Submission</button>
-
-									</ng-template>
-								</div>
-
-
-							</div>
-
-						</div>
-
-					</div>
-				</div>
-
-			</div>
-		</div>
-	</div>
-</form> -->

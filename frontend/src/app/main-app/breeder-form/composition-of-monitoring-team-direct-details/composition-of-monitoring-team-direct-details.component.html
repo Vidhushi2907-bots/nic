@@ -3,8 +3,8 @@
         <!-- <div class="main-inventory my-4 w-90 py-1" > -->
         <!-- *ngIf="isCrop" -->
         <!--  -->
-        <div *ngIf="isDirectFormShow" >
-            <div class="col-12 col-md-12 col-lg-12 pt-1 col-xl-12 pt-2"*ngIf="!isExits" >
+        <div *ngIf="isDirectFormShow">
+            <div class="col-12 col-md-12 col-lg-12 pt-1 col-xl-12 pt-2" *ngIf="!isExits">
                 <div class="row card-inventory form-group " *ngIf="isHidden">
                     <div class="col-xl-12 pb-3" *ngIf="isCrop">
                         <span class="title-inventory pt-1">
@@ -12,7 +12,7 @@
                         </span>
                     </div>
 
-                    <div class="col-12 px-3" >
+                    <div class="col-12 px-3">
                         <div class="row card-monitoring form-group mx-1">
                             <ng-container *ngFor="let ele of bspc.controls; let i = index" formArrayName="bsp1Arr">
                                 <div [formGroupName]="i" class="col-xl-11 col-lg-11 col-md-11 col-12 pt-3">
@@ -39,7 +39,8 @@
                                                             &&
                                                             (ngForm.controls['bsp1Arr']['controls'][i].controls['designation'].value.name)?
                                                             (ngForm.controls['bsp1Arr']['controls'][i].controls['designation'].value.name)
-                                                            :selectDestination? selectDestination: 'Select Designation'}}</button>
+                                                            :selectDestination? selectDestination: 'Select
+                                                            Designation'}}</button>
                                                         <div class="dropdown-menu w-100" ngbDropdownMenu="states"
                                                             aria-labelledby="sortMenu">
                                                             <input type="text" class="form-control px-4"
@@ -78,40 +79,40 @@
                                                 </div>
                                                 <div class="col-12 col-md-12 col-lg-12 col-lg-12 col-xl-12">
                                                     <!-- <div class="col-12 col-md-12 col-lg-12 col-lg-12 col-xl-12"> -->
-                                                        <div ngbDropdown class="d-inline-block w-100 ">
-                                                            <button class="btn takeplacholder w-100 crop toggle-button"
-                                                                [id]="'agency' + i" ngbDropdownToggle
-                                                                style="text-align: left;font-weight:400;">{{ngForm.controls['bsp1Arr']['controls'][i].controls['designation']
-                                                                &&
-                                                                ngForm.controls['bsp1Arr']['controls'][i].controls['agency'].value
-                                                                &&
-                                                                ngForm.controls['bsp1Arr']['controls'][i].controls['agency'].value.name
-                                                                &&
-                                                                (ngForm.controls['bsp1Arr']['controls'][i].controls['agency'].value.name.length>20)?
-                                                                (ngForm.controls['bsp1Arr']['controls'][i].controls['agency'].value.name.substring(0,20)+'...'):
-                                                                (ngForm.controls['bsp1Arr']['controls'][i].controls['agency'].value)
-                                                                &&
-                                                                (ngForm.controls['bsp1Arr']['controls'][i].controls['agency'].value.name)?
-                                                                (ngForm.controls['bsp1Arr']['controls'][i].controls['agency'].value.name)
-                                                                :selectagency? selectagency: 'Select Agency'}}</button>
-                                                            <div class="dropdown-menu w-100" ngbDropdownMenu="agency"
-                                                                aria-labelledby="sortMenu">
-                                                                <input type="text" class="form-control px-4"
-                                                                    formControlName="type_of_agency"
-                                                                    (ngModelChange)="filterAgencyName($event,i)">
-                                                                <button class="dropdown-item"
-                                                                    *ngFor="let data of ngForm.controls['bsp1Arr']['controls'][i]['controls'].agency_id.agencyList"
-                                                                    (click)="agencyName(data,i,$event)" #dropdownItem
-                                                                    [attr.data-parent-name]="'agency'"
-                                                                    title="{{data && data.name ? data.name :''}}">
-                                                                    {{data && data.name ? data.name :''}}
-                                                                </button>
-                                                            </div>
+                                                    <div ngbDropdown class="d-inline-block w-100 ">
+                                                        <button class="btn takeplacholder w-100 crop toggle-button"
+                                                            [id]="'agency' + i" ngbDropdownToggle
+                                                            style="text-align: left;font-weight:400;">{{ngForm.controls['bsp1Arr']['controls'][i].controls['designation']
+                                                            &&
+                                                            ngForm.controls['bsp1Arr']['controls'][i].controls['agency'].value
+                                                            &&
+                                                            ngForm.controls['bsp1Arr']['controls'][i].controls['agency'].value.name
+                                                            &&
+                                                            (ngForm.controls['bsp1Arr']['controls'][i].controls['agency'].value.name.length>20)?
+                                                            (ngForm.controls['bsp1Arr']['controls'][i].controls['agency'].value.name.substring(0,20)+'...'):
+                                                            (ngForm.controls['bsp1Arr']['controls'][i].controls['agency'].value)
+                                                            &&
+                                                            (ngForm.controls['bsp1Arr']['controls'][i].controls['agency'].value.name)?
+                                                            (ngForm.controls['bsp1Arr']['controls'][i].controls['agency'].value.name)
+                                                            :selectagency? selectagency: 'Select Agency'}}</button>
+                                                        <div class="dropdown-menu w-100" ngbDropdownMenu="agency"
+                                                            aria-labelledby="sortMenu">
+                                                            <input type="text" class="form-control px-4"
+                                                                formControlName="type_of_agency"
+                                                                (ngModelChange)="filterAgencyName($event,i)">
+                                                            <button class="dropdown-item"
+                                                                *ngFor="let data of ngForm.controls['bsp1Arr']['controls'][i]['controls'].agency_id.agencyList"
+                                                                (click)="agencyName(data,i,$event)" #dropdownItem
+                                                                [attr.data-parent-name]="'agency'"
+                                                                title="{{data && data.name ? data.name :''}}">
+                                                                {{data && data.name ? data.name :''}}
+                                                            </button>
                                                         </div>
-                                                        <div class="pl-0 toggle-button" ngbDropdown>
-                                                            <i class="fa-solid fa-angle-down downicon"
-                                                                (click)="cagencyClick(i)"></i>
-                                                        </div>
+                                                    </div>
+                                                    <div class="pl-0 toggle-button" ngbDropdown>
+                                                        <i class="fa-solid fa-angle-down downicon"
+                                                            (click)="cagencyClick(i)"></i>
+                                                    </div>
                                                     <!-- </div> -->
                                                     <!-- <select class=" form-control input-inventory"
                                                         (ngModelChange)="getStatelistSecond(i)"
@@ -343,13 +344,13 @@
                                 </div>
                             </ng-container>
 
-                            <div class="col-xl-8 col-lg-8 col-md-8 col-12 col-sm-12 pt-3 buttons-phone"
-                            *ngIf="isCrop">
+                            <div class="col-xl-8 col-lg-8 col-md-8 col-12 col-sm-12 pt-3 buttons-phone" *ngIf="isCrop">
                                 <div class="row pb-2">
                                     <div class="col-12 col-md-6 col-lg-6 col-lg-6 col-xl-6">
                                         <div class="row">
                                             <div class="col-12 col-md-12 col-lg-12 col-lg-12 col-xl-12">
-                                                <label for="year" class="label-inventorys required">Select User of Inspection
+                                                <label for="year" class="label-inventorys required">Select User of
+                                                    Inspection
                                                     App
                                                 </label>
                                             </div>
@@ -358,12 +359,13 @@
                                                     style="text-align: left;">
                                                     <i class="fa-solid fa-angle-down downicon"></i>
                                                     <button class="btn takeplacholder w-100 crop toggle-button"
-                                                        ngbDropdownToggle style="text-align: left;" title="{{teamName}}">
+                                                        ngbDropdownToggle style="text-align: left;"
+                                                        title="{{teamName}}">
                                                         {{teamName ? ((teamName.length>35) ? teamName.substring(0, 35)
                                                         +"...":teamName):
                                                         'Please Select'}}
                                                     </button>
-        
+
                                                     <div class="dropdown-menu w-100" ngbDropdownMenu="team_leader"
                                                         aria-labelledby="sortMenu">
                                                         <button class="dropdown-item"
@@ -379,7 +381,8 @@
                                                         </button>
                                                     </div>
                                                     <div *ngIf="!selectUserEvent && submitted" class="errorMsg">
-                                                        <span style="font-size: 17px;color: red;">User of Inspection App Required</span>
+                                                        <span style="font-size: 17px;color: red;">User of Inspection App
+                                                            Required</span>
                                                     </div>
                                                 </div>
                                                 <!-- <select class=" form-control input-inventory" (change)="selectTeamData($event)"
@@ -398,8 +401,8 @@
                                                 <label for="" class="label-inventorys team_name required">Plots</label>
                                             </div>
                                             <div class="col-12 col-md-12 col-lg-12 col-lg-12 col-xl-12">
-                                                <ng-multiselect-dropdown [settings]="dropdownSettingsPlots" [data]="plotsData"
-                                                    class="containers" formControlName="plots"
+                                                <ng-multiselect-dropdown [settings]="dropdownSettingsPlots"
+                                                    [data]="plotsData" class="containers" formControlName="plots"
                                                     [placeholder]="'Please Select Plots'" onselect="onselect($event)">
                                                 </ng-multiselect-dropdown>
                                             </div>
@@ -427,9 +430,9 @@
                     </div>
                 </div>
             </div>
-           
+
         </div>
-        <div *ngIf="!isDirectFormShow"  class="px-2 py-3 w-100" style="height: 50px;">
+        <div *ngIf="!isDirectFormShow" class="px-2 py-3 w-100" style="height: 50px;">
             <div class="d-flex verticle-content-middle justify-content-center w-100">
                 No Data Found.
             </div>
@@ -442,24 +445,24 @@
         <div class="col-12 col-md-12 col-lg-12 pt-1 col-xl-12" *ngIf="showTab && !isSearch">
             <div class="row card-inventory form-group pb-4">
                 <div class="col-12 col-md-12 col-lg-12 col-sm-12 col-xl-12">
-                    <div class="row">
+                    <div class="row" *ngIf="filterPaginateSearch.itemList && filterPaginateSearch.itemList.length>0">
                         <div class="col-12 col-xl-12">
                             <div class="row table-responsive">
 
                                 <table class="table table-bordered table-responsive-sm table-responsive-lg pt-3">
                                     <thead>
                                         <tr class="data-row-header">
-                                            <th scope="col">Team Name</th>
-                                            <th scope="col">Designation</th>
-                                            <th scope="col">Type of Agency</th>
-                                            <th scope="col">State</th>
-                                            <th scope="col">District</th>
+                                            <th class="col-lg-1" scope="col">Team Name</th>
+                                            <th class="col-lg-1" scope="col">Designation</th>
+                                            <th class="col-lg-1" scope="col">Type of Agency</th>
+                                            <th class="col-lg-1" scope="col">State</th>
+                                            <th class="col-lg-1" scope="col">District</th>
                                             <th scope="col">Name</th>
-                                            <th scope="col">Mobile No.</th>
-                                            <th scope="col">Email ID</th>
-                                            <th scope="col">Address</th>
-                                            <th scope="col">Plots</th>
-                                            <th scope="col">Action</th>
+                                            <th class="col-lg-1" scope="col">Mobile No.</th>
+                                            <th class="col-lg-1" scope="col">Email ID</th>
+                                            <th class="col-lg-1" scope="col">Address</th>
+                                            <th class="col-lg-2" scope="col">Plots</th>
+                                            <th class="col-lg-1" scope="col">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody class="data-row2">
@@ -503,23 +506,24 @@
                                                         15) +"..."):val.address):'NA'}}
 
                                                     </td>
-                                                    <td scope="col" *ngIf="bsp1Index == 0" [attr.rowspan]="item.count"> {{item && item.plots?getPlotName(item.plots):'NA'}}</td>
                                                     <td scope="col" *ngIf="bsp1Index == 0" [attr.rowspan]="item.count">
-                                                        <div class="col-8">
+                                                        {{item && item.plots?getPlotName(item.plots):'NA'}}</td>
+                                                    <td scope="col" *ngIf="bsp1Index == 0" [attr.rowspan]="item.count">
+                                                        <div class="col-12">
                                                             <div class="row">
                                                                 <div class="col-6 pt-2">
-                                                                    <button class="list-action-buttons-second"
-                                                                        [disabled]="is_update"
-                                                                        [ngClass]="is_update?'disabled-btn':''"
+                                                                    <button class="list-action-buttons-second1"
+                                                                        [disabled]="is_update || item.is_inspected"
+                                                                        [ngClass]="(is_update || item.is_inspected)?'disabled-btn':''"
                                                                         (click)="editFunctinality(item)"
                                                                         style="cursor: pointer;">
                                                                         <img src="assets/images/Vector.svg">
                                                                     </button>
                                                                 </div>
                                                                 <div class="col-6">
-                                                                    <button [disabled]="is_update"
-                                                                        [ngClass]="is_update?'disabled-btn':''"
-                                                                        class="list-action-buttons-second ml-lg-3 mt-sm-2 mt-md-2 "
+                                                                    <button [disabled]="is_update || item.is_inspected"
+                                                                        [ngClass]="(is_update || item.is_inspected)?'disabled-btn':''"
+                                                                        class="list-action-buttons-second1 ml-lg-3 mt-sm-2 mt-md-2 "
                                                                         style="cursor: pointer;"
                                                                         (click)="deleteData(item.id)">
                                                                         <img src="assets/images/Vector_delete.svg">

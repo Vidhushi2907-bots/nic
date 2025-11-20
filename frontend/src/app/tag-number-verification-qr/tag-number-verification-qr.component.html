@@ -14,12 +14,12 @@
                                     </div>
                                     <div class="col-9 text-center">
                                         <span class="title font-weight-bold mb-2" style="font-size: 18px;">
-                                            {{ allData[0].seed_tag_detail.user.agency_detail.agency_name }}
+                                            {{ allData && allData[0] && allData[0].seed_tag_detail && allData[0].seed_tag_detail.user && allData[0].seed_tag_detail.user.agency_detail && allData[0].seed_tag_detail.user.agency_detail.agency_name ? allData[0].seed_tag_detail.user.agency_detail.agency_name:"NA" }}
                                         </span>
                                         <p class="address-title mb-2">
-                                            <b>{{ allData[0].seed_tag_detail.user.agency_detail.m_district.district_name
+                                            <b>{{allData && allData[0] && allData[0].seed_tag_detail && allData[0].seed_tag_detail.user && allData[0].seed_tag_detail.user.agency_detail && allData[0].seed_tag_detail.user.agency_detail.m_district && allData[0].seed_tag_detail.user.agency_detail.m_district.district_name ? allData[0].seed_tag_detail.user.agency_detail.m_district.district_name:"NA"
                                                 }},
-                                                {{ allData[0].seed_tag_detail.user.agency_detail.m_state.state_name
+                                                {{ allData && allData[0] && allData[0].seed_tag_detail && allData[0].seed_tag_detail.user && allData[0].seed_tag_detail.user.agency_detail && allData[0].seed_tag_detail.user.agency_detail.m_state && allData[0].seed_tag_detail.user.agency_detail.m_state.state_name ? allData[0].seed_tag_detail.user.agency_detail.m_state.state_name:"NA"
                                                 }}</b>
                                         </p>
                                         <!-- Divider Section -->
@@ -39,54 +39,53 @@
                                     <div class="col-6 mr-2">
                                         <div class="field-row mb-2 d-flex justify-content-between">
                                             <span class="input-heading">Crop:</span>
-                                            <span class="input-field"><b>{{ allData[0].seed_tag_detail.m_crop.crop_name
+                                            <span class="input-field"><b>{{ allData && allData[0] && allData[0].seed_tag_detail && allData[0].seed_tag_detail.m_crop.crop_name ? allData[0].seed_tag_detail.m_crop.crop_name:"NA"
                                                     }}</b></span>
                                         </div>
                                         <div class="field-row mb-2 d-flex justify-content-between">
                                             <span class="input-heading">Variety:</span>
                                             <span class="input-field"><b>{{
-                                                    allData[0].seed_tag_detail.m_crop_variety.variety_name }}</b></span>
+                                                allData && allData[0] && allData[0].seed_tag_detail && allData[0].seed_tag_detail.m_crop_variety && allData[0].seed_tag_detail.m_crop_variety.variety_name ? allData[0].seed_tag_detail.m_crop_variety.variety_name:"NA" }}</b></span>
                                         </div>
                                         <div class="field-row mb-2 d-flex justify-content-between">
                                             <span class="input-heading">Parental<br> Line:</span>
                                             <span class="input-field"><b>{{
-                                                    allData[0]?.seed_tag_detail?.m_variety_line?.line_variety_name ||
-                                                    'NA' }}</b></span>
+                                                allData && allData[0] && allData[0].seed_tag_detail && allData[0].seed_tag_detail.m_variety_line && allData[0].seed_tag_detail.m_variety_line.line_variety_name ? allData[0].seed_tag_detail.m_variety_line.line_variety_name:"NA" }}</b></span>
                                         </div>
                                         <div class="field-row mb-2 d-flex justify-content-between">
                                             <span class="input-heading">Lot<br> No.:</span>
-                                            <span class="input-field"><b>{{ allData[0].seed_tag_detail.lot_no
+                                            <span class="input-field"><b>{{ allData && allData[0] && allData[0].seed_tag_detail && allData[0].seed_tag_detail.lot_no ? allData[0].seed_tag_detail.lot_no : "NA"
                                                     }}</b></span>
                                         </div>
                                         <div class="field-row mb-2 d-flex justify-content-between">
                                             <span class="input-heading">Tag No.:</span>
-                                            <span class="input-field"><b>{{ allData[0].tag_no }}</b></span>
+                                            <span class="input-field"><b>{{ allData?.[0]?.tag_no || "NA" }}</b></span>
                                         </div>
                                     </div>
                                     <!-- Right Column -->
                                     <div class="col-6 ml-2">
                                         <div class="field-row mb-2 d-flex justify-content-between">
                                             <span class="input-heading">Date of Test:</span>
-                                            <span class="input-field"><b>{{ allData[0].seed_tag_detail.date_of_test
+                                            <span class="input-field"><b>{{ allData?.[0]?.seed_tag_detail?.date_of_test || "NA"
                                                     }}</b></span>
                                         </div>
                                         <div class="field-row mb-2 d-flex justify-content-between">
                                             <span class="input-heading">Bag Weight (Kg):</span>
-                                            <span class="input-field"><b>{{ allData[0].bag_size }}</b></span>
+                                            <span class="input-field"><b>{{ allData?.[0]?.bag_size || "NA" }}</b></span>
                                         </div>
                                         <div class="field-row mb-2 d-flex justify-content-between">
                                             <span class="input-heading">Inert<br> Seed (%):</span>
-                                            <span class="input-field"><b>{{ allData[0].seed_tag_detail.inert_matter
+                                            <span class="input-field"><b>{{ allData?.[0]?.seed_tag_detail?.inert_matter || "NA"
                                                     }}</b></span>
                                         </div>
                                         <div class="field-row mb-2 d-flex justify-content-between">
                                             <span class="input-heading">Pure<br> Seed (%):</span>
-                                            <span class="input-field"><b>{{ allData[0].seed_tag_detail.pure_seed
+                                            <span class="input-field"><b>{{ allData?.[0]?.seed_tag_detail?.pure_seed || "NA"
                                                     }}</b></span>
                                         </div>
                                         <div class="field-row mb-2 d-flex justify-content-between">
                                             <span class="input-heading">Germination (%):</span>
-                                            <span class="input-field"><b>{{ allData[0].seed_tag_detail.germination
+                                            <span class="input-field"><b>{{ allData?.[0]?.seed_tag_detail?.germination || "NA"
                                                     }}</b></span>
                                         </div>
                                     </div>
@@ -103,9 +102,9 @@
                                     <div class="col-lg-6 d-flex justify-content-end flex-column align-items-end">
                                         <span class="input-heading">(-SD-)</span>
                                         <span class="input-heading">{{
-                                            allData[0].seed_tag_detail.user.agency_detail.contact_person_name }}</span>
+                                            allData?.[0]?.seed_tag_detail?.user?.agency_detail?.contact_person_name || "NA" }}</span>
                                         <span class="input-heading">{{
-                                            allData[0].seed_tag_detail.user.agency_detail.m_designation.name }}</span>
+                                            allData?.[0]?.seed_tag_detail?.user.agency_detail?.m_designation?.name ||"NA" }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -122,13 +121,13 @@
     <div class="tag-container">
         <div class="tag-header">
             <div class="left-header" style="padding:10px">
-                <img src="../../assets/images/left-icar-logo.png" class="left-logo-img"
-                    style="width: 80px; height: auto;">
+                <!-- <img src="../../assets/images/left-icar-logo.png" class="left-logo-img"
+                    style="width: 80px; height: auto;"> -->
             </div>
             <div class="right-header">
-                <h2><b>{{ allData[0].seed_tag_detail.user.agency_detail.agency_name }}</b> <br><b>{{
-                    allData[0].seed_tag_detail.user.agency_detail.m_district.district_name }},
-                    {{ allData[0].seed_tag_detail.user.agency_detail.m_state.state_name }}</b></h2>
+                <h2><b>{{allData && allData[0] && allData[0].seed_tag_detail && allData[0].seed_tag_detail.user && allData[0].seed_tag_detail.user.agency_detail && allData[0].seed_tag_detail.user.agency_detail.agency_name ? allData[0].seed_tag_detail.user.agency_detail.agency_name:"NA" }}</b> <br><b>{{
+                    allData && allData[0] && allData[0].seed_tag_detail && allData[0].seed_tag_detail.user && allData[0].seed_tag_detail.user.agency_detail && allData[0].seed_tag_detail.user.agency_detail.m_district && allData[0].seed_tag_detail.user.agency_detail.m_district.district_name ? allData[0].seed_tag_detail.user.agency_detail.m_district.district_name:"NA" }},
+                    {{ allData && allData[0] && allData[0].seed_tag_detail && allData[0].seed_tag_detail.user && allData[0].seed_tag_detail.user.agency_detail && allData[0].seed_tag_detail.user.agency_detail.m_state && allData[0].seed_tag_detail.user.agency_detail.m_state.state_name ? allData[0].seed_tag_detail.user.agency_detail.m_state.state_name:"NA" }}</b></h2>
                 <h3>Class of Seed : Breeder Seed</h3>
             </div>
             <div class="qr-code">
@@ -144,41 +143,41 @@
                         <!-- style="z-index: 1;" -->
                         <div class="row">
                             <div class="col-12">
-                                <span>Crop:&nbsp;&nbsp;<b>{{ allData[0].seed_tag_detail.m_crop.crop_name}}</b></span>
+                                <span>Crop:&nbsp;&nbsp;<b>{{ allData && allData[0] && allData[0].seed_tag_detail && allData[0].seed_tag_detail.m_crop.crop_name ? allData[0].seed_tag_detail.m_crop.crop_name:"NA"}}</b></span>
                             </div>
                             <div class="col-12">
-                                <span>Variety:&nbsp;&nbsp;<b>{{ allData[0].seed_tag_detail.m_crop_variety.variety_name }}</b></span>
+                                <span>Variety:&nbsp;&nbsp;<b>{{ allData && allData[0] && allData[0].seed_tag_detail && allData[0].seed_tag_detail.m_crop_variety && allData[0].seed_tag_detail.m_crop_variety.variety_name ? allData[0].seed_tag_detail.m_crop_variety.variety_name:"NA" }}</b></span>
                             </div>
                             <div class="col-12">
-                                <span>Parental Line:&nbsp;&nbsp;<b>{{allData[0]?.seed_tag_detail?.m_variety_line?.line_variety_name ||'NA'}}</b>
+                                <span>Parental Line:&nbsp;&nbsp;<b>{{allData && allData[0] && allData[0].seed_tag_detail && allData[0].seed_tag_detail.m_variety_line && allData[0].seed_tag_detail.m_variety_line.line_variety_name ? allData[0].seed_tag_detail.m_variety_line.line_variety_name:"NA" }}</b>
                                 </span>
                             </div>
                             <div class="col-12">
-                                <span>Lot No:&nbsp;&nbsp;<b>{{ allData[0].seed_tag_detail.lot_no }}</b></span>
+                                <span>Lot No:&nbsp;&nbsp;<b>{{ allData && allData[0] && allData[0].seed_tag_detail && allData[0].seed_tag_detail.lot_no ? allData[0].seed_tag_detail.lot_no:"NA" }}</b></span>
                             </div>
                             <div class="col-12">
-                                <span>Tag No:&nbsp;&nbsp;<b>{{ allData[0].tag_no }}</b></span>
+                                <span>Tag No:&nbsp;&nbsp;<b>{{ allData && allData[0] && allData[0].tag_no ? allData[0].tag_no:"NA" }}</b></span>
                             </div>
                             <div class="col-12">
-                                <span>Bag Weight (Kg):&nbsp;&nbsp;<b>{{ allData[0].bag_size }}</b></span>
+                                <span>Bag Weight (Kg):&nbsp;&nbsp;<b>{{ allData && allData[0] && allData[0].bag_size ? allData[0].bag_size:"NA" }}</b></span>
                             </div>
                         </div>
                     </div>
                     <div class="col-5">
                         <div class="row">
                             <div class="col-12">
-                                <span>Date of Test:&nbsp;&nbsp;<b>{{ allData[0].seed_tag_detail.stl_report_status.date_of_test }} </b></span>
+                                <span>Date of Test:&nbsp;&nbsp;<b>{{ allData && allData[0] && allData[0].seed_tag_detail && allData[0].seed_tag_detail.stl_report_status && allData[0].seed_tag_detail.stl_report_status.date_of_test ?  allData[0].seed_tag_detail.stl_report_status.date_of_test:"NA" }} </b></span>
                             </div>
 
                             <div class="col-12">
-                                <span>Pure Seed(%):&nbsp;&nbsp;<b>{{allData[0].seed_tag_detail.pure_seed}}</b></span>
+                                <span>Pure Seed(%):&nbsp;&nbsp;<b>{{allData && allData[0] && allData[0].seed_tag_detail && allData[0].seed_tag_detail.pure_seed ? allData[0].seed_tag_detail.pure_seed:"NA"}}</b></span>
                             </div>
                             <div class="col-12">
                                 <span>Inert Seed(%):&nbsp;&nbsp;<b>{{
-                                        allData[0].seed_tag_detail.inert_matter}}</b></span>
+                                    allData && allData[0] && allData[0].seed_tag_detail && allData[0].seed_tag_detail.inert_matter ? allData[0].seed_tag_detail.inert_matter:"NA"}}</b></span>
                             </div>
                             <div class="col-12">
-                                <span>Germination(%): &nbsp;&nbsp;<b>{{ allData[0].seed_tag_detail.stl_report_status.normal_seeding }}</b></span>
+                                <span>Germination(%): &nbsp;&nbsp;<b>{{ allData && allData[0] && allData[0].seed_tag_detail && allData[0].seed_tag_detail.stl_report_status && allData[0].seed_tag_detail.stl_report_status.normal_seeding ? allData[0].seed_tag_detail.stl_report_status.normal_seeding:"NA" }}</b></span>
                             </div>
                         </div>
                     </div>
@@ -189,8 +188,8 @@
             </div>
 
             <div class="signature">
-                <span><b>{{ allData[0].seed_tag_detail.user.agency_detail.contact_person_name }}</b></span> <br>
-                <span><b>{{ allData[0].seed_tag_detail.user.agency_detail.m_designation.name }}</b></span>
+                <span><b>{{ allData && allData[0] && allData[0].seed_tag_detail && allData[0].seed_tag_detail.user && allData[0].seed_tag_detail.user.agency_detail && allData[0].seed_tag_detail.user.agency_detail.contact_person_name ? allData[0].seed_tag_detail.user.agency_detail.contact_person_name:"NA" }}</b></span> <br>
+                <span><b>{{ allData && allData[0] && allData[0].seed_tag_detail && allData[0].seed_tag_detail.user && allData[0].seed_tag_detail.user.agency_detail && allData[0].seed_tag_detail.user.agency_detail.m_designation && allData[0].seed_tag_detail.user.agency_detail.m_designation.name ? allData[0].seed_tag_detail.user.agency_detail.m_designation.name:"NA" }}</b></span>
             </div>
         </div>
     </div>

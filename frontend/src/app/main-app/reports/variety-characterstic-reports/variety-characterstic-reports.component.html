@@ -32,16 +32,6 @@
                                         </label>
                                     </div>
                                 </div>
-                                <!-- <div class="col-md-2 col-sm-6 col-md-2 col-lg-4">
-                                    <div class="form-check">
-                                        <input class="radio-button form-check-input radio-btn"  
-                                            name="notifiedValue" type="radio" (change)="notifiedvalue('notified_year')"
-                                            id="flexRadioDefault2">
-                                        <label class="form-check-label" for="flexRadioDefault2">
-                                            Search by Notification Year
-                                        </label>
-                                    </div>
-                                </div> -->
                                 <div class="col-md-2 col-sm-6 col-md-2 col-lg-4">
                                     <div class="form-check">
                                         <input class="radio-button form-check-input radio-btn"  
@@ -69,18 +59,6 @@
                                     <div class="pl-0 toggle-button" ngbDropdown>
                                         <img src="assets/images/16.svg" alt="" srcset="">
                                     </div>
-                                    <!-- Notification Year -->
-                                    <!-- <div class="col-12 px-0 ">
-                                        <label for="Crop Group" class="search_text">Notification Year</label>
-                                    </div>
-
-                                    <select class="form-control"  formControlName="not_date">
-                                        <option value="">Select Notification Year</option>
-                                        <option *ngFor="let data of  cropNotDateData" value="{{data && data.notification_date ? (data.notification_date):null}}">{{data && data.notification_date ? (data.notification_date ):"" }} </option>
-                                    </select>
-                                    <div class="pl-0 toggle-button" ngbDropdown>
-                                        <img src="assets/images/16.svg" alt="" srcset="">
-                                    </div> -->
 
                                 </div>
 
@@ -102,19 +80,11 @@
                                                 Variety Name Should Be More Than 2 Character <br>
                                             </span>
                                         </div>
-                                        <!-- <select class="form-select form-control" aria-label="Default select example"
-                                                formControlName="variety_name">
-                                                <option value="" hidden selected>Select Variety Name</option>
-                                                <option *ngFor="let data of cropVarietyData" value="{{data.variety_code}}">
-                                                    {{data.variety_name}}</option>
-                                            </select> -->
+
                                         <div class="pl-0 toggle-button" ngbDropdown>
                                             <img src="assets/images/16.svg" alt="" srcset="">
     
                                         </div>
-                                        <!-- <div class="pl-0 toggle-button" ngbDropdown>
-                                            </div> -->
-    
                                     </div>
     
                                     <div class="col-12 col-md-4 mt-2 px-0 pr-3">
@@ -146,16 +116,8 @@
                                                 >
                                                 <i class="fa-solid fa-angle-down downicon" (click)="cgClick()"></i>
                                             </div>
-                                            <!-- <select class="form-select form-control  " aria-label="Default select example"
-                                                formControlName="crop_group">
-                                                <option value="" disabled>Select Crop Group</option>
-                                                <option *ngFor="let data of croupGroupList" class="dropdown-menus"
-                                                    value="{{data && data.group_code ? data.group_code:''}}">
-                                                    {{data && data.group_name ? data.group_name:''}}</option>
-                                            </select> -->
                                             <div class="pl-0 toggle-button" ngbDropdown>
                                                 <img src="assets/images/16.svg" alt="" srcset="">
-                                                <!-- <i class="fa-solid fa-angle-down downicon"></i> -->
                                             </div>
                                         </div>
     
@@ -176,7 +138,6 @@
                                                         (click)="cropName(data)" #dropdownItem [attr.data-parent-name]="'crop_name'">
                                                         {{data && data.m_crop && data.m_crop.crop_name ?
                                                             data.m_crop.crop_name:''}}
-                                                        <!-- <input type="hidden" formControlName="crop_code"> -->
                                                     </button>
                                                    
                                                 </div>
@@ -186,14 +147,7 @@
                                             [ngClass]=" disabledfieldcropName ? 'disabledfield' : ''" >
                                                 <i class="fa-solid fa-angle-down downicon" (click)="cnClick()"></i>
                                             </div>
-                                            <!-- <select class="form-select form-control" aria-label="Default select example"
-                                                formControlName="crop_name">
-                                                <option value="" disabled>Select Crop Name</option>
-                                                <option *ngFor="let data of crop_name_list"
-                                                    value="{{data && data.m_crop && data.m_crop.crop_code? data.m_crop.crop_code:''}}">
-                                                    {{data && data.m_crop && data.m_crop.crop_name ?
-                                                    data.m_crop.crop_name:''}}</option>
-                                            </select> -->
+    
                                             <div class="pl-0 toggle-button" ngbDropdown>
                                                 <img src="assets/images/16.svg" alt="" srcset="">
                                                 <!-- <i class="fa-solid fa-angle-down downicon"></i> -->
@@ -228,14 +182,6 @@
                                             [ngClass]=" disabledfieldVariety  ? 'disabledfield' : ''"  >
                                                 <i class="fa-solid fa-angle-down downicon" (click)="cvClick()"></i>
                                             </div>
-                                            <!-- <select class="form-select form-control" aria-label="Default select example"
-                                                formControlName="variety_name">
-                                                <option value="" hidden selected>Select Variety Name</option>
-                                                <option *ngFor="let data of cropVarietyData"
-                                                    value="{{data && data['m_crop_variety.variety_code'] ? data['m_crop_variety.variety_code'] :'' }}">
-                                                    {{data && data['m_crop_variety.variety_name'] ? data['m_crop_variety.variety_name'] :'' }}
-                                                </option>
-                                            </select> -->
                                             <div class="pl-0 toggle-button" ngbDropdown>
                                                 <img src="assets/images/16.svg" alt="" srcset="">
                                                 <!-- <i class="fa-solid fa-angle-down downicon"></i> -->
@@ -347,17 +293,6 @@
                                     </span>
                                 </div>
                             </div>
-                            <!-- <div class="col-6 col-md-1 py-1 d-flex verticle-content-middle">
-                                <div class="w-fit-content">
-                                    <label class="d-md-none"><b>Vatiety Code:</b>&nbsp;</label>
-                                    <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                        data-placement="bottom"
-                                        title="{{ data && data.m_crop_variety && data.m_crop_variety.variety_code ? data.m_crop_variety.variety_code : 'NA'}}">
-                                        {{data && data.m_crop_variety && data.m_crop_variety.variety_code ?
-                                        data.m_crop_variety.variety_code :'NA' }}
-                                    </span>
-                                </div>
-                            </div> -->
 
                              <div class="col-6 col-md-1 py-1 d-flex verticle-content-middle">
                                 <div class="w-fit-content">

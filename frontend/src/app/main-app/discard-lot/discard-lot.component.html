@@ -1,0 +1,747 @@
+<form [formGroup]="ngForm" class="pt-2">
+    <div class="main-inventory my-4 w-90  pt-2">
+        <span class="title-inventory pt-3 ">
+            Discard Tags
+        </span>
+        <!-- first card ui -->
+        <div class="col-12 col-sm-12 col-md-12 col-lg-12 pt-2">
+            <div class="row card-inventory form-group pl-1 pr-1">
+                <!-- start sectio 1 -->
+                <div class="col-11 col-md-10 col-lg-11 col-sm-11 pt-1 pl-2">
+                    <div class="row">
+                        <!-- year of indent -->
+                        <div class="col-12 col-md-4 col-lg-4 col-xl-4 col-sm-12">
+                            <div class="row">
+                                <div class="col-12 col-md-12 col-lg-12 col-lg-12 col-xl-12">
+                                    <label for="year" class="label-inventory required">Year of Indent</label>
+                                </div>
+                                <div class="col-12 col-md-12 col-lg-12 col-lg-12 col-xl-12">
+                                    <select class=" form-control input-inventory" formControlName="year">
+                                        <option value="">Select Year</option>
+                                        <option *ngFor="let data of yearOfIndent"
+                                            value="{{data && data.year ? data.year :''}}">
+                                            {{data && data.year ? data.year :''}}-{{data && data.year ?
+                                            (data.year-2000)+1 :''}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- season -->
+                        <div class="col-12 col-md-4 col-lg-4 col-sm-12 col-xl-4">
+                            <div class="row">
+                                <div class="col-12 col-md-12 col-lg-12 col-xl-12">
+                                    <label for="year" class="label-inventory required">Season</label>
+                                </div>
+                                <div class="col-12 col-md-12 col-lg-12 col-xl-12">
+                                    <select class=" form-control input-inventory" formControlName="season"
+                                        [disabled]="!ngForm.controls['year'].value">
+                                        <option value="">Select Season</option>
+                                        <option *ngFor="let data of seasonlist "
+                                            value="{{data && data.season ? data.season :''}}"> {{data &&
+                                            data.season_name ?
+                                            data.season_name :''}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- crop -->
+                        <div class="col-12 col-md-4 col-lg-4 col-sm-12 col-xl-4">
+                            <div class="row">
+                                <div class="col-12 col-md-12 col-lg-12 col-xl-12">
+                                    <label for="year" class="label-inventory required">Crop</label>
+                                </div>
+                                <div class="col-md-12 px-2">
+                                    <div ngbDropdown class="d-inline-block w-100 ">
+                                        <button [disabled]="!ngForm.controls['season'].value"
+                                            class="btn takeplacholder w-100 crop toggle-button input-inventory form-control"
+                                            id="crop_group" ngbDropdownToggle style="text-align: left;">{{selectCrop &&
+                                            (selectCrop.length>30) ? (selectCrop.substring(0,30)+'...'):selectCrop?
+                                            selectCrop :'Select Crop '}}
+                                        </button>
+                                        <div class="dropdown-menu w-100" ngbDropdownMenu="crop_group"
+                                            aria-labelledby="sortMenu">
+                                            <input type="text" class="form-control px-4" formControlName="crop_text"
+                                                (click)="cropdatatext()">
+                                            <button class="dropdown-item" *ngFor="let data of cropDataList"
+                                                (click)="cropNameValue(data)" #dropdownItem
+                                                [attr.data-parent-name]="'crop_group'">
+                                                {{data && data.crop_name ? data.crop_name :''}}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="pl-0 toggle-button" ngbDropdown>
+                                        <i class="fa-solid fa-angle-down downicon" (click)="cgClick()"></i>
+                                    </div>
+                                    <div class="pl-0 toggle-button" ngbDropdown>
+                                        <img src="assets/images/16.svg" alt="" srcset="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-1 col-md-2 col-sm-6 col-12 pt-4 mt-2">
+                    <!-- <div class="row"> -->
+                    <!-- <div class="col-12 col-md-12 col-lg-12 "> -->
+                    <button (click)="getPageData()"
+                        class="w-100 py-2 mt-2 text-white btn-inventory1 bspc_text d-inline-flex justify-content-center verticle-content-middle mb-3 mt-1">
+                        Search
+                    </button>
+                    <!-- </div> -->
+                    <!-- </div> -->
+                </div>
+            </div>
+        </div>
+        <!-- *ngIf="forRequest" -->
+        <div *ngIf="forRequest"  class="col-12 col-sm-12 col-md-12 col-lg-12  pt-2 pr-0">
+            <!-- *ngIf="isSearch" -->
+            <div class="row  card-inventory form-group formargin" *ngIf="isSearch" > 
+                <!-- start sectio 1 -->
+                <div class="col-12 col-md-12 col-lg-12 col-sm-12 pt-1 ml-2 pr-5">
+                    <div class="row">
+                        <!-- variety -->
+                        <div class="col-12 col-md-4 col-lg-4 col-xl-4 col-sm-12">
+                            <div class="row">
+                                <div class="col-12 col-md-12 col-lg-12 col-lg-12 col-xl-12">
+                                    <label for="year" class="label-inventory required">Variety</label>
+                                </div>
+                                <div class="col-12 col-md-12 col-lg-12 col-lg-12 col-xl-12">
+                                    <select class=" form-control input-inventory" formControlName="variety">
+                                        <option value="">Select Variety</option>
+                                        <option *ngFor="let data of varietyList"
+                                            value="{{data && data.variety_code ? data.variety_code :''}}">
+                                            {{data && data.variety_name ? data.variety_name :''}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Parental Line -->
+                        <div class="col-12 col-md-4 col-lg-4 col-sm-12 col-xl-4">
+                            <div class="row">
+                                <div class="col-12 col-md-12 col-lg-12 col-xl-12">
+                                    <label for="year" class="label-inventory required">Parental Line</label>
+                                </div>
+                                <div class="col-12 col-md-12 col-lg-12 col-xl-12">
+                                    <select class=" form-control input-inventory" formControlName="parental_line">
+                                        <option value="">Select Parental Line</option>
+                                        <option *ngFor="let data of varietylineList "
+                                            value="{{data && data.variety_line_code ? data.variety_line_code :'N/A'}}">
+                                            {{data && data.variety_line_name ?
+                                            data.variety_line_name :'N/A'}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Lot No. -->
+                        <div class="col-12 col-md-4 col-lg-4 col-sm-12 col-xl-4">
+                            <div class="row">
+                                <div class="col-12 col-md-12 col-lg-12 col-xl-12">
+                                    <label for="year" class="label-inventory required">Lot No.</label>
+                                </div>
+                                <div class="col-md-12 px-2">
+                                    <select class=" form-control input-inventory" formControlName="lot_id"
+                                        (change)="selectLot($event)">
+                                        <option value="">Select Lot No</option>
+                                        <option *ngFor="let data of lotNumberList"
+                                            value="{{data && data.lot_id ? data.lot_id :''}}">
+                                            {{data && data.lot_no ? data.lot_no :''}}
+                                        </option>
+                                    </select>
+                                    <!-- <div ngbDropdown class="d-inline-block w-100 ">
+                                        <button
+                                            class="btn takeplacholder w-100 crop toggle-button input-inventory form-control"
+                                            id="crop_group" ngbDropdownToggle style="text-align: left;">{{selectCrop &&
+                                            (selectCrop.length>30) ? (selectCrop.substring(0,30)+'...'):selectCrop?
+                                            selectCrop :'Select Crop '}}
+                                        </button>
+                                        <div class="dropdown-menu w-100" ngbDropdownMenu="crop_group"
+                                            aria-labelledby="sortMenu">
+                                            <input type="text" class="form-control px-4" formControlName="crop_text"
+                                                (click)="cropdatatext()">
+                                            <button class="dropdown-item" *ngFor="let data of cropDataList"
+                                                (click)="cropNameValue(data)" #dropdownItem
+                                                [attr.data-parent-name]="'crop_group'">
+                                                {{data && data.crop_name ? data.crop_name :''}}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="pl-0 toggle-button" ngbDropdown>
+                                        <i class="fa-solid fa-angle-down downicon" (click)="cgClick()"></i>
+                                    </div>
+                                    <div class="pl-0 toggle-button" ngbDropdown>
+                                        <img src="assets/images/16.svg" alt="" srcset="">
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Select Tag Numbers for Reprinting -->
+                        <div class="col-12 col-md-4 col-lg-4 col-xl-4 col-sm-12">
+                            <div class="row">
+                                <div class="col-12 col-md-12 col-lg-12 col-lg-12 col-xl-12 mt-2">
+                                    <label for="year" class="label-inventory required">Select Tag Numbers for
+                                        Reprinting</label>
+                                </div>
+                                <div class="col-12 col-md-12 col-lg-12 col-lg-12 col-xl-12">
+                                    <!-- <select class=" form-control input-inventory" formControlName="year">
+                                        <option value="">Select Year</option>
+                                        <option *ngFor="let data of yearOfIndent"
+                                            value="{{data && data.value ? data.value :''}}">
+                                            {{data && data.year ? data.year :''}}
+                                        </option>
+                                    </select> -->
+                                    <ng-multiselect-dropdown [placeholder]="'Select Tag'" [settings]="dropdownSettings"
+                                        [data]="reprintTagData" formControlName="tag_for_reprint"
+                                        (onSelect)="onItemSelect($event)" (onSelectAll)="onSelectAll($event)"
+                                        (onDeSelect)="onItemDeselect($event)" (onDeSelectAll)="onDeselectAll($event)" >
+                                    </ng-multiselect-dropdown>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- No of tags -->
+                        <div class="col-12 col-md-4 col-lg-4 col-sm-12 col-xl-4">
+                            <div class="row">
+                                <div class="col-12 col-md-12 col-lg-12 col-xl-12 mt-2">
+                                    <label for="year" class="label-inventory required">No. of tags</label>
+                                </div>
+                                <div class="col-12 col-md-12 col-lg-12 col-xl-12">
+                                    <input type="text" class="form-control" formControlName="no_of_tags" value="">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Select Reason for Reprinting. -->
+                        <div class="col-12 col-md-4 col-lg-4 col-sm-12 col-xl-4">
+                            <div class="row">
+                                <div class="col-12 col-md-12 col-lg-12 col-xl-12 mt-2">
+                                    <label for="year" class="label-inventory">Select Reason for
+                                        Reprinting</label>
+                                </div>
+                                <div class="col-md-12 px-2">
+                                    <select class=" form-control input-inventory" formControlName="reason_for_reprint">
+                                        <option value="">Select Reason</option>
+                                        <option *ngFor="let data of reasonDataList"
+                                            value="{{data && data.id ? data.id :''}}">
+                                            {{data && data.reason ? data.reason :''}}
+                                        </option>
+                                    </select>
+                                    <!-- <div ngbDropdown class="d-inline-block w-100 ">
+                                        <button
+                                            class="btn takeplacholder w-100 crop toggle-button input-inventory form-control"
+                                            id="crop_group" ngbDropdownToggle style="text-align: left;">{{selectCrop &&
+                                            (selectCrop.length>30) ? (selectCrop.substring(0,30)+'...'):selectCrop?
+                                            selectCrop :'Select Crop '}}
+                                        </button>
+                                        <div class="dropdown-menu w-100" ngbDropdownMenu="crop_group"
+                                            aria-labelledby="sortMenu">
+                                            <input type="text" class="form-control px-4" formControlName="crop_text"
+                                                (click)="cropdatatext()">
+                                            <button class="dropdown-item" *ngFor="let data of cropDataList"
+                                                (click)="cropNameValue(data)" #dropdownItem
+                                                [attr.data-parent-name]="'crop_group'">
+                                                {{data && data.crop_name ? data.crop_name :''}}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="pl-0 toggle-button" ngbDropdown>
+                                        <i class="fa-solid fa-angle-down downicon" (click)="cgClick()"></i>
+                                    </div>
+                                    <div class="pl-0 toggle-button" ngbDropdown>
+                                        <img src="assets/images/16.svg" alt="" srcset="">
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-12  pr-4 formargin pt-3">
+                    <label for="">
+                        <!-- BSPC whose approval is required: ICAR IARI SPU NEW DELHI -->
+                    </label>
+                </div>
+                <hr>
+
+                <div class="col-lg-12 expa col-md-12 col-sm-12 col-12  pr-4 formargin pt-3">
+                    <label class="">
+                        <input type="file" class="form-control" accept=".pdf, .jpg, .png, .docx" formControlName="user_agreement">
+                        <!-- <span class="checkmark"></span> -->
+                    </label>
+                    <!-- <label class="container1">
+                        <input type="checkbox" checked="checked" formControlName="user_agreement">
+                        <span class="checkmark"></span>
+                    </label>
+                    <div class="pl-5">
+                        <li>The BSPC in-charge hereby confirms that due to misprinting/ exhaustion of
+                            cartridge/misplacement/damage, the aforementioned tag(s) need reprinting. If any
+                            duplication is found in this series then she/he will be held responsible. 
+                        </li>
+                        <li>The in-charge also understands that this reprinting facility is available only once for
+                            the selected tags.</li>
+                        <li>The in-charge hereby confirms that the previously printed original tags have been
+                            destroyed by them.</li>
+                    </div> -->
+                </div>
+
+                <div class="col-lg-6 expa col-md-6 col-sm-12 col-12 pt-4 mt-2 pr-4 formargin">
+                    <div class="row">
+                        <div class="col-6 col-md-4 col-lg-4">
+                            <button (click)="cancel()"
+                                class="w-100 py-2 mt-2 btn-inventory-cancel d-inline-flex justify-content-center verticle-content-middle mb-3 mt-1">
+                                Cancel
+                            </button>
+                        </div>
+                        <div class="col-6 col-md-4 col-lg-4  ">
+                            <button (click)="submit(ngForm)"
+                                class="w-100 py-2 mt-2 text-white btn-inventory1 bspc_text d-inline-flex justify-content-center verticle-content-middle mb-3 mt-1">
+                                Discard Tags
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- *ngIf="isSearch" -->
+        <!--  Third Card ui -->
+        <div class="col-12 col-sm-12 col-md-12 col-lg-12  pt-3 pr-0" *ngIf="isSearch" >
+            <div class="row card-inventory form-group pb-2 pl-0">
+                <div class="col-12 col-md-12 col-lg-12 ">
+                    <div class="col-12 col-md-12 col-lg-12 col-sm-12 pt-1 pb-1">
+                        <div class="row">
+                            <div class="col-1 col-md-1 col-lg-1 pl-0 pt-1">
+                                <label for="year" class="label-inventory">Filter by :</label>
+                            </div>
+                            <div class="col-8 col-md-8 col-lg-8 pt-1">
+                                <div class="row">
+                                    <div class="col-4 pb-1">
+                                        <select class=" form-control input-inventory" formControlName="variety_filter"
+                                            (change)="getReprintAllData()">
+                                            <option value="">Select Variety</option>
+                                            <option *ngFor="let data of varietyApproveList"
+                                                value="{{data && data.variety_code ? data.variety_code :''}}"> {{data &&
+                                                data.variety_name ?
+                                                data.variety_name :''}}
+                                            </option>
+                                        </select>
+                                        <!-- <ng-multiselect-dropdown   [placeholder]="'Select Variety'"
+                                                        [settings]="dropdownSettings" [data]="dropdownList1"
+                                                        [(ngModel)]="selectedItems" (onSelect)="onItemSelect($event)"
+                                                        (onSelectAll)="onSelectAll($event)">
+                                                    </ng-multiselect-dropdown> -->
+                                    </div>
+                                    <div class="col-4 pb-1">
+                                        <select class=" form-control input-inventory" formControlName="lot_not_filter"
+                                            (change)="getReprintAllData()">
+                                            <option value="">Lot No.</option>
+                                            <option *ngFor="let data of getReprintLotNoDataList "
+                                                value="{{data && data.lot_no ? data.lot_no :''}}"> {{data &&
+                                                data.lot_no ?
+                                                data.lot_no :''}}
+                                            </option>
+                                        </select>
+                                        <!-- <ng-multiselect-dropdown   [placeholder]="'Select Variety'"
+                                                        [settings]="dropdownSettings" [data]="dropdownList1"
+                                                        [(ngModel)]="selectedItems" (onSelect)="onItemSelect($event)"
+                                                        (onSelectAll)="onSelectAll($event)">
+                                                    </ng-multiselect-dropdown> -->
+                                    </div>
+                                    <div class="col-4 pb-1">
+                                        <select class=" form-control input-inventory" formControlName="tag_no_filter"
+                                            (change)="getReprintAllData()">
+                                            <option value="">Tag No.</option>
+                                            <option *ngFor="let data of getReprintTagNoDataList "
+                                                value="{{data && data.tag_no ? data.tag_no :''}}"> {{data &&
+                                                data.tag_no ?
+                                                data.tag_no :''}}
+                                            </option>
+                                        </select>
+                                        <!-- <ng-multiselect-dropdown   [placeholder]="'Select Variety'"
+                                                        [settings]="dropdownSettings" [data]="dropdownList1"
+                                                        [(ngModel)]="selectedItems" (onSelect)="onItemSelect($event)"
+                                                        (onSelectAll)="onSelectAll($event)">
+                                                    </ng-multiselect-dropdown> -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-3 col-md-3 col-lg-3 pr-0">
+                                <div class="row">
+                                    <div class="col-6 col-md-6 col-lg-6">
+                                        <button (click)="reustForReprint()"
+                                            class="w-100 py-2 mt-2 text-white btn-inventory1 bspc_text d-inline-flex justify-content-center verticle-content-middle mb-3 mt-1">
+                                           Discard Tags
+                                        </button>
+                                    </div>
+                                    <!-- <div class="col-6 col-md-6 col-lg-6">
+                                        <button (click)="downlodePdf()"
+                                            class="w-100 py-2 mt-2 text-white btn-inventory1 bspc_text d-inline-flex justify-content-center verticle-content-middle mb-3 mt-1">
+                                            Test Print
+                                        </button>
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-2 col-lg-2">
+                    </div>
+                    <!-- *ngIf="selectedTable === 'table1'" -->
+                    <div class="row data-row ">
+                        <table class="table">
+                            <thead class="w-100">
+                                <tr class="data-row-header">
+                                    <th class="col-md-1 py-3 px-2 text-white vertical-align-center heading">S.No
+                                    </th>
+                                    <th class="col-md-2 py-3 px-2 text-white vertical-align-center heading">Variety
+                                    </th>
+                                    <th class="col-md-2 py-3 px-3 text-white vertical-align-center heading">Lot
+                                        Details </th>
+                                    <th class="col-md-2 py-3 px-2 text-white vertical-align-center heading">Tag
+                                        to be reprinted</th>
+                                    <th class="col-md-1 py-3 px-2 text-white vertical-align-center heading">No. of
+                                        Tags</th>
+                                    <th class="col-md-2 py-3 px-2 text-white vertical-align-center heading">Reason for
+                                        Reprinting
+                                    </th>
+                                    <th class="col-md-2 py-3 px-2 text-white vertical-align-center heading">Action</th>
+                                    <!-- <th class="col-md-1 py-3 px-2 text-white vertical-align-center heading">Approval
+                                        Status</th>
+                                    <th class="col-md-1 py-3 px-3 text-white vertical-align-center heading">Action
+                                    </th> -->
+                                </tr>
+                            </thead>
+                            <tbody class="py-2 text-white   heading data-row">
+                                <tr *ngIf="!getReprintAllDataList || getReprintAllDataList.length === 0">
+                                    <td colspan="6" class="text-center py-3"><b>No Data Found</b> </td>
+                                </tr>
+                                <tr *ngFor="let data of getReprintAllDataList;let i=index;">
+                                    <td class="col-md-1 py-2">
+                                        {{i+1}}
+                                    </td>
+                                    <td class="col-md-2 py-2">{{data && data.m_crop_variety &&
+                                        data.m_crop_variety.variety_name ?
+                                        data.m_crop_variety.variety_name:"NA"}}<br>
+                                        <span
+                                            *ngIf="data && data.m_variety_line && data.m_variety_line.line_variety_name">
+                                            Parental line:{{data && data.m_variety_line &&
+                                            data.m_variety_line.line_variety_name ?
+                                            data.m_variety_line.line_variety_name:"N/A"}}
+                                        </span>
+                                    </td>
+                                    <td class="col-md-2 py-2">
+                                        <!-- <span *ngFor="let item of data.lot_details"> -->
+                                        Lot No:<b class="font-weight-bold"> {{data && data.seed_tag_detail &&
+                                            data.seed_tag_detail.lot_no ?
+                                            data.seed_tag_detail.lot_no:"NA"}}</b><br>
+                                        Lot Quantity(Qt):<b class="font-weight-bold">{{data && data.seed_tag_detail &&
+                                            data.seed_tag_detail.lot_qty
+                                            ? data.seed_tag_detail.lot_qty:"NA"}}</b><br>
+                                        Total No. of Bags:<b class="font-weight-bold">{{data && data.seed_tag_detail &&
+                                            data.seed_tag_detail.no_of_bags ?
+                                            data.seed_tag_detail.no_of_bags:""}}</b><br>
+                                        <!-- </span> -->
+                                    </td>
+                                    <!-- getAllTag -->
+                                    <td class="col-md-1 py-2">{{data && data.discard_tag_request  ? getAllTagData(data.discard_tag_request):'NA'}}</td>
+                                    <td class="col-md-1 py-2">{{data && data.discard_tag_request && (data.discard_tag_request.length) ? (data.discard_tag_request.length):'NA'}}</td>
+                                    <td class="col-md-1 py-2">{{data && data.reason ? getReasonName(data.reason) :'NA'
+                                        }}</td>
+                                    <!-- <td class="col-md-2 py-2">
+                                        <span
+                                            [ngClass]="(data.is_approved==true) ?'accepted-css':(data.is_approved==false) ?'rejected-css':'pending-css'">
+                                            {{data &&
+                                            (data.is_approved==false?'Rejected':(data.is_approved==true?'Approved':'Pending'))}}
+                                        </span>
+                                    </td> -->
+                                    <td class="col-md-1 py-2">
+                                        <div class="row">
+                                            <!-- *ngIf="!data.is_approved"  -->
+                                            <div class="col-6 pb-1">
+                                                <button (click)="edit(data)"
+                                                    class="form-button btn-inventory-edit search d-inline-flex justify-content-center verticle-content-middle">
+                                                    <span class="text-white">Edit</span>
+                                                </button>
+                                            </div>
+                                            <!-- *ngIf="data.is_approved" -->
+                                            <div class="col-6 pt-1" >
+                                                <button (click)="delete(data.reprint_id)"
+                                                    class="form-button btn-inventory-reject search d-inline-flex justify-content-center verticle-content-middle">
+                                                    <span class="text-white">Delete</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- <div *ngIf="getReprintAllDataList && getReprintAllDataList.length<1">
+                            <ng-template >
+                                <div class="row data-row">
+                                    <div class="col px-2 py-3 w-100" style="height: 50px;">
+                                        <div class="d-flex verticle-content-middle justify-content-center w-100">
+                                            No Data Found.
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</form>
+
+<!-- d-none -->
+<div class="row my-4 w-100 mx-0 d-none tag-report"> 
+    <div class="col-12 d-flex justify-content-center verticle-content-middle" id="pdf-tables">
+        <div class=" px-0 py-2" style="width: 100%;">
+            <div class="container print-section " *ngFor="let item of cardData; let index= index" [id]="item.pageId">
+                <div class="row align-items-center "  >
+                    <div class="col-6 mx-auto">
+                        <div class="card shadow border tagCard mt-4" >
+                            <div class="card-body d-flex flex-column align-items-center ">
+                                <div class="col-12">
+                                    <div class="row">
+                                        <div class="col-md-2 col-sm-12 float-right pl-0">
+                                            <div class="left-logo mt-2">
+                                                <p> <img src="../../assets/images/left-icar-logo.png"
+                                                        class="left-logo-img"> </p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8 col-sm-12 ">
+                                            <div class="heading mt-2">
+                                                <span align="center" class="title">{{agency_name ?
+                                                    agency_name
+                                                    :'NA'}}</span>
+                                                <p class="address-title">{{district_name ? district_name
+                                                    :'NA'}},&nbsp;{{state_name ? state_name:'NA'}}</p>
+                                                <p class="divider"><img src="../../assets/images/card-divider.png"
+                                                        class="diveder-image"></p>
+                                                <p class="class-of">Class of Seed : Breeder Seed</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-sm-12 float-right pl-0 d-flex justify-content-end">
+                                            <div class="left-logo mt-2" style="float: right;">
+                                                <qrcode 
+                                                [qrdata]="baseUrl+ 'tag-number-verification?tagNo=' + item.tag_no"
+                                                [allowEmptyString]="true"
+                                                [ariaLabel]="'QR Code image with the following content...'"
+                                                [cssClass]="'top'" [colorDark]="'#000000ff'" [colorLight]="'#fed16c'"
+                                                [elementType]="'canvas'" [errorCorrectionLevel]="'M'" [imageSrc]=""
+                                                [imageHeight]="80" [imageWidth]="80" [margin]="2" [scale]="1"
+                                                [title]="'A custom title attribute'" [width]="140">
+                                            </qrcode>
+                                                <!-- <qrcode
+                                                [qrdata]="baseUrl+ 'generate-card/'+ encryptedData"
+                                                 [allowEmptyString]="true"
+                                                    [ariaLabel]="'QR Code image with the following content...'"
+                                                    [cssClass]="'qrcod'" [colorDark]="'#000000ff'"
+                                                    [colorLight]="'#fed16c'" [elementType]="'canvas'"
+                                                    [errorCorrectionLevel]="'M'" [imageSrc]="" [imageHeight]="60"
+                                                    [imageWidth]="60" [margin]="2" [scale]="1"
+                                                    [title]="'A custom title attribute'" [width]="60">
+                                                </qrcode> -->
+                                                <!-- <p> <img src="../../assets/images/left-icar-logo.png" class="left-logo-img"> </p> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-5 col-md-6 col-sm-12 pl-0">
+                                            <div class="row pt-2">
+                                                <div class="col-md-3  ">
+                                                    <span class="input-heading" style="white-space: nowrap;">Crop</span>
+                                                </div>
+                                                <div class="col-md-9 pl-5 ">
+                                                    <input class="first" style="width: 147px; 
+                                                            height: 22px;font-size: 13px;margin-left: -1em;margin-top: -1em;"
+                                                        type="text" value="{{selectCrop ? selectCrop :''}}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-7 col-md-6 col-sm-12 ">
+                                            <div class="row pt-2">
+                                                <div class="col-md-3">
+                                                    <span class="input-heading" style="white-space: nowrap;">Date of
+                                                        Test:</span>
+                                                </div>
+                                                <div class="col-md-6 ml-5 ">
+                                                    <input type="text" class="second"
+                                                        value="{{item && item.date_of_test ? (item.date_of_test) :''}}">
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-5 col-md-6 col-sm-12 pl-0">
+                                            <div class="row pt-2">
+                                                <div class="col-md-3  ">
+                                                    <span class="input-heading"
+                                                        style="white-space: nowrap;">Variety</span>
+                                                </div>
+                                                <div class="col-md-9 pl-5">
+                                                    <input class="first" style="width: 147px; 
+                                            height: 22px;font-size: 13px;margin-left: -1em;margin-top: -1em;"
+                                                        type="text"
+                                                        value="{{item && item.variety ? item.variety :''}}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-7 col-md-6 col-sm-12 ">
+                                            <div class="row pt-2">
+                                                <div class="col-md-3">
+                                                    <span class="input-heading" style="white-space: nowrap;">Pure
+                                                        Seed(%):</span>
+                                                </div>
+                                                <div class="col-md-6 ml-5 ">
+                                                    <input type="text" class="second"
+                                                        value="{{item && item.pure_seed ? item.pure_seed :''}}">
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-5 col-md-6 col-sm-12 pl-0">
+                                            <div class="row pt-2">
+                                                <div class="col-md-3  ">
+                                                    <span class="input-heading" style="white-space: nowrap;">Parental
+                                                        <br> Line</span>
+                                                </div>
+                                                <div class="col-md-9 pl-5">
+                                                    <input class="first" style="width: 147px; 
+                                            height: 22px;font-size: 13px;margin-left: -1em;margin-top: -1em;"
+                                                        type="text"
+                                                        value="{{item && item.line_variety_name ? item.line_variety_name :'NA'}}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-7 col-md-6 col-sm-12 ">
+                                            <div class="row pt-2">
+                                                <div class="col-md-3">
+                                                    <span class="input-heading" style="white-space: nowrap;">Inert
+                                                        Seed(%):</span>
+                                                </div>
+                                                <div class="col-md-6 ml-5 ">
+                                                    <input type="text" class="second"
+                                                        value="{{item && item.inert_matter ? item.inert_matter :'N/A'}}">
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-5 col-md-6 col-sm-12 pl-0">
+                                            <div class="row pt-2">
+                                                <div class="col-md-3  ">
+                                                    <span class="input-heading" style="white-space: nowrap;">Lot
+                                                        No.</span>
+                                                </div>
+                                                <div class="col-md-9 pl-5">
+                                                    <input class="first" style="width: 147px; 
+                                                        height: 22px;font-size: 13px;margin-left: -1em;margin-top: -1em;"
+                                                        type="text" value="{{item && item.lot_no ? item.lot_no :'N/A'}}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-7 col-md-6 col-sm-12 ">
+                                            <div class="row pt-2">
+                                                <div class="col-md-3">
+                                                    <span class="input-heading"
+                                                        style="white-space: nowrap;">Germination(%):</span>
+                                                </div>
+                                                <div class="col-md-6 ml-5 ">
+                                                    <input type="text" class="second"
+                                                    value="{{item && item.normal_seeding ? item.normal_seeding :'N/A'}}">
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-5 col-md-6 col-sm-12 pl-0">
+                                            <div class="row pt-2">
+                                                <div class="col-md-3  ">
+                                                    <span class="input-heading" style="white-space: nowrap;">Tag
+                                                        No.</span>
+                                                </div>
+                                                <div class="col-md-9 pl-5">
+                                                   
+                                                        <input 
+                                                       
+                                                       class="first "
+                                                        style="width: 147px; 
+                                                height: 22px;font-size: 13px;margin-left: -1em;margin-top: -1em;"
+                                                            type="text" value="{{item && item.tag_no ? item.tag_no :''}}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                   
+
+
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-5 col-md-6 col-sm-12 pl-0">
+                                            <div class="row pt-2">
+                                                <div class="col-md-3  ">
+                                                    <span class="input-heading" style="white-space: nowrap;">Bag
+                                                        Weight<br> (Kg).</span>
+                                                </div>
+                                                <div class="col-md-9 pl-5">
+                                                    <input class="first" style="width: 147px; 
+                                                        height: 22px;font-size: 13px;margin-left: -1em;margin-top: -1em;"
+                                                        type="text"
+                                                        value="{{item && item.bag_size ? item.bag_size :50}}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                       
+                                    </div>
+                                <div class="row">
+                                    <div class="col-lg-8">
+                                        <span class="input-heading" style="white-space: nowrap;margin-left: -1em;">This tag is system generated and does required any signature.</span>
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 pl-0 d-flex justify-content-end">
+                                        <div class="row pt-2">
+                                            <div class="col-md-3  ">
+                                                <!-- <span class="input-heading" style="white-space: nowrap;margin-left: -1em;">This tag is system generated and does required any signature.</span> -->
+                                            </div>
+                                            <div class="col-md-12 " style="margin-left: -3em;margin-top:-4em">
+                                                <span class="input-heading"  style="white-space: nowrap;display: flex;justify-content:end;">
+                                                    (-SD-)
+                                                    </span>
+                                            </div>
+                                            <div class="col-md-12 ">
+                                                <span class="input-heading"  style="white-space: nowrap;display: flex;justify-content:end;margin-top:-2em">
+                                                    {{contactPersonName ? contactPersonName:'NA'}}
+                                                    </span>
+                                            </div>
+                                            <div class="col-md-12 ">
+                                                <span class="input-heading"  style="white-space: nowrap;display: flex;justify-content:end;margin-top:-1em">
+                                                    {{designation_name ? designation_name:'NA'}}
+                                                    </span>
+                                            </div>
+                                           
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

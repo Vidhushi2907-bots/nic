@@ -1,0 +1,533 @@
+<div *ngIf="hideView"class="pt-3 pb-3 px-4">
+    <form [formGroup]="ngForm" (ngSubmit)="onSubmit()">
+        <div class=" card">
+            <div class="col-12 heading verticle-content-middle mt-3 pb-3 pl-3">
+                <div class="row">
+                    <div class="col-5">
+
+                    </div>
+                    <div class="col-4 view">
+                        {{isEdit? "Update": isView ? 'View':'Add'}} Variety Characteristics
+                     
+                    </div>
+                    <div class="col-3">
+
+                    </div>
+                </div>
+               
+            </div>
+            <hr class="custom-hr">
+            <!-- form-row -->
+            <!-- <div class="col-12 heading12   mt-1 pb-3 ">
+                Part I: Basic Information
+            </div> -->
+            <div class="row form-group pl-2 pr-2">
+                <div class="col-12 pt-3 px-4">
+                    <div class="row">
+                        <div class=" col-sm-12 col-md-2 pl-3">
+                            <label for="" class="left-heading ">Crop Group/Crop Category</label>
+                        </div>
+                        <div class="col-sm-12 col-md-4">
+                            <div ngbDropdown class="d-inline-block w-100">
+                               <span>{{crop_groups && (crop_groups.length>30) ?
+                                    (crop_groups.substring(0,30)+'...'):crop_groups?crop_groups :'NA'}}</span> 
+                            </div>
+                        </div>
+                        <div class=" col-sm-12 col-md-2 pl-3">
+                            <label for="" class="left-heading  ">Crop Name</label>
+                        </div>
+                        <div class="col-sm-12 col-md-4 in_sel_box">
+                            <div ngbDropdown class="d-inline-block w-100">
+                                <span>
+                                    {{crop_names && (crop_names.length>30) ?
+                                    (crop_names.substring(0,30)+'...'):crop_names?crop_names :'NA'}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- scientific name and hindi name adding -->
+                <div class="col-12 pt-2 px-4">
+                    <div class="row">
+                        <div class="col-lg-2 col-sm-12 col-md-2 pl-3">
+                            <label for="" class="left-heading ">Botanical/Scientific Name</label>
+                        </div>
+
+                        <div class="col-sm-12 col-md-4 pb-4">
+                            <span *ngIf="ngForm.controls['crop_name'].value">{{ cropBasicData && cropBasicData[0] &&
+                                cropBasicData[0].scientific_name ?
+                                cropBasicData[0].scientific_name:'NA'}}
+                            </span>
+                            <span *ngIf="!ngForm.controls['crop_name'].value">{{ cropBasicData && cropBasicData[0] &&
+                                cropBasicData[0].scientific_name ?
+                                cropBasicData[0].scientific_name:'NA'}}
+                            </span>
+                        </div>
+
+                        <!--  hindi name adding -->
+                        <div class="col-lg-2 col-sm-12 col-md-2 pl-3">
+                            <label for="" class="left-headings">Crop Name (Hindi)</label>
+                        </div>
+                        <div class="col-lg-4 col-sm-12 col-md-4 in_sel_box pb-4">
+                            <span *ngIf="ngForm.controls['crop_name'].value"
+                                 >{{ngForm.controls['crop_name'].value && cropBasicData &&
+                                cropBasicData[0] &&
+                                cropBasicData[0].hindi_name ? cropBasicData[0].hindi_name:'NA'}}</span>
+                            <span *ngIf="!ngForm.controls['crop_name'].value"
+                                >{{ngForm.controls['crop_name'].value && cropBasicData &&
+                                cropBasicData[0] &&
+                                cropBasicData[0].hindi_name ? cropBasicData[0].hindi_name:'NA'}}</span>
+                        </div>
+                    </div>
+                </div>
+               
+                <div class="col-12 pt-0 px-4">
+                    <div class="row">
+                        <div class=" col-sm-12 col-md-2 pl-3">
+                            <label for="" class="left-heading">Variety Name</label>
+                        </div>
+                        <div class="col-sm-12 col-md-4">
+                            <div ngbDropdown class="d-inline-block w-100">
+                                <span>
+                                    {{variety_names &&
+                                    (variety_names.length>30) ?
+                                    (variety_names.substring(0,30)+'...'):variety_names?variety_names :'NA'}}
+                                </span>
+                            </div>
+                        </div>
+                        <div class=" col-sm-12 col-md-2 pl-3">
+                            <label for="" class="left-heading">Variety Code</label>
+                        </div>
+                        <div class="col-sm-12 col-md-4 in_sel_box">
+                            <!-- <input formControlName="variety_code" class="form-control"> -->
+                            <span>{{ngForm.controls['variety_code'].value ? ngForm.controls['variety_code'].value:'NA'}}</span> 
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+                <div class="col-12 pt-0 px-4">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-2 pl-3">
+                            <label for="" class="left-heading">Notified / Non-Notified</label>
+                        </div>
+                        <div class="col-sm-12 col-md-4">
+                            <span class="notified">
+                                {{this.ngForm.controls['notified_non_notified'].value ? this.ngForm.controls['notified_non_notified'].value:'NA'}}
+                            </span>
+                        </div>
+                        <div class="col-sm-12 col-md-2 pl-3" *ngIf="check_notified =='Notified'">
+                            <label for="" class="left-heading">Notification Date</label>
+                        </div>
+                        <div class="col-sm-12 col-md-4 in_sel_box" *ngIf="check_notified =='Notified'">
+                            {{ngForm.controls['notification_date'].value ? ngForm.controls['notification_date'].value:'NA' }}
+                            <!-- <input type="text" name="begin" class="form-control" formControlName="notification_date"
+                                (keydown)="checkAlphabet($event)" data-date-format="DD MMMM YYYY"
+                                placeholder="DD-MM-YYYY"> -->
+                        </div>
+
+                        <div class="col-lg-2   col-sm-12 " *ngIf="check_notified =='Non-Notified'">
+                            <label for="" class="left-heading">Year of Introduction in the market</label>
+                        </div>
+                        <div class="col-lg-4  in_sel_box" *ngIf="check_notified =='Non-Notified'">
+                          {{ngForm.controls['year_of_introduction'].value ? ngForm.controls['year_of_introduction'].value:'NA'}}
+                        </div>
+
+                    </div>
+                </div>
+                <!-- placeholder="{{!ngForm.controls['notification_date'].value? 'DD/MM/YYYY':''}}" -->
+
+
+                <div class="col-12 pt-0 px-4">
+                    <div class="row">
+                        <div class="col-lg-2 pl-lg-4 col-sm-12" [hidden]="check_notified !== ''">
+                            <label for="" class="left-heading">Notification Date</label>
+                        </div>
+                        <div class="col-lg-4 col-sm-12" [hidden]="check_notified !== ''">
+                            <div class="form-control-static">{{ notificationDate }}</div>
+                            <div class="notification_date errorMessage"
+                                *ngIf="submitted || ngForm.controls['notification_date'].invalid && (ngForm.controls['notification_date'].dirty || ngForm.controls['notification_date'].touched)">
+                                <span *ngIf=" ngForm.controls['notification_date'].errors?.['required']">
+                                    Please Select Notification Date. <br>
+                                </span>
+                            </div>
+                            <div class="pl-0 toggle-button" ngbDropdown>
+                                <img src="assets/images/16.svg" alt="" srcset="">
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-sm-12 col-md-2 pl-3" [hidden]="check_notified !== ''">
+                            <label for="" class="left-heading">Year of Introduction in the market</label>
+                        </div>
+                        <div class="col-lg-4" style="margin-left: -1em;" [hidden]="check_notified !== ''">
+                            <div class="">{{ yearOfIntroduction }}</div>
+                        </div>
+                    </div>    
+                </div>
+                <!--  -->
+                <div class="col-12 pt-0 px-4">
+                    <div class="row">
+                        <div class=" col-sm-12 col-md-2 pl-3" [hidden]="check_notified == 'Non-Notified'">
+
+                            <label for="" class="left-heading">Notification Number</label>
+                        </div>
+                        <div class="col-sm-12 col-md-4 " [hidden]="check_notified == 'Non-Notified'">
+                            {{ngForm.controls['notification_number'].value ?  ngForm.controls['notification_number'].value:'NA'}}
+                        </div>
+                        <div class=" col-lg-2  col-sm-12 col-md-2 pl-3" [hidden]="check_notified == 'Non-Notified'">
+
+                            <label for="" class="left-headings">Meeting Number</label>
+                        </div>
+                        <div class="col-sm-12 col-md-4 in_sel_box" [hidden]="check_notified == 'Non-Notified'">
+                            {{ngForm.controls['meeting_number'].value ?  ngForm.controls['meeting_number'].value:'NA'}}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 pt-0 px-4">
+                    <div class="row">
+                        <div class=" col-lg-2  col-sm-12 col-md-2 pl-3 mb-3" [hidden]="check_notified == 'Non-Notified'">
+
+                            <label for="" class="left-headings">Year of Release</label>
+                        </div>
+                        <div class="col-sm-12 col-md-4 mb-3" [hidden]="check_notified == 'Non-Notified'">
+                            {{ngForm.controls['year_release'].value ?  ngForm.controls['year_release'].value:'NA'}}
+                        </div>
+
+                        <!-- ============================  category fields =============================== -->
+                        
+                        <div class="col-lg-2 col-sm-12 col-md-2 pl-3 mb-3">
+                            <label for="" class="left-heading">Category</label>
+                        </div>
+                        <div class="col-sm-12 col-md-4 mb-3 in_sel_box">
+                            <span *ngFor="let data of ngForm.controls['category'].value">
+                                <!-- [ngClass]=" true  ? 'disabledfield' : ''" id="state_for_cultivation" -->
+                               <span class="oval" [ngClass]="data.m_variety_category.category==='Bio-fortified'?'green-oval':data.m_variety_category.category==='Biotic Stress tolerant'?'red-oval':data.m_variety_category.category==='Climate resilient'?'yellow-oval':'random-oval'">
+                                 {{data && data.m_variety_category.category ?  data.m_variety_category.category:''}}
+                               </span> 
+                            </span>
+                        </div>
+                        
+                    </div>
+                </div>
+
+
+                <div class="col-12 pt-0 px-4">
+                    <div class="row">
+                        <div class=" col-sm-12 col-md-2 pl-3">
+
+                            <label for="" class="left-heading">Select Type</label>
+                        </div>
+                        <div class="col-sm-12 col-md-4">
+                            <span class="notified oval green-oval">
+                                <!-- Hybrid -->
+                                {{ngForm.controls['type'].value ?  ngForm.controls['type'].value:'NA'}}
+                            </span>
+                        </div>
+                        <div class=" col-sm-12 col-md-2 pl-3">
+                            <label for="" class="left-heading">Developed By</label>
+                        </div>
+                        <div class="col-sm-12 col-md-4 in_sel_box">
+                           <span class="oval red-oval">{{ngForm.controls['developed_by'].value ?  ngForm.controls['developed_by'].value:'NA'}}</span> 
+                        </div>
+                    </div>
+                </div>
+               
+                <!-- temp value  -->
+                <!-- <p>---------------------------- Part II: Variety Characteristics-------------------------------------</p> -->
+                <div class="col-12 pt-3 px-4">
+                    <div class="row">
+                        <div class=" col-sm-12 col-md-2 pl-3">
+                            <label for="" class="left-heading">IP protected</label>
+                        </div>
+                        <div class=" col-sm-12 col-md-4">
+                            <div class="col-sm-12 col-md-11  ">
+                                <div class="form-check form-check-inline    ">
+                                    <div class="row "> 
+                                        <!-- ipCheckValue==0 -->
+                                        <div *ngIf="ipCheckValue==0" class="col-sm-4 col-md-2  col-lg-2 col-xs-3 in_sel_box ">
+                                            <label class="form-check-label  font-size-18 radio-btn-class    "
+                                                for="inlineRadio"><span class="oval yellow-oval">No</span></label>
+                                        </div>
+                                        <div *ngIf="ipCheckValue==1" class=" col-sm-4 col-md-2 col-lg-2 col-xs-3 in_sel_box">
+
+                                            <label class=" form-check-label font-size-18 radio-btn-class  "
+                                                for="inlineRadio2"><span class="oval yellow-oval">Yes</span></label>
+                                        </div>
+                                        <!-- <div class=" col-sm-1 col-md-1 pl-3 " *ngIf="ipCheckValue==1">
+
+                                            <label for="" class="left-heading1"> </label>
+                                        </div> -->
+                                        <div class="col-sm-4 col-md-6 col-lg-6 col-xs-6  protected mr-2    " *ngIf="ipCheckValue==1">
+                                            {{ngForm.controls['ip_protected_reg_no'].value ? ', '+ngForm.controls['ip_protected_reg_no'].value:'NA'}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                            <div class=" col-sm-12 col-md-2 pl-3">
+                                <label for="" class="left-heading">GI Tagged</label>
+                            </div>
+                            <div class=" col-sm-12 col-md-4">
+                                <div class="col-sm-12 col-md-11  ">
+    
+                                    <div class="form-check form-check-inline ">
+                                        <div class="row ">
+                                            <!-- giCheckValue==0 -->
+                                            <div *ngIf="giCheckValue==0" class="col-sm-4 col-lg-2 col-md-2 in_sel_box">
+    
+                                                <label class="form-check-label  font-size-18 radio-btn-class in_sel_box"
+                                                    for="inlineRadio"><span class="oval random-oval">No</span></label>
+                                            </div>
+                                             
+                                            <div *ngIf="giCheckValue==1" class=" col-sm-4 col-md-2 in_sel_box">
+    
+                                                <label class=" form-check-label font-size-18 radio-btn-class in_sel_box"
+                                                    for="inlineRadio2"><span class="oval random-oval">Yes</span></label>
+                                            </div>
+                                            <!-- <div class=" col-sm-12 col-md-4 pl-3 " *ngIf="giCheckValue==1">
+    
+                                                <label for="" class="left-heading1">Registration No.</label>
+                                            </div> -->
+                                            <div class="col-sm-4 col-md-6 col-lg-6 col-xs-6  protected mr-1   " *ngIf="giCheckValue==1">
+                                                {{ngForm.controls['gi_tagged_reg_no'].value ?', '+ ngForm.controls['gi_tagged_reg_no'].value:'NA'}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+                 <!-- Released By & state of release -->
+                 <div class="col-12 pt-3 px-4">
+                    <div class="row">
+                        <div class=" col-sm-12 col-md-2 pl-3"> 
+                            <label for="" class="left-heading">Released By.</label>
+                        </div>
+                        <div class=" col-sm-12 col-md-4  ">
+                            <div class="col-sm-12 col-md-11 ">
+
+                                <div class="form-check form-check-inline    ">
+                                    <div class="row "> 
+                                        <div *ngIf="true" class="col-sm-12 col-md-4 col-lg-6   in_sel_box"> 
+                                            <label class="form-check-label  font-size-18 radio-btn-class  "
+                                                for="inlineRadio"><span class="oval realised-by-oval">State</span></label>
+                                        </div>
+                                        <div *ngIf="checkValue==1" class=" col-md-12 col-sm-4 col-lg-6  in_sel_box ">
+
+                                            <label class=" form-check-label font-size-18 radio-btn-class"
+                                                for="inlineRadio2"><span class="oval realised-by-oval">Central</span></label>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                         <!-- Responsible Institution For Developing Breeder Seed -->
+                         <div class="col-sm-12 col-md-2 pl-3">
+                            <label for="" class="left-heading">Developed By
+                            </label>
+                        </div>
+                        <div class="col-sm-12 col-md-4 in_sel_box">
+                            <span> {{selected_insitution && (selected_insitution.length>30) ?
+                                (selected_insitution.substring(0,20)+'...'):selected_insitution?selected_insitution:isView
+                                || isEdit && apiResponseData &&
+                                !apiResponseData.responsible_insitution_for_breeder_seed?'' :'NA'}}</span>
+                        </div>
+                        <!-- *ngIf="checkValue==0" -->
+                        <div class=" col-sm-12 col-md-2 pl-3 " *ngIf="false">
+                            <label for="" class="left-heading1">Location of Institute</label>
+                        </div>
+                        <!-- *ngIf="checkValue==0" -->
+                        <div *ngIf="false" class="col-sm-12 col-md-4 in_sel_box" >
+                            <div ngbDropdown class="d-inline-block w-100">
+
+                                <button class="btn takeplacholder w-100 crop toggle-button"
+                                    [ngClass]=" true  ? 'disabledfield' : ''" id="state_for_cultivation"
+                                    ngbDropdownToggle style="text-align: left;" aria-disabled="true">
+                                    {{stateByBspcData && stateByBspcData.m_state && stateByBspcData.m_state['state_name']?stateByBspcData.m_state['state_name']:'NA'}}
+                                    <!-- {{state_names && (state_names.length>30) ?
+                                    (state_names.substring(0,30)+'...'):state_names?state_names :stateByBspcData && stateByBspcData.state && stateByBspcData.state['state_name']?stateByBspcData.state['state_name']: 'Select State Name'}} -->
+                                </button>
+
+                                <div class="dropdown-menu w-100" ngbDropdownMenu="state_for_cultivation"
+                                    aria-labelledby="sortMenu">
+
+                                    <input type="text" class="form-control px-4" formControlName="state_name_text">
+                                    <button class="dropdown-item" *ngFor="let data of stateList " value="{{data.id}}"
+                                        (click)="state_name(data)" #dropdownItem
+                                        [attr.data-parent-name]="'state_for_cultivation'">
+                                        {{data.state_name}}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+
+                <!--  Recommended State(s) for Cultivation sectoin and ecologicale region -->
+                <div class="col-12 pt-3 px-4">
+                    <div class="row">
+                        <div class=" col-sm-12 col-md-2 pl-3">
+                            <label for="" class="left-heading">Recommended State(s) for Cultivation.</label>
+                        </div>
+                        <div class=" col-sm-12 col-md-4">
+                            <div>
+                                  <span *ngFor="let data of ngForm.controls['state_for_cultivation_central'].value">
+                                        {{data && data.state_name ? data.state_name+',':'NA' }}
+                                  </span>
+                            </div>
+                        </div>
+
+                        <!-- Agro-Ecological Regions* -->
+                        <div class=" col-sm-12 col-md-2 pl-3">
+                            <label for="" class="left-heading">Agro-Ecological Regions</label>
+                        </div>
+                        <div class=" col-sm-12 col-md-4 in_sel_box">
+                                    <div formArrayName="regions">
+                                        <div *ngIf="regions.controls?.length">
+                                            <div *ngFor="let employee of regions.controls; let i=index">
+                                                <div [formGroupName]="i"     >
+                                                    <!-- <div *ngIf="j===0"><b>{{ele.short_name ? ele.short_name+':':''}}</b></div> -->
+                                                     <div class="row ">  
+                                                        <div class="col-12 col-md-11 col-lg-11 col-sm-11 ">
+                                                            {{ this.ngForm.controls['regions']['controls'][i].controls['regions_name'].value}}
+                                                        </div>   
+                                                     </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                       
+                                    </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- type of maturity radio button and Maturity in days -->
+                <div class="col-12 pt-0 px-4 mt-3">
+                    <div class="row">
+                        <!-- type of maturity radio button -->
+                        <div class=" col-lg-2  col-sm-12 col-md-2 pl-3">
+                            <label for="" class="left-heading">Type of Maturity</label>
+                        </div>
+                        <div class="col-lg-4 col-sm-12 col-md-4">
+                            <div
+                                class="col-md-12 col-sm-11 pl-sm-3 pl-lg-0 pl-4 col-lg-9 ml-xs-3 px-sm-4 pr-sm-4 col-11 col-xs-3 pl-sm-4 pr-sm-4 pl-md-4 pr-mr-4 pl-0">
+                                <div class="form-check form-check-inline">
+                                    <div class="row in_sel_box">
+                                        <div  class=" col-md-12 col-sm-4 col-lg-6 col-11 col-xs-3  ">
+                                            <!-- muturityStatus==1 -->
+                                            <label *ngIf="muturityStatus==1" class=" form-check-label font-size-18 radio-btn-class"
+                                                for="inlineRadio2"><span class="oval muturity-oval">Early</span>&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <div class="row">
+                                        <div class="col-md-12 col-sm-12 col-lg-2 ml-4">
+                                        </div>
+                                        <div *ngIf="muturityStatus==2" class="col-md-12 col-sm-4 col-lg-6 col-11 col-xs-3">
+                                            <label class="form-check-label  font-size-18 radio-btn-class"
+                                                for="inlineRadio"><span class="oval muturity-oval">Medium</span></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-check form-check-inline ">
+                                    <div class="row">
+                                        <div class="col-md-12 col-sm-12  col-lg-2 ml-4 ">
+                                        </div>
+                                        <div *ngIf="muturityStatus==3" class="col-md-12 col-sm-4 col-lg-6 col-11 col-xs-3 ">
+                                            <label class="form-check-label font-size-18 radio-btn-class"
+                                                for="inlineRadio"><span class="oval muturity-oval">Late</span></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                           
+                        </div>
+                          <!-- muturity in days -->
+                          <div class=" col-lg-2 col-sm-12 col-md-2 pl-3 pt-4 pt-md-0">
+
+                            <label for="" class="left-heading">Enter Maturity (in Days)</label>
+                        </div>
+                        <div class="col-sm-12 col-md-4 in_sel_box">
+                            <span>{{ngForm.controls['maturity_to'].value ? getMaturityData(ngForm.controls['maturity_to'].value):'NA'}}</span>
+                             <!-- <span>50-55</span> -->
+                        </div>
+                    </div>
+                </div>
+                <!-- tavaearge yield and climate resilennce -->
+                <div class="col-12 pt-0 px-4">
+                    <div class="row">
+                        <!--Average Yield (kg/Ha -->
+                        <div class=" col-lg-2  col-sm-12 col-md-2 pl-3">
+                            <label for="" class="left-heading">Average Yield (Qt/Ha)</label>
+                        </div>
+                        <div class="col-lg-4 col-sm-12 col-md-4">
+                            <div class="row">
+                                <div class="col-6 col-sm-12 col-md-6 col-xl-6">
+                                    <div class="row">
+                                       
+                                        <div class="col-sm-8 col-md-8 col-xl-8  mr-6">
+                                            <span>{{ngForm.controls['average_from'].value ? ngForm.controls['average_from'].value:'NA'}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-sm-12 col-md-6 col-xl-6" *ngIf="ngForm.controls['average_to'].value">
+                                    <div class="row">
+                                        <div class="col-sm-2 col-md-2 col-xl-2">
+                                            <label for="" class="left-heading1">To</label>
+                                        </div>
+                                        <!-- isView  || isEdit && apiResponseData && !apiResponseData.average_yeild_from ?'': 'Average Yield (kg/Ha)' -->
+                                        <div class="col-sm-8 col-md-8 col-xl-8">
+                                            {{ngForm.controls['average_to'].value ? ngForm.controls['average_to'].value:'NA'}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- climate  Resilience-->
+                        <div class=" col-lg-2  col-sm-12 col-md-2 pl-3">
+                            <label for="" class="left-heading">Climate Resilience</label>
+                            <!-- <label for="" class="left-heading1">Adaptation and Recommended Ecology</label> -->
+                        </div>
+                        <div class="col-lg-4 col-sm-12 col-md-4 in_sel_box">
+                            <span  class="oval climate-oval" *ngFor="let item of ngForm.controls['climate_resilience'].value">{{item && item.name ? item.name +',':'' }}</span>
+                            
+                        </div>
+                    </div>
+                </div>
+                <!-- reaction/tolerance to major insect and reaction resitance to major diseases -->
+                <div class="col-12 pt-0 px-4 mt-3">
+                    <div class="row">
+                        <!-- Reaction/Tolerance to Major Insect Pests -->
+                        <div class=" col-lg-2  col-sm-12 col-md-2 pl-3">
+                            <label for="" class="left-heading">Reaction/Tolerance to Major Insect Pests</label>
+                            <!-- <label for="" class="left-heading1">Reaction to Major Diseases</label> -->
+                        </div>
+                        <div class="col-lg-4 col-sm-12 col-md-4">
+                            <!-- <span>{{ngForm.controls['major_pest'].value ? ngForm.controls['major_pest'].value:'Nut weevil, Paddy stem borer'}}</span> -->
+                            <span *ngFor="let item of ngForm.controls['major_pest'].value">{{item && item.name ? item.name +',':'' }}</span>
+                        </div>
+                        
+                        <!-- Reaction/Resistance to Major Diseases -->
+                        <div class="col-lg-2  col-sm-12 col-md-2 pl-3">
+
+                            <label for="" class="left-heading">Reaction/Resistance to Major Diseases</label>
+                        </div>
+                        <div class="col-sm-12 col-md-4 in_sel_box">
+                            <!-- <span>{{ngForm.controls['major_diseases'].value ? ngForm.controls['major_diseases'].value:'All major diseases'}}</span> -->
+                            <span *ngFor="let item of ngForm.controls['major_diseases'].value">{{item && item.name ? item.name +',':'' }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div> 

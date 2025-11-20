@@ -101,7 +101,7 @@
               <div class="col-12 col-md-10 col-lg-10 col-sm-12 pt-1 pl-4 formargin" *ngIf="searchClicked">
                 <div class="row align-items-center">
                   <!-- Radio button 1 -->
-                  <div class="col-12 col-md-2 col-lg-2 col-sm-12 radio-container">
+                  <div class="col-12 col-md-2 col-lg-2 col-sm-12 radio-container" *ngIf="is_potato">
                     <label class="radio-label d-flex align-items-center justify-content-center">
                       <input type="radio" name="tableSelection" (change)="selectTable('table1')" [checked]="selectedTable === 'table1'" class="radio-input" >
                       <span class="radio-text font-weight-bold ml-2">For Sending to STL</span>

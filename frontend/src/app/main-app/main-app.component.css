@@ -56,3 +56,28 @@
         margin-left: -12px;
     }
 }
+
+
+@media (max-width: 599px) {
+    .hide-sidebar-res
+{
+    margin-left: -50px !important
+}
+.sidebar-wrapper
+{
+    height: 100% !important;
+}
+
+}
+
+/* ============= SMALL PHONES (<400px) ============= */
+@media (max-width: 399px) {
+    .hide-sidebar-res
+{
+    margin-left: -50px !important
+}
+.sidebar-wrapper
+{
+    height: 100% !important;
+}
+}

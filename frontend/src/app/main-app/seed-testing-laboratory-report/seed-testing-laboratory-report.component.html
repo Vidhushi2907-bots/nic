@@ -1,435 +1,238 @@
 <div class="row my-4 w-100 mx-0">
     <div class="col-12 d-flex justify-content-center verticle-content-middle">
-        <div class="main-content-form-wrapper px-0 py-2">
-            <div class="row">
-                <div class="w-100">
-                <form [formGroup]="ngForm">
-                    <div class="col-12 px-4 mt-2">
-                        <div class="row">
-                            <div class="col-md-12 col-sm-12 pl-4 pb-2">
-                                <span class="heading_notofied">List of Seed Testing Laboratory</span>
-                            </div>
-                                <div class="col-md-4 col-sm-12 mt-2 pl-lg-2 pr-md-0">
-                                    <div class="col-md-4 col-sm-12">
-                                        <label for="" class="left-heading">State</label>
-                                    </div>
-                                    <div _ngcontent-cvx-c131="" class="col-md-12 col-sm-12 pr-md-0">
-                                        <div ngbDropdown class="d-inline-block w-100 "
-                            
-                                        >
-                                            <button class="btn takeplacholder w-100 crop toggle-button"
-                                                 id="state" ngbDropdownToggle
-                                                style="text-align: left;font-weight:400;">{{selected_state && (selected_state.length>30) ? (selected_state.substring(0,30)+'...'):selected_state? selected_state :'Select State'}}</button>
-            
-                                            <div class="dropdown-menu w-100" ngbDropdownMenu="state" aria-labelledby="sortMenu">
-                                                <input type="text" class="form-control px-4"  formControlName="state_text" >
-                                                <button class="dropdown-item" *ngFor="let data of stateData"
-                                                    (click)="state_select(data)" #dropdownItem [attr.data-parent-name]="'state'">
-                                                    {{data && data.state_name ? data.state_name :''}}
-                                                </button>
-                                            </div>
-            
-                                        </div>
-                                        <div class="pl-0 toggle-button" ngbDropdown
-                                            >
-                                            <i class="fa-solid fa-angle-down downicon" (click)="cnClick()"></i>
-                                        </div>
-                                        <!-- <select class="form-control" formControlName="state">
-                                            <option value="">Select State</option>
-                                            <option *ngFor="let data of stateData" value="{{data.state_code}}">
-                                                {{data.state_name}}
-                                            </option>
-                                        </select> -->
-                                    </div>
-                                </div>
-                                <div class="col-md-4 col-sm-12 mt-2 pr-md-0">
-                                    <div class="col-md-4 col-sm-12">
-                                        <label for="" class="left-heading">District</label>
-                                    </div>
-                                    <div _ngcontent-cvx-c131="" class="col-md-12 col-sm-12 pl-md-0">
-                                        <div ngbDropdown class="d-inline-block w-100 "
-                            
-                                        >
-                                            <button class="btn takeplacholder w-100 crop toggle-button"
-                                            [ngClass]=" disabledfield ? 'disabledfield' : ''"
-                                                id="district" ngbDropdownToggle
-                                                style="text-align: left;">{{selected_district && (selected_district.length>30) ? (selected_district.substring(0,30)+'...'):selected_district? selected_district :'Select District'}}</button>
-            
-                                            <div class="dropdown-menu w-100" ngbDropdownMenu="district" aria-labelledby="sortMenu">
-                                                <input type="text" class="form-control px-4"  formControlName="district_text" >
-                                                <button class="dropdown-item" *ngFor="let data of DistrictData"
-                                                    (click)="district_select(data)" #dropdownItem [attr.data-parent-name]="'district'">
-                                                    {{data && data['m_district.district_name'] ? data['m_district.district_name']:''}}
-                                                    <!-- <input type="hidden" formControlName="crop_code"> -->
-                                                </button>
-                                            </div>
-            
-                                        </div>
-                                        <div class="pl-0 toggle-button" ngbDropdown
-                                        [ngClass]=" disabledfield ? 'disabledfield' : ''" >
-                                            <i class="fa-solid fa-angle-down downicon" (click)="cdClick()"></i>
-                                        </div>
-                                        <!-- <select class="form-control" formControlName="district">
-                                            <option value="">Select District</option>
-                                            <option *ngFor="let data of DistrictData" value="{{data['m_district.district_code']}}">
-                                                {{data['m_district.district_name']}}
-                                            </option>
-                                        </select> -->
-                                    </div>
-                                </div>
-                           
-
-                            <div _ngcontent-cvx-c131="" class="col-12 mt-4 pl-2 search-cancle-button buttons-phone">
-                                <button _ngcontent-cvx-c131=""
-                                    class="form-button   search ml-2 d-inline-flex justify-content-center verticle-content-middle mb-3 mx-3"
-                                    (click)="submit()"> Search </button>
-                                <button _ngcontent-cvx-c131="" (click)="clear()"
-                                    class="clear-form-button d-inline-flex justify-content-center verticle-content-middle mb-3">
-                                    Clear
-                                </button>
-
-                                <div class="dropdown float-right export_dropdown">
-                                    <button (click)="myFunction()"
-                                        class="form-button  search  d-inline-flex justify-content-center verticle-content-middle mb-2 mx-2"
-                                        style="font-size: 87%;">Export To &nbsp;<i class="fa fa-angle-down"
-                                            aria-hidden="true"> </i></button>
-                                    <div id="myDropdown" class="dropdown-content">
-                                        <a (click)="download()"> <img src="assets\icons\pdf-icon.png" alt=""
-                                                width="20px" height="20px"> PDF</a>
-                                        <a (click)="exportexcel()"> <img src="assets\icons\excel.jpg" alt=""
-                                                width="20px" alt=""> Excel</a>
-                                    </div>
-                                </div>
-
-                            </div>
-
-
-                            <div _ngcontent-cvx-c131="" class="col-12 px-4">
-                                <hr _ngcontent-cvx-c131="" class="separator m-0">
-                            </div>
-                        </div>
+      <div class="main-content-form-wrapper px-0 py-2">
+        <div class="row">
+  
+          <!-- <div class="col-md-12 col-sm-12 pl-4 pb-2">
+            <span class="heading_notofied filting1">List of Seed Testing Laboratory</span>
+          </div> -->
+  
+          <div class="col-12 d-flex justify-content-start mb-0 filting">
+            <button class="filter-btn" (click)="toggleFilter()">
+              <i class="fa fa-filter"></i> Filter Options
+            </button>
+          </div>
+  
+          <div *ngIf="showFilter" class="w-100">
+            <form [formGroup]="ngForm">
+              <div class="col-12 px-4 mt-2">
+                <div class="row">
+  
+                  <!-- State Filter -->
+                  <div class="col-md-4 col-sm-12 mt-2 pl-lg-2 pr-md-0">
+                    <div class="col-md-4 col-sm-12">
+                      <label class="left-heading">State</label>
                     </div>
-                </form>
-            </div>
-                 <!-- table for exel Download start -->
-                 <table id="excel-table" style="display: none;">
-                    <tr>
-                        <td>List of Seed Testing Laboratory</td>
+                    <div class="col-md-12 col-sm-12 pr-md-0">
+                      <div ngbDropdown class="d-inline-block w-100">
+                        <button class="btn takeplacholder w-100 crop toggle-button"
+                                id="state"
+                                ngbDropdownToggle
+                                style="text-align: left;font-weight:400;">
+                          {{ selected_state && (selected_state.length > 30)
+                            ? (selected_state.substring(0,30) + '...')
+                            : selected_state ? selected_state : 'Select State' }}
+                        </button>
+  
+                        <div class="dropdown-menu w-100"
+                             ngbDropdownMenu="state"
+                             aria-labelledby="sortMenu">
+                          <input type="text" class="form-control px-4" formControlName="state_text">
+                          <button class="dropdown-item" (click)="clear()">All</button>
+                          <button class="dropdown-item"
+                                  *ngFor="let data of stateData"
+                                  (click)="state_select(data)"
+                                  #dropdownItem
+                                  [attr.data-parent-name]="'state'">
+                            {{ data?.state_name || '' }}
+                          </button>
+                        </div>
+                      </div>
+                      <div class="pl-0 toggle-button" ngbDropdown>
+                        <i class="fa-solid fa-angle-down downicon" (click)="cnClick()"></i>
+                      </div>
+                    </div>
+                  </div>
+  
+                  <!-- District Filter -->
+                  <div class="col-md-4 col-sm-12 mt-2 pr-md-0">
+                    <div class="col-md-4 col-sm-12">
+                      <label class="left-heading">District</label>
+                    </div>
+                    <div class="col-md-12 col-sm-12 pl-md-0">
+                      <div ngbDropdown class="d-inline-block w-100">
+                        <button class="btn takeplacholder w-100 crop toggle-button"
+                                [ngClass]="disabledfield ? 'disabledfield' : ''"
+                                id="district"
+                                ngbDropdownToggle
+                                style="text-align: left;">
+                          {{ selected_district && (selected_district.length > 30)
+                            ? (selected_district.substring(0,30) + '...')
+                            : selected_district ? selected_district : 'Select District' }}
+                        </button>
+  
+                        <div class="dropdown-menu w-100"
+                             ngbDropdownMenu="district"
+                             aria-labelledby="sortMenu">
+                          <input type="text" class="form-control px-4" formControlName="district_text">
+                          <button class="dropdown-item" (click)="clear()">All</button>
+                          <button class="dropdown-item"
+                                  *ngFor="let data of DistrictData"
+                                  (click)="district_select(data)"
+                                  #dropdownItem
+                                  [attr.data-parent-name]="'district'">
+                            {{ data?.['m_district.district_name'] || '' }}
+                          </button>
+                        </div>
+                      </div>
+                      <div class="pl-0 toggle-button" ngbDropdown [ngClass]="disabledfield ? 'disabledfield' : ''">
+                        <i class="fa-solid fa-angle-down downicon" (click)="cdClick()"></i>
+                      </div>
+                    </div>
+                  </div>
+  
+                  <!-- (Search & Clear buttons were commented) -->
+  
+                </div>
+              </div>
+            </form>
+          </div>
+  
+          <!-- Hidden Table for Excel Download -->
+          <table id="excel-table" style="display: none;">
+            <tr><td>List of Seed Testing Laboratory</td></tr>
+            <tr><td>State</td><td>District</td></tr>
+            <tr><td>{{ selected_state || '' }}</td><td>{{ selected_district || '' }}</td></tr>
+            <thead>
+              <tr>
+                <th scope="col" class="col-md-1 sn-report">S/N</th>
+                <th scope="col" class="col-md-2">Name of Seed Testing Laboratory</th>
+                <th scope="col" class="col-md-2">Short Name</th>
+                <th scope="col" class="col-md-2">State</th>
+                <th scope="col" class="col-md-3">District</th>
+                <th scope="col" class="col-md-2">Address</th>
+                <th scope="col" class="col-md-2">Contact Person Name</th>
+                <th scope="col" class="col-md-2">Contact Person Designation<th>
+                <th scope="col" class="col-md-2">Mobile Number</th>
+                <th scope="col" class="col-md-2">Email Address</th>
+                <th scope="col" class="col-md-2">Status</th>
+              </tr>
+            </thead>
+            <tbody *ngFor="let data of completeData; let dataIndex=index">
+              <tr>
+                <td class="sn-td-report"><span>{{ dataIndex + 1 }}.</span></td>
+                <td><span>{{ data?.lab_name || 'NA' }}</span></td>
+                <td><span>{{ data?.short_name || 'NA' }}</span></td>
+                <td><span>{{ data?.m_district?.state_name || 'NA' }}</span></td>
+                <td><span>{{ data?.m_district?.district_name || 'NA' }}</span></td>
+                <td><span>{{ data?.address || 'NA' }}</span></td>
+                <td><span>{{ data?.contact_person_name || 'NA' }}</span></td>
+                <td><span>{{ data?.m_designation?.name || 'NA' }}</span></td>
+                <td><span>{{ data?.mobile_number || 'NA' }}</span></td>
+                <td><span>{{ data?.email || 'NA' }}</span></td>
+                <td>
+                  <span>{{ data?.is_active && data.is_active == 1 ? 'ACTIVE' : 'INACTIVE' }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <!-- Hidden table end -->
+  
+          <!-- Visible Table -->
+          <div class="col-12 px-4" id="excel-table">
+            <div class="list-wrapper px-4 py-3">
+  
+              <div class="row d-md-flex data-row-header extra-header">
+                <div class="col-12 col-md-12 py-3 d-flex justify-content-between align-items-center text-white">
+                  <div class="mx-auto">List of Seed Testing Laboratory</div>
+                  <div>(Total: {{ totalIndenters }})</div>
+                </div>
+              </div>
+  
+              <div class="col-12 pt-3">
+                <div class="search-export-container mb-2">
+                  <input type="text"
+                         class="form-control search-input input1"
+                         placeholder="Search"
+                         [(ngModel)]="searchText"
+                         (input)="onSearch()" />
+  
+                  <div class="dropdown float-right export_dropdown drop1">
+                    <button type="button" (click)="myFunction()"
+                            class="form-button search ml-1 d-inline-flex justify-content-center verticle-content-middle mb-2 mx-0"
+                            style="font-size: 87%;">
+                      Export To &nbsp;<i class="fa fa-angle-down"></i>
+                    </button>
+                    <div id="myDropdown" class="dropdown-content">
+                      <a (click)="download()">
+                        <img src="assets/icons/pdf-icon.png" width="20" height="20"> PDF
+                      </a>
+                      <a (click)="exportexcel()">
+                        <img src="assets/icons/excel.jpg" width="20"> Excel
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+  
+              <br>
+  
+              <div class="row data-row">
+                <table class="table table-bordered table-responsive">
+                  <thead class="height">
+                    <tr class="data-row-header">
+                      <th class="col-md-1 sn-report"><span class="now">S/N </span></th>
+                      <th class="col-md-2"><span class="now">Name of Seed Testing Laboratory</span></th>
+                      <th class="col-md-2"><span class="now">Short Name </span></th>
+                      <th class="col-md-2"><span class="now">State</span></th>
+                      <th class="col-md-3"><span class="now">District </span></th>
+                      <th class="col-md-2"><span class="now">Address</span></th>
+                      <th class="col-md-2"><span class="now">Contact Person Name</span></th>
+                      <th class="col-md-2"><span class="now">Contact Person Designation</span></th>
+                      <th class="col-md-2"><span class="now">Mobile Number</span></th>
+                      <th class="col-md-2"><span class="now">Email ID</span></th>
+                      <th class="col-md-2"><span class="now">Status</span></th>
                     </tr>
+                  </thead>
+                  <tbody *ngFor="let data of completeData; let dataIndex=index">
                     <tr>
-                        <td>State</td>
-                        <td>District</td>
+                      <td class="sn-td-report">
+                        <span>{{ dataIndex + 1 }}.</span>
+                      </td>
+                      <td><span>{{ data?.lab_name || 'NA' }}</span></td>
+                      <td><span>{{ data?.short_name || 'NA' }}</span></td>
+                      <td><span>{{ data?.m_district?.state_name || 'NA' }}</span></td>
+                      <td><span>{{ data?.m_district?.district_name || 'NA' }}</span></td>
+                      <td><span>{{ data?.address || 'NA' }}</span></td>
+                      <td><span>{{ data?.contact_person_name || 'NA' }}</span></td>
+                      <td><span>{{ data?.m_designation?.name || 'NA' }}</span></td>
+                      <td><span>{{ data?.mobile_number || 'NA' }}</span></td>
+                      <td><span>{{ data?.email || 'NA' }}</span></td>
+                      <td>
+                        <span>{{ data?.is_active && data.is_active == 1 ? 'ACTIVE' : 'INACTIVE' }}</span>
+                      </td>
                     </tr>
-                    <tr>
-                        <td>{{selected_state ? selected_state:''}}</td>
-                        <td>{{selected_district ? selected_district :''}}</td>
-                    </tr>
-                    <thead>
-                        <tr>
-                            <th scope="col" class="col-md-1 sn-report">S/N</th>
-                            <th scope="col" class="col-md-2">Name of Seed Testing Laboratory</th>                                        
-                            <th scope="col" class="col-md-2">Short Name</th>
-                            <th scope="col" class="col-md-2">State</th>
-                            <th scope="col" class="col-md-3">District</th>
-                            <th scope="col" class="col-md-2">Address</th>
-                            <th scope="col" class="col-md-2">Contact Person Name</th>
-                            <th scope="col" class="col-md-2">Contact Person Designation<th>
-                            <th scope="col" class="col-md-2">Mobile Number</th>
-                            <th scope="col" class="col-md-2">Email Address</th>
-                            <th scope="col" class="col-md-2">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody *ngFor="let data of exportdata; let dataIndex=index">
-                        <tr>
-                            <td class="sn-td-report">
-                                <span>{{ dataIndex +1}}.</span>
-                            </td>
-                            <td>
-
-                                <span style="cursor: pointer;" data-toggle="tooltip"
-                                    data-placement="bottom">{{data &&
-                                    data.lab_name || 'NA'}}</span>
-                            </td>
-                            <td>
-                                <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                    data-placement="bottom">{{data &&
-                                    data.short_name || 'NA'
-                                    }}</span>
-                            </td>
-
-                         
-                            <td>
-
-                                <span style="cursor: pointer;" data-toggle="tooltip"
-                                    data-placement="bottom">{{data &&
-                                    data.m_district
-                                    && data.m_district.state_name || 'NA'}}</span>
-                            </td>
-                            
-                            <td>
-
-                                <span style="cursor: pointer;" data-toggle="tooltip"
-                                    data-placement="bottom">{{data &&
-                                    data.m_district
-                                    && data.m_district.district_name || 'NA'}}</span>
-                            </td>
-                            <td>
-
-                                <span style="cursor: pointer;" data-toggle="tooltip"
-                                    data-placement="bottom">{{data &&
-                                    data.address || 'NA'}}</span>
-                            </td>
-                            <td>
-                                <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                    data-placement="bottom">{{data &&
-                                    data.contact_person_name || 'NA'
-                                    }}</span>
-                            </td>
-                            <td>
-                                <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                    data-placement="bottom">{{data &&
-                                    data.m_designation  && data.m_designation.name || 'NA'
-                                    }}</span>
-                            </td>
-                         
-                            <td>
-                                <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                    data-placement="bottom">{{data &&
-                                    data.mobile_number || 'NA'
-                                    }}</span>
-                            </td>
-                              <td>
-                                <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                    data-placement="bottom">{{data &&
-                                    data.email || 'NA'
-                                    }}</span>
-                            </td>
-                              <td>
-                                <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                    data-placement="bottom">{{data  &&
-                                        data.is_active && data.is_active==1 ?
-                                        'ACTIVE' :'INACTIVE'
-                                        }}</span>
-                            </td>
-<!--                                        
-                            <td>
-                                <div class="list-action-buttons-wrapper w-fit-content">
-                                    <button class="list-action-buttons ml-5">
-                                        <img src="assets/images/view.svg">
-                                    </button>
-                                </div>
-                            </td> -->
-
-
-
-                        </tr>
-                    </tbody>
+                  </tbody>
                 </table>
-                <!-- table for exel Download end -->
-
-
-                <div class="col-12 px-4" id="excel-table">
-                    <!-- <app-dynamic-fields [fieldsList]="fieldsList" [formGroup]="formGroup"></app-dynamic-fields> -->
-                    <div class="list-wrapper px-4 py-3">
-                        <div class="row d-md-flex data-row-header extra-header">
-                            <!-- <div class="col-6 col-md-2 py-3 d-flex verticle-content-middle">
-                            </div> -->
-                            <div class="col-12 col-md-12 py-3 d-flex justify-content-center">List of Seed Testing Laboratory
-                            </div>
-                            <!-- <div class="col-6 col-md-2 py-3 d-flex verticle-content-middle">
-                            </div> -->
-                        </div>
-                        <br>
-
-                        <!-- <div class="row d-md-flex data-row-header">
-                            <div class="col-6 col-md-3 py-3 d-flex verticle-content-middle">State :
-                                {{year?year:'2022'}}</div>
-                            <div class="col-6 col-md-3 py-3 d-flex verticle-content-middle">
-                            </div>
-                            <div class="col-6 col-md-3 py-3 d-flex verticle-content-middle">
-
-                            </div>
-
-                            <div class="col-6 col-md-3 py-3 d-flex justify-content-end">As on Date: {{todayData
-                                | date:"dd-MM-YYYY"}}</div>
-
-                        </div>
-                        <div class="middle_line"></div> -->
-
-                        <div class="row data-row">
-                            <table class="table table-bordered table-responsive">
-                                <thead>
-                                    <tr class="data-row-header">
-                                        <th scope="col" class="col-md-1 sn-report ">S/N</th>
-                                        <th scope="col" class="col-md-2">Name of Seed Testing Laboratory</th>                                        
-                                        <th scope="col" class="col-md-2">Short Name</th>
-                                        <th scope="col" class="col-md-2">State</th>
-                                        <th scope="col" class="col-md-3">District</th>
-                                        <th scope="col" class="col-md-2">Address</th>
-                                        <th scope="col" class="col-md-2">Contact Person Name</th>
-                                        <th scope="col" class="col-md-2">Contact Person Designation</th>
-                                        <th scope="col" class="col-md-2">Mobile Number</th>
-                                        <th scope="col" class="col-md-2">Email ID</th>
-                                        <th scope="col" class="col-md-2">Status</th>
-                                        <!-- <th scope="col" class="col-md-1">Contact Person Designation<th>
-                                        <th scope="col" class="col-md-2">Mobile Number</th>
-                                      <th scope="col" class="col-md-2">View more details</th> -->
-
-
-                                    </tr>
-                                </thead>
-                                <tbody *ngFor="let data of filterPaginateSearch.itemList; let dataIndex=index">
-                                    <tr>
-                                        <td class="sn-td-report">
-                                            <span>{{ (filterPaginateSearch.itemListCurrentPage - 1) *
-                                                filterPaginateSearch.itemListPageSize + dataIndex + 1}}.</span>
-                                        </td>
-                                        <td>
-
-                                            <span style="cursor: pointer;" data-toggle="tooltip"
-                                                data-placement="bottom">{{data &&
-                                                data.lab_name || 'NA'}}</span>
-                                        </td>
-                                        <td>
-                                            <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                                data-placement="bottom">{{data &&
-                                                data.short_name || 'NA'
-                                                }}</span>
-                                        </td>
-
-                                     
-                                        <td>
-
-                                            <span style="cursor: pointer;" data-toggle="tooltip"
-                                                data-placement="bottom">{{data &&
-                                                data.m_district
-                                                && data.m_district.state_name || 'NA'}}</span>
-                                        </td>
-                                        
-                                        <td>
-
-                                            <span style="cursor: pointer;" data-toggle="tooltip"
-                                                data-placement="bottom">{{data &&
-                                                data.m_district
-                                                && data.m_district.district_name || 'NA'}}</span>
-                                        </td>
-                                        <td>
-
-                                            <span style="cursor: pointer;" data-toggle="tooltip"
-                                                data-placement="bottom">{{data &&
-                                                data.address || 'NA'}}</span>
-                                        </td>
-                                        <td>
-                                            <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                                data-placement="bottom">{{data &&
-                                                data.contact_person_name || 'NA'
-                                                }}</span>
-                                        </td>
-                                        <td>
-                                            <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                                data-placement="bottom">{{data &&
-                                                data.m_designation  && data.m_designation.name || 'NA'
-                                                }}</span>
-                                        </td>
-                                     
-                                        <td>
-                                            <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                                data-placement="bottom">{{data &&
-                                                data.mobile_number || 'NA'
-                                                }}</span>
-                                        </td>
-                                          <td>
-                                            <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                                data-placement="bottom">{{data &&
-                                                data.email || 'NA'
-                                                }}</span>
-                                        </td>
-                                          <td>
-                                            <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                                data-placement="bottom">{{data  &&
-                                                    data.is_active && data.is_active==1 ?
-                                                    'ACTIVE' :'INACTIVE'
-                                                    }}</span>
-                                        </td>
-<!--                                        
-                                        <td>
-                                            <div class="list-action-buttons-wrapper w-fit-content">
-                                                <button class="list-action-buttons ml-5">
-                                                    <img src="assets/images/view.svg">
-                                                </button>
-                                            </div>
-                                        </td> -->
-
-
-
-                                    </tr>
-
-                                </tbody>
-                            </table>
-                        </div>
-                        <!-- <table class="table table-bordered border-primary table-responsive text-center">
-                                    <thead style="display:none;">
-                                        <tr style="background-color: #eb9777;">
-                                            <td>Year: {{year?year:'2022'}}</td>
-                                            <td>Season: {{season?season:'Kharif'}}</td>
-                                            <td>Crop Name: {{crop?crop:'BULB VEGETABLES'}}</td>
-                                            <td>As on Date: {{todayData | date:"dd-MM-YYYY"}}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Variety</td>
-                                            <td>Indent Needed</td>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <div *ngFor="let data of finalData; let dataIndex=index">
-                                            <tr class="v1">
-                                                <td rowspan="0" title="{{(data.variety_id?data.variety_id:'NA')}}"
-                                                    width="30%">{{(data && data.variety_id && (data.variety_id.length >
-                                                    30) ? (data.variety_id.substring(0, 30) +
-                                                    "..."):(data.variety_id?data.variety_id:'NA'))}}</td>
-                                                <td rowspan="0" title="{{(data.season?data.season:'NA')}}" width="30%">
-                                                    {{(data && data.season && (data.season.length>
-                                                    30) ? (data.season.substring(0, 30) +
-                                                    "..."):(data.season?data.season:'NA'))}}</td>
-                                                <td rowspan="0" title="{{(data.variety_id?data.variety_id:'NA')}}"
-                                                    width="80%">{{(data && data.variety_id && (data.variety_id.length >
-                                                    30) ? (data.variety_id.substring(0, 30) +
-                                                    "..."):(data.variety_id?data.variety_id:'NA'))}}</td>
-                                                <td rowspan="0" title="{{(data.variety_id?data.variety_id:'NA')}}"
-                                                    width="80%">{{(data && data.variety_id && (data.variety_id.length >
-                                                    30) ? (data.variety_id.substring(0, 30) +
-                                                    "..."):(data.variety_id?data.variety_id:'NA'))}}</td>
-                                                <td rowspan="0" title="{{(data.variety_id?data.variety_id:'NA')}}"
-                                                    width="30%">{{(data && data.variety_id && (data.variety_id.length >
-                                                    30) ? (data.variety_id.substring(0, 30) +
-                                                    "..."):(data.variety_id?data.variety_id:'NA'))}}</td>
-                                                <td rowspan="0" title="{{(data.variety_id?data.variety_id:'NA')}}"
-                                                    width="80%">{{(data && data.variety_id && (data.variety_id.length >
-                                                    30) ? (data.variety_id.substring(0, 30) +
-                                                    "..."):(data.variety_id?data.variety_id:'NA'))}}</td>
-                                               
-                                            </tr>
-                                        </div>
-                                    </tbody>
-                                </table> -->
-
-
-                    </div>
-                </div>
-
-
-                <div class="col-12 px-3   py-3">
-                    <app-pagination-ui></app-pagination-ui>
-                    <!-- <div _ngcontent-col-c109="" class="w-fit-content pr-2 d-block d-lg-inline-flex"><button _ngcontent-col-c109="" class="prev-paginate page-numbers d-inline-flex justify-content-center verticle-content-middle mx-2"><i _ngcontent-col-c109="" class="fal fa-less-than"></i></button><div _ngcontent-col-c109="" class="page-number-wrapper d-inline-flex py-2 py-lg-0"><button _ngcontent-col-c109="" class="page-numbers mx-2 active" ng-reflect-ng-class="active"> 1 </button><button _ngcontent-col-c109="" class="page-numbers mx-2" ng-reflect-ng-class=""> 2 </button>
-                    </div><div _ngcontent-col-c109="" class="enter-page-wrapper d-inline-flex mx-2"><input _ngcontent-col-c109="" placeholder="Enter Page No." formcontrolname="enterPage" class="px-2 ng-untouched ng-pristine ng-valid" ng-reflect-name="enterPage" ng-reflect-ng-class=""><button _ngcontent-col-c109="" class="page-numbers active">Go</button></div></div> -->
-                </div>
-                <div *ngIf="filterPaginateSearch && filterPaginateSearch.initialized &&(!filterPaginateSearch.itemList || filterPaginateSearch.itemList.length < 1)"
-                    class="px-2 py-3 w-100" style="height: 50px;">
-                    <div class="d-flex verticle-content-middle justify-content-center w-100">
-                        No Data Found.
-                    </div>
-                </div>
+              </div>
+  
             </div>
+          </div>
+  
+          <div class="col-12 px-3 py-3">
+            <!-- <app-pagination-ui></app-pagination-ui> -->
+          </div>
+  
+          <div *ngIf="completeData && completeData.length < 1"
+               class="px-2 py-3 w-100"
+               style="height: 50px;">
+            <div class="d-flex verticle-content-middle justify-content-center w-100">
+              No Data Found.
+            </div>
+          </div>
+  
         </div>
+      </div>
     </div>
-</div>
+  </div>
+  

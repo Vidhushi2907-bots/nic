@@ -1,0 +1,424 @@
+<div class="row my-4 w-100 mx-0 pt-0">
+    <div class="col-12 d-flex justify-content-center verticle-content-middle">
+        <div class=" main-content-form-wrapper px-0 py-2">
+            <div class="row">
+                <div class="col-12 pl-4 pb-3 px-4 mt-2 ml-2">
+
+                    <span class="heading_notofied">
+                        Crop Variety Characteristics
+                    </span>
+                    <div class="row px-2 pt-2">
+                        <div class="col-8">
+                            <div class="row">
+                                <div class="col-md-2 col-sm-6 col-md-2 col-lg-4 mb-2 mb-md-0">
+                                    <div class="form-check">
+                                        <input class="radio-button form-check-input radio-btn" name="notifiedValue"
+                                             type="radio" (change)="notifiedvalue('notified')"
+                                            id="flexRadioDefault1" value="non-notified" checked>
+                                        <label class="form-check-label" for="flexRadioDefault1">
+                                            Search By Crop Group
+                                        </label>
+                                    </div>
+                                </div>
+                                <!-- [(ngModel)]="notifiedValue" -->
+                                <!-- checked -->
+                                <div class="col-md-2 col-sm-6 col-md-2 col-lg-4">
+                                    <div class="form-check">
+                                        <input class="radio-button form-check-input radio-btn"  
+                                            name="notifiedValue" type="radio" (change)="notifiedvalue('non_notified')"
+                                            id="flexRadioDefault2">
+                                        <label class="form-check-label" for="flexRadioDefault2">
+                                            Search By Variety Name
+                                        </label>
+                                    </div>
+                                </div>
+                                <!-- <div class="col-md-2 col-sm-6 col-md-2 col-lg-4">
+                                    <div class="form-check">
+                                        <input class="radio-button form-check-input radio-btn"  
+                                            name="notifiedValue" type="radio" (change)="notifiedvalue('notified_year')"
+                                            id="flexRadioDefault2">
+                                        <label class="form-check-label" for="flexRadioDefault2">
+                                            Search by Notification Year
+                                        </label>
+                                    </div>
+                                </div> -->
+                                <div class="col-md-2 col-sm-6 col-md-2 col-lg-4">
+                                    <div class="form-check">
+                                        <input class="radio-button form-check-input radio-btn"  
+                                            name="notifiedValue" type="radio" (change)="notifiedvalue('notified_year')"
+                                            id="flexRadioDefault2">
+                                        <label class="form-check-label" for="flexRadioDefault2">
+                                            Search by Notification No.
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- {{AddCrop ? "Add Crop  To Add New Crop" : ''}} -->
+                    <div class="col-12 pt-2 pl-3 for-margin">
+                        <form [formGroup]="ngForm">
+                            <div class="row ">
+                                <!--search by  notification year  -->
+                                <div *ngIf="disableFiledsByYear" class="col-12 col-md-4 mt-2 px-0 px-md-1 pr-2 pr-md-2">
+                                    <div class="col-12 px-0 ">
+                                        <label for="Crop Group" class="search_text">Notification No.</label>
+                                    </div>
+                                    <input class="form-control" formControlName="not_no" placeholder="Enter Notification No.">
+                                    <div class="pl-0 toggle-button" ngbDropdown>
+                                        <img src="assets/images/16.svg" alt="" srcset="">
+                                    </div>
+                                    <!-- Notification Year -->
+                                    <!-- <div class="col-12 px-0 ">
+                                        <label for="Crop Group" class="search_text">Notification Year</label>
+                                    </div>
+
+                                    <select class="form-control"  formControlName="not_date">
+                                        <option value="">Select Notification Year</option>
+                                        <option *ngFor="let data of  cropNotDateData" value="{{data && data.notification_date ? (data.notification_date):null}}">{{data && data.notification_date ? (data.notification_date ):"" }} </option>
+                                    </select>
+                                    <div class="pl-0 toggle-button" ngbDropdown>
+                                        <img src="assets/images/16.svg" alt="" srcset="">
+                                    </div> -->
+
+                                </div>
+
+                                <ng-container *ngIf="!disableFiledsByYear">
+                                    <div *ngIf="!disableFileds" class="col-12 col-md-4 mt-2 px-0 px-md-1 pr-2 pr-md-2">
+                                        <div class="col-12 px-0 ">
+                                            <label for="Crop Group" class="search_text">Variety Name</label>
+                                        </div>
+    
+                                        <input type="text" class="form-control" placeholder="Enter Variety Name" formControlName="variety_name_filter" >
+                                        
+                                        <div class="variety_name_filter errorMessage "
+                                            *ngIf="
+                                            ngForm.controls['variety_name_filter'].invalid &&
+                                            (ngForm.controls['variety_name_filter'].dirty ||
+                                            ngForm.controls['variety_name_filter'].touched)">
+                                            <span *ngIf="
+                                                ngForm.controls['variety_name_filter'].errors?.['minlength']">
+                                                Variety Name Should Be More Than 2 Character <br>
+                                            </span>
+                                        </div>
+                                        <!-- <select class="form-select form-control" aria-label="Default select example"
+                                                formControlName="variety_name">
+                                                <option value="" hidden selected>Select Variety Name</option>
+                                                <option *ngFor="let data of cropVarietyData" value="{{data.variety_code}}">
+                                                    {{data.variety_name}}</option>
+                                            </select> -->
+                                        <div class="pl-0 toggle-button" ngbDropdown>
+                                            <img src="assets/images/16.svg" alt="" srcset="">
+    
+                                        </div>
+                                        <!-- <div class="pl-0 toggle-button" ngbDropdown>
+                                            </div> -->
+    
+                                    </div>
+    
+                                    <div class="col-12 col-md-4 mt-2 px-0 pr-3">
+                                        <div class="col-12 px-0">
+                                            <label for="Crop Group" class="search_text"
+                                                style="font: normal Poppins 16px/25px !important;">Crop Group</label>
+                                        </div>
+                                        <div class="col-12  mt-0 px-0">
+                                            <div ngbDropdown class="d-inline-block w-100 "
+                                
+                                            >
+                                                <button class="btn takeplacholder w-100 crop toggle-button"
+                                                     id="crop_group" ngbDropdownToggle
+                                                    style="text-align: left;">{{crop_grops && (crop_grops.length>30) ? (crop_grops.substring(0,30)+'...'):crop_grops? crop_grops :'Select Crop Group'}}</button>
+                
+                                                <div class="dropdown-menu w-100" ngbDropdownMenu="crop_group" aria-labelledby="sortMenu">
+                                                    <input type="text" class="form-control px-4"  formControlName="crop_text" >
+                                                    <button class="dropdown-item" *ngFor="let data of croupGroupList"
+                                                        (click)="crop(data)" #dropdownItem [attr.data-parent-name]="'crop_group'">
+                                                        {{data && data.group_name ? data.group_name
+                                                            :""}}
+                                                        <!-- <input type="hidden" formControlName="crop_code"> -->
+                                                    </button>
+                                                   
+                                                </div>
+                
+                                            </div>
+                                            <div class="pl-0 toggle-button" ngbDropdown
+                                                >
+                                                <i class="fa-solid fa-angle-down downicon" (click)="cgClick()"></i>
+                                            </div>
+                                            <div class="pl-0 toggle-button" ngbDropdown>
+                                                <img src="assets/images/16.svg" alt="" srcset="">
+                                                <!-- <i class="fa-solid fa-angle-down downicon"></i> -->
+                                            </div>
+                                        </div>
+    
+                                    </div>
+    
+                                    <div class="col-12 col-md-4 mt-2 px-0 pr-3">
+                                        <div class="col-12 px-0">
+                                            <label for="Crop Name" class="search_text">Crop Name</label>
+                                        </div>
+                                        <div class="col-12  mt-0 px-0">
+                                            <div ngbDropdown class="d-inline-block w-100 ">
+                                                <button class="btn takeplacholder w-100 crop toggle-button" [ngClass]=" disabledfieldcropName ? 'disabledfield' : ''" id="crop_name" ngbDropdownToggle style="text-align: left;">{{crop_names && (crop_names.length>30) ? (crop_names.substring(0,30)+'...'):crop_names? crop_names :'Select Crop Name'}}
+                                                </button>
+                
+                                                <div class="dropdown-menu w-100" ngbDropdownMenu="crop_name" aria-labelledby="sortMenu">
+                                                    <input type="text" class="form-control px-4"  formControlName="crop_name_text" >
+                                                    <button class="dropdown-item" *ngFor="let data of crop_name_list"
+                                                        (click)="cropName(data)" #dropdownItem [attr.data-parent-name]="'crop_name'">
+                                                        {{data && data.m_crop && data.m_crop.crop_name ?
+                                                            data.m_crop.crop_name:''}}
+                                                        <!-- <input type="hidden" formControlName="crop_code"> -->
+                                                    </button>
+                                                   
+                                                </div>
+                
+                                            </div>
+                                            <div class="pl-0 toggle-button" ngbDropdown
+                                            [ngClass]=" disabledfieldcropName ? 'disabledfield' : ''" >
+                                                <i class="fa-solid fa-angle-down downicon" (click)="cnClick()"></i>
+                                            </div>
+                                            <div class="pl-0 toggle-button" ngbDropdown>
+                                                <img src="assets/images/16.svg" alt="" srcset="">
+                                                <!-- <i class="fa-solid fa-angle-down downicon"></i> -->
+                                            </div>
+                                        </div>
+    
+                                    </div>
+                                    <div  *ngIf="disableFileds" class="col-12 col-md-4 mt-2 px-0 pr-3">
+                                        <div class="col-12 px-0">
+                                            <label for="Variety Name" class="search_text">Variety Name</label>
+                                        </div>
+                                        <div class="col-12  mt-0 px-0">
+                                            <div ngbDropdown class="d-inline-block w-100 "
+                                
+                                            >
+                                                <button class="btn takeplacholder w-100 crop toggle-button"
+                                                [ngClass]=" disabledfieldVariety  ? 'disabledfield' : ''"    id="variety_name" ngbDropdownToggle
+                                                    style="text-align: left;">{{variety_names && (variety_names.length>30) ? (variety_names.substring(0,30)+'...'):variety_names? variety_names :'Select Variety Name'}}</button>
+                
+                                                <div class="dropdown-menu w-100" ngbDropdownMenu="variety_name" aria-labelledby="sortMenu">
+                                                    <input type="text" class="form-control px-4"  formControlName="variety_name_text" >
+                                                    <button class="dropdown-item" *ngFor="let data of cropVarietyData"
+                                                        (click)="VarieyName(data)" #dropdownItem [attr.data-parent-name]="'variety_name'">
+                                                        {{data && data.variety_name ? data.variety_name :'' }}
+                                                        <!-- <input type="hidden" formControlName="crop_code"> -->
+                                                    </button>
+                                                   
+                                                </div>
+                
+                                            </div>
+                                            <div class="pl-0 toggle-button" ngbDropdown
+                                            [ngClass]=" disabledfieldVariety  ? 'disabledfield' : ''"  >
+                                                <i class="fa-solid fa-angle-down downicon" (click)="cvClick()"></i>
+                                            </div>
+                                            <div class="pl-0 toggle-button" ngbDropdown>
+                                                <img src="assets/images/16.svg" alt="" srcset="">
+                                                <!-- <i class="fa-solid fa-angle-down downicon"></i> -->
+                                            </div>
+                                        </div>
+    
+    
+                                    </div>
+    
+                                </ng-container>
+                               
+                                <div class="col-12 pt-0 pl-0 buttons-phone">
+                                    <button
+                                        class="form-button search d-inline-flex justify-content-center verticle-content-middle mb-3"
+                                        (keyup.enter)="search()" (click)="search()">Search</button>
+                                    <button
+                                        class="clear-form-button ml-3 d-inline-flex justify-content-center verticle-content-middle mb-3"
+                                        (click)="clear()">Clear</button>
+                                </div>
+                                <div class="col-12 px-1 pr-3">
+                                    <hr class="separator m-0">
+                                </div>
+                            </div>
+                            
+                        </form>
+                    </div>
+                </div>
+                <div class="col-12 px-4 d-flex justify-content-end buttons-phone-add"
+                 >
+                        <!-- <app-variety-characterstic-view-form [hideView]="hideViewSection"></app-variety-characterstic-view-form> -->
+                        <app-variety-characterstic-reports-view-form  [hideView]="hideViewSection"></app-variety-characterstic-reports-view-form>
+                </div>
+                <div class="col-12" *ngIf="hideViewSection">
+                    <div class="row">
+                        <div class="col-5"></div>
+                        <div class="col-4">
+                            <!-- [disabled]="currentPage === 1" -->
+                            <!-- [disabled]="currentPage * pageSize >= allData.length" -->
+                            <button class="pagination-btn" (click)="previousPage()">Previous</button>
+                            <button class="pagination-btn" (click)="nextPage()" >Next</button>
+                        </div>
+                        <div class="col-3"></div>
+                    </div>
+                </div>
+                <div class="col-12 px-4">
+                    <div class="list-wrapper px-4 py-3">
+                        <div class="row d-none d-md-flex data-row-header">
+                            <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle">S/N</div>
+                            <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle">Crop Group</div>
+                            <div class="col-6 col-md-2 py-3 d-flex verticle-content-middle">Crop Name
+                            </div>
+                            <div class="col-6 col-md-2 py-3 d-flex verticle-content-middle">Variety Name</div>
+                            <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle">Notification Date</div>
+                            <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle">Notification No.</div>
+                            <!-- <div class="col-6 col-md-1 py-2 d-flex verticle-content-middle">Variety Code</div> -->
+
+                            <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle">Developed By
+                            </div>
+                            <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle pl-lg-4">Status</div>
+                            <div class="col-6 col-md-2 py-3 d-flex verticle-content-middle justify-content-center">
+                                Action
+                            </div>
+                        </div>
+                        <div class="row data-row" style="font-size:13px"
+                            *ngFor="let data of filterPaginateSearch.itemList; let dataIndex=index">
+                            <div class="col-6 col-md-1 py-1 d-flex verticle-content-middle">
+                                <div class="w-fit-content">
+                                    <label class="d-md-none" class="d-md-none"><b>S/N:</b>&nbsp;</label>
+                                    <span>{{ (filterPaginateSearch.itemListCurrentPage - 1) *
+                                        filterPaginateSearch.itemListPageSize + dataIndex + 1}}.</span>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-1 py-1 d-flex verticle-content-middle">
+                                <div class="w-fit-content">
+                                    <label class="d-md-none"><b>Crop Group:</b>&nbsp;</label>
+
+                                    <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
+                                        data-placement="bottom"
+                                        title="{{data && data.m_crop && data.m_crop.m_crop_group && data.m_crop.m_crop_group.group_name ? data.m_crop.m_crop_group.group_name :'NA'}}">{{(data
+                                        && data.m_crop && data.m_crop.m_crop_group &&
+                                        (data.m_crop.m_crop_group.group_name.length > 30) ?
+                                        ((data.m_crop.m_crop_group.group_name.substring(0, 30)|uppercase)
+                                        +
+                                        "..."):(data && data.m_crop && data.m_crop.m_crop_group ? (data.m_crop.m_crop_group.group_name|uppercase) :"NA"))}}</span>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-2 py-1 d-flex verticle-content-middle">
+                                <div class="w-fit-content">
+                                    <label class="d-md-none"><b>Crop Name:</b>&nbsp;</label>
+                                    <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
+                                        data-placement="bottom"
+                                        title="{{data && data.m_crop && data.m_crop.crop_name ? data.m_crop.crop_name : 'NA'}}">{{(data
+                                        && data.m_crop&& data.m_crop.crop_name &&
+                                        (data.m_crop.crop_name.length > 30) ? ((data.m_crop.crop_name.substring(0, 30)|uppercase) +
+                                        "..."):(data&& data.m_crop && data.m_crop.crop_name ? (data.m_crop.crop_name|uppercase)
+                                        :'NA'))}}</span>
+
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-2 py-1 d-flex verticle-content-middle">
+                                <div class="w-fit-content">
+                                    <label class="d-md-none"><b>Vatiety Name:</b>&nbsp;</label>
+                                    <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
+                                        data-placement="bottom"
+                                        title="{{ data && data.variety_name ? data.variety_name : 'NA'}}">
+                                        {{data && data.variety_name &&
+                                        (data.variety_name.length>30)
+                                        ?(data.variety_name.substring(0,30)+'...'):(data && data.variety_name ?
+                                        (data.variety_name) :'NA') }}
+                                    </span>
+                                </div>
+                            </div>
+                            <!-- <div class="col-6 col-md-1 py-1 d-flex verticle-content-middle">
+                                <div class="w-fit-content">
+                                    <label class="d-md-none"><b>Vatiety Code:</b>&nbsp;</label>
+                                    <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
+                                        data-placement="bottom"
+                                        title="{{ data && data.m_crop_variety && data.m_crop_variety.variety_code ? data.m_crop_variety.variety_code : 'NA'}}">
+                                        {{data && data.m_crop_variety && data.m_crop_variety.variety_code ?
+                                        data.m_crop_variety.variety_code :'NA' }}
+                                    </span>
+                                </div>
+                            </div> -->
+
+                             <div class="col-6 col-md-1 py-1 d-flex verticle-content-middle">
+                                <div class="w-fit-content">
+                                    <label class="d-md-none"><b>Notification Date:</b>&nbsp;</label>
+                                    <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
+                                        data-placement="bottom"
+                                        title="{{ data &&  data.not_date ? data.not_date : 'NA'}}">
+                                        <!-- {{data && data.not_date ?
+                                        (data.not_date) :'NA' }} -->
+
+                                        {{data
+                                            && data.not_date && ((data.not_date == '00:00.0') ? 'NA':(data.not_date
+                                            !='00:00.0' || (data.not_date !='') ||(data.not_date !='null') ? (data.not_date |
+                                            date:'dd-MM-yyyy') :'NA' ))}}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-1 py-1 d-flex verticle-content-middle">
+                                <div class="w-fit-content">
+                                    <label class="d-md-none"><b>Notification No:</b>&nbsp;</label>
+                                    <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
+                                        data-placement="bottom"
+                                        title="{{ data && data.not_number ? data.not_number : 'NA'}}">
+                                        {{data && data.not_number ?
+                                        data.not_number :'NA' }}
+                                    </span>
+                                </div>
+                            </div>
+                            <!-- {{(data && data.m_crop && data.m_crop.crop_group &&
+                                (data.m_crop.crop_group.length > 30) ? (data.m_crop.crop_group.substring(0, 30)
+                                + "..."):"NA")}} -->
+
+                            <div class="col-6 col-md-1  py-1 d-flex verticle-content-middle">
+                                <div class="w-fit-content">
+                                    <!-- {{data && data.fertilizer_dosage
+                                        ? (data.fertilizer_dosage +'Kg') :'NA' }} -->
+                                    <label class="d-md-none"><b>Developed By:</b>&nbsp;</label>
+                                    <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
+
+                                        data-placement="bottom" title="{{data && data.developed_by && data.developed_by}}">{{data
+                                        && data.developed_by ? (data.developed_by|uppercase) :'NA'
+                                        }}</span>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-1 py-1 d-flex verticle-content-middle pl-lg-4">
+                                <div class="w-fit-content">
+                                    <label class="d-md-none"><b>Status:</b>&nbsp;</label>
+                                    <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
+                                        data-placement="bottom">{{data &&
+                                        (data.is_active==1)?'ACTIVE':'INACTIVE'}}</span>
+
+                                </div>
+                            </div>
+
+                            <div
+                                class="col-12 col-md-2 py-1 d-flex verticle-content-middle justify-content-md-center phone_view_btn">
+                                <div class="list-action-buttons-wrapper w-fit-content phone_view_action_btn">
+                                    <button class="list-action-buttons" style="cursor: pointer;"
+                                    (click)="patchData(data,dataIndex)">
+                                        <img src="assets/images/view.svg">
+                                    </button>
+                                 
+
+                                    <!-- <button class="list-action-buttons" style="cursor: pointer;"
+                                        (click)="delete(data.id,data.crop_code)">
+                                        <img src="assets/images/delete.svg">
+                                    </button> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="filterPaginateSearch && filterPaginateSearch.initialized &&(!filterPaginateSearch.itemList || filterPaginateSearch.itemList.length < 1)"
+                        class="px-2 py-3 w-100" style="height: 50px;">
+                        <div class="d-flex verticle-content-middle justify-content-center w-100">
+                            No Data Found.
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 px-4 px-md-3 py-1 pb-4">
+                    <app-pagination-ui></app-pagination-ui>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

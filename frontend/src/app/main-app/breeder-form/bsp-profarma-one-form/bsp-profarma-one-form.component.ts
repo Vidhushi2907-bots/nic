@@ -12,7 +12,8 @@ import { MasterService } from 'src/app/services/master/master.service';
 import * as html2PDF from 'html2pdf.js';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import * as XLSX from 'xlsx';
+//pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as CryptoJS from 'crypto-js';
 import { environment } from 'src/environments/environment';
 import jsPDF from 'jspdf';
@@ -26,6 +27,7 @@ import { checkDecimal, checkDecimalValue, checkLength, checkNumber } from 'src/a
 export class BspProfarmaOneFormComponent implements OnInit {
   [x: string]: any;
   @ViewChild('pdfContainer') pdfContainer: ElementRef;
+  fileName = 'breeder-bsp-profarma-one.xlsx';
 
   @ViewChild(PaginationUiComponent) paginationUiComponent!: PaginationUiComponent;
   ngForm!: FormGroup;
@@ -34,7 +36,7 @@ export class BspProfarmaOneFormComponent implements OnInit {
   allData: any;
   is_developed: boolean;
   is_update: boolean = false;
-  reportDataCropvalue : any;
+  reportDataCropvalue: any;
   isCrop: boolean = false;
   isSearch: boolean = true;
   dropdownSettings: IDropdownSettings = {};
@@ -50,7 +52,7 @@ export class BspProfarmaOneFormComponent implements OnInit {
   bspsDataArray: { id: number; production_center: string; season: string; crop: string; variety_name: string; variety_code: string; bspc_developed_by: number; req_no_doc_moa: string; req_no_dept_moa: string; nucleus_seed_available: any; breeder_seed_available: any; total_target: string; }[];
   userId: any;
   bspData: any;
-  isFinalSubmit: boolean = true;
+  isFinalSubmit: boolean = false;
   cropBasicDetails: any;
   // breederService: any;
   varietyFilterList: any;
@@ -85,24 +87,13 @@ export class BspProfarmaOneFormComponent implements OnInit {
   varietyName: any;
   varietyNameLine: any;
   productionType: any;
-  // reasonData: any = [
-  //   { id: 1011, comment: "Non availability of Nucleus Seeds", type: "ASSING_CROP" },
-  //   { id: 1012, comment: "Variety Not Notified", type: "ASSING_CROP" },
-  //   { id: 1013, comment: "Hybrid Not Notified", type: "ASSING_CROP" },
-  //   { id: 1014, comment: "Hybrid variety-parental information missing", type: "ASSING_CROP" },
-  //   { id: 1015, comment: "Seed Production Discontinued", type: "ASSING_CROP" },
-  //   { id: 1016, comment: "Non availability of Nucleus Seeds", type: "WILL_TO_PRODUCE" },
-  //   { id: 1017, comment: "Non availability of Breeder Seeds", type: "WILL_TO_PRODUCE" },
-  //   { id: 1018, comment: "Variety not notified", type: "WILL_TO_PRODUCE" },
-  //   { id: 1019, comment: "Hybrid not notified", type: "WILL_TO_PRODUCE" },
-  //   { id: 1020, comment: "Hybrid variety-parental information missing", type: "WILL_TO_PRODUCE" },
-  //   { id: 1021, comment: "Seed production discontinued", type: "WILL_TO_PRODUCE" }
-  // ];
+  varietyLineCode: any;
+
   selectedData: any;
   viewheader: boolean;
   encryptedData: string;
 
-  constructor(private service: SeedServiceService, private _masterService: MasterService, private breeder: BreederService, private fb: FormBuilder, private route: Router,private cdRef: ChangeDetectorRef ,private _productionCenter: ProductioncenterService, private master: MasterService) {
+  constructor(private service: SeedServiceService, private _masterService: MasterService, private breeder: BreederService, private fb: FormBuilder, private route: Router, private cdRef: ChangeDetectorRef, private _productionCenter: ProductioncenterService, private master: MasterService) {
     this.createForm();
     this.bspcData = this.breeder.redirectData;
     if (this.bspcData && this.bspcData !== undefined && this.bspcData != null) {
@@ -110,7 +101,7 @@ export class BspProfarmaOneFormComponent implements OnInit {
         this.ngForm.controls['year'].patchValue(this.bspcData.year);
         this.ngForm.controls['season'].patchValue(this.bspcData.season);
         this.ngForm.controls['crop'].patchValue(this.bspcData.crop_code);
-        this.getPageData(null,null,null);
+        this.getPageData(null, null, null);
       }
     }
   }
@@ -162,6 +153,7 @@ export class BspProfarmaOneFormComponent implements OnInit {
         this.isCrop = false;
         this.bspc.clear();
         this.isSearch = true;
+        // this.is_update=false
       }
     });
 
@@ -177,6 +169,7 @@ export class BspProfarmaOneFormComponent implements OnInit {
         this.bspc.clear();
         this.isCrop = false;
         this.isSearch = true;
+        // this.is_update=false
         this.getCropData(null);
       }
     });
@@ -189,6 +182,7 @@ export class BspProfarmaOneFormComponent implements OnInit {
         this.parentalLineVarietyLength = [];
         this.isCrop = false;
         this.isSearch = true;
+        // this.is_update=false
         this.ngForm.controls['variety'].enable();
         // this.ngForm.controls['bspc'].setValue([]);
         this.bspc.clear();
@@ -210,8 +204,6 @@ export class BspProfarmaOneFormComponent implements OnInit {
         this.cropBasicDetails = [];
         if (this.inventoryVarietyData) {
           let varietyStatus = this.inventoryVarietyData.filter(ele => ele.variety_code == newvalue)
-          // console.log("varietyStatus", varietyStatus[0].status);
-          // [0].status
 
           if (varietyStatus && varietyStatus[0] && varietyStatus[0].status == 'hybrid') {
             this.isPrentalLine = true;
@@ -263,9 +255,9 @@ export class BspProfarmaOneFormComponent implements OnInit {
       willing_to_produce: [''],
       reason: [''],
       isPermission: [''],
-      reason_for_delay:[''],
-      production_type:[''],
-      expected_date:['']
+      reason_for_delay: [''],
+      production_type: [''],
+      expected_date: ['']
     })
   }
 
@@ -278,31 +270,31 @@ export class BspProfarmaOneFormComponent implements OnInit {
     this.userId = data.id;
     this.pdpcName = data && data.name ? data.name : 'NA';
     this.pdpcAddres = data && data.address ? data.address : 'NA';
-    this.getAgencyData(null,null);
+    this.getAgencyData(null, null);
   }
-  getAgencyData(agencyData,reportData) {  
-    console.log("repooortData==",reportData); 
+  getAgencyData(agencyData, reportData) {
+    console.log("repooortData==", reportData);
     const data = localStorage.getItem('BHTCurrentUser')
-    console.log("dataIs===",data);  
+    console.log("dataIs===", data);
     // let reportStatus;
     // reportStatus={report_status:"bsp_one_report"};
-    let userData = JSON.parse(data); 
-    agencyData=userData;
-    console.log("agency",agencyData); 
-    let userId;  
+    let userData = JSON.parse(data);
+    agencyData = userData;
+    console.log("agency", agencyData);
+    let userId;
     if (reportData) {
       userId = reportData.agency_id;
-      console.log("curr agency_id===",userId);
-      
+      console.log("curr agency_id===", userId);
+
     } else {
       userId = agencyData.agency_id
-      console.log("curr login_id===",userId);
+      console.log("curr login_id===", userId);
     }
     const param = {
       id: userId
     }
-    
-    this._masterService.postRequestCreator('getAgencyUserDataById/'+userId).subscribe(data => {
+
+    this._masterService.postRequestCreator('getAgencyUserDataById/' + userId).subscribe(data => {
       // let res = 2
       let apiResponse = data && data.EncryptedResponse && data.EncryptedResponse.data ? data.EncryptedResponse.data : ''
       this.profileData = apiResponse ? apiResponse : '';
@@ -311,31 +303,31 @@ export class BspProfarmaOneFormComponent implements OnInit {
       // contact_person_name
       if (apiResponse && apiResponse.agency_name) {
         this.userName = apiResponse.agency_name.charAt(0).toUpperCase() + apiResponse.agency_name.slice(1);
-        console.log("username==",this.userName);
-        
+        console.log("username==", this.userName);
+
       }
       if (apiResponse && apiResponse.address) {
         this.pdpcAdrress = apiResponse.address.charAt(0).toUpperCase() + apiResponse.address.slice(1);
       }
       if (apiResponse && apiResponse.state_name) {
         this.stateName = apiResponse.state_name.charAt(0).toUpperCase() + apiResponse.state_name.slice(1);
-        console.log("stateName==",this.stateName);
+        console.log("stateName==", this.stateName);
       }
       if (apiResponse && apiResponse.district_name) {
         this.districtName = apiResponse.district_name.charAt(0).toUpperCase() + apiResponse.district_name.slice(1);
-        console.log("districtName==",this.districtName);
+        console.log("districtName==", this.districtName);
       }
       if (apiResponse && apiResponse.image_url2) {
         this.pdpcImageUrl = apiResponse.image_url2.charAt(0).toUpperCase() + apiResponse.image_url2.slice(1);
       }
       if (apiResponse && apiResponse['m_designation'] && apiResponse['m_designation.name']) {
         this.pdpcDesignation = apiResponse['m_designation.name'].charAt(0).toUpperCase() + apiResponse['m_designation.name'].slice(1);
-        console.log("pdpcDesignation==",this.pdpcDesignation);
+        console.log("pdpcDesignation==", this.pdpcDesignation);
       }
       // pdpcImageUrl ? pdpcImageUrl
     })
   }
-   
+
 
 
   fetchData() {
@@ -372,9 +364,6 @@ export class BspProfarmaOneFormComponent implements OnInit {
 
   getDistrictListSecond() {
     const param = {
-      // search: {
-      //   state_code: newValue
-      // }
     }
     this.master.postRequestCreator('get-district-list', null, param).subscribe(data => {
       this.listofDistrict = data && data.EncryptedResponse && data.EncryptedResponse.data ? data.EncryptedResponse.data : ''
@@ -428,8 +417,9 @@ export class BspProfarmaOneFormComponent implements OnInit {
         season: this.ngForm.controls["season"].value,
         crop_code: this.ngForm.controls["crop"].value,
         variety_code: this.ngForm.controls["variety"].value,
-        // id:item && item.seed_for_production_id ? item.seed_for_production_id :'',
-        variety_line_code: this.ngForm.controls["variety_line"].value ? this.ngForm.controls["variety_line"].value : data && data.line_variety_code ? data.line_variety_code : ''
+        id: data && data.id ? data.id : null,
+        variety_line_code: this.ngForm.controls["variety_line"].value ? this.ngForm.controls["variety_line"].value : data && data.line_variety_code ? data.line_variety_code : '',
+        updateMode: data ? true : false
       }
     };
     this.breeder.postRequestCreator(route, null, param).subscribe(res => {
@@ -437,7 +427,6 @@ export class BspProfarmaOneFormComponent implements OnInit {
         this.bspsData = res && res.EncryptedResponse && res.EncryptedResponse.data ? res.EncryptedResponse.data : [];
         if (this.bspsData && this.bspsData.length > 0 && this.bspsData !== undefined) {
           if (data) {
-            console.log(this.bspsData, 'this.bspsData')
             for (let i = 0; i < this.bspsData.length; i++) {
               // alert('hii')
               this.addBspc();
@@ -469,8 +458,102 @@ export class BspProfarmaOneFormComponent implements OnInit {
                 production_type: this.bspsData[i].production_type ? this.bspsData[i].production_type : 'NA',
                 expected_date: this.bspsData[i].expected_date ? this.bspsData[i].expected_date : 'NA',
               });
-              console.log("this.ngForm.controls['bspc']['controls'][i]",this.ngForm.controls['bspc']['controls'][i].value);
-              
+              console.log("this.ngForm.controls['bspc']['controls'][i]", this.ngForm.controls['bspc']['controls'][i].value);
+
+            }
+          } else {
+            for (let i = 0; i < this.bspsData.length; i++) {
+              if (this.ngForm.controls['bspc'].value.length > 1) {
+                this.removeBspc(i);
+              }
+              this.addBspc();
+              if ((this.bspsData[i].breeder_seed_available_qnt < 0 || !this.bspsData[i].breeder_seed_available_qnt)) {
+                this.ngForm.controls['bspc']['controls'][i].controls['isPermission'].disable();
+              }
+              if (this.bspsData[i].nucleus_seed_available_qnt < 0 || !this.bspsData[i].nucleus_seed_available_qnt) {
+                this.ngForm.controls['bspc']['controls'][i].controls['target_qunatity'].disable();
+              }
+              if (this.bspsData[i].nucleus_seed_available_qnt > 0) {
+                this.ngForm.controls['bspc']['controls'][i].controls['target_qunatity'].enable();
+              }
+              if ((this.bspsData[i].nucleus_seed_available_qnt > 0) && (this.bspsData[i].breeder_seed_available_qnt > 0)) {
+                this.ngForm.controls['bspc']['controls'][i].controls['target_qunatity'].enable();
+              }
+              this.ngForm.controls['bspc']['controls'][i].patchValue({
+                breeder_seed_available: [this.bspsData[i].breeder_seed_available_qnt ? this.bspsData[i].breeder_seed_available_qnt : 0],
+                nucleus_seed_available: [this.bspsData[i].nucleus_seed_available_qnt ? this.bspsData[i].nucleus_seed_available_qnt : 0],
+                production_center: [this.bspsData[i].bspc_name],
+                id: [this.bspsData[i].bspc_id],
+                willing_to_produce: [this.bspsData[i].willing_to_produce],
+                reason: [this.bspsData[i].reason],
+                target_qunatity: 0,
+                reason_for_delay: this.bspsData[i].reason_for_delay ? this.bspsData[i].reason_for_delay : 'NA',
+                production_type: this.bspsData[i].production_type ? this.bspsData[i].production_type : 'NA',
+                expected_date: this.bspsData[i].expected_date ? this.bspsData[i].expected_date : 'NA',
+              });
+            }
+          }
+        }
+      }
+    })
+  }
+
+  // for update old code 
+  fetchQntInventryDataUpdateOld(data, item = null) {
+    this.bspc.clear();
+    let route = "get-bsp-proforma-one-variety-basic-data-update";
+    console.log(data, 'datadata')
+    let param = {
+      search: {
+        year: this.ngForm.controls["year"].value,
+        season: this.ngForm.controls["season"].value,
+        crop_code: this.ngForm.controls["crop"].value,
+        variety_code: this.ngForm.controls["variety"].value,
+        id: data && data.id ? data.id : null,
+        variety_line_code: data && data.line_variety_code ? data.line_variety_code : '',
+        updateMode: true
+      }
+    };
+    this.breeder.postRequestCreator(route, null, param).subscribe(res => {
+      if (res.EncryptedResponse.status_code === 200) {
+        this.bspsData = res && res.EncryptedResponse && res.EncryptedResponse.data ? res.EncryptedResponse.data : [];
+        console.log('this.bspsData ======', this.bspsData);
+        console.log('data====', data);
+        if (this.bspsData && this.bspsData.length > 0 && this.bspsData !== undefined) {
+          if (data) {
+            for (let i = 0; i < this.bspsData.length; i++) {
+              // alert('hii')
+              this.addBspc();
+              if (((data && data['bspc'] && data['bspc'][i] && data['bspc'][i].breeder_seed < 0) || (data && data && data['bspc'][i] && !data['bspc'][i].breeder_seed))) {
+                this.ngForm.controls['bspc']['controls'][i].controls['isPermission'].disable();
+              }
+              if (this.bspsData[i].nucleus_seed_available_qnt < 0 || this.bspsData && this.bspsData[i] && !this.bspsData[i].nucleus_seed_available_qnt) {
+                this.ngForm.controls['bspc']['controls'][i].controls['target_qunatity'].disable();
+              }
+              if (this.bspsData[i].nucleus_seed_available_qnt > 0) {
+                this.ngForm.controls['bspc']['controls'][i].controls['target_qunatity'].enable();
+              }
+              if ((this.bspsData[i].nucleus_seed_available_qnt > 0) && (this.bspsData[i].breeder_seed_available_qnt > 0)) {
+                this.ngForm.controls['bspc']['controls'][i].controls['target_qunatity'].enable();
+              }
+              if (data['bspc'] && data['bspc'][i] && data['bspc'][i].breeder_seed && (data['bspc'][i].breeder_seed)) {
+                this.ngForm.controls['bspc']['controls'][i].controls['target_qunatity'].enable();
+              }
+              this.ngForm.controls['bspc']['controls'][i].patchValue({
+                breeder_seed_available: [data['bspc'] && data['bspc'][i] && data['bspc'][i].breeder_seed ? (data['bspc'][i].breeder_seed).toFixed(3) : 0],
+                nucleus_seed_available: [data['bspc'] && data['bspc'][i] && data['bspc'][i].include_seed ? (data['bspc'][i].include_seed).toFixed(3) : 0],
+                production_center: [this.bspsData[i].bspc_name],
+                id: [this.bspsData[i].id],
+                willing_to_produce: [this.bspsData[i].willing_to_produce],
+                isPermission: (data['bspc'] && data['bspc'][i] && data['bspc'][i].isPermission),
+                reason: [this.bspsData[i].reason],
+                target_qunatity: [data['bspc'] && data['bspc'][i] && data['bspc'][i].target_quantity ? data['bspc'][i].target_quantity : 0],
+                reason_for_delay: this.bspsData[i].reason_for_delay ? this.bspsData[i].reason_for_delay : 'NA',
+                production_type: this.bspsData[i].production_type ? this.bspsData[i].production_type : 'NA',
+                expected_date: this.bspsData[i].expected_date ? this.bspsData[i].expected_date : 'NA',
+              });
+              console.log("this.ngForm.controls['bspc']['controls'][i]", this.ngForm.controls['bspc']['controls'][i].value);
+
             }
           } else {
             for (let i = 0; i < this.bspsData.length; i++) {
@@ -508,6 +591,90 @@ export class BspProfarmaOneFormComponent implements OnInit {
       }
     })
   }
+  // for update new code 
+  fetchQntInventryDataUpdate(data, item = null) {
+    this.bspc.clear();
+    let route = "get-bsp-proforma-one-variety-basic-data-update";
+    let param = {
+      search: {
+        year: this.ngForm.controls["year"].value,
+        season: this.ngForm.controls["season"].value,
+        crop_code: this.ngForm.controls["crop"].value,
+        variety_code: this.ngForm.controls["variety"].value,
+        id: data && data.id ? data.id : null,
+        variety_line_code: this.ngForm.controls["variety_line"].value
+          ? this.ngForm.controls["variety_line"].value
+          : data && data.line_variety_code
+            ? data.line_variety_code
+            : "",
+        updateMode: true
+      }
+    };
+
+    this.breeder.postRequestCreator(route, null, param).subscribe(res => {
+      if (res.EncryptedResponse.status_code === 200) {
+        this.bspsData =
+          res?.EncryptedResponse?.data && res.EncryptedResponse.data.length
+            ? res.EncryptedResponse.data
+            : [];
+        this
+        if (this.bspsData.length > 0) {
+          // data
+          if (1) {
+            // EDIT CASE
+            for (let i = 0; i < this.bspsData.length; i++) {
+              this.addBspc();
+
+              // disable/enable logic
+              if (
+                (this.bspsData?.[i]?.breeder_seed_available_qnt < 0) ||
+                !this.bspsData?.[i]?.nucleus_seed_available_qnt
+              ) {
+                this.ngForm.controls["bspc"]["controls"][i].controls[
+                  "isPermission"
+                ].disable();
+              }
+              if (
+                this.bspsData[i].nucleus_seed_available_qnt <= 0 ||
+                !this.bspsData[i].nucleus_seed_available_qnt
+              ) {
+                this.ngForm.controls["bspc"]["controls"][i].controls[
+                  "target_qunatity"
+                ].disable();
+              } else {
+                this.ngForm.controls["bspc"]["controls"][i].controls[
+                  "target_qunatity"
+                ].enable();
+              }
+
+              // patch values correctly
+              this.ngForm.controls["bspc"]["controls"][i].patchValue({
+                breeder_seed_available:
+                  this.bspsData[i].breeder_seed_available_qnt ??
+                  0,
+                nucleus_seed_available:
+                  this.bspsData[i].nucleus_seed_available_qnt ??
+                  0,
+                production_center: this.bspsData[i].bspc_name,
+                id: this.bspsData[i].id,
+                willing_to_produce: this.bspsData[i].willing_to_produce ?? 0,
+                isPermission: this.bspsData?.[i]?.isPermission ?? false,
+                target_qunatity:
+                  this.bspsData[i].target_qunatity ??
+                  0,
+                reason_for_delay:
+                  this.bspsData[i].reason_for_delay ?? "NA",
+                production_type:
+                  this.bspsData[i].production_type ?? "NA",
+                expected_date:
+                  this.bspsData[i].expected_date ?? null
+              });
+            }
+          }
+        }
+      }
+    });
+  }
 
   addBspc() {
     this.bspc.push(this.bspcCreateForm());
@@ -523,7 +690,7 @@ export class BspProfarmaOneFormComponent implements OnInit {
 
   getYearData() {
     const route = "get-bsp-proforma-one-year";
-    this.breeder.postRequestCreator(route, null, {search:{"production_type":this.productionType}}).subscribe(data => {
+    this.breeder.postRequestCreator(route, null, { search: { "production_type": this.productionType } }).subscribe(data => {
       if (data.EncryptedResponse.status_code === 200) {
         this.inventoryYearData = data.EncryptedResponse.data
       }
@@ -586,7 +753,7 @@ export class BspProfarmaOneFormComponent implements OnInit {
       search: {
         "year": this.ngForm.controls['year'].value,
         "user_type": "pdpc",
-        "production_type":this.productionType
+        "production_type": this.productionType
       }
     }).subscribe(data => {
       if (data.EncryptedResponse.status_code === 200) {
@@ -595,144 +762,90 @@ export class BspProfarmaOneFormComponent implements OnInit {
     })
   }
 
-  // getCropData(reportData) {
-  //   let reportStatus;
-  //   if (reportData) { 
-  //    this.ngForm.controls["year"].setValue(reportData.year,{emitEvent:false}) 
-  //    this.ngForm.controls["season"].setValue(reportData.season,{emitEvent:false}) 
-  //    reportStatus = {report_status:"bsp_one_report"}; 
-  //   }
-  //   const route = "get-bsp-proforma-one-crop";
-  //   this.breeder.postRequestCreator(route, null, {
-  //     search: {
-  //       "year": this.ngForm.controls['year'].value,
-  //       "season": this.ngForm.controls['season'].value,
-  //       "user_type": "pdpc",
-  //       "production_type":this.productionType,
-  //       ...reportStatus
-
-  //     }
-  //   }).subscribe(data => {
-  //     console.log("season data vale", data);
-  //     if (data.EncryptedResponse.status_code === 200) {
-  //       this.inventoryCropData = data.EncryptedResponse.data
-  //     }
-  //   })
-  // }
-
-  // getCropData(reportData) {
-  //   let reportStatus;
-  //   console.log("reportData1 is=",reportData)
-  //   if (reportData) { 
-  //     // this.inventoryCropData = reportData1.crop_code
-  //     // this.ngForm.controls["year"].setValue,
-  //     // this.ngForm.controls["season"].value
-       
-  //    reportStatus = {report_status:"bsp_one_report"}; 
-  //   }
-  //   const route = "get-bsp-proforma-one-crop";
-  //   this.breeder.postRequestCreator(route, null, {
-  //     search: { 
-  //       "year": this.ngForm.controls["year"].value ,
-  //       "season": this.ngForm.controls["season"].value,
-  //       "user_type": "pdpc",
-  //       ...reportStatus
-  //       // "user_id": reportData.user_id,
-              
-  //       }
-  //   }).subscribe(data => {
-  //     console.log("season data vale", data);
-  //     if (data.EncryptedResponse.status_code === 200) {
-  //       this.inventoryCropData = data.EncryptedResponse.data
-  //     }  
-
-  //   })
-  // }
   getFormattedDate(date: any): string {
     if (!date) return 'NA';
-  
+
     const dateObj = new Date(date);
-  
+
     // Check if dateObj is valid
     if (isNaN(dateObj.getTime())) return 'NA';
-  
+
     const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Asia/Kolkata' };
-  
+
     return dateObj.toLocaleDateString('en-GB', options);
   }
-   
+
   getCropData(reportData1): Promise<void> {
     return new Promise((resolve, reject) => {
-        let reportStatus;
-        console.log("reportData1 is=", reportData1);
+      let reportStatus;
+      console.log("reportData1 is=", reportData1);
 
-        if (reportData1) {
-            reportStatus = { report_status: "bsp_one_report" };
+      if (reportData1) {
+        reportStatus = { report_status: "bsp_one_report" };
+      }
+
+      const route = "get-bsp-proforma-one-crop";
+
+      // Make the API request
+      this.breeder.postRequestCreator(route, null, {
+        search: {
+          "year": this.ngForm.controls["year"].value,
+          "season": this.ngForm.controls["season"].value,
+          "user_type": "pdpc",
+          ...reportStatus
         }
+      }).subscribe(data => {
+        console.log("season data value", data);
 
-        const route = "get-bsp-proforma-one-crop";
-        
-        // Make the API request
-        this.breeder.postRequestCreator(route, null, {
-            search: { 
-                "year": this.ngForm.controls["year"].value,
-                "season": this.ngForm.controls["season"].value,
-                "user_type": "pdpc",
-                ...reportStatus
-            }
-        }).subscribe(data => {
-            console.log("season data value", data);
-            
-            // Check if the API response is successful
-            if (data.EncryptedResponse.status_code === 200) {
-                this.inventoryCropData = data.EncryptedResponse.data;
-                console.log("Fetched inventoryCropData:", this.inventoryCropData);
+        // Check if the API response is successful
+        if (data.EncryptedResponse.status_code === 200) {
+          this.inventoryCropData = data.EncryptedResponse.data;
+          console.log("Fetched inventoryCropData:", this.inventoryCropData);
 
-                // Proceed with filtering and extracting crop data once the data is available
-                if (reportData1) {
-                    console.log('Using reportData:', reportData1);
-                    
-                    // Filter based on crop_code
-                    let cropData = this.inventoryCropData.filter(item => item.crop_code == reportData1.crop_code);
-                    
-                    console.log("Filtered cropData:", cropData);
+          // Proceed with filtering and extracting crop data once the data is available
+          if (reportData1) {
+            console.log('Using reportData:', reportData1);
 
-                    // Extract crop name
-                    let cropName = cropData && cropData[0] && cropData[0].crop_name
-                        ? cropData[0].crop_name 
-                        : '';
+            // Filter based on crop_code
+            let cropData = this.inventoryCropData.filter(item => item.crop_code == reportData1.crop_code);
 
-                    console.log("Extracted cropName:", cropName);
-                    this.reportDataCropvalue = cropName;
+            console.log("Filtered cropData:", cropData);
 
-                    // Resolve the promise once data is available
-                    resolve();
-                }
-            } else {
-                console.error('Error fetching crop data:', data.EncryptedResponse.message);
-                reject('Failed to fetch crop data');
-            }
-        }, error => {
-            console.error('API request failed:', error);
-            reject(error);
-        });
+            // Extract crop name
+            let cropName = cropData && cropData[0] && cropData[0].crop_name
+              ? cropData[0].crop_name
+              : '';
+
+            console.log("Extracted cropName:", cropName);
+            this.reportDataCropvalue = cropName;
+
+            // Resolve the promise once data is available
+            resolve();
+          }
+        } else {
+          console.error('Error fetching crop data:', data.EncryptedResponse.message);
+          reject('Failed to fetch crop data');
+        }
+      }, error => {
+        console.error('API request failed:', error);
+        reject(error);
+      });
     });
-}
+  }
 
 
 
 
   getCropName(value) {
     // console.log('value====',value);
-    if(value){
+    if (value) {
       // console.log('inventoryCropData====',this.inventoryCropData);
-      let cropData = this.inventoryCropData.filter(item => item.crop_code == value) 
+      let cropData = this.inventoryCropData.filter(item => item.crop_code == value)
       let cropName = cropData && cropData[0] && cropData[0].crop_name ? cropData[0].crop_name : '';
-      // console.log('cropName====',cropName);
       return cropName;
     }
-    
-   
+
+
   }
   getVarietyData(data) {
     const route = "get-bsp-proforma-one-variety";
@@ -742,7 +855,7 @@ export class BspProfarmaOneFormComponent implements OnInit {
         "season": this.ngForm.controls['season'].value,
         "crop_code": this.ngForm.controls['crop'].value,
         "user_type": "bspc",
-        "production_type":this.productionType
+        "production_type": this.productionType
       }
     }).subscribe(data => {
       if (data.EncryptedResponse.status_code === 200) {
@@ -766,7 +879,7 @@ export class BspProfarmaOneFormComponent implements OnInit {
         "season": this.ngForm.controls['season'].value,
         "crop_code": this.ngForm.controls['crop'].value,
         "user_type": "bspc",
-        "production_type":this.productionType
+        "production_type": this.productionType
       }
     }).subscribe(data => {
       if (data.EncryptedResponse.status_code === 200) {
@@ -781,8 +894,6 @@ export class BspProfarmaOneFormComponent implements OnInit {
         }
         let varietyCodeArray = this.inventoryVarietyData.filter(ele => ele.variety_code == value);
         this.varietyName = varietyCodeArray && varietyCodeArray[0] && varietyCodeArray[0].variety_name ? varietyCodeArray[0].variety_name : '';
-
-
       }
     })
   }
@@ -822,7 +933,7 @@ export class BspProfarmaOneFormComponent implements OnInit {
   selcetAll(event) {
     if (event && event.length > 0) {
       this.ngForm.controls["variety_filter"].patchValue(event);
-      this.getPageData(null,null,null);
+      this.getPageData(null, null, null);
     }
   }
   openpopup() {
@@ -831,8 +942,8 @@ export class BspProfarmaOneFormComponent implements OnInit {
   close() {
     this.displayStyle = 'none'
   }
-  getBspcTeamData(index, team_id,reportData=null) {
-    console.log("reportData",reportData); 
+  getBspcTeamData(index, team_id, reportData = null) {
+    console.log("reportData", reportData);
     const route = "get-bsp-monitoring-team";
     this.breeder.postRequestCreator(route, null, {
       search: {
@@ -869,46 +980,46 @@ export class BspProfarmaOneFormComponent implements OnInit {
   }
 
   getTeamMemberPdf(data) {
-     
+
     if (this.teamdetailsDataSecond && this.teamdetailsDataSecond.length) {
       let monitoringTeamData = this.teamdetailsDataSecond.filter(ele => ele.id == data);
       return monitoringTeamData;
     }
-     
+
   }
-  getPageData(loadPageNumberData: number = 1, searchData: any | undefined = undefined, reportData ) {
+  getPageData(loadPageNumberData: number = 1, searchData: any | undefined = undefined, reportData) {
     const userData = localStorage.getItem('BHTCurrentUser');
     const data = JSON.parse(userData);
-    
-    let userId ;
+    let userId;
+    // this.is_update=false;
     let reportStatus;
-    console.log("jjjj",reportData);
+    console.log("jjjj", reportData);
     if (reportData && reportData !== undefined) {
       // this.getAgencyData(null,data.user_id);
       // this.getYearData();
-     this.ngForm.controls["year"].setValue(reportData.year)
-    //  this.getSeasonData();
-     this.ngForm.controls["season"].setValue(reportData.season)
-     this.ngForm.controls["crop"].setValue(reportData.crop_code)
-      
-    //  this.getCropData();
-    //  this.getCropName(reportData.crop_code);
-     userId = reportData.user_id;
-     console.log("ui",userId);
-     
-     reportStatus = {report_status:"bsp_one_report"};
-     this.isPdfDisbaled = true;
-     console.log("isPdfDisbaled");
-     
-    }else{
+      this.ngForm.controls["year"].setValue(reportData.year)
+      //  this.getSeasonData();
+      this.ngForm.controls["season"].setValue(reportData.season)
+      this.ngForm.controls["crop"].setValue(reportData.crop_code)
+
+      //  this.getCropData();
+      //  this.getCropName(reportData.crop_code);
+      userId = reportData.user_id;
+      console.log("ui", userId);
+
+      reportStatus = { report_status: "bsp_one_report" };
+      this.isPdfDisbaled = true;
+      console.log("isPdfDisbaled");
+
+    } else {
       userId = data.id
       // this.userId = data
     }
-    console.log("hghhhg",this.ngForm.controls["year"].value );
-    console.log("hghhhg",this.ngForm.controls["season"].value );
-    console.log("hghhhg",this.ngForm.controls["crop"].value );
-    
-     
+    console.log("hghhhg", this.ngForm.controls["year"].value);
+    console.log("hghhhg", this.ngForm.controls["season"].value);
+    console.log("hghhhg", this.ngForm.controls["crop"].value);
+
+
     if (!this.ngForm.controls['year'].value || !this.ngForm.controls['season'].value || !this.ngForm.controls['crop'].value) {
       Swal.fire({
         toast: false,
@@ -923,33 +1034,33 @@ export class BspProfarmaOneFormComponent implements OnInit {
     } else {
       let varietyCodeArr = [];
       // if(!reportData){
-        this.isSearch = false;
-        this.isCrop = true;
-        this.varietyDisbled = false;
-        this.ngForm.controls['variety_filter'].enable();
-        if (!this.varietyTempValue) {
-          this.getVarietyData(null);
-        }
-        // this.getVarietyData();
-        this.getVarietyFilterData();
-        if (this.ngForm.controls["variety_filter"].value && this.ngForm.controls["variety_filter"].value !== undefined && this.ngForm.controls["variety_filter"].value.length > 0) {
-          this.ngForm.controls["variety_filter"].value.forEach(ele => {
-            varietyCodeArr.push(ele.variety_code);
-          })
-        }
+      this.isSearch = false;
+      this.isCrop = true;
+      this.varietyDisbled = false;
+      this.ngForm.controls['variety_filter'].enable();
+      if (!this.varietyTempValue) {
+        this.getVarietyData(null);
+      }
+      // this.getVarietyData();
+      this.getVarietyFilterData();
+      if (this.ngForm.controls["variety_filter"].value && this.ngForm.controls["variety_filter"].value !== undefined && this.ngForm.controls["variety_filter"].value.length > 0) {
+        this.ngForm.controls["variety_filter"].value.forEach(ele => {
+          varietyCodeArr.push(ele.variety_code);
+        })
+      }
       // }
-     
+
 
       let y = this.ngForm.controls["year"].value;
       let s = this.ngForm.controls["season"].value;
       let c = this.ngForm.controls["crop"].value;
       let uid = userId;
       let d = this.currentDate
-      
-      const encryptedForm = CryptoJS.AES.encrypt(JSON.stringify({ y, s, uid, c,d }), 'a-343%^5ds67fg%__%add').toString();
+
+      const encryptedForm = CryptoJS.AES.encrypt(JSON.stringify({ y, s, uid, c, d }), 'a-343%^5ds67fg%__%add').toString();
       this.encryptedData = encodeURIComponent(encryptedForm);
       console.log('this.encryptedData', this.encryptedData);
-      // this.encryptedData =  year+season +crop_code+user_id
+    
 
       this.breeder.postRequestCreator("get-bsp-proforma-one-data", null, {
         page: loadPageNumberData,
@@ -960,7 +1071,7 @@ export class BspProfarmaOneFormComponent implements OnInit {
           season: this.ngForm.controls["season"].value,
           crop_code: this.ngForm.controls["crop"].value,
           variety_code_array: varietyCodeArr && (varietyCodeArr.length > 0) ? varietyCodeArr : null,
-          user_id: userId ? userId:null,
+          user_id: userId ? userId : null,
           ...reportStatus
         }
       }).subscribe((apiResponse: any) => {
@@ -979,7 +1090,7 @@ export class BspProfarmaOneFormComponent implements OnInit {
           if (this.allData === undefined) {
             this.allData = [];
           }
-         
+
           // //start temp code for testing (fab 6 2024)
           // this.allData.forEach(ele=>{
           //   this.allData.push(ele);
@@ -994,29 +1105,29 @@ export class BspProfarmaOneFormComponent implements OnInit {
           //   this.allData.push(ele);
           // })
           // //finish temp code for testing (fab 6 2024)
-          this.filterPaginateSearch.itemList= this.allData;
+          this.filterPaginateSearch.itemList = this.allData;
 
-          if(this.allData){
+          if (this.allData) {
             if (reportData) {
               console.log('report data======', reportData);
-          
+
               // Await the result of getCropData
               this.getCropData(reportData).then(() => {
-                  // Once crop data is fetched, generate the PDF
-                  this.generatePdf(null);
+                // Once crop data is fetched, generate the PDF
+                this.generatePdf(null);
               }).catch(error => {
-                  console.error('Error while fetching crop data:', error);
+                console.error('Error while fetching crop data:', error);
               });
+            }
           }
-          }
-          
+
           // this.filterPaginateSearch.Init(this.allData, this, "getPageData", undefined, null, true);
 
           // this.filterPaginateSearch.Init(this.allData, this, "getPageData", undefined, apiResponse.EncryptedResponse.data.count, true);
           // this.initSearchAndPagination();
         }
       });
-     
+
     }
   }
 
@@ -1086,6 +1197,7 @@ export class BspProfarmaOneFormComponent implements OnInit {
     this.isVariety = false;
     this.isPrentalLine = false;
     this.varietyTempValue = ""
+    this.varietyLineCode = ""
   }
 
   resetForm() {
@@ -1111,23 +1223,25 @@ export class BspProfarmaOneFormComponent implements OnInit {
     // this.ngForm.controls['variety'].setValue('');
     this.ngForm.controls['variety_line'].setValue('');
     this.ngForm.controls['bspc'].reset;
+    this.varietyLineCode = ""
     // this.isPrentalLine = false;
     this.bspc.clear();
   }
 
   editFunctinality(data, item) {
+    console.log('data', data.line_variety_code);
+    this.varietyLineCode = data.line_variety_code
+    this.ngForm.controls['variety_line'].patchValue(data && data.line_variety_code ? data.line_variety_code : "");
     this.is_update = true;
     this.bspc.clear();
     this.ngForm.controls['id'].patchValue(data && data.id ? data.id : '');
     this.ngForm.controls['year'].patchValue(data && data.year ? data.year : '', { emitEvent: false });
     this.ngForm.controls['season'].patchValue(data && data.season ? data.season : '', { emitEvent: false });
     this.ngForm.controls['crop'].patchValue(data && data.crop_code ? data.crop_code : '', { emitEvent: false });
-    this.getVarietyDataSecond(data.variety_code);
-    this.checkParentalLineVarietySecond(data && data.variety_code, data && data.line_variety_code);
+
     if (data && data.line_variety_code) {
-      console.log(' data.variety_code', data.variety_code);
       this.ngForm.controls['variety'].setValue(data && data.variety_code ? data.variety_code : '', { emitEvent: false });
-      this.ngForm.controls['variety_line'].patchValue(data && data.line_variety_code ? data.line_variety_code : '');
+
       this.ngForm.controls['variety'].disable();
       this.ngForm.controls['variety_line'].disable();
       this.isPrentalLine = true;
@@ -1136,11 +1250,16 @@ export class BspProfarmaOneFormComponent implements OnInit {
       this.ngForm.controls['variety'].patchValue(data && data.variety_code ? data.variety_code : '');
       this.isPrentalLine = false;
     }
+    this.getVarietyDataSecond(data.variety_code);
+    this.checkParentalLineVarietySecond(data && data.variety_code, data && data.line_variety_code);
     console.log(data, 'dataa')
-    this.fetchQntInventryData(data, item);
+    this.fetchQntInventryDataUpdate(data, item);
   }
 
   saveForm() {
+    console.log('this.varietyLineCode====', this.varietyLineCode);
+    console.log(this.ngForm.controls['variety_line'].value);
+    // return
     let param = {
       year: this.ngForm.controls['year'].value,
       season: this.ngForm.controls['season'].value,
@@ -1148,7 +1267,7 @@ export class BspProfarmaOneFormComponent implements OnInit {
       variety_code: this.ngForm.controls['variety'].value,
       bspc_array: this.ngForm.controls['bspc'].value,
       user_id: this.userId,
-      variety_parental_line: this.ngForm.controls['variety_line'].value ? this.ngForm.controls['variety_line'].value : null
+      variety_parental_line: this.ngForm.controls['variety_line'].value ? this.ngForm.controls['variety_line'].value : this.varietyLineCode ? this.varietyLineCode : null
     }
     let route = "add-bsp-proforma-one-data";
     if (this.ngForm.controls['id'].value) {
@@ -1165,7 +1284,7 @@ export class BspProfarmaOneFormComponent implements OnInit {
           this.ngForm.controls['variety'].enable();
           this.ngForm.controls['variety_line'].enable();
           this.resetForm();
-          this.getPageData(null,null,null);
+          this.getPageData(null, null, null);
 
         } else {
           Swal.fire({
@@ -1188,7 +1307,7 @@ export class BspProfarmaOneFormComponent implements OnInit {
             confirmButtonColor: '#E97E15'
           });
           this.resetForm();
-          this.getPageData(null,null,null);
+          this.getPageData(null, null, null);
 
         } else if (res.EncryptedResponse.status_code === 201) {
           Swal.fire({
@@ -1231,7 +1350,7 @@ export class BspProfarmaOneFormComponent implements OnInit {
             text: "Your data has been deleted.",
             icon: "success"
           });
-          this.getPageData(null,null,null);
+          this.getPageData(null, null, null);
         });
       }
     });
@@ -1248,91 +1367,72 @@ export class BspProfarmaOneFormComponent implements OnInit {
       }
     });
   }
-  // items =['Apple','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
-  //   'aa','bb','cc','dd','ee','ff','gg','hh','ii','jj','kk','ll','mm','nn','oo','pp','qq','rr','ss','tt','uu','vv','ww','xx','yy',
-  //   'zz', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
-  //    'a','b','c','d','e','f','g','h','i','j','k'
-  // ];
-  generatePdf(param:any) {
+
+  generatePdf(param: any) {
     // console.log("kkk",param); 
     let filename = "bsp_one_report"
     const pdfOptions = {
-        filename: `${filename}.pdf`,
-        margin: [5, 0],
-        image: {
-          type: 'jpeg',
-          quality: 0.3
-        },
-        html2canvas: {
-          dpi: 300,
-          scale: 0.75,
-          letterRendering: true,
-          logging: true,
-          useCORS: true,
-        },
-        jsPDF: {
-          unit: 'mm',
-          format: 'a3',
-          orientation: 'landscape'
-        },
-        pagebreak: { mode: ['css', 'legacy'], avoid: 'img' } // Helps with pagebreak issues
+      filename: `${filename}.pdf`,
+      margin: [5, 0],
+      image: {
+        type: 'jpeg',
+        quality: 0.3
+      },
+      html2canvas: {
+        dpi: 300,
+        scale: 0.75,
+        letterRendering: true,
+        logging: true,
+        useCORS: true,
+      },
+      jsPDF: {
+        unit: 'mm',
+        format: 'a3',
+        orientation: 'landscape'
+      },
+      pagebreak: { mode: ['css', 'legacy'], avoid: 'img' } // Helps with pagebreak issues
 
-      };
-        const pages = Array.from(this.pdfContainer.nativeElement.querySelectorAll('div[aria-label^="pdf-page-"]'));
-        
-        if (pages.length === 0) {
-          console.error('No pages found with the specified aria-label.');
-          return;
-        }
+    };
+    const pages = Array.from(this.pdfContainer.nativeElement.querySelectorAll('div[aria-label^="pdf-page-"]'));
 
-        let worker = html2PDF().set(pdfOptions).from(pages[0]).toPdf();
-        console.log("pages.length ", pages.length )
-        if (pages.length > 1) {
-          pages.slice(1).forEach((page) => {
-            worker = worker
-              .get('pdf')
-              .then((pdf) => {
-                pdf.addPage();
-              })
-              .from(page)
-              .toContainer()
-              .toCanvas()
-              .toPdf();
-          });
-        }
+    if (pages.length === 0) {
+      console.error('No pages found with the specified aria-label.');
+      return;
+    }
 
-        worker.save();
-  //Old code
-    // let elementId = document.getElementById('pdf-tables')
-    // // pdf-tables
-    // // pdf-report
-    // const name = 'bsp-three-report';
-    // const element = elementId
-    // var doc = new jsPDF();
-    // const options = {
-    //   filename: `${filename}.pdf`,
-    //   margin: [5, 0],
-    //   image: {
-    //     type: 'jpeg',
-    //     quality: 0.5
-    //   },
-    //   html2canvas: {
-    //     dpi: 300,
-    //     scale: 0.75,
-    //     letterRendering: true,
-    //     logging: true,
-    //     useCORS: true,
-    //   },
-    //   jsPDF: {
-    //     unit: 'mm',
-    //     format: 'a3',
-    //     orientation: 'landscape'
-    //   },
-    // };
-    // var pageCount = doc.getNumberOfPages();
-    // console.log(pageCount, 'pdf', elementId)
-    // let pdf = html2PDF().set(options).from(element).toPdf().save();
- 
+    let worker = html2PDF().set(pdfOptions).from(pages[0]).toPdf();
+    console.log("pages.length ", pages.length)
+    if (pages.length > 1) {
+      pages.slice(1).forEach((page) => {
+        worker = worker
+          .get('pdf')
+          .then((pdf) => {
+            pdf.addPage();
+          })
+          .from(page)
+          .toContainer()
+          .toCanvas()
+          .toPdf();
+      });
+    }
+
+    worker.save();
+  }
+  myFunction() {
+    document.getElementById("myDropdown").classList.toggle("show");
+  }
+  exportexcel(): void {
+    /* pass here the table id */
+    let element = document.getElementById('excel-tables');
+    const ws: XLSX.WorkSheet = XLSX.utils.table_to_sheet(element);
+
+    /* generate workbook and add the worksheet */
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+    /* save to file */
+    XLSX.writeFile(wb, this.fileName);
+
   }
 
   getReasonName(data) {
@@ -1378,9 +1478,6 @@ export class BspProfarmaOneFormComponent implements OnInit {
     } else {
       if ((this.ngForm.controls['bspc']['controls'][i].controls['breeder_seed_available'].value > 0) && (this.ngForm.controls['bspc']['controls'][i].controls['nucleus_seed_available'].value > 0))
         this.ngForm.controls['bspc']['controls'][i].controls['target_qunatity'].enable();
-      // else if((this.ngForm.controls['bspc']['controls'][i].controls['breeder_seed_available'].value == 0)  && (this.ngForm.controls['bspc']['controls'][i].controls['nucleus_seed_available'].value > 0)){
-
-      //   this.ngForm.controls['bspc']['controls'][i].controls['target_qunatity'].disable();}
       else
         this.ngForm.controls['bspc']['controls'][i].controls['target_qunatity'].disable();
     }

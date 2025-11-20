@@ -41,16 +41,16 @@ export class BreederSeedCertificateDownloadComponent implements OnInit {
   agencyAddress: any;
   state_name: any;
   district_name: any;
-  code:any;
+  code: any;
   dataToShow: any;
   designation_name: any;
   contact_person_name: any;
   currentDate = new Date();
   baseUrl: string = environment.ms_nb_06_production_center.baseUrl;
   decryptedId: any;
-  submissionDecryptedId:any;
-  submitedEncryptedData:any;
-  AESKey:string = environment.AESKey;
+  submissionDecryptedId: any;
+  submitedEncryptedData: any;
+  AESKey: string = environment.AESKey;
   encryptedData: any;
   yearnew: any;
   constructor(activatedRoute: ActivatedRoute, private router: Router,
@@ -58,7 +58,7 @@ export class BreederSeedCertificateDownloadComponent implements OnInit {
     // private route: ActivatedRoute,
     private ngxService: NgxUiLoaderService, private breederService: BreederService,
     private productionService: ProductioncenterService,
-    ) {
+  ) {
 
     const params: any = activatedRoute.snapshot.params;
     if (params["submissionid"]) {
@@ -70,60 +70,43 @@ export class BreederSeedCertificateDownloadComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getName();
+    // this.getName();
     this.getAgencyData();
     this.getCertificateData();
-    this.getSerialNumber();
-
-
+    // this.getSerialNumber();
     // if (this.isEdit || this.isView) {
-    //   this.breederService.getRequestCreator('get-breeder-certificate/' + this.submissionId).subscribe(dataList => {
-    //     console.log("dataList", dataList)
+    //   this.breederService.getRequestCreator('certificate-generated/' + this.submissionId).subscribe(dataList => {
     //     if (dataList && dataList.EncryptedResponse && dataList.EncryptedResponse.status_code && dataList.EncryptedResponse.status_code == 200) {
-    //       this.pdfdata = dataList.EncryptedResponse.data
+    //       this.pdfdata = dataList.EncryptedResponse.data;
+    //       console.log(this.pdfdata.crop_code)
+    //       this.getCertificateNameByUser(this.pdfdata.crop_code)
+    //       this.getSpaNameList(this.pdfdata.spa_code)
+
+    //       // this.pdfdata.date_of_inspection = convertDate(this.pdfdata.date_of_inspection)
+    //       this.pdfdata.date_of_inspection = this.pdfdata.date_of_inspection
+    //       this.pdfdata.generation_date = convertDate(this.pdfdata.generation_date)
+    //       if ((this.pdfdata.crop_code).slice(0,1)  == 'A') {
+    //         this.unit = 'Quintal';
+    //       } else if ((this.pdfdata[0].crop_code).slice(0,1) == 'H') {
+    //         this.unit = 'Kg'
+    //       }
+    //       let data = parseInt(this.pdfdata.year)
+
+    //       this.years = data + '-' + (data + 1 - 2000)
+
     //     }
     //   });
-    // }.getRequestCreator("certificate-generated/" + billId, null, null)
 
-    if (this.isEdit || this.isView) {
-      this.breederService.getRequestCreator('certificate-generated/' + this.submissionId).subscribe(dataList => {
-        if (dataList && dataList.EncryptedResponse && dataList.EncryptedResponse.status_code && dataList.EncryptedResponse.status_code == 200) {
-          this.pdfdata = dataList.EncryptedResponse.data;
-          console.log(this.pdfdata.crop_code)
-          this.getCertificateNameByUser(this.pdfdata.crop_code)
-          this.getSpaNameList(this.pdfdata.spa_code)
-         
-          // this.pdfdata.date_of_inspection = convertDate(this.pdfdata.date_of_inspection)
-          this.pdfdata.date_of_inspection = this.pdfdata.date_of_inspection
-          this.pdfdata.generation_date = convertDate(this.pdfdata.generation_date)
-          if ((this.pdfdata.crop_code).slice(0,1)  == 'A') {
-            this.unit = 'Quintal';
-          } else if ((this.pdfdata[0].crop_code).slice(0,1) == 'H') {
-            this.unit = 'Kg'
-          }
-          let data = parseInt(this.pdfdata.year)
-
-          this.years = data + '-' + (data + 1 - 2000)
-
-        }
-      });
-    
-    }
-
+    // }
   }
 
   downloadImage(e) {
     let image64 = this.pdfdata
   }
 
-
-  patchForm(data) {
-
-  }
-
   async downloadFile(fileHtmlElement: HTMLElement) {
     const element = document.getElementById('content');
-    console.log('fileHtmlElement',element)
+    console.log('fileHtmlElement', element)
     this.ngxService.start();
     const options = {
       background: 'white',
@@ -139,7 +122,7 @@ export class BreederSeedCertificateDownloadComponent implements OnInit {
 
 
       const FILEURI = canvas.toDataURL('image/png');
-      console.log('FILEURI',FILEURI)
+      console.log('FILEURI', FILEURI)
       var imageData = new Image();
       imageData.src = FILEURI;
       imageData.onload = function () {
@@ -161,13 +144,14 @@ export class BreederSeedCertificateDownloadComponent implements OnInit {
 
 
 
-        PDF.addImage(FILEURI, 'PNG',  0, 600, fileHeight,fileWidth);
+        PDF.addImage(FILEURI, 'PNG', 0, 600, fileHeight, fileWidth);
         PDF.save('breeder-seed-certificate');
       };
 
     });
     this.ngxService.stop();
   }
+
   public openPDFs(e): void {
     let DATA: any = document.getElementById('htmlData');
 
@@ -187,17 +171,16 @@ export class BreederSeedCertificateDownloadComponent implements OnInit {
   }
 
   download() {
-
     const name = 'breeder-seed-certificate';
     const element = document.getElementById('content');
     const options = {
       filename: `${name}.pdf`,
       // margin: [10, 3, 0, 0], //top, left, buttom, right,
       // filename: 'my_file.pdf',
-      margin:       [0, 0, 10, 0],
+      margin: [0, 0, 10, 0],
       // image: { type: 'jpeg', quality: 1 },
-      image:        { type: 'jpeg', quality: 0.98,crossorigin:"*" ,width:'50px'},
-      
+      image: { type: 'jpeg', quality: 0.98, crossorigin: "*", width: '50px' },
+
       // html2canvas: {dpi: 192, scale: 2, letterRendering: true},
       // pagebreak: {mode: 'avoid-all'},
       letterRendering: true,
@@ -215,17 +198,18 @@ export class BreederSeedCertificateDownloadComponent implements OnInit {
       // jsPDF: { unit: 'in', format: 'a4', orientation: 'p' }
       // jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
     };
-    html2PDF().from(element).outputPdf().then(function(pdf) {
+    html2PDF().from(element).outputPdf().then(function (pdf) {
       // This logs the right base64
-      console.log(btoa(pdf),'bto');
-  });
-   
+      console.log(btoa(pdf), 'bto');
+    });
+
     html2PDF().set(options).from(element).toPdf().save();
   }
 
   convertDatecertificate(val) {
     convertDate(val)
   }
+
   openPDF(): void {
     // let DATA: any = document.getElementById('content');
     const source = document.getElementById("content");
@@ -240,6 +224,7 @@ export class BreederSeedCertificateDownloadComponent implements OnInit {
       PDF.save('angular-demo.pdf');
     });
   }
+
   onExport() {
     const doc = new jsPDF("p", "pt", "a4");
     const source = document.getElementById("content");
@@ -255,6 +240,7 @@ export class BreederSeedCertificateDownloadComponent implements OnInit {
     //   useCss: true
     // })
   }
+
   makePdf() {
     let pdf = new jsPDF('p', 'mm', [200, 200])
     pdf.html(this.content.nativeElement, {
@@ -285,6 +271,7 @@ export class BreederSeedCertificateDownloadComponent implements OnInit {
     //   pdf.save("output.pdf")
     // })
   }
+
   exportPDF() {
     const element = document.getElementById('content-section');
     html2canvas(element).then((canvas) => {
@@ -305,6 +292,7 @@ export class BreederSeedCertificateDownloadComponent implements OnInit {
       pdf.save("output.pdf")
     })
   }
+
   convetToPDF() {
     var data = document.getElementById('content');
     html2canvas(data).then(canvas => {
@@ -321,29 +309,23 @@ export class BreederSeedCertificateDownloadComponent implements OnInit {
       pdf.save('new-file.pdf'); // Generated PDF
     });
   }
+
   getName() {
     // this.selectCrop_group = "";
     const route = "get-name-certificate-of-breeeder";
     let data = localStorage.getItem('BHTCurrentUser');
     let localdata = JSON.parse(data)
-
-
     // const created_by = data.created_by
-
     const param = {
       search: {
-
         created_by: localdata.created_by,
         user_id: localdata.id
       }
-
-
     }
     this.breederService
       .postRequestCreator(route, null, param)
       .subscribe((apiResponse: any) => {
         console.log(apiResponse);
-
         console.log(apiResponse.EncryptedResponse.status_code, 'this.user_table')
         if (apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.status_code
           && apiResponse.EncryptedResponse.status_code == 200) {
@@ -362,11 +344,8 @@ export class BreederSeedCertificateDownloadComponent implements OnInit {
   getNameByUser() {
     // this.selectCrop_group = "";
     const route = "get-name-certificate-of-breeeder-by-created-by";
-
-
-
     // const created_by = data.created_by
-console.log(this.user_table,'this.user_table')
+    // console.log(this.user_table, 'this.user_table')
     const param = {
       search: {
         user_id: this.user_table
@@ -375,15 +354,12 @@ console.log(this.user_table,'this.user_table')
     this.breederService
       .postRequestCreator(route, null, param)
       .subscribe((apiResponse: any) => {
-
-
         if (apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.status_code
           && apiResponse.EncryptedResponse.status_code == 200) {
-            this.agency_id= apiResponse.EncryptedResponse.data.data[0].agency_id;
-            this.certificate_name = apiResponse.EncryptedResponse.data.data[0].name,
+          this.agency_id = apiResponse.EncryptedResponse.data.data[0].agency_id;
+          this.certificate_name = apiResponse.EncryptedResponse.data.data[0].name,
             this.getNameByUserByAgencyTable()
-
-            // this.getNameByUserByAgencyTable()
+          // this.getNameByUserByAgencyTable()
           // this.isCropName = true;
           // this.crop_name_list = apiResponse.EncryptedResponse.data.rows;
         }
@@ -392,38 +368,35 @@ console.log(this.user_table,'this.user_table')
     //   this.crop_name_list = data && data['EncryptedResponse'] && data['EncryptedResponse'].data && data['EncryptedResponse'].data ? data['EncryptedResponse'].data : '';
     // })
   }
+
   getCertificateNameByUser(newValue) {
     // this.selectCrop_group = "";
     const route = "getCeritificateName";
-
-
-
     // const created_by = data.created_by
-console.log(this.user_table,'this.user_table')
+    console.log(this.user_table, 'this.user_table')
     const param = {
       search: {
-        crop_code:newValue
+        crop_code: newValue
       }
     }
+    
     this.breederService
       .postRequestCreator(route, null, param)
       .subscribe((apiResponse: any) => {
-
-
         if (apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.status_code
           && apiResponse.EncryptedResponse.status_code == 200) {
-            this.agency_id= apiResponse.EncryptedResponse.data.data[0].agency_id;
-            this.certificate_names = apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.data && apiResponse.EncryptedResponse.data.data &&
+          this.agency_id = apiResponse.EncryptedResponse.data.data[0].agency_id;
+          this.certificate_names = apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.data && apiResponse.EncryptedResponse.data.data &&
             apiResponse.EncryptedResponse.data.data[0] && apiResponse.EncryptedResponse.data.data[0].m_crop && apiResponse.EncryptedResponse.data.data[0].m_crop.agency_detail
-            && apiResponse.EncryptedResponse.data.data[0].m_crop.agency_detail.agency_name ? apiResponse.EncryptedResponse.data.data[0].m_crop.agency_detail.agency_name:'';
-           
-            this.certificate_address = apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.data && apiResponse.EncryptedResponse.data.data &&
-            apiResponse.EncryptedResponse.data.data[0] && apiResponse.EncryptedResponse.data.data[0].m_crop && apiResponse.EncryptedResponse.data.data[0].m_crop.agency_detail
-            && apiResponse.EncryptedResponse.data.data[0].m_crop.agency_detail.address ? apiResponse.EncryptedResponse.data.data[0].m_crop.agency_detail.address:'';
-           
-            // this.getNameByUserByAgencyTable()
+            && apiResponse.EncryptedResponse.data.data[0].m_crop.agency_detail.agency_name ? apiResponse.EncryptedResponse.data.data[0].m_crop.agency_detail.agency_name : '';
 
-            // this.getNameByUserByAgencyTable()
+          this.certificate_address = apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.data && apiResponse.EncryptedResponse.data.data &&
+            apiResponse.EncryptedResponse.data.data[0] && apiResponse.EncryptedResponse.data.data[0].m_crop && apiResponse.EncryptedResponse.data.data[0].m_crop.agency_detail
+            && apiResponse.EncryptedResponse.data.data[0].m_crop.agency_detail.address ? apiResponse.EncryptedResponse.data.data[0].m_crop.agency_detail.address : '';
+
+          // this.getNameByUserByAgencyTable()
+
+          // this.getNameByUserByAgencyTable()
           // this.isCropName = true;
           // this.crop_name_list = apiResponse.EncryptedResponse.data.rows;
         }
@@ -448,12 +421,12 @@ console.log(this.user_table,'this.user_table')
 
         if (apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.status_code
           && apiResponse.EncryptedResponse.status_code == 200) {
-            // this.imageIconName = environment.awsUrl + 
-            // apiResponse.EncryptedResponse.data.data[0].image_url;
-            console.log('this.imageIconName',this.imageIconName)
-            // this.certificate_name=  apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.data 
-            // && apiResponse.EncryptedResponse.data.data &&  apiResponse.EncryptedResponse.data.data[0] &&
-            // apiResponse.EncryptedResponse.data.data[0].agency_name
+          // this.imageIconName = environment.awsUrl + 
+          // apiResponse.EncryptedResponse.data.data[0].image_url;
+          console.log('this.imageIconName', this.imageIconName)
+          // this.certificate_name=  apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.data 
+          // && apiResponse.EncryptedResponse.data.data &&  apiResponse.EncryptedResponse.data.data[0] &&
+          // apiResponse.EncryptedResponse.data.data[0].agency_name
           // this.isCropName = true;
           // this.crop_name_list = apiResponse.EncryptedResponse.data.rows;
         }
@@ -462,25 +435,26 @@ console.log(this.user_table,'this.user_table')
     //   this.crop_name_list = data && data['EncryptedResponse'] && data['EncryptedResponse'].data && data['EncryptedResponse'].data ? data['EncryptedResponse'].data : '';
     // })
   }
-  exportAsPDF(div_id)
-  {
-    let data = document.getElementById(div_id);  
+
+  exportAsPDF(div_id) {
+    let data = document.getElementById(div_id);
     html2canvas(data).then(canvas => {
-      const contentDataURL = canvas.toDataURL('image/png')  
-      console.log('contentDataURL',canvas)
+      const contentDataURL = canvas.toDataURL('image/png')
+      console.log('contentDataURL', canvas)
       var doc = new jsPDF("p", "mm", "a4");
 
-var width = doc.internal.pageSize.getWidth();
-var height = doc.internal.pageSize.getHeight();
-var imgData = contentDataURL;
-doc.addImage(imgData, 'JPEG', 0, 0, width, height);
+      var width = doc.internal.pageSize.getWidth();
+      var height = doc.internal.pageSize.getHeight();
+      var imgData = contentDataURL;
+      doc.addImage(imgData, 'JPEG', 0, 0, width, height);
 
       // let pdf = new jspdf('l', 'cm', 'a4'); //Generates PDF in landscape mode
       // let pdf = new jspdf('p', 'cm', 'a4'); Generates PDF in portrait mode
       // pdf.addImage(contentDataURL, 'PNG', 0, 0, 29.7, 21.0);  
-      doc.save('Filename.pdf');   
-    }); 
+      doc.save('Filename.pdf');
+    });
   }
+
   generatePDF() {
     var data = document.getElementById("content");
     html2canvas(data).then(canvas => {
@@ -494,6 +468,7 @@ doc.addImage(imgData, 'JPEG', 0, 0, width, height);
       pdf.save("newPDF.pdf");
     });
   }
+
   public downloadAsPDF() {
     const doc = new jsPDF();
 
@@ -505,32 +480,33 @@ doc.addImage(imgData, 'JPEG', 0, 0, width, height);
 
     const pdfTable = this.content.nativeElement;
 
-    doc.html(pdfTable.innerHTML,   {
+    doc.html(pdfTable.innerHTML, {
       width: 190,
       // 'elementHandlers': specialElementHandlers
     });
 
     doc.save('tableToPdf.pdf');
   }
- 
-  downloadGraphPDF(){  
+
+  downloadGraphPDF() {
     var data = document.getElementById('content');
-    html2canvas(data).then(canvas => {  
-      var imgWidth = 208;   
-      var pageHeight = 295;    
-      var imgHeight = canvas.height * imgWidth / canvas.width;  
-      var heightLeft = imgHeight;  
-    
-      const contentDataURL = canvas.toDataURL('image/jpg')  
+    html2canvas(data).then(canvas => {
+      var imgWidth = 208;
+      var pageHeight = 295;
+      var imgHeight = canvas.height * imgWidth / canvas.width;
+      var heightLeft = imgHeight;
+
+      const contentDataURL = canvas.toDataURL('image/jpg')
       console.log(contentDataURL)
       let pdf = new jspdf('p', 'mm', 'a4'); // A4 size page of PDF  
-      var position = 0;  
-      pdf.addImage(contentDataURL, 'JPG', 0, position, imgWidth, imgHeight)  
+      var position = 0;
+      pdf.addImage(contentDataURL, 'JPG', 0, position, imgWidth, imgHeight)
       pdf.save('document.pdf')
     })
   }
-  getSerialNumber(){
-   // get encrypted data from url and decrypted start
+
+  getSerialNumber() {
+    // get encrypted data from url and decrypted start
     this.route.params.subscribe(params => {
       const encryptedId = params['submissionid'];
 
@@ -542,47 +518,50 @@ doc.addImage(imgData, 'JPEG', 0, 0, width, height);
         const encryptedForm = CryptoJS.AES.encrypt(JSON.stringify({ encryptedId }), this.AESKey).toString();
         this.submitedEncryptedData = encryptedId;
       }
-   
+
     });
- // get encrypted data from url and decrypted end
- 
-    const param={
-      id:this.submissionDecryptedId
+    // get encrypted data from url and decrypted end
+
+    const param = {
+      id: this.submissionDecryptedId
     }
-    this.breederService.postRequestCreator('get-serial-number',null , param).subscribe(data=>{
-      this.serialNumber = data && data.EncryptedResponse && data.EncryptedResponse.data && data.EncryptedResponse.data[0] && data.EncryptedResponse.data[0].serial_number  ? data.EncryptedResponse.data[0].serial_number :'';
-      this.yearnew = data && data.EncryptedResponse && data.EncryptedResponse.data && data.EncryptedResponse.data[0] && data.EncryptedResponse.data[0].year  ? data.EncryptedResponse.data[0].year :'';
-   
-    })
-  }
-  convertDatewithDash(data){}
-  getSpaNameList(spacode){
-    this.breederService.postRequestCreator('getSpaUserList?spacode='+ spacode ,null).subscribe(data=>{
-      console.log(data)
-      let res = data && data.EncryptedResponse && data.EncryptedResponse.data  ? data.EncryptedResponse.data :
-      '';
-      this.spaName = res && res.user && res.user.agency_detail && res.user.agency_detail.agency_name ?  res.user.agency_detail.agency_name :''
+    this.breederService.postRequestCreator('get-serial-number', null, param).subscribe(data => {
+      this.serialNumber = data && data.EncryptedResponse && data.EncryptedResponse.data && data.EncryptedResponse.data[0] && data.EncryptedResponse.data[0].serial_number ? data.EncryptedResponse.data[0].serial_number : '';
+      this.yearnew = data && data.EncryptedResponse && data.EncryptedResponse.data && data.EncryptedResponse.data[0] && data.EncryptedResponse.data[0].year ? data.EncryptedResponse.data[0].year : '';
 
     })
   }
-  getAgencyData(){
+
+  convertDatewithDash(data) { }
+
+  getSpaNameList(spacode) {
+    this.breederService.postRequestCreator('getSpaUserList?spacode=' + spacode, null).subscribe(data => {
+      console.log(data)
+      let res = data && data.EncryptedResponse && data.EncryptedResponse.data ? data.EncryptedResponse.data :
+        '';
+      this.spaName = res && res.user && res.user.agency_detail && res.user.agency_detail.agency_name ? res.user.agency_detail.agency_name : ''
+
+    })
+  }
+
+  getAgencyData() {
     // get-agency-data
     let data = localStorage.getItem('BHTCurrentUser');
     let localdata = JSON.parse(data)
-    let userId= localdata.id;
-    const param={
-      search:{
-        user_id:userId
+    let userId = localdata.id;
+    const param = {
+      search: {
+        user_id: userId
       }
     }
-    this.productionService.postRequestCreator('get-agency-data',param).subscribe(data=>{
-      let res = data && data.EncryptedResponse && data.EncryptedResponse.data ? data.EncryptedResponse.data :'';
-      this.agenyName= res && res[0] && res[0].agency_name ? res[0].agency_name:'';
-      this.state_name=res && res[0] && res[0].state_name ? res[0].state_name:'';
-      this.district_name=res && res[0] && res[0].district_name ? res[0].district_name:'';
-      this.contact_person_name=res && res[0] && res[0].contact_person_name ? res[0].contact_person_name:'';
-      this.designation_name=res && res[0] && res[0].designation_name ? res[0].designation_name:'';
-      this.code=res && res[0] && res[0].code ? res[0].code:'';
+    this.productionService.postRequestCreator('get-agency-data', param).subscribe(data => {
+      let res = data && data.EncryptedResponse && data.EncryptedResponse.data ? data.EncryptedResponse.data : '';
+      this.agenyName = res && res[0] && res[0].agency_name ? res[0].agency_name : '';
+      this.state_name = res && res[0] && res[0].state_name ? res[0].state_name : '';
+      this.district_name = res && res[0] && res[0].district_name ? res[0].district_name : '';
+      this.contact_person_name = res && res[0] && res[0].contact_person_name ? res[0].contact_person_name : '';
+      this.designation_name = res && res[0] && res[0].designation_name ? res[0].designation_name : '';
+      this.code = res && res[0] && res[0].code ? res[0].code : '';
 
 
     })
@@ -610,6 +589,7 @@ doc.addImage(imgData, 'JPEG', 0, 0, width, height);
     this.productionService.postRequestCreator('get-lifting-data-bill-cerificate', param).subscribe(data => {
       let res = data && data.EncryptedResponse && data.EncryptedResponse.data ? data.EncryptedResponse.data : '';
       this.dataToShow = res && res[0] ? res[0] : '';
+      // console.log(this.dataToShow.refrence_id,"ghjkl********");
       if (this.dataToShow && this.dataToShow.indentor && this.dataToShow.indentor.length > 0) {
         this.dataToShow.indentor.forEach(el => {
           el.tagsNo = this.convertToArray(el.tags.map(val => val && val.tag_no ? val.tag_no : ''));
@@ -674,11 +654,13 @@ doc.addImage(imgData, 'JPEG', 0, 0, width, height);
     arr.push(last2StrNew)
     return arr.join("-");
   }
-  converttoArray(arr){
-    if(arr && arr.length>0){
-      let item = arr  && arr.length>0 ?arr.toString():'';
+  converttoArray(arr) {
+    console.log('arr===',arr);
+    if (arr && arr.length > 0) {
+      let item = arr && arr.length > 0 ? arr.toString() : '';
+      console.log('itemitem===========',item);
       return item
-    }else{
+    } else {
       return 'NA'
     }
   }

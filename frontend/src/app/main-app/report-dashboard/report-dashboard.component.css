@@ -1,0 +1,108 @@
+/* 
+.report-toggle {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.custom-radio input[type='radio'] {
+  display: none;
+}
+
+
+.custom-radio .radio-btn {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  font-size: 16px;
+  color: #6b4c3b;
+  cursor: pointer;
+}
+
+.custom-radio .checkmark {
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  border: 2px solid #b14600;
+  margin-right: 8px;
+  position: relative;
+}
+
+.custom-radio input[type='radio']:checked + .radio-btn .checkmark::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #b14600;
+}
+
+
+.custom-radio .radio-btn:hover .checkmark {
+  border-color: #843100;
+} */
+
+
+/* Container for radio buttons */
+.report-toggle {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 20px;
+  align-items: center;
+  padding-top: 30px;
+  padding-left: 50px;
+}
+
+/* Hide the original radio button */
+.custom-radio input[type='radio'] {
+  display: none;
+}
+
+/* Custom styled radio container */
+.custom-radio .radio-btn {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  font-size: 16px;
+  color: #6b4c3b; /* Brownish Text color like image */
+  cursor: pointer;
+}
+
+/* Circle for radio */
+.custom-radio .checkmark {
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  border: 2px solid #b14600; /* Outline color */
+  margin-right: 8px;
+  position: relative;
+}
+
+/* Filled circle if selected */
+.custom-radio input[type='radio']:checked + .radio-btn .checkmark::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #b14600; /* Fill color */
+}
+
+/* Hover effect (optional) */
+.custom-radio .radio-btn:hover .checkmark {
+  border-color: #843100;
+}
+.section-heading {
+  font-size: 20px;
+  font-weight: 600;
+  color: #5b1c16; /* Dark brown */
+  margin-bottom: 1rem;
+  padding-top: 30px;
+  padding-left: 50px;
+}
+

@@ -82,7 +82,7 @@ export class GenerateInvoiceComponent implements OnInit {
     textField: 'charges',
     selectAllText: 'Select All',
     unSelectAllText: 'Unselect All',
-    itemsShowLimit: 2, 
+    itemsShowLimit: 1, 
     allowSearchFilter: true,
     maxHeight: 70,
   };
@@ -233,7 +233,7 @@ this.ngForm.controls['spa_array'].valueChanges.subscribe(newValue => {
       textField: textField,
       selectAllText: 'Select All',
       unSelectAllText: 'UnSelect All',
-      itemsShowLimit: 3,
+      itemsShowLimit: 1,
       allowSearchFilter: allowSearchFilter,
       // searchPlaceholderText: searchIconUrl + "Search",
       closeDropDownOnSelection: closeDropDownList,
@@ -427,17 +427,57 @@ this.ngForm.controls['spa_array'].valueChanges.subscribe(newValue => {
       parseInt(this.ngForm.controls['rlt_amt'].value ? this.ngForm.controls['rlt_amt'].value : 0) +
       // parseInt(this.ngForm.controls['gst_amt'].value ? this.ngForm.controls['gst_amt'].value : 0) +
       parseInt(this.grandTotal ? this.grandTotal : this.ngForm.controls['grand_total_amt'].value ? this.ngForm.controls['grand_total_amt'].value : 0));
-    }
-  calculategstCharges(event) {
-    this.ngForm.controls['final_grand_total_amt'].setValue(parseInt(((this.ngForm.controls['mou_amt'].value) + (this.ngForm.controls['mou_amt'].value * this.ngForm.controls['mougst_amt'].value) / 100)) +
-      parseInt(((this.ngForm.controls['licence_amt'].value) + (this.ngForm.controls['licence_amt'].value * this.ngForm.controls['licencegst_amt'].value) / 100)) +
-      parseInt(((this.ngForm.controls['ppv_amt'].value) + (this.ngForm.controls['ppv_amt'].value * this.ngForm.controls['ppvgst_amt'].value) / 100)) +
-      parseInt(((this.ngForm.controls['rlt_amt'].value) + (this.ngForm.controls['rlt_amt'].value * this.ngForm.controls['rltgst_amt'].value) / 100)) +
-      // parseInt(((this.ngForm.controls['gst_amt'].value) + (this.ngForm.controls['gst_amt'].value * this.ngForm.controls['gstGst_amt'].value) / 100)) +
-      ((this.ngForm.controls['gst_amt'].value * this.ngForm.controls['gstGst_amt'].value) / 100) +
-      parseInt(this.grandTotal ? this.grandTotal : this.ngForm.controls['grand_total_amt'].value ? this.ngForm.controls['grand_total_amt'].value : 0));
   }
-  onDeSelectAll(event){
+
+  calculategstCharges(event) {
+    const mouAmt = parseFloat(this.ngForm.controls['mou_amt'].value || 0);
+    const mouGstAmt = parseFloat(this.ngForm.controls['mougst_amt'].value || 0);
+  
+    const licenceAmt = parseFloat(this.ngForm.controls['licence_amt'].value || 0);
+    const licenceGstAmt = parseFloat(this.ngForm.controls['licencegst_amt'].value || 0);
+  
+    const ppvAmt = parseFloat(this.ngForm.controls['ppv_amt'].value || 0);
+    const ppvGstAmt = parseFloat(this.ngForm.controls['ppvgst_amt'].value || 0);
+  
+    const rltAmt = parseFloat(this.ngForm.controls['rlt_amt'].value || 0);
+    const rltGstAmt = parseFloat(this.ngForm.controls['rltgst_amt'].value || 0);
+  
+    const gstAmt = parseFloat(this.ngForm.controls['gst_amt'].value || 0);
+    const gstGstAmt = parseFloat(this.ngForm.controls['gstGst_amt'].value || 0);
+
+    const grandTotalAmt = parseFloat(this.ngForm.controls['grand_total_amt'].value || 0);
+  
+    const total = 
+      (mouAmt + (mouAmt * mouGstAmt) / 100) +
+      (licenceAmt + (licenceAmt * licenceGstAmt) / 100) +
+      (ppvAmt + (ppvAmt * ppvGstAmt) / 100) +
+      (rltAmt + (rltAmt * rltGstAmt) / 100) +
+      ((gstAmt * gstGstAmt) / 100) +
+      (grandTotalAmt);
+      this.ngForm.controls['final_grand_total_amt'].setValue(total.toFixed(2));
+  }
+
+  onDeSelectAll(){
+    this.visibleMouCharges = false;
+    this.visibleLicenceCharges = false;
+    this.visibleppvCharges = false;
+    this.visiblerltCharges = false;
+    this.visibleGstCharges = false;
+    this.ngForm.controls['selectedCharges'].reset();
+    this.ngForm.controls['mou_amt'].reset();
+    this.ngForm.controls['mougst_amt'].reset();
+    this.ngForm.controls['mougst_amt_total'].reset();
+    this.ngForm.controls['licence_amt'].reset();
+    this.ngForm.controls['licencegst_amt'].reset();
+    this.ngForm.controls['licencegst_amt_total'].reset();
+    this.ngForm.controls['ppv_amt'].reset();
+    this.ngForm.controls['ppvgst_amt'].reset();
+    this.ngForm.controls['ppvgst_amt_total'].reset();
+    this.ngForm.controls['rlt_amt'].reset();
+    this.ngForm.controls['rltgst_amt'].reset();
+    this.ngForm.controls['rltgst_amt_total'].reset();
+    this.ngForm.controls['gstGst_amt'].reset();
+    this.ngForm.controls['gst_amt_total'].reset();
   }
 
   onItemSelect(item: any) {
@@ -516,7 +556,6 @@ this.ngForm.controls['spa_array'].valueChanges.subscribe(newValue => {
     }
   }
   
-  
   onSelectAll(items: any) {
     this.visibleMouCharges = true
     this.visibleLicenceCharges = true;
@@ -543,7 +582,7 @@ this.ngForm.controls['spa_array'].valueChanges.subscribe(newValue => {
   fetchInviceData() {
     if (this.spaBagList) {
       for (let i = 0; i < this.spaBagList.length; i++) {
-        if (this.ngForm.controls['bag_details'].value.length > 1) {
+        if (this.ngForm.controls['bag_details'].value.length > 0) {
           this.remove(i);
         }
         this.addMore(i);
@@ -560,7 +599,6 @@ this.ngForm.controls['spa_array'].valueChanges.subscribe(newValue => {
     }
   }
 
-
   sumValue(event: any, index: number) {
     const controls = this.ngForm.controls['bag_details']['controls'][index].controls;
     const noOfBag = controls['no_of_bag'].value;
@@ -575,9 +613,7 @@ this.ngForm.controls['spa_array'].valueChanges.subscribe(newValue => {
     this.ngForm.controls['grand_total_amt'].setValue(sumOfTotal);
     this.ngForm.controls['gst_amt'].setValue(sumOfTotal)
   }
-  
- 
-  
+
   initSearchAndPagination() {
     if (this.paginationUiComponent === undefined) {
       setTimeout(() => {
@@ -628,38 +664,15 @@ this.ngForm.controls['spa_array'].valueChanges.subscribe(newValue => {
     return <FormArray>this.ngForm.get('bsp2Arr');
   }
 
-
   get items(): FormArray {
     return this.ngForm.get('bsp2Arr') as FormArray;
   }
   
-  // createInvoice( ) {
-  //   this.visibleForm = true;
-  //   this.fetchInviceData(); 
-  // }
-  // createInvoice(  ) {
-  //   this.visibleForm = true;
-  //   this.fetchInviceData();
-
-  //   // this.selectedRowData = rowData;
-  // }
-   // Function to navigate to the invoice component with encrypted ID
-   navigateToInvoice(data: any, item:any) {
-    // navigateToInvoice(id: any, spa_code:any) {
-
-    // const spa_code=item && item.spa_code ? item.spa_code :'';
+  navigateToInvoice(data: any, item:any) {
     const id = data && data.id ? data.id :'';
-    // Encrypt the ID
-    // let userId = this.currentUserId;
-
- 
-    console.log("11111111111111111--------",id)
-    
-    const encryptedForm = CryptoJS.AES.encrypt(JSON.stringify({ id }), this.AESKey).toString();
+    const encryptedForm = CryptoJS.AES.encrypt(JSON.stringify({ id }), 'a-343%^5ds67fg%__%add').toString();
     const encryptedData = encodeURIComponent(encryptedForm);
-
-    // Navigate to the invoice component with encrypted ID as parameter
-       this.router.navigate(['/generate-invoices', encryptedData ]);
+    this.router.navigate(['/generate-invoices', encryptedData ]);
   }
 
   createInvoice(data: any,indenterData: any, spaData: any) {
@@ -730,65 +743,6 @@ this.ngForm.controls['spa_array'].valueChanges.subscribe(newValue => {
       }
     });
   }
-  // generateInvoiceData() {
-  //   let param = this.ngForm.value;
-  //   param.parental_line = this.parental_line ? this.parental_line : '';
-  //   param.indentor_id = this.indentor_id ? this.indentor_id : '';
-  //   param.spa_code = this.spa_code ? this.spa_code : '';
-  //   param.state_code = this.state_code ? this.state_code : '';
-  //   param.variety_code = this.variety_code ? this.variety_code : '';
-  //   param.receipt_id = this.receipt_id ? this.receipt_id : '';
-    
-  //   let bspData = [];
-  //   let bagweightData = [];
-  //   let bspcs = param && param.bag_details ? param.bag_details : '';
-
-  //   if (bspcs && bspcs.length > 0) {
-  //     bspcs.forEach(el => {
-  //       bspData.push(el && el.spa_no_of_bag ? el.spa_no_of_bag : 0);
-  //     });
-  //     bspcs.forEach(el => {
-  //       bagweightData.push(el && el.spa_packages_size ? el.spa_packages_size : 0);
-  //     });
-  //   }
-
-  //   const sum = bspData.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
-  //   param.bagweightData = bagweightData && bagweightData.length > 0 ? bagweightData.toString() : 0;
-  //   param.totalbags = sum;
-  //   param.user_id = this.currentUserId;
-  //   param.final_grand_total_amt = param && param.final_grand_total_amt == null ? param.grand_total_amt : param.final_grand_total_amt;
-
-  //   this.productionService
-  //     .postRequestCreator("save-generate-invoice", param)
-  //     .subscribe((apiResponse: any) => {
-  //       if (apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.status_code
-  //         && apiResponse.EncryptedResponse.status_code == 200) {
-
-  //         // Store the response data (bag details) to a variable
-  //         this.spaData = apiResponse.EncryptedResponse.data; // assuming data contains bag details
-
-  //         Swal.fire({
-  //           title: '<p style="font-size:25px;">Data Has Been Successfully Saved.</p>',
-  //           icon: 'success',
-  //           confirmButtonText: 'OK',
-  //           confirmButtonColor: '#E97E15'
-  //         }).then(x => {
-  //           this.visibleForm = false;
-  //           this.getPageData();
-  //         });
-  //       } else {
-  //         // Clear the data if the response is not successful
-  //         this.spaData = null;
-  //         Swal.fire({
-  //           title: '<p style="font-size:25px;">Something Went Wrong.</p>',
-  //           icon: 'error',
-  //           confirmButtonText: 'OK',
-  //           confirmButtonColor: '#E97E15'
-  //         });
-  //       }
-  //     });
-  // }
-
 
   displayRowData(data: any, spaData: any) {
     this.selectedRowData = {
@@ -802,6 +756,29 @@ this.ngForm.controls['spa_array'].valueChanges.subscribe(newValue => {
 
   cancel() {
     this.visibleForm = false;
+    this.visibleMouCharges = false;
+    this.visibleLicenceCharges = false;
+    this.visibleppvCharges = false;
+    this.visiblerltCharges = false;
+    this.visibleGstCharges = false;
+    this.ngForm.controls['selectedCharges'].reset();
+    this.ngForm.controls['bag_details'].reset();
+    this.ngForm.controls['mou_amt'].reset();
+    this.ngForm.controls['mougst_amt'].reset();
+    this.ngForm.controls['mougst_amt_total'].reset();
+    this.ngForm.controls['licence_amt'].reset();
+    this.ngForm.controls['licencegst_amt'].reset();
+    this.ngForm.controls['licencegst_amt_total'].reset();
+    this.ngForm.controls['ppv_amt'].reset();
+    this.ngForm.controls['ppvgst_amt'].reset();
+    this.ngForm.controls['ppvgst_amt_total'].reset();
+    this.ngForm.controls['rlt_amt'].reset();
+    this.ngForm.controls['rltgst_amt'].reset();
+    this.ngForm.controls['rltgst_amt_total'].reset();
+    this.ngForm.controls['gst_amt'].reset();
+    this.ngForm.controls['gstGst_amt'].reset();
+    this.ngForm.controls['gst_amt_total'].reset();
+    this.ngForm.controls['final_grand_total_amt'].reset();
   }
 
   cgClick() {
@@ -818,6 +795,7 @@ this.ngForm.controls['spa_array'].valueChanges.subscribe(newValue => {
     // this.ngForm.controls['crop_name'].setValue('')
     this.crop_text_check = 'crop_group'
   }
+
   cropdatatext() {
     this.cropNameSecond;
     console.log(' this.cropNameSecond;', this.cropNameSecond);

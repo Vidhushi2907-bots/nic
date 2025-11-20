@@ -1,0 +1,586 @@
+:root {
+    font-family: 'Inter', sans-serif;
+}
+
+@supports (font-variation-settings: normal) {
+    :root {
+        font-family: 'Inter var', sans-serif;
+    }
+}
+
+.main-inventory {
+    background-color: #FFFFFF;
+    border: 1px #D2D2D2;
+    /* width: 1540px;
+          height: 999px;
+          top: 142px;
+          left: 330px; */
+    border-radius: 10px;
+    /* border: 1px; */
+    margin: .5%;
+    padding: 1.5%;
+}
+
+.form-button.search {
+    /* width: auto !important; */
+    align-items: center !important;
+    height: 38px !important;
+    background: #B64B1D;
+    font-size: 16px;
+}
+
+.card-inventory {
+    /* width: 1492px;
+          height: 382px;
+          top: 206px;
+          left: 360px; */
+    border-radius: 10px;
+    background: #B64B1D0D;
+
+}
+
+.label-inventory {
+    font-family: Inter;
+    font-size: 16px;
+    font-weight: 500;
+    /* font-weight: 500;
+          line-height: 19px; */
+    letter-spacing: 0em;
+    text-align: left;
+    color: #1C1C1C;
+    /* font-family: Inter;
+          font-size: 16px;
+          font-weight: 500;
+          line-height: 19px;
+          letter-spacing: 0em;
+          text-align: left;
+          color: #1C1C1C; */
+    /* linear-gradient(0deg, #1C1C1C, #1C1C1C); */
+    /* linear-gradient(0deg, #FF0000, #FF0000); */
+}
+
+.input-inventory {
+    /* border: 1px solid #A1A1A1; */
+    border: 1px solid #B64B1D !important;
+    /* background: linear-gradient(0deg, #A2A2A2, #A2A2A2),
+              linear-gradient(0deg, #FFFFFF, #FFFFFF);
+          width: 420px;
+          height: 43px;
+          top: 254px;
+          left: 372px; */
+    /* border-radius: 8px; */
+}
+
+.btn-inventory {
+    /* width: Hug (135px);
+          height: Hug (43px); */
+    /* top: 254px;
+          left: 1705px;
+          padding: 12px, 41px, 12px, 41px; */
+    /* border-radius: 6px; */
+    /* gap: 10px; */
+    background: #B64B1D;
+}
+
+.form-control {
+    border-color: 2px solid #B64B1D;
+}
+
+.btn-inventory-text {
+    color: #FFFFFF;
+}
+
+
+
+.radio-button {
+    width: 25px;
+    height: 25px;
+}
+
+input[type='radio'] {
+    accent-color: #d7720f;
+    top: -6px;
+    left: 12px;
+}
+
+/*start  table css  */
+.data-row-header {
+    background: #B64B1D 0% 0% no-repeat padding-box;
+    border-top-right-radius: 15px;
+    border-top-left-radius: 15px;
+    margin: 0.2%;
+    /* padding: 2%; */
+}
+
+.data-row-header * {
+    font: normal Poppins 600 15px/19px;
+    font-weight: 500;
+    letter-spacing: 0px;
+    color: #FFFFFF;
+}
+
+.data-row {
+    border: 1px solid #dcdcdc;
+    border-top: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    /* border-style: dotted; */
+    background-color: #FFFFFF;
+    margin: 0.2%;
+    margin-bottom: none !important;
+}
+
+.errorMessage {
+    font-size: 1rem;
+    font-weight: 400;
+    text-align: left;
+    line-height: 1.5;
+}
+
+.data-row * {
+    /* font-family: Inter; */
+    font-weight: 500 !important;
+    font-size: 16px;
+    text-align: left;
+    font: normal Poppins 15px/18px;
+    letter-spacing: 0px;
+    color: #000000;
+}
+
+.list-action-buttons-second,
+.list-action-buttons-second:focus,
+.list-action-buttons-second:active {
+    width: 32px;
+    /* height: 39px; */
+    height: 35px;
+    outline: none;
+    border: none !important;
+    fill: #B64B1D !important;
+    cursor: pointer;
+}
+
+.heading {
+    font: normal Poppins 600 15px/19px;
+    font-weight: 500;
+    letter-spacing: 0px;
+    color: #FFFFFF;
+}
+
+.btn-inventory-cancel {
+    background: rgba(182, 75, 29, 0.05);
+    color: #B64B1D;
+    border-radius: 5px;
+    outline: none !important;
+    font-size: 16px;
+    width: 158px;
+    height: 41px;
+}
+
+.disableButton {
+    background-color: #afb7bb !important;
+    cursor: none;
+    border-radius: 4px;
+}
+
+.heading:first-child {
+    border-top-left-radius: 15px;
+    border-top: 7px;
+    border-bottom: 5px;
+    /* border: 2px solid  #B64B1D; */
+    /* border-top-right-radius: 50%; */
+}
+
+.clear-form-button {
+    height: 41px !important;
+}
+
+.heading:last-child {
+    border-top: 7px;
+    border-bottom: 5px;
+    /* border-bottom-left-radius: 15px; */
+    border-top-right-radius: 15px;
+    /* border: 2px solid  #B64B1D; */
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    color: rgba(0, 0, 0, 0);
+    opacity: 1;
+    display: block;
+    /* background: url('../../../assets/images/calendar.svg') no-repeat; */
+    width: 20px;
+    height: 20px;
+    border-width: thin;
+}
+
+/* for 150%  */
+
+@media only screen and (width: 1233.33px) {
+    .main-inventory {
+        zoom: 1.0;
+    }
+}
+
+/* for 175%  */
+
+@media only screen and (width: 1057.14px) {
+    .main-inventory {
+        zoom: 0.9;
+    }
+}
+
+/* for 125% */
+@media only screen and (width: 1480px) {
+    .main-inventory {
+        zoom: 0.9;
+    }
+}
+
+.form-group {
+    margin-bottom: 0.5rem !important;
+}
+
+.nowrap {
+    white-space: nowrap !important;
+}
+
+.form-button {
+    /* width: inherit !important; */
+    height: 44px !important;
+}
+
+.label-inventory-v2 {
+    font-family: Inter;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0em;
+    text-align: left;
+    color: #1C1C1C;
+    white-space: nowrap !important;
+
+}
+
+.list-action-buttons-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-left: 0px !important;
+}
+
+@media only screen and (width: 1057.14px) {
+    .scrollable-content {
+        zoom: 0.7;
+    }
+}
+
+.table {
+    margin-bottom: 0rem !important;
+}
+
+@media only screen and (max-width: 500px) {
+    .btn-inventory-cancel {
+        width: 240px;
+        align-items: center;
+        margin-left: 0px !important;
+    }
+}
+
+.classtext {
+    font-size: 15px;
+
+}
+
+tr td {
+    font-weight: normal !important;
+    font-size: 14px !important;
+    /* border: none; */
+    text-align: center !important;
+    vertical-align: top !important;
+    white-space: pre-wrap;
+    overflow-wrap: break-word !important;
+    word-wrap: break-word !important;
+    word-break: break-word !important;
+    padding-top: 0;
+}
+
+tr th {
+    vertical-align: top !important;
+    text-align: center !important;
+    vertical-align: top !important;
+    white-space: pre-wrap;
+    overflow-wrap: break-word !important;
+    word-wrap: break-word !important;
+    word-break: break-word !important;
+    padding-top: 0;
+}
+
+tbody {
+    background-color: white;
+
+}
+
+.bagMarka {
+    pointer-events: none;
+    background-color: #e9ecef;
+}
+
+.not_dates {
+    /* background: url('../../../assets/images/calendar.svg') no-repeat; */
+    /* background: #FFFFFF url(Layer\ 93.bb00de6fa7ad1a9d.svg)no-repeat padding-box 95%; */
+    /* width: 12em; */
+    border-width: thin;
+    opacity: 1;
+    display: block;
+    padding-right: 18px;
+    color: rgba(0, 0, 0, 0);
+}
+
+@media screen and (max-width: 1100px) {
+    tr th {
+        white-space: pre !important;
+    }
+
+    .files {
+        display: contents !important;
+    }
+}
+
+.generateClass {
+    min-width: 176px !important;
+    white-space: pre;
+}
+
+@media screen and (min-width: 1100px) {
+    .filtertext {
+        white-space: pre;
+    }
+
+
+}
+
+.label-inventory-v2 {
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0em;
+    text-align: left;
+    color: #1C1C1C;
+    /* white-space: nowrap !important; */
+
+}
+
+.files {
+    display: contents !important;
+}
+
+.filtertext {
+    font-size: 16px;
+    font-weight: 450;
+}
+
+.card {
+    height: 100%;
+}
+
+.datalist {
+    font-size: 15px;
+    font-weight: 400;
+}
+
+.card-title {
+    font-size: 18px;
+    color: orange;
+}
+
+.tabledata {
+    background: orange;
+
+}
+
+.tabledata th {
+    color: white;
+}
+
+.tableheading {
+    font-size: 16px;
+    font-weight: 450;
+}
+
+.btn-inventorys {
+    /* width: 158px !important; */
+    background: #B64B1D;
+    height: 41px !important;
+    align-items: center !important;
+    /* height: 38px !important; */
+    /* background: #B64B1D; */
+    font-size: 16px;
+    border-radius: 5px;
+
+
+
+}
+
+.btn-inventory-cancel {
+    /* border: 1px solid #B64B1D; */
+    /* background: #B64B1D; */
+    background: rgba(182, 75, 29, 0.05);
+    color: #B64B1D;
+    border-radius: 5px;
+    outline: none !important;
+    /* border: none !important; */
+    width: 158px;
+    height: 41px;
+    /* border: 2px #B64B1D; */
+    /* background: transparent; */
+}
+
+.centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    /* This ensures the card is centered vertically */
+}
+
+.tagCard {
+    background-color: #fed16c !important;
+    height: 100%;
+    width: 170%;
+}
+
+.left-logo-img {
+    height: 1cm;
+    width: 1cm;
+}
+
+.diveder-image {
+    width: 140px;
+}
+
+.divider {
+    margin-top: -25px;
+}
+
+.heading {
+    font-size: 14px;
+    /* font-weight: bold; */
+    text-align: center;
+    color: #000000;
+}
+
+.class-of {
+    margin-top: -15px;
+    font-weight: 450;
+    font-size: 14px;
+    color: #000000;
+
+}
+
+.first {
+    border: none;
+    border-bottom: 1px dashed black;
+    width: 147px !important;
+}
+
+.second {
+    border: none;
+    border-bottom: 1px dashed black;
+}
+
+input {
+    border: none;
+    /* background-color: #fed16c ; */
+    /* Add a bottom border */
+    border-bottom: 1px solid black;
+    /* You can change the color and size as needed */
+}
+
+input[type=text]:focus {
+    outline: none;
+}
+
+.form-button.searches {
+    /* width: auto !important; */
+    align-items: center !important;
+    height: 38px !important;
+    background: #B64B1D;
+    font-size: 16px;
+}
+
+@media screen and (min-width: 1101px) {
+    .btn-inventorys {
+        /* width: 158px !important; */
+        background: #B64B1D;
+        height: 41px !important;
+        /* margin-left: -2em!important;e */
+    }
+}
+
+.first {
+    background: #fed16c !important;
+}
+
+.second {
+    background: #fed16c !important;
+}
+
+.qrcod {
+    background: #fed16c !important;
+}
+
+.form-check-input {
+    width: 25px;
+    height: 21px;
+}
+
+.form-check-label {
+    font-size: 16px;
+}
+
+.disableField {
+    pointer-events: none;
+    background-color: gainsboro;
+    cursor: none;
+}
+
+.list-action-buttons-second,
+.list-action-buttons-second:focus,
+.list-action-buttons-second:active {
+    /* width: 32px; */
+    /* height: 39px; */
+    height: 35px;
+    outline: none;
+    border: none !important;
+    /* fill: #B64B1D !important; */
+    background: none;
+    cursor: pointer;
+}
+
+.list-action-buttons-second,
+.list-action-buttons-second:focus,
+.list-action-buttons-second:active {
+    width: 32px;
+    /* height: 39px; */
+    height: 35px;
+    outline: none;
+    border: none !important;
+    fill: #B64B1D !important;
+    cursor: pointer;
+}
+
+.form-button-second {
+    background: gainsboro !important;
+    color: #1C1C1C !important;
+    height: 38px !important;
+    border-radius: 5px !important;
+    pointer-events: none !important;
+    border: none!important;
+    box-shadow: none!important;
+    outline: none!important;
+}
+
+.estimate {
+    font-size: 16px!important;
+    font-weight: 500!important;
+    color: #B64B1D!important;
+}
+.gridspace{
+    min-width:11em;
+}

@@ -15,7 +15,7 @@ import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { IndenterService } from 'src/app/services/indenter/indenter.service';
 import { MasterService } from 'src/app/services/master/master.service';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+//pdfMake.vfs = pdfFonts.pdfMake.vfs;
 @Component({
   selector: 'app-generated-label-numbers',
   templateUrl: './generated-label-numbers.component.html',

@@ -11,7 +11,7 @@ import * as XLSX from 'xlsx';
 import * as html2pdf from 'html2pdf.js';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+//pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as html2PDF from 'html2pdf.js';
 import { environment } from 'src/environments/environment';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -106,6 +106,9 @@ export class BillReceiptComponent implements OnInit {
   user_id: any;
   payment_method_no: any;
   encryptedId: any;
+  totalAfterApplyGst: any;
+  grandTotal: number;
+  GSt1: any;
   selectTable(table: string) {
     this.selectedTable = table;
   }
@@ -114,17 +117,23 @@ export class BillReceiptComponent implements OnInit {
     { id: 2, charges: "License fee" },
     { id: 3, charges: "PPV fee" },
     { id: 4, charges: "Royalty" },
-    { id: 5, charges: "Other" },
+    { id: 5, charges: "Transportation" },
+    { id: 6, charges: "Postage" },
+    { id: 7, charges: "Packing" },
+    { id: 8, charges: "Other" },
   ];
+  formattedDate: string;
   constructor(private service: SeedServiceService, private fb: FormBuilder, private http: HttpClient,
     private route: ActivatedRoute,
     private router: Router, private _productionCenter: ProductioncenterService) {
     this.liftingRecieptData = this._productionCenter && this._productionCenter.liftingData ? this._productionCenter.liftingData : "";
     console.log('liftingRecieptData====', this.liftingRecieptData)
+    const now = new Date();
+    this.formattedDate = this.formatDate(now);
     this.createForm();
   }
   openPrintBillDialog(): void {
-    this.router.navigate(['/lifting']);
+    this.router.navigate(['/self-surplus-lifting']);
   }
 
 
@@ -207,7 +216,7 @@ export class BillReceiptComponent implements OnInit {
   getBillPrintData(id) {
     const param = {
       search: {
-        id: this.encryptedData
+        id: this.decryptedId
       }
     }
     this._productionCenter.postRequestCreator('get-bill-print-data', param).subscribe(data => {
@@ -222,11 +231,28 @@ export class BillReceiptComponent implements OnInit {
         this.payment_method_no = val && val[0] && val[0].payment_method_no ? val[0].payment_method_no : '';
       }
       this.liftingDataValue = dataList ? dataList : [];
+      this.GSt1 = dataList && dataList[0] && dataList[0].gst   
+      console.log('gst===', this.GSt1);
       let additionalCharges =liftingCharges.filter(item => item.lifting_details_id == id)
         console.log('additionalCharges===', additionalCharges);
-        this.liftingAdditionalChargesValue = additionalCharges
-      // this.getRecieptAdditionalCharge(this.liftingDataValue[0].id);
+       // Calculate the total of after_apply_gst
+      const totalAfterApplyGst = additionalCharges.reduce((total, charge) => total + (charge.after_apply_gst || 0), 0);
+      console.log('Total after_apply_gst:', totalAfterApplyGst);
 
+      this.liftingAdditionalChargesValue = additionalCharges;
+      this.totalAfterApplyGst = totalAfterApplyGst; // Save the total for display or further use
+
+      // this.getRecieptAdditionalCharge(this.liftingDataValue[0].id);
+      console.log('totalAfterApplyGst', totalAfterApplyGst)
+
+          // Calculate the sum of `total_price` from `dataList`
+      const totalPriceSum = dataList.reduce((sum, item) => sum + (item.total_price || 0), 0);
+      console.log('Total total_price:', totalPriceSum);
+
+      // Add the two totals together
+      const grandTotal = totalPriceSum - totalAfterApplyGst; 
+      this.grandTotal = grandTotal;
+      console.log('Grand Total (total_price - after_apply_gst):', grandTotal);
       console.log('dataaa', data)
     })
   }
@@ -360,6 +386,16 @@ export class BillReceiptComponent implements OnInit {
       }
     };
     html2PDF().set(options).from(element).toPdf().save();
+  }
+  formatDate(date: Date): string {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
   }
 }
 

@@ -11,7 +11,7 @@ import * as XLSX from 'xlsx';
 import * as html2pdf from 'html2pdf.js';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+// //pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as html2PDF from 'html2pdf.js';
 import { environment } from 'src/environments/environment';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -111,6 +111,10 @@ export class BillReceiptQrComponent implements OnInit {
   crop_code: any;
   user_id: any;
   payment_method_no: any;
+  GSt1: any;
+  totalAfterApplyGst: any;
+  grandTotal: number;
+  formattedDate: any;
   selectTable(table: string) {
     this.selectedTable = table;
   }
@@ -126,9 +130,20 @@ export class BillReceiptQrComponent implements OnInit {
     private router: Router ,private _productionCenter:ProductioncenterService) {
     this.liftingRecieptData = this._productionCenter && this._productionCenter.liftingData ? this._productionCenter.liftingData : "";
     console.log('liftingRecieptData====',this.liftingRecieptData)
-    
+    const now = new Date();
+    this.formattedDate = this.formatDate(now);
     this.createForm(); 
   } 
+  formatDate(date: Date): string {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+  }
   openPrintBillDialog(): void { 
     this.router.navigate(['/lifting']);
   }
@@ -212,26 +227,69 @@ export class BillReceiptQrComponent implements OnInit {
     this.getRecieptLiftingData();
     this.getBillPrintData(this.decryptedId)
   } 
-  getBillPrintData(id){
-    const param={
-      search:{
-        id:id
+  // getBillPrintData(id){
+  //   const param={
+  //     search:{
+  //        id: id
+  //     }
+  //   }
+  //   this._productionCenter.postRequestCreator('get-bill-print-data1',param).subscribe(data=>{
+  //     let res = data && data.EncryptedResponse && data.EncryptedResponse.data ?  data.EncryptedResponse.data:'';
+  //     let val = res && res.data ? res.data :'';
+  //     this.liftingbspcData = res && res.liftingbspcData ? res.liftingbspcData[0] :'';
+  //     this.spaDetails = res && res.spaDetails ? res.spaDetails[0] :'';
+  //     if(val && val.length>0){
+  //       this.billNo= val && val[0] && val[0].lifting_bill_no ? val[0].lifting_bill_no:'';
+  //       this.payment_method_no=val && val[0] && val[0].payment_method_no ? val[0].payment_method_no:'';
+  //     }
+  //     console.log('dataaa',data)
+  //   })
+  // }
+  getBillPrintData(id) {
+    const param = {
+      search: {
+        id: id
       }
     }
-    this._productionCenter.postRequestCreator('get-bill-print-data',param).subscribe(data=>{
-      let res = data && data.EncryptedResponse && data.EncryptedResponse.data ?  data.EncryptedResponse.data:'';
-      let val = res && res.data ? res.data :'';
-      this.liftingbspcData = res && res.liftingbspcData ? res.liftingbspcData[0] :'';
-      this.spaDetails = res && res.spaDetails ? res.spaDetails[0] :'';
-      if(val && val.length>0){
-        this.billNo= val && val[0] && val[0].lifting_bill_no ? val[0].lifting_bill_no:'';
-        this.payment_method_no=val && val[0] && val[0].payment_method_no ? val[0].payment_method_no:'';
+    this._productionCenter.postRequestCreator('get-bill-print-data1', param).subscribe(data => {
+      let res = data && data.EncryptedResponse && data.EncryptedResponse.data ? data.EncryptedResponse.data : '';
+      let dataList = res && res.dataList ? res.dataList : '';
+      let liftingCharges = res && res.liftingCharges ? res.liftingCharges :'';
+      let val = res && res.data ? res.data : '';
+      this.liftingbspcData = res && res.liftingbspcData ? res.liftingbspcData[0] : '';
+      this.spaDetails = res && res.spaDetails ? res.spaDetails[0] : '';
+      if (val && val.length > 0) {
+        this.billNo = val && val[0] && val[0].lifting_bill_no ? val[0].lifting_bill_no : '';
+        this.payment_method_no = val && val[0] && val[0].payment_method_no ? val[0].payment_method_no : '';
       }
-      console.log('dataaa',data)
+      this.liftingDataValue = dataList ? dataList : [];
+      this.GSt1 = dataList && dataList[0] && dataList[0].gst   
+      console.log('gst===', this.GSt1);
+      let additionalCharges =liftingCharges.filter(item => item.lifting_details_id == id)
+        console.log('additionalCharges===', additionalCharges);
+       // Calculate the total of after_apply_gst
+      const totalAfterApplyGst = additionalCharges.reduce((total, charge) => total + (charge.after_apply_gst || 0), 0);
+      console.log('Total after_apply_gst:', totalAfterApplyGst);
+
+      this.liftingAdditionalChargesValue = additionalCharges;
+      this.totalAfterApplyGst = totalAfterApplyGst; // Save the total for display or further use
+
+      // this.getRecieptAdditionalCharge(this.liftingDataValue[0].id);
+      console.log('totalAfterApplyGst', totalAfterApplyGst)
+
+          // Calculate the sum of `total_price` from `dataList`
+      const totalPriceSum = dataList.reduce((sum, item) => sum + (item.total_price || 0), 0);
+      console.log('Total total_price:', totalPriceSum);
+
+      // Add the two totals together
+      const grandTotal = totalPriceSum - totalAfterApplyGst; 
+      this.grandTotal = grandTotal;
+      console.log('Grand Total (total_price - after_apply_gst):', grandTotal);
+      console.log('dataaa', data)
     })
   }
   getRecieptLiftingData(){
-    let route = 'get-lifting-data';
+    let route = 'get-lifting-data1';
     let user = localStorage.getItem('BHTCurrentUser');
     let userData =  JSON.parse(user);
     let userId = userData && userData.id  ? userData.id:'';

@@ -125,7 +125,7 @@
                 <div class="col-12 mt-2" *ngIf="showGrid">
                     <div class="row card-inventory form-group">
                         <div *ngIf="tableData && tableData.length>0"
-                            class="col-12 mt-2 pt-2 col-md-12 col-lg-12 float-right" >
+                            class="col-12 mt-2 pt-2 col-md-12 col-lg-12 float-right">
                             <div class="col-12 pl-0">
                                 <div class="row">
                                     <div class="col-lg-4 col-12 d-xl-flex d-lg-flex ">
@@ -155,13 +155,16 @@
                                                 total_processed_qty_second_value?(total_processed_qty_second_value | number : '1.2-2'):'NA'
                                             }} -->
                                             {{total_processed_qty ?
-                                                (total_processed_qty | number : '1.2-2'):total_processed_qty_second_value?(total_processed_qty_second_value | number : '1.2-2'):'NA'}}
+                                            (total_processed_qty | number :
+                                            '1.2-2'):total_processed_qty_second_value?(total_processed_qty_second_value
+                                            | number : '1.2-2'):'NA'}}
                                             <!-- {{totalBreederAvailable ? (totalBreederAvailable | number : '1.2-2'):''}} -->
                                         </span>
                                     </div>
                                     <div class="col-lg-4 col-12  d-xl-flex d-lg-flex  justify-content-center">
                                         <label class="label-inventory-v2 ">Total Breeder Seed Produced:&nbsp;</label>
-                                        <span style="font-size: 16px;">{{totalBreederAvailable ? (totalBreederAvailable | number : '1.2-2'):'NA'}}</span>
+                                        <span style="font-size: 16px;">{{totalBreederAvailable ? (totalBreederAvailable
+                                            | number : '1.2-2'):'NA'}}</span>
                                     </div>
                                     <div class="col-lg-4 col-12  d-xl-flex d-lg-flex  justify-content-end">
                                         <label class="label-inventory-v2 ">Total Carry Over Quantity:&nbsp;</label>
@@ -197,178 +200,271 @@
 
                         <div class="col-12 pt-3 d-none">
                             <div class="row data-row" id="pdf-tables">
-                            
+
                                 <table class="table table-responsive" formArrayName="bspc">
                                     <thead>
                                         <tr class="data-row-header">
                                             <td scope="col"
-                                            class="col-md-2 py-2 text-white  verticle-content-middle heading datalist"> Year: {{ngForm.controls['year'].value ||
+                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist">
+                                                Year: {{ngForm.controls['year'].value ||
                                                 'NA'}}-{{(ngForm.controls['year'].value-2000)+1 || 'NA'}}</td>
-        
+
                                             <td scope="col"
-                                            class="col-md-2 py-2 text-white  verticle-content-middle heading datalist">Season :
+                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist">
+                                                Season :
                                                 {{(!ngForm.controls['season'].value?'NA':
                                                 ngForm.controls['season'].value && ngForm.controls['season'].value=='R'
                                                 ?'Rabi' : ngForm.controls['season'].value=='K'? 'Kharif' :'Other') ||
                                                 'NA'}}</td>
-        
-                                            <td scope="col"
-                                            class="col-md-2 py-2 text-white  verticle-content-middle heading datalist">Crop Name :
-                                                {{selectCrop || 'NA'}}
-        
-                                            </td>
-                                           <td  scope="col"
-                                           class="col-md-2 py-2 text-white  verticle-content-middle heading datalist">
 
-                                           </td>
                                             <td scope="col"
-                                            class="col-md-2 py-2 text-white  verticle-content-middle heading datalist">As on Date :
-                                                {{today | date:"dd-MM-YYYY"}}
-        
+                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist">
+                                                Crop Name :
+                                                {{selectCrop || 'NA'}}
+
                                             </td>
-                                          
-                                            
                                             <td scope="col"
-                                            class="col-md-2 py-2 text-white  verticle-content-middle heading datalist">Unit :
+                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist">
+
+                                            </td>
+                                            <td scope="col"
+                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist">
+                                                As on Date :
+                                                {{today | date:"dd-MM-YYYY"}}
+
+                                            </td>
+
+
+                                            <td scope="col"
+                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist">
+                                                Unit :
                                                 {{(!ngForm.controls['crop'].value?'NA':
                                                 ngForm.controls['crop'].value &&
                                                 ( ngForm.controls['crop'].value.substring(0,1))=='H' ?'Kg' :
                                                 (ngForm.controls['crop'].value.substring(0,1))=='A'? 'Qt' :'NA') ||
                                                 'NA'}}
-        
+
                                             </td>
-                                            
-        
-                                        </tr>
-                                      </thead>
-                                    <thead>
 
-                                        <tr class="data-row-header">
-
-                                            <th scope="col"
-                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist">
-                                                Variety
-                                            </th>
-                                            <th scope="col"
-                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist">
-                                                Carry Over
-                                            </th>
-                                            <th scope="col"
-                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist">
-                                                Breeder Seed Produced
-                                            </th>
-                                            <th scope="col"
-                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist ">
-                                                Total Breeder Seed Available
-                                            </th>
-                                            <th scope="col"
-                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist">
-                                                Target Quantity (National)
-                                            </th>
-                                            <th scope="col"
-                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist">
-                                                Target Quantity (Direct/Additional)
-                                            </th>
-                                            <th scope="col"
-                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist"
-                                                style="min-width: 9em;">
-                                                Allocate Quantity for National Target
-
-                                            </th>
 
                                         </tr>
                                     </thead>
-
-                                    <tbody class="table-bordered">
-                                        <ng-container *ngFor="let data of bspc.controls; let i=index">
-
-                                            <tr [formGroupName]="i">
-                                                <td class="datalist pt-3">
-                                                    {{
-                                                    ngForm.controls['bspc']['controls'][i].controls['variety_name'] &&
-                                                    ngForm.controls['bspc']['controls'][i].controls['variety_name'].value
-                                                    ?
-                                                    ngForm.controls['bspc']['controls'][i].controls['variety_name'].value
-                                                    :''}}
-
-                                                    <br>
-                                                    <span
-                                                        *ngIf=" ngForm.controls['bspc']['controls'][i].controls['line_variety_name'].value">Parental
-                                                        Line: <b style="font-weight: bold !important;">
-                                                            {{ngForm.controls['bspc']['controls'][i].controls['line_variety_name']
-                                                            &&
-                                                            ngForm.controls['bspc']['controls'][i].controls['line_variety_name'].value
-                                                            ?
-                                                            ngForm.controls['bspc']['controls'][i].controls['line_variety_name'].value
-                                                            :"NA"}}
-                                                        </b></span>
-                                                </td>
-                                                <td class="datalist pt-3">
-                                                    {{ngForm.controls['bspc']['controls'][i].controls['total_carry_over_qty']
-                                                    &&
-                                                    ngForm.controls['bspc']['controls'][i].controls['total_carry_over_qty'].value
-                                                    ?
-                                                    (ngForm.controls['bspc']['controls'][i].controls['total_carry_over_qty'].value
-                                                    | number : '1.2-2'):'0'}}
-                                                </td>
-
-                                                <td class="datalist pt-3">
-                                                    {{ngForm.controls['bspc']['controls'][i].controls['breeder_seed_produced']
-                                                    &&
-                                                    ngForm.controls['bspc']['controls'][i].controls['breeder_seed_produced'].value
-                                                    ?
-                                                    ngForm.controls['bspc']['controls'][i].controls['breeder_seed_produced'].value:'0'}}
-                                                </td>
-                                                <td class="datalist pt-3">
-                                                    <!-- <span > -->
-                                                    {{(ngForm.controls['bspc']['controls'][i].controls['breeder_seed_produced'].value
-                                                    +
-                                                    ngForm.controls['bspc']['controls'][i].controls['total_carry_over_qty'].value
-                                                    | number : '1.2-2') }}
-                                                    <!-- </span> -->
-
-                                                </td>
-
-                                                <td class="datalist pt-3">
-                                                    {{ngForm.controls['bspc']['controls'][i].controls['total_nation_qty']
-                                                    &&
-                                                    ngForm.controls['bspc']['controls'][i].controls['total_nation_qty'].value
-                                                    ?
-                                                    ngForm.controls['bspc']['controls'][i].controls['total_nation_qty'].value
-                                                    :'NA'}}
-                                                </td>
-                                                <td class="datalist pt-3">
-                                                    {{ngForm.controls['bspc']['controls'][i].controls['total_direct_qty']
-                                                    &&
-                                                    ngForm.controls['bspc']['controls'][i].controls['total_direct_qty'].value
-                                                    ?
-                                                    ngForm.controls['bspc']['controls'][i].controls['total_direct_qty'].value
-                                                    :'NA'}}
-                                                </td>
-                                                <td class="datalist pt-3"
-                                                    *ngIf="ngForm.controls && ngForm.controls['bspc'] &&  ngForm.controls['bspc']['controls'] &&  ngForm.controls['bspc']['controls'][i] &&  ngForm.controls['bspc']['controls'][i].controls && ngForm.controls['bspc']['controls'][i].controls['allocate_qty'] ">
-                                            
-                                                    {{ngForm.controls['bspc']['controls'][i].controls['allocate_qty']
-                                                    &&
-                                                    ngForm.controls['bspc']['controls'][i].controls['allocate_qty'].value
-                                                    ?
-                                                    ngForm.controls['bspc']['controls'][i].controls['allocate_qty'].value
-                                                    :'NA'}}
-                                                    <!-- <input
-                                                        [ngClass]="disableField? 'disableButton form-control target-input-field':' form-control target-input-field' "
-                                                        type="text" (ngModelChange)="getQty(i)"
-                                                        formControlName="allocate_qty"> -->
-                                                </td>
-                                            </tr>
-                                        </ng-container>
-                                    </tbody>
-                                    <tbody *ngIf="tableData && tableData.length<1">
-                                        <tr>
-                                            <td colspan="8" style="text-align: center;">No Data Found</td>
-                                            <td colspan="4"></td>
-                                        </tr>
-                                    </tbody>
                                 </table>
+                                <div class="col-12 pt-3">
+                                    <div class="row data-row">
+                                        <table class="table table-responsive" formArrayName="bspc">
+                                            <thead>
+                                                <tr class="data-row-header">
+        
+                                                    <th scope="col"
+                                                        class="col-2 py-2 text-white  verticle-content-middle heading datalist">
+                                                        Variety
+                                                    </th>
+                                                    <!-- Expected B/S as per BSP-II
+                                                    Expected B/S as per BSP-III
+                                                    Expected B/S as per Intake Verification -->
+                                                    <th scope="col"
+                                                        class="col-1 py-2 text-white  verticle-content-middle heading datalist">
+                                                        Expected B/S as per BSP-II<!-- Bsp 2 -->
+                                                    </th>
+                                                    <th scope="col"
+                                                        class="col-1 py-2 text-white  verticle-content-middle heading datalist">
+                                                        Expected B/S as per BSP-III<!-- Bsp 3 -->
+                                                    </th>
+                                                    <th scope="col"
+                                                        class="col-1 py-2 text-white  verticle-content-middle heading datalist">
+                                                        Expected B/S as per Intake Verification<!-- Intake verification -->
+                                                    </th>
+                                                    <th scope="col"
+                                                        class="col-1 py-2 text-white  verticle-content-middle heading datalist">
+                                                        Carry Over
+                                                    </th>
+                                                    <th scope="col"
+                                                        class="col-1 py-2 text-white  verticle-content-middle heading datalist">
+                                                        {{colomtext ?colomtext:''}} Breeder Seed Produced
+                                                    </th>
+                                                    <th scope="col"
+                                                        class="col-1 py-2 text-white verticle-content-middle heading datalist">
+                                                        Total Breeder Seed Available
+                                                    </th>
+                                                    <th scope="col"
+                                                        class="col-1 py-2 text-white  verticle-content-middle heading datalist">
+                                                        Target Quantity (National)
+                                                    </th>
+                                                    <th scope="col"
+                                                        class="col-1 py-2 text-white  verticle-content-middle heading datalist">
+                                                        Target Quantity (Direct/Additional)
+                                                    </th>
+                                                    <th scope="col"
+                                                        class="col-2 py-2 text-white  verticle-content-middle heading datalist"
+                                                        style="min-width: 9em;">
+                                                        Allocate Quantity for National Target
+                                                    </th>
+        
+                                                </tr>
+                                            </thead>
+        
+                                            <tbody class="table-bordered">
+                                                <ng-container *ngFor="let data of bspc.controls; let i=index">
+        
+                                                    <tr [formGroupName]="i">
+                                                        <td class="datalist pt-3">
+                                                            {{
+                                                            ngForm.controls['bspc']['controls'][i].controls['variety_name'] &&
+                                                            ngForm.controls['bspc']['controls'][i].controls['variety_name'].value
+                                                            ?
+                                                            ngForm.controls['bspc']['controls'][i].controls['variety_name'].value
+                                                            :''}}
+        
+                                                            <br>
+                                                            <span
+                                                                *ngIf=" ngForm.controls['bspc']['controls'][i].controls['line_variety_name'].value">Parental
+                                                                Line: <b style="font-weight: bold !important;">
+                                                                    {{ngForm.controls['bspc']['controls'][i].controls['line_variety_name']
+                                                                    &&
+                                                                    ngForm.controls['bspc']['controls'][i].controls['line_variety_name'].value
+                                                                    ?
+                                                                    ngForm.controls['bspc']['controls'][i].controls['line_variety_name'].value
+                                                                    :"0"}}
+                                                                </b></span>
+                                                        </td>
+                                                        <!-- bsp2 qty -->
+                                                        <td class="datalist pt-3">
+                                                            {{ngForm.controls['bspc']['controls'][i].controls['bsp2_qty']
+                                                            &&
+                                                            ngForm.controls['bspc']['controls'][i].controls['bsp2_qty'].value
+                                                            ?
+                                                            (ngForm.controls['bspc']['controls'][i].controls['bsp2_qty'].value
+                                                            | number : '1.2-2'):'NA'}}
+                                                            <br>
+                                                            <!-- *ngIf="ngForm.controls['bspc']['controls'][i].controls['check_letest'].value == 'bsp2'" -->
+                                                            <span style="color: red;"
+                                                                *ngIf="ngForm.controls['bspc']['controls'][i].controls['check_letest'].value == 'bsp2'">
+                                                                E % <input
+                                                                    [ngClass]="disableField? 'disableButton form-control target-input-field':' form-control target-input-field'"
+                                                                    class="form-control" step="0.01" type="number" min="1"
+                                                                    max="100" value="100" (input)="validatePercentage2(i)"
+                                                                    formControlName="bsp2_per_qty"
+                                                                    (change)="changePercentage($event,i,ngForm.controls['bspc']['controls'][i].controls['bsp2_qty'].value)"></span>
+                                                            <div *ngIf="ngForm.controls['bspc']['controls'][i].controls['bsp2_per_qty'].invalid && ngForm.controls['bspc']['controls'][i].controls['bsp2_per_qty'].touched"
+                                                                style="color: red;">
+                                                                Enter a valid percentage (1-100)
+                                                            </div>
+                                                        </td>
+        
+                                                        <!-- bsp3 qty -->
+                                                        <td class="datalist pt-3">
+                                                            {{ngForm.controls['bspc']['controls'][i].controls['bsp3_qty']
+                                                            &&
+                                                            ngForm.controls['bspc']['controls'][i].controls['bsp3_qty'].value
+                                                            ?
+                                                            (ngForm.controls['bspc']['controls'][i].controls['bsp3_qty'].value
+                                                            | number : '1.2-2'):'NA'}}
+                                                            <br>
+                                                            <!-- *ngIf="ngForm.controls['bspc']['controls'][i].controls['check_letest'].value == 'bsp3'" -->
+                                                            <span style="color: red;"
+                                                                *ngIf="ngForm.controls['bspc']['controls'][i].controls['check_letest'].value == 'bsp3'">
+                                                                E % <input
+                                                                    [ngClass]="disableField? 'disableButton form-control target-input-field':' form-control target-input-field'"
+                                                                    class="form-control" type="number" step="0.01" min="1"
+                                                                    max="100" value="100" (input)="validatePercentage(i)"
+                                                                    formControlName="bsp3_per_qty"
+                                                                    (change)="changePercentage($event,i,ngForm.controls['bspc']['controls'][i].controls['bsp3_qty'].value)"></span>
+                                                            <div *ngIf="ngForm.controls['bspc']['controls'][i].controls['bsp3_per_qty'].invalid && ngForm.controls['bspc']['controls'][i].controls['bsp3_per_qty'].touched"
+                                                                style="color: red;">
+                                                                Enter a valid percentage (1-100)
+                                                            </div>
+                                                        </td>
+        
+                                                        <!-- intake verification qty -->
+                                                        <td class="datalist pt-3">
+                                                            {{ngForm.controls['bspc']['controls'][i].controls['intake_vrfictn_qty']
+                                                            &&
+                                                            ngForm.controls['bspc']['controls'][i].controls['intake_vrfictn_qty'].value
+                                                            ?
+                                                            (ngForm.controls['bspc']['controls'][i].controls['intake_vrfictn_qty'].value
+                                                            | number : '1.2-2'):'NA'}}
+                                                            <br>
+                                                            <!-- *ngIf="ngForm.controls['bspc']['controls'][i].controls['check_letest'].value == 'intake'" -->
+                                                            <span style="color: red;"
+                                                                *ngIf="ngForm.controls['bspc']['controls'][i].controls['check_letest'].value == 'intake'">
+                                                                E % <input
+                                                                    [ngClass]="disableField? 'disableButton form-control target-input-field':' form-control target-input-field'"
+                                                                    type="number" step="0.01" min="1" max="100"
+                                                                    class="form-control" value="100"
+                                                                    (input)="validatePercentage1(i)"
+                                                                    formControlName="intake_vrfictn__pr_qty"
+                                                                    (change)="changePercentage($event,i,ngForm.controls['bspc']['controls'][i].controls['intake_vrfictn_qty'].value)"></span>
+                                                            <div *ngIf="ngForm.controls['bspc']['controls'][i].controls['intake_vrfictn__pr_qty'].invalid && ngForm.controls['bspc']['controls'][i].controls['intake_vrfictn__pr_qty'].touched"
+                                                                style="color: red;">
+                                                                Enter a valid percentage (1-100)
+                                                            </div>
+                                                        </td>
+                                                        <td class="datalist pt-3">
+                                                            {{ngForm.controls['bspc']['controls'][i].controls['total_carry_over_qty']
+                                                            &&
+                                                            ngForm.controls['bspc']['controls'][i].controls['total_carry_over_qty'].value
+                                                            ?
+                                                            (ngForm.controls['bspc']['controls'][i].controls['total_carry_over_qty'].value
+                                                            | number : '1.2-2'):'NA'}}
+                                                        </td>
+        
+                                                        <td class="datalist pt-3">
+                                                            {{ngForm.controls['bspc']['controls'][i].controls['breeder_seed_produced']
+                                                            &&
+                                                            ngForm.controls['bspc']['controls'][i].controls['breeder_seed_produced'].value
+                                                            ?
+                                                            ngForm.controls['bspc']['controls'][i].controls['breeder_seed_produced'].value:'0'}}
+                                                        </td>
+                                                        <td class="datalist pt-3">
+                                                            <!-- <span > -->
+                                                            {{(ngForm.controls['bspc']['controls'][i].controls['breeder_seed_produced'].value
+                                                            +
+                                                            ngForm.controls['bspc']['controls'][i].controls['total_carry_over_qty'].value
+                                                            | number : '1.2-2') }}
+                                                            <!-- </span> -->
+        
+                                                        </td>
+        
+                                                        <td class="datalist pt-3">
+                                                            {{ngForm.controls['bspc']['controls'][i].controls['total_nation_qty']
+                                                            &&
+                                                            ngForm.controls['bspc']['controls'][i].controls['total_nation_qty'].value
+                                                            ?
+                                                            ngForm.controls['bspc']['controls'][i].controls['total_nation_qty'].value
+                                                            :'NA'}}
+                                                        </td>
+                                                        <td class="datalist pt-3">
+                                                            {{ngForm.controls['bspc']['controls'][i].controls['total_direct_qty']
+                                                            &&
+                                                            ngForm.controls['bspc']['controls'][i].controls['total_direct_qty'].value
+                                                            ?
+                                                            ngForm.controls['bspc']['controls'][i].controls['total_direct_qty'].value
+                                                            :'NA'}}
+                                                        </td>
+                                                        <td class="datalist pt-3"
+                                                            *ngIf="ngForm.controls && ngForm.controls['bspc'] &&  ngForm.controls['bspc']['controls'] &&  ngForm.controls['bspc']['controls'][i] &&  ngForm.controls['bspc']['controls'][i].controls && ngForm.controls['bspc']['controls'][i].controls['allocate_qty'] ">
+                                                            <input
+                                                                [ngClass]="disableField? 'disableButton form-control target-input-field':' form-control target-input-field' "
+                                                                type="text" (ngModelChange)="getQty(i)" placeholder="Enter"
+                                                                formControlName="allocate_qty">
+                                                        </td>
+                                                    </tr>
+                                                </ng-container>
+                                            </tbody>
+                                            <tbody *ngIf="tableData && tableData.length<1">
+                                                <tr>
+                                                    <td colspan="8" style="text-align: center;">No Data Found</td>
+                                                    <td colspan="4"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+        
+                                    </div>
+                                    <div>
+        
+                                    </div>
+                                </div>
 
                             </div>
                             <div>
@@ -382,34 +478,48 @@
                                         <tr class="data-row-header">
 
                                             <th scope="col"
-                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist">
+                                                class="col-2 py-2 text-white  verticle-content-middle heading datalist">
                                                 Variety
                                             </th>
+                                            <!-- Expected B/S as per BSP-II
+                                            Expected B/S as per BSP-III
+                                            Expected B/S as per Intake Verification -->
                                             <th scope="col"
-                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist">
+                                                class="col-1 py-2 text-white  verticle-content-middle heading datalist">
+                                                Expected B/S as per BSP-II<!-- Bsp 2 -->
+                                            </th>
+                                            <th scope="col"
+                                                class="col-1 py-2 text-white  verticle-content-middle heading datalist">
+                                                Expected B/S as per BSP-III<!-- Bsp 3 -->
+                                            </th>
+                                            <th scope="col"
+                                                class="col-1 py-2 text-white  verticle-content-middle heading datalist">
+                                                Expected B/S as per Intake Verification<!-- Intake verification -->
+                                            </th>
+                                            <th scope="col"
+                                                class="col-1 py-2 text-white  verticle-content-middle heading datalist">
                                                 Carry Over
                                             </th>
                                             <th scope="col"
-                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist">
-                                                Breeder Seed Produced
+                                                class="col-1 py-2 text-white  verticle-content-middle heading datalist">
+                                                {{colomtext ?colomtext:''}} Breeder Seed Produced
                                             </th>
                                             <th scope="col"
-                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist ">
+                                                class="col-1 py-2 text-white verticle-content-middle heading datalist">
                                                 Total Breeder Seed Available
                                             </th>
                                             <th scope="col"
-                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist">
+                                                class="col-1 py-2 text-white  verticle-content-middle heading datalist">
                                                 Target Quantity (National)
                                             </th>
                                             <th scope="col"
-                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist">
+                                                class="col-1 py-2 text-white  verticle-content-middle heading datalist">
                                                 Target Quantity (Direct/Additional)
                                             </th>
                                             <th scope="col"
-                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist"
+                                                class="col-2 py-2 text-white  verticle-content-middle heading datalist"
                                                 style="min-width: 9em;">
                                                 Allocate Quantity for National Target
-
                                             </th>
 
                                         </tr>
@@ -438,6 +548,78 @@
                                                             ngForm.controls['bspc']['controls'][i].controls['line_variety_name'].value
                                                             :"0"}}
                                                         </b></span>
+                                                </td>
+                                                <!-- bsp2 qty -->
+                                                <td class="datalist pt-3">
+                                                    {{ngForm.controls['bspc']['controls'][i].controls['bsp2_qty']
+                                                    &&
+                                                    ngForm.controls['bspc']['controls'][i].controls['bsp2_qty'].value
+                                                    ?
+                                                    (ngForm.controls['bspc']['controls'][i].controls['bsp2_qty'].value
+                                                    | number : '1.2-2'):'NA'}}
+                                                    <br>
+                                                    <!-- *ngIf="ngForm.controls['bspc']['controls'][i].controls['check_letest'].value == 'bsp2'" -->
+                                                    <span style="color: red;"
+                                                        *ngIf="ngForm.controls['bspc']['controls'][i].controls['check_letest'].value == 'bsp2'">
+                                                        Estimated % <input
+                                                            [ngClass]="disableField? 'disableButton form-control target-input-field':' form-control target-input-field'"
+                                                            class="form-control" step="0.01" type="number" min="1"
+                                                            max="100" value="100" (input)="validatePercentage2(i)"
+                                                            formControlName="bsp2_per_qty"
+                                                            (change)="changePercentage($event,i,ngForm.controls['bspc']['controls'][i].controls['bsp2_qty'].value)"></span>
+                                                    <div *ngIf="ngForm.controls['bspc']['controls'][i].controls['bsp2_per_qty'].invalid && ngForm.controls['bspc']['controls'][i].controls['bsp2_per_qty'].touched"
+                                                        style="color: red;">
+                                                        Enter a valid percentage (1-100)
+                                                    </div>
+                                                </td>
+
+                                                <!-- bsp3 qty -->
+                                                <td class="datalist pt-3">
+                                                    {{ngForm.controls['bspc']['controls'][i].controls['bsp3_qty']
+                                                    &&
+                                                    ngForm.controls['bspc']['controls'][i].controls['bsp3_qty'].value
+                                                    ?
+                                                    (ngForm.controls['bspc']['controls'][i].controls['bsp3_qty'].value
+                                                    | number : '1.2-2'):'NA'}}
+                                                    <br>
+                                                    <!-- *ngIf="ngForm.controls['bspc']['controls'][i].controls['check_letest'].value == 'bsp3'" -->
+                                                    <span style="color: red;"
+                                                        *ngIf="ngForm.controls['bspc']['controls'][i].controls['check_letest'].value == 'bsp3'">
+                                                        Estimated % <input
+                                                            [ngClass]="disableField? 'disableButton form-control target-input-field':' form-control target-input-field'"
+                                                            class="form-control" type="number" step="0.01" min="1"
+                                                            max="100" value="100" (input)="validatePercentage(i)"
+                                                            formControlName="bsp3_per_qty"
+                                                            (change)="changePercentage($event,i,ngForm.controls['bspc']['controls'][i].controls['bsp3_qty'].value)"></span>
+                                                    <div *ngIf="ngForm.controls['bspc']['controls'][i].controls['bsp3_per_qty'].invalid && ngForm.controls['bspc']['controls'][i].controls['bsp3_per_qty'].touched"
+                                                        style="color: red;">
+                                                        Enter a valid percentage (1-100)
+                                                    </div>
+                                                </td>
+
+                                                <!-- intake verification qty -->
+                                                <td class="datalist pt-3">
+                                                    {{ngForm.controls['bspc']['controls'][i].controls['intake_vrfictn_qty']
+                                                    &&
+                                                    ngForm.controls['bspc']['controls'][i].controls['intake_vrfictn_qty'].value
+                                                    ?
+                                                    (ngForm.controls['bspc']['controls'][i].controls['intake_vrfictn_qty'].value
+                                                    | number : '1.2-2'):'NA'}}
+                                                    <br>
+                                                    <!-- *ngIf="ngForm.controls['bspc']['controls'][i].controls['check_letest'].value == 'intake'" -->
+                                                    <span style="color: red;"
+                                                        *ngIf="ngForm.controls['bspc']['controls'][i].controls['check_letest'].value == 'intake'">
+                                                        Estimated % <input
+                                                            [ngClass]="disableField? 'disableButton form-control target-input-field':' form-control target-input-field'"
+                                                            type="number" step="0.01" min="1" max="100"
+                                                            class="form-control" value="100"
+                                                            (input)="validatePercentage1(i)"
+                                                            formControlName="intake_vrfictn__pr_qty"
+                                                            (change)="changePercentage($event,i,ngForm.controls['bspc']['controls'][i].controls['intake_vrfictn_qty'].value)"></span>
+                                                    <div *ngIf="ngForm.controls['bspc']['controls'][i].controls['intake_vrfictn__pr_qty'].invalid && ngForm.controls['bspc']['controls'][i].controls['intake_vrfictn__pr_qty'].touched"
+                                                        style="color: red;">
+                                                        Enter a valid percentage (1-100)
+                                                    </div>
                                                 </td>
                                                 <td class="datalist pt-3">
                                                     {{ngForm.controls['bspc']['controls'][i].controls['total_carry_over_qty']
@@ -511,6 +693,7 @@
                                         <tr>
                                             <td> Availability of Breeder Seeds (BSP IV)</td>
                                         </tr>
+                                        <tr></tr>
                                         <tr>
                                             <td>
                                                 Year
@@ -531,7 +714,7 @@
                                                 Unit
                                             </td>
 
-                                        </tr>
+                                        </tr> 
                                         <tr>
                                             <td> {{ngForm.controls['year'].value ||
                                                 'NA'}}-{{(ngForm.controls['year'].value-2000)+1 || 'NA'}}</td>
@@ -562,38 +745,53 @@
                                             </td>
 
                                         </tr>
+                                        <tr></tr>
 
                                         <tr class="data-row-header">
 
                                             <th scope="col"
-                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist">
+                                                class="col-2 py-2 text-white  verticle-content-middle heading datalist">
                                                 Variety
                                             </th>
+                                            <!-- Expected B/S as per BSP-II
+                                            Expected B/S as per BSP-III
+                                            Expected B/S as per Intake Verification -->
                                             <th scope="col"
-                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist">
+                                                class="col-1 py-2 text-white  verticle-content-middle heading datalist">
+                                                Expected B/S as per BSP-II<!-- Bsp 2 -->
+                                            </th>
+                                            <th scope="col"
+                                                class="col-1 py-2 text-white  verticle-content-middle heading datalist">
+                                                Expected B/S as per BSP-III<!-- Bsp 3 -->
+                                            </th>
+                                            <th scope="col"
+                                                class="col-1 py-2 text-white  verticle-content-middle heading datalist">
+                                                Expected B/S as per Intake Verification<!-- Intake verification -->
+                                            </th>
+                                            <th scope="col"
+                                                class="col-1 py-2 text-white  verticle-content-middle heading datalist">
                                                 Carry Over
                                             </th>
                                             <th scope="col"
-                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist">
-                                                Breeder Seed Produced
+                                                class="col-1 py-2 text-white  verticle-content-middle heading datalist">
+                                                {{colomtext ?colomtext:''}} Breeder Seed Produced
                                             </th>
                                             <th scope="col"
-                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist ">
+                                                class="col-1 py-2 text-white verticle-content-middle heading datalist">
                                                 Total Breeder Seed Available
                                             </th>
                                             <th scope="col"
-                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist">
+                                                class="col-1 py-2 text-white  verticle-content-middle heading datalist">
                                                 Target Quantity (National)
                                             </th>
                                             <th scope="col"
-                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist">
+                                                class="col-1 py-2 text-white  verticle-content-middle heading datalist">
                                                 Target Quantity (Direct/Additional)
                                             </th>
                                             <th scope="col"
-                                                class="col-md-2 py-2 text-white  verticle-content-middle heading datalist"
+                                                class="col-2 py-2 text-white  verticle-content-middle heading datalist"
                                                 style="min-width: 9em;">
                                                 Allocate Quantity for National Target
-
                                             </th>
 
                                         </tr>
@@ -603,7 +801,7 @@
                                         <ng-container *ngFor="let data of bspc.controls; let i=index">
 
                                             <tr [formGroupName]="i">
-                                                <td class="datalist">
+                                                <td class="datalist pt-3">
                                                     {{
                                                     ngForm.controls['bspc']['controls'][i].controls['variety_name'] &&
                                                     ngForm.controls['bspc']['controls'][i].controls['variety_name'].value
@@ -620,34 +818,108 @@
                                                             ngForm.controls['bspc']['controls'][i].controls['line_variety_name'].value
                                                             ?
                                                             ngForm.controls['bspc']['controls'][i].controls['line_variety_name'].value
-                                                            :"NA"}}
+                                                            :"0"}}
                                                         </b></span>
                                                 </td>
-                                                <td>
+                                                <!-- bsp2 qty -->
+                                                <td class="datalist pt-3">
+                                                    {{ngForm.controls['bspc']['controls'][i].controls['bsp2_qty']
+                                                    &&
+                                                    ngForm.controls['bspc']['controls'][i].controls['bsp2_qty'].value
+                                                    ?
+                                                    (ngForm.controls['bspc']['controls'][i].controls['bsp2_qty'].value
+                                                    | number : '1.2-2'):'NA'}}
+                                                    <br>
+                                                    <!-- *ngIf="ngForm.controls['bspc']['controls'][i].controls['check_letest'].value == 'bsp2'" -->
+                                                    <span style="color: red;"
+                                                        *ngIf="ngForm.controls['bspc']['controls'][i].controls['check_letest'].value == 'bsp2'">
+                                                        E % <input
+                                                            [ngClass]="disableField? 'disableButton form-control target-input-field':' form-control target-input-field'"
+                                                            class="form-control" step="0.01" type="number" min="1"
+                                                            max="100" value="100" (input)="validatePercentage2(i)"
+                                                            formControlName="bsp2_per_qty"
+                                                            (change)="changePercentage($event,i,ngForm.controls['bspc']['controls'][i].controls['bsp2_qty'].value)"></span>
+                                                    <div *ngIf="ngForm.controls['bspc']['controls'][i].controls['bsp2_per_qty'].invalid && ngForm.controls['bspc']['controls'][i].controls['bsp2_per_qty'].touched"
+                                                        style="color: red;">
+                                                        Enter a valid percentage (1-100)
+                                                    </div>
+                                                </td>
+
+                                                <!-- bsp3 qty -->
+                                                <td class="datalist pt-3">
+                                                    {{ngForm.controls['bspc']['controls'][i].controls['bsp3_qty']
+                                                    &&
+                                                    ngForm.controls['bspc']['controls'][i].controls['bsp3_qty'].value
+                                                    ?
+                                                    (ngForm.controls['bspc']['controls'][i].controls['bsp3_qty'].value
+                                                    | number : '1.2-2'):'NA'}}
+                                                    <br>
+                                                    <!-- *ngIf="ngForm.controls['bspc']['controls'][i].controls['check_letest'].value == 'bsp3'" -->
+                                                    <span style="color: red;"
+                                                        *ngIf="ngForm.controls['bspc']['controls'][i].controls['check_letest'].value == 'bsp3'">
+                                                        E % <input
+                                                            [ngClass]="disableField? 'disableButton form-control target-input-field':' form-control target-input-field'"
+                                                            class="form-control" type="number" step="0.01" min="1"
+                                                            max="100" value="100" (input)="validatePercentage(i)"
+                                                            formControlName="bsp3_per_qty"
+                                                            (change)="changePercentage($event,i,ngForm.controls['bspc']['controls'][i].controls['bsp3_qty'].value)"></span>
+                                                    <div *ngIf="ngForm.controls['bspc']['controls'][i].controls['bsp3_per_qty'].invalid && ngForm.controls['bspc']['controls'][i].controls['bsp3_per_qty'].touched"
+                                                        style="color: red;">
+                                                        Enter a valid percentage (1-100)
+                                                    </div>
+                                                </td>
+
+                                                <!-- intake verification qty -->
+                                                <td class="datalist pt-3">
+                                                    {{ngForm.controls['bspc']['controls'][i].controls['intake_vrfictn_qty']
+                                                    &&
+                                                    ngForm.controls['bspc']['controls'][i].controls['intake_vrfictn_qty'].value
+                                                    ?
+                                                    (ngForm.controls['bspc']['controls'][i].controls['intake_vrfictn_qty'].value
+                                                    | number : '1.2-2'):'NA'}}
+                                                    <br>
+                                                    <!-- *ngIf="ngForm.controls['bspc']['controls'][i].controls['check_letest'].value == 'intake'" -->
+                                                    <span style="color: red;"
+                                                        *ngIf="ngForm.controls['bspc']['controls'][i].controls['check_letest'].value == 'intake'">
+                                                        E % <input
+                                                            [ngClass]="disableField? 'disableButton form-control target-input-field':' form-control target-input-field'"
+                                                            type="number" step="0.01" min="1" max="100"
+                                                            class="form-control" value="100"
+                                                            (input)="validatePercentage1(i)"
+                                                            formControlName="intake_vrfictn__pr_qty"
+                                                            (change)="changePercentage($event,i,ngForm.controls['bspc']['controls'][i].controls['intake_vrfictn_qty'].value)"></span>
+                                                    <div *ngIf="ngForm.controls['bspc']['controls'][i].controls['intake_vrfictn__pr_qty'].invalid && ngForm.controls['bspc']['controls'][i].controls['intake_vrfictn__pr_qty'].touched"
+                                                        style="color: red;">
+                                                        Enter a valid percentage (1-100)
+                                                    </div>
+                                                </td>
+                                                <td class="datalist pt-3">
                                                     {{ngForm.controls['bspc']['controls'][i].controls['total_carry_over_qty']
                                                     &&
                                                     ngForm.controls['bspc']['controls'][i].controls['total_carry_over_qty'].value
                                                     ?
-                                                    ngForm.controls['bspc']['controls'][i].controls['total_carry_over_qty'].value:'0'}}
+                                                    (ngForm.controls['bspc']['controls'][i].controls['total_carry_over_qty'].value
+                                                    | number : '1.2-2'):'NA'}}
                                                 </td>
 
-                                                <td>
+                                                <td class="datalist pt-3">
                                                     {{ngForm.controls['bspc']['controls'][i].controls['breeder_seed_produced']
                                                     &&
                                                     ngForm.controls['bspc']['controls'][i].controls['breeder_seed_produced'].value
                                                     ?
                                                     ngForm.controls['bspc']['controls'][i].controls['breeder_seed_produced'].value:'0'}}
                                                 </td>
-                                                <td>
-                                                    {{ngForm.controls['bspc']['controls'][i].controls['total_breeder_seed_available_over_qty']
-                                                    &&
-                                                    ngForm.controls['bspc']['controls'][i].controls['total_breeder_seed_available_over_qty'].value
-                                                    ?
-                                                    (ngForm.controls['bspc']['controls'][i].controls['total_breeder_seed_available_over_qty'].value
-                                                    | number : '1.2-2'):'NA'}}
+                                                <td class="datalist pt-3">
+                                                    <!-- <span > -->
+                                                    {{(ngForm.controls['bspc']['controls'][i].controls['breeder_seed_produced'].value
+                                                    +
+                                                    ngForm.controls['bspc']['controls'][i].controls['total_carry_over_qty'].value
+                                                    | number : '1.2-2') }}
+                                                    <!-- </span> -->
+
                                                 </td>
 
-                                                <td>
+                                                <td class="datalist pt-3">
                                                     {{ngForm.controls['bspc']['controls'][i].controls['total_nation_qty']
                                                     &&
                                                     ngForm.controls['bspc']['controls'][i].controls['total_nation_qty'].value
@@ -655,7 +927,7 @@
                                                     ngForm.controls['bspc']['controls'][i].controls['total_nation_qty'].value
                                                     :'NA'}}
                                                 </td>
-                                                <td>
+                                                <td class="datalist pt-3">
                                                     {{ngForm.controls['bspc']['controls'][i].controls['total_direct_qty']
                                                     &&
                                                     ngForm.controls['bspc']['controls'][i].controls['total_direct_qty'].value
@@ -663,14 +935,17 @@
                                                     ngForm.controls['bspc']['controls'][i].controls['total_direct_qty'].value
                                                     :'NA'}}
                                                 </td>
-                                                <td>
+                                                <td class="datalist pt-3" >
                                                     {{ngForm.controls['bspc']['controls'][i].controls['allocate_qty']
                                                     &&
                                                     ngForm.controls['bspc']['controls'][i].controls['allocate_qty'].value
                                                     ?
                                                     ngForm.controls['bspc']['controls'][i].controls['allocate_qty'].value
                                                     :'NA'}}
-
+                                                    <input
+                                                        [ngClass]="disableField? 'disableButton form-control target-input-field':' form-control target-input-field' "
+                                                        type="text" (ngModelChange)="getQty(i)" placeholder="Enter"
+                                                        formControlName="allocate_qty">
                                                 </td>
                                             </tr>
                                         </ng-container>
@@ -691,18 +966,18 @@
                     </div>
                 </div>
                 <div class="row " *ngIf="showGrid">
-                    <div class="col-xl-2 ">
+                    <div class="col-2 ">
                         <button style=" outline:none" (click)="cancel()" [disabled]="disableField"
                             [ngClass]=" disableField ?'disableButton w-100 search d-inline-flex justify-content-center verticle-content-middle mb-3' :'btn-inventory-cancel w-100 search d-inline-flex justify-content-center verticle-content-middle mb-3'">Cancel</button>
                     </div>
-                    <div class="col-xl-2 ml-3">
+                    <div class="col-2 ml-3">
                         <button (click)="saveAsDraft()" [disabled]="disableField"
                             [ngClass]="disableField ? 'disableButton btn-inventorys w-100 ml-2 d-inline-flex justify-content-center verticle-content-middle mb-3':'btn-inventorys w-100 ml-2 d-inline-flex justify-content-center verticle-content-middle mb-3 text-white'">Save
                             as a Draft</button>
                     </div>
-                    <div class="col-xl-2 pl-0">
+                    <div class="col-2 pl-0">
                         <button (click)="confirmSave()" [disabled]="disableField"
-                                [ngClass]="disableField ? 'disableButton btn-inventorys w-100 ml-2 d-inline-flex justify-content-center verticle-content-middle mb-3' : 'search w-75 text-white btn-inventorys w-100 ml-2 d-inline-flex justify-content-center verticle-content-middle mb-3'">
+                            [ngClass]="disableField ? 'disableButton btn-inventorys w-100 ml-2 d-inline-flex justify-content-center verticle-content-middle mb-3' : 'search w-75 text-white btn-inventorys w-100 ml-2 d-inline-flex justify-content-center verticle-content-middle mb-3'">
                             Submit
                         </button>
 

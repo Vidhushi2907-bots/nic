@@ -73,17 +73,6 @@
                                         </div>
 
                                     </div>
-                                    <!-- <select class="form-select form-control  " aria-label="Default select example"
-                                        formControlName="crop_group">
-                                        <option value="" disabled>Select Crop Group</option>
-                                        <option *ngFor="let data of croupGroupList" class="dropdown-menus"
-                                            value="{{data.group_code}}">
-                                            {{data.group_name}}</option>
-                                    </select>
-                                    <div class="pl-0 toggle-button" ngbDropdown>
-                                        <img src="assets/images/16.svg" alt="" srcset="">
-
-                                    </div> -->
                                 </div>
 
                             </div>
@@ -120,18 +109,6 @@
                                         <i class="fa-solid fa-angle-down downicon" (click)="cnClick()"></i>
                                     </div>
 
-                                    <!-- <select class="form-select form-control" aria-label="Default select example"
-                                        formControlName="crop_name">
-                                        <option value="" disabled>Select Crop Name</option>
-                                        <option *ngFor="let data of crop_name_list"
-                                            value="{{data && data.m_crop &&data.m_crop.crop_code? data.m_crop.crop_code:''}}">
-                                            {{data && data.m_crop &&data.m_crop.crop_name?
-                                            data.m_crop.crop_name:''}}</option>
-                                    </select>
-                                    <div class="pl-0 toggle-button" ngbDropdown>
-                                        <img src="assets/images/16.svg" alt="" srcset="">
-
-                                    </div> -->
                                 </div>
 
                             </div>
@@ -156,8 +133,8 @@
                                             <button class="dropdown-item" *ngFor="let data of cropVarietyData"
                                                 (click)="varietyNames(data)" #dropdownItem
                                                 [attr.data-parent-name]="'variety_name'">
-                                                {{data && data['m_crop_variety.variety_name'] ?
-                                                data['m_crop_variety.variety_name'] :'' }}
+                                                {{data && data.variety_name ?
+                                                data.variety_name :'' }}
                                                 <!-- <input type="hidden" formControlName="crop_code"> -->
                                             </button>
 
@@ -168,18 +145,6 @@
                                         [ngClass]=" disabledfieldVariety ? 'disabledfield' : ''">
                                         <i class="fa-solid fa-angle-down downicon" (click)="cvClick()"></i>
                                     </div>
-                                    <!-- <select class="form-select form-control" aria-label="Default select example"
-                                    formControlName="variety_name">
-                                    <option value="" hidden selected>Select Variety Name</option>
-                                    <option *ngFor="let data of cropVarietyData"
-                                        value="{{data && data['m_crop_variety.variety_code'] ? data['m_crop_variety.variety_code'] :'' }}">
-                                        {{data && data['m_crop_variety.variety_name'] ? data['m_crop_variety.variety_name'] :'' }}
-                                    </option>
-                                </select>
-                                    <div class="pl-0 toggle-button" ngbDropdown>
-                                        <img src="assets/images/16.svg" alt="" srcset="">
-
-                                    </div> -->
                                 </div>
 
                             </div>
@@ -234,7 +199,6 @@
                     <thead>
                         <tr class="data-row-header">
                             <th scope="col" class="col-md-1 py-3">S/N</th>
-                            <!-- <th *ngFor="let data of gridData;" scope="col" class="col-md-3 py-3">{{data && data.fieldName ? data.fieldName :''}}</th> -->
                             <th class="col-md-2 py-3" *ngIf="activeCropGroup">Crop Group</th>
                             <th class="col-md-3 py-3" *ngIf="activeCropName">Crop Name</th>
 
@@ -280,60 +244,6 @@
                     <tbody *ngFor="let data of exportdata; let dataIndex=index">
                         <tr>
                             <td>{{ dataIndex + 1}}</td>
-                            <!-- <td *ngIf="activeCropGroup">
-                                <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                    data-placement="bottom"
-                                    title="{{data && data.m_crop && data.m_crop.m_crop_group && data.m_crop.m_crop_group.group_name ? data.m_crop.m_crop_group.group_name :'NA'}}">{{(data
-                                    && data.m_crop && data.m_crop.m_crop_group &&
-                                    (data.m_crop.m_crop_group.group_name.length > 30) ?
-                                    (data.m_crop.m_crop_group.group_name.substring(0, 30)
-                                    +
-                                    "..."):(data.m_crop? data.m_crop.m_crop_group.group_name :"NA"))}}</span>
-                            </td>
-                            <td *ngIf="activeCropName">
-                                <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                    data-placement="bottom"
-                                    title="{{data && data.m_crop && data.m_crop.crop_name ? data.m_crop.crop_name : 'NA'}}">{{(data
-                                    && data.m_crop&& data.m_crop.crop_name &&
-                                    (data.m_crop.crop_name.length > 30) ? (data.m_crop.crop_name.substring(0, 30) +
-                                    "..."):(data&& data.m_crop && data.m_crop.crop_name ? data.m_crop.crop_name
-                                    :'NA'))}}</span>
-                            </td>
-                           
-                            <td *ngIf="activeVarietyName">
-                                <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                    data-placement="bottom"
-                                    title="{{ data && data.m_crop_variety && data.m_crop_variety.variety_name ? data.m_crop_variety.variety_name : 'NA'}}">
-                                    {{data && data.m_crop_variety && data.m_crop_variety.variety_name &&
-                                    (data.m_crop_variety.variety_name.length>30)
-                                    ?(data.m_crop_variety.variety_name.substring(0,30)+'...'):(data &&
-                                    data.m_crop_variety && data.m_crop_variety.variety_name ?
-                                    data.m_crop_variety.variety_name :'NA') }}
-                                </span>
-                            </td>
-                            <td *ngIf="activeVarietyCode">
-                                <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                    data-placement="bottom"
-                                    title="{{ data && data.m_crop_variety && data.m_crop_variety.variety_code ? data.m_crop_variety.variety_code : 'NA'}}">
-                                    {{data && data.m_crop_variety && data.m_crop_variety.variety_code ?
-                                    data.m_crop_variety.variety_code :'NA' }}
-                                </span>
-                            </td>
-                            <td *ngIf="resemblance_to_varietyData">
-                                <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                    data-placement="bottom"
-                                    title="{{ data  && data.resemblance_to_variety ? data.resemblance_to_variety : 'NA'}}">
-                                    {{data && data.resemblance_to_variety  ?
-                                    data.resemblance_to_variety :'NA' }}
-                                </span>
-                            </td>
-                            <td *ngIf="activeDevelopedBy">
-                                <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                    data-placement="bottom" title="{{data.fertilizer_dosage}}">{{data &&
-                                    data.m_crop_variety
-                                    && data.m_crop_variety.developed_by ? data.m_crop_variety.developed_by :'NA'
-                                    }}</span>
-                            </td> -->
                             <td *ngIf="activeCropGroup">
                                 <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
                                     data-placement="bottom"

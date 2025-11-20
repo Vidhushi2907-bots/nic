@@ -14,7 +14,7 @@ import { ngbDropdownEvents } from 'src/app/_helpers/ngbDropdownEvents';
 
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+//pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
   selector: 'app-crop-variety-characterstic-reoprt',
@@ -112,6 +112,52 @@ export class CropVarietyCharactersticReoprtComponent implements OnInit {
       filed_data: new FormControl('',),
 
     });
+
+
+    this.ngForm.controls['filed_data'].valueChanges.subscribe(newValue => {
+      const userData = localStorage.getItem('BHTCurrentUser');
+      const data = JSON.parse(userData);
+      const user_type = data?.user_type;
+    
+      if (user_type === 'OILSEEDADMIN') {
+    this.ngForm.controls['crop_group'].patchValue([
+      {
+        group_code: "A04",
+        group_name: "OILSEEDS"
+      }
+    ]);
+    this.ngForm.controls['crop_group'].disable();
+      this.ngForm.controls['crop_text'].patchValue("OILSEEDS");
+      this.ngForm.controls['crop_text'].disable();
+      this.crop_grops = "OILSEEDS";
+        this.ngForm.controls['crop_name'].enable();
+        this.ngForm.controls['crop_name'].setValue("");
+        this.ngForm.controls['variety_name'].setValue("");
+        this.ngForm.controls['variety_name'].disable();
+        this.disabledfieldcropName = false;
+        this.variety_names = '';
+      }
+      if (user_type === 'PULSESSEEDADMIN') {
+        this.ngForm.controls['crop_group'].patchValue([
+          {
+            group_code: "A03",
+            group_name: "PULSES"
+          }
+        ]);
+        this.ngForm.controls['crop_group'].disable();
+        this.ngForm.controls['crop_text'].patchValue("PULSES");
+        this.ngForm.controls['crop_text'].disable();
+        this.crop_grops = "PULSES";
+        this.ngForm.controls['crop_name'].enable();
+        this.ngForm.controls['crop_name'].setValue("");
+        this.ngForm.controls['variety_name'].setValue("");
+        this.ngForm.controls['variety_name'].disable();
+        this.disabledfieldcropName = false;
+        this.variety_names = '';
+      }
+    });
+
+
     this.ngForm.controls['crop_group'].valueChanges.subscribe(newValue => {
       this.ngForm.controls['crop_name'].enable();
       this.ngForm.controls['crop_name'].setValue("");
@@ -121,6 +167,7 @@ export class CropVarietyCharactersticReoprtComponent implements OnInit {
       this.crop_names = '';
       this.variety_names = '';
       this.getCropNameList(newValue);
+
     });
 
     this.ngForm.controls['crop_name'].valueChanges.subscribe(newValue => {
@@ -188,10 +235,7 @@ export class CropVarietyCharactersticReoprtComponent implements OnInit {
     this.getCroupCroupList();
     this.ngForm.controls['crop_name'].disable();
     this.ngForm.controls['variety_name'].disable();
-    // this.getCroupNameList();
-    // this.getCropVarietyData();
-    // this.delete(this.deletedId)
-    //get user id from localstorage
+
     this.dropdownSettings = {
       idField: 'value',
       textField: 'fieldName',
@@ -1086,10 +1130,10 @@ export class CropVarietyCharactersticReoprtComponent implements OnInit {
   }
   varietyNames(data) {
 
-    this.variety_names = data && data['m_crop_variety.variety_name'] ? data['m_crop_variety.variety_name'] : '';
+    this.variety_names = data && data.variety_name ? data.variety_name : '';
     this.cropVarietyData = this.cropVarietyDataSecond
     this.ngForm.controls['variety_name_text'].setValue('', { emitEvent: false })
-    this.ngForm.controls['variety_name'].setValue(data && data['m_crop_variety.variety_code'] ? data['m_crop_variety.variety_code'] : '')
+    this.ngForm.controls['variety_name'].setValue(data && data.variety_code ? data.variety_code: '')
   }
   cvClick() {
     document.getElementById('variety_name').click();

@@ -241,7 +241,8 @@
                                 <!-- <label class="d-md-none"><b>Name of the Institute/SPP:</b>&nbsp;</label> -->
                                 <span style="cursor: pointer; word-break: break-word; word-break: break-word;"
                                     data-toggle="tooltip" data-placement="bottom"
-                                    title="{{data && data.agency_name ? data.agency_name :''}}">{{(data && data.agency_name
+                                    title="{{data && data.agency_name ? data.agency_name :''}}">{{(data &&
+                                    data.agency_name
                                     &&
                                     (data.agency_name.length > 30) ? (data.agency_name.substring(0, 30) +
                                     "..."):data && data.agency_name? (data.agency_name|uppercase):'NA')}}</span>
@@ -258,14 +259,16 @@
                                         data.user
                                         && data.user.name ?
                                         ((data.user.name.length > 30) ? (data.user.name.substring(0, 30) +
-                                        "..."):data && data.user && data.user.name ? (data.user.name|uppercase):'NA'):'NA')}}</span>
+                                        "..."):data && data.user && data.user.name ?
+                                        (data.user.name|uppercase):'NA'):'NA')}}</span>
                                 </div>
                             </div>
                             <div class="col-3 col-md-1  py-1 d-flex verticle-content-middle ">
                                 <div class="w-fit-content">
                                     <label class="d-md-none"><b>Code:</b>&nbsp;</label>
                                     <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                        data-placement="bottom" title="{{data && data.user &&  data.user.code ? data.user.code:''}}">{{ data &&
+                                        data-placement="bottom"
+                                        title="{{data && data.user &&  data.user.code ? data.user.code:''}}">{{ data &&
                                         data.user && data.user.code ? data.user.code:'NA'
                                         }}</span>
                                 </div>
@@ -305,7 +308,8 @@
                                     <label class="d-md-none"><b>State Name:</b>&nbsp;</label>
                                     <span style="cursor: pointer; word-break: break-word; word-break: break-word;"
                                         data-toggle="tooltip" data-placement="bottom"
-                                        title="{{data && data.m_state && data.m_state.state_name ? data.m_state.state_name:''}}">{{(data && data.m_state &&
+                                        title="{{data && data.m_state && data.m_state.state_name ? data.m_state.state_name:''}}">{{(data
+                                        && data.m_state &&
                                         data.m_state.state_name
                                         ?
                                         ((data.m_state.state_name.length > 30) ? ((data.m_state.state_name.substring(0,
@@ -354,7 +358,7 @@
                             <div class="col-6 col-md-1  py-1 d-flex verticle-content-middle w-100 pl-0">
                                 <span style="cursor: pointer; word-break: break-word;" class="statusValue"
                                     data-toggle="tooltip" data-placement="bottom">{{
-                                        data &&  data.user_id ? setlastlogin(data.user_id):"NA"}}</span>
+                                    data && data.user_id ? setlastlogin(data.user_id):"NA"}}</span>
                                 <!-- <div class="w-fit-content">
                                     <label class="d-md-none"><b>Status:</b>&nbsp;</label>
                                     <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
@@ -374,7 +378,7 @@
                                 </div> -->
                             </div>
 
-                           
+
                             <div
                                 class="col-12 col-md-1 py-1 d-flex verticle-content-middle justify-content-md-center phone_view_btn">
                                 <div class="list-action-buttons-wrapper w-fit-content phone_view_action_btn">
@@ -387,7 +391,9 @@
                                         [routerLink]="['/add-plant-form/edit', data.id]">
                                         <img src="assets/images/edit.svg">
                                     </button>
-                                    <button class="list-action-buttons " (click)="delete(data.id, data.agency_name)">
+                                    <button class="list-action-buttons " [disabled]="userType === 'SUPERADMIN'"
+                                        [ngClass]="{'btn-disabled': userType !== 'SUPERADMIN','btn-active': userType === 'SUPERADMIN'}"
+                                        (click)="delete(data.id, data.agency_name)">
                                         <img src="assets/images/delete.svg">
                                     </button>
                                 </div>

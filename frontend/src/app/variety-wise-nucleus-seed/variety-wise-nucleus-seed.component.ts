@@ -18,7 +18,7 @@ import { ProductioncenterService } from 'src/app/services/productionCenter/produ
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { IDropdownSettings, } from 'ng-multiselect-dropdown';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+//pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
   selector: 'app-variety-wise-nucleus-seed',

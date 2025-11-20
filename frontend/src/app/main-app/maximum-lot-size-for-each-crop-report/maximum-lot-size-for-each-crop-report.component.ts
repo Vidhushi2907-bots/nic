@@ -15,7 +15,7 @@ import * as html2PDF from 'html2pdf.js';
 import Swal from 'sweetalert2';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+//pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 
 @Component({
@@ -29,29 +29,27 @@ export class MaximumLotSizeForEachCropReportComponent implements OnInit {
   filterPaginateSearch: FilterPaginateSearch = new FilterPaginateSearch();
   cropGroupData;
   statename = [];
+  searchText: string = '';
   identor = [];
+  totalIndenters: number = 0;
   ngForm!: FormGroup;
   seasonList: any = [];
   response_crop_group: any = [];
   data: any;
   data1: any;
+  showFilter: boolean = false;
   custom_array: any[];
   finalData: any[];
   fileName = 'Crop-Wise-Maximum-Lot-Size-report.xlsx';
-  // yearOfIndent: any = [
-  //   { name: "2025 - 2026", "value": "2025" },
-  //   { name: "2024 - 2025", "value": "2024" },
-  //   { name: "2023 - 2024", "value": "2023" },
-  //   { name: "2022 - 2023", "value": "2022" },
-  //   { name: "2021 - 2022", "value": "2021" },
-  //   { name: "2020 - 2021", "value": "2020" }
-  // ];
   year: any;
+  
   group_code: any;
   isSearch: boolean = false;
   todayData = new Date();
   tableId: any[];
   allData: any;
+  filteredData: any[] = [];
+  searchTerm: string = '';
   getCropNameListArr: any;
   exportdata: any[];
   selectCrop: any;
@@ -64,74 +62,105 @@ export class MaximumLotSizeForEachCropReportComponent implements OnInit {
   isCropName=false;
   seasonListsecond: any;
   getCropNameListArrSecond: any;
+  masterData: any[];
+  completeData: any[];
   constructor(private breederService: BreederService, private fb: FormBuilder, private service: SeedServiceService, private router: Router) { this.createEnrollForm(); }
   createEnrollForm() {
     this.ngForm = this.fb.group({
-      // year: ['',],
-      group_code: ['',],
-      crop_name:[''],
+
+       group_code: ['All'],  // default All
+  crop_name: ['All'],
+
       crop_text:[''],
       name_text:['']
     });
-    this.ngForm.controls['group_code'].valueChanges.subscribe(newValue=>{
-      if(newValue){
-        this.getCropName(newValue)
-        this.isCropName=true
-        this.selectCrop_name='';
-        this.ngForm.controls['crop_name'].setValue('')
 
-      }
-    });
+    this.ngForm.controls['group_code'].valueChanges.subscribe(newValue => {
+  if (newValue && newValue !== 'All') {
+    this.getCropName(newValue);
+    this.isCropName = true;
+    this.selectCrop_name = '';
+    this.ngForm.controls['crop_name'].setValue('All'); 
+  } else {
+    this.isCropName = false;
+    this.ngForm.controls['crop_name'].setValue('All'); 
+    this.getPageData(); 
+  }
+  this.autoSubmit(); 
+});
+this.ngForm.controls['crop_name'].valueChanges.subscribe(newValue => {
+  if (newValue) {
+    this.autoSubmit(); 
+  }
+});
+     this.ngForm.controls['crop_text'].valueChanges.subscribe(newValue => {
+    if (newValue) {
+      const terms = newValue.toLowerCase().split(/\s+/).filter(t => t);
 
-    this.ngForm.controls['crop_text'].valueChanges.subscribe(newValue => {
-      if (newValue ) {
-        console.log(newValue)
-        this.seasonList =this.seasonListsecond
-        let response= this.seasonList.filter(x=>x.group_name.toLowerCase().startsWith(newValue.toLowerCase()))      
-        this.seasonList=response      
-      }
-      else{
-      this.getGroupCode()
-      }
-    });
+      this.seasonList = this.seasonListsecond.filter(x =>
+        terms.every(term =>
+          x.group_name.toLowerCase().includes(term) ||
+          x.group_name.toLowerCase().split(/\s+/).some(word => word.startsWith(term))
+        )
+      );
+    } else {
+      this.getGroupCode(); // reset full list
+    }
+  });
 
-    this.ngForm.controls['name_text'].valueChanges.subscribe(newValue => {
-      if (newValue ) {
-        console.log(newValue)
-        this.getCropNameListArr =this.getCropNameListArrSecond
-        let response= this.getCropNameListArr.filter(x=>x['m_crop.crop_name'].toLowerCase().startsWith(newValue.toLowerCase()))      
-        this.getCropNameListArr=response      
-      }
-      else{
-      this.getCropName(this.ngForm.controls['group_code'].value)
-      }
-    });
+
+      this.ngForm.controls['name_text'].valueChanges.subscribe(newValue => {
+    if (newValue) {
+      const terms = newValue.toLowerCase().split(/\s+/).filter(t => t);
+
+      this.getCropNameListArr = this.getCropNameListArrSecond.filter(x =>
+        terms.every(term =>
+          x['m_crop.crop_name'].toLowerCase().includes(term) ||
+          x['m_crop.crop_name'].toLowerCase().split(/\s+/).some(word => word.startsWith(term))
+        )
+      );
+    } else {
+      this.getCropName(this.ngForm.controls['group_code'].value); // reset list
+    }
+  });
     
   }
   ngOnInit(): void {
-    // localStorage.setItem('logined_user', "Seed");
-    // if (!localStorage.getItem('foo')) {
-    //   localStorage.setItem('foo', 'no reload')
-    //   location.reload()
-    // } else {
-    //   localStorage.removeItem('foo')
-    // }
+    this.loadData();
 
-    this.filterPaginateSearch.itemListPageSize = 50;
+    this.filterPaginateSearch.itemListPageSize = 80;
     this.getPageData();
     this.getGroupCode();
     this.runExcelApi();
-
-    // this.shortStatename();
-    // this.getCroupCroupList();
-    // this.getSeasonData();
-    // this.submitindentor();
+      this.filterPaginateSearch.itemListPageSize = 80;
   }
 
+  
+
   getPageData(loadPageNumberData: number = 1, searchData: any | undefined = undefined) {
+    searchData = { isSearch: false, isReport: true };
+
+  this.service
+    .postRequestCreator("get-crop-max-lot-size-data", null, {
+      page: loadPageNumberData,
+      pageSize: this.filterPaginateSearch.itemListPageSize || 50,
+      search: searchData
+    })
+    .subscribe((apiResponse: any) => {
+      if (apiResponse?.EncryptedResponse?.status_code == 200) {
+        this.allData = apiResponse.EncryptedResponse.data.rows || [];
+        this.totalIndenters = apiResponse.EncryptedResponse.data.rows.length;
+        this.masterData = [...apiResponse.EncryptedResponse.data.rows];
+        this.completeData = [...apiResponse.EncryptedResponse.data.rows]; 
+
+        // init with full data at first
+        // this.applyFilter(this.allData);
+      }
+    });
 
     searchData = {
-      isSearch: false
+      isSearch: true,
+      isReport: true
     }
 
     this.service
@@ -146,15 +175,33 @@ export class MaximumLotSizeForEachCropReportComponent implements OnInit {
           && apiResponse.EncryptedResponse.status_code == 200) {
           this.filterPaginateSearch.itemListPageSize = 50;
           this.allData = apiResponse.EncryptedResponse.data.rows;
+          this.masterData = [...apiResponse.EncryptedResponse.data.rows];
+         this.completeData = [...apiResponse.EncryptedResponse.data.rows]; 
+
+         console.log("completeData", this.completeData)
+
           if (this.allData === undefined) {
             this.allData = [];
           }
           console.log(this.allData)
+          this.totalIndenters = apiResponse.EncryptedResponse.data.rows.length;
           this.filterPaginateSearch.Init(this.allData, this, "getPageData", undefined, apiResponse.EncryptedResponse.data.count, true);
           this.initSearchAndPagination();
         }
       });
   }
+
+  applyFilter(data: any[]) {
+  this.filterPaginateSearch.Init(
+    data,
+    this,
+    "getPageData",
+    undefined,
+    data.length,
+    true
+  );
+  this.initSearchAndPagination();
+}
 
   initSearchAndPagination() {
     if (this.paginationUiComponent === undefined) {
@@ -214,6 +261,56 @@ export class MaximumLotSizeForEachCropReportComponent implements OnInit {
     }
   }
 
+onSearch1() {
+  const term = this.searchTerm.toLowerCase().trim();
+
+  if (!term) {
+    this.filterPaginateSearch.itemList = [...this.allData];
+  } else {
+    this.filterPaginateSearch.itemList = this.allData.filter(item =>
+      (item?.m_crop?.m_crop_group?.group_name || '').toLowerCase().includes(term) ||
+      (item?.m_crop?.crop_name || '').toLowerCase().includes(term) ||
+      (item?.crop || '').toLowerCase().includes(term) ||
+      (item?.max_lot_size || '').toString().toLowerCase().includes(term)
+    );
+  }
+  this.totalIndenters = this.filterPaginateSearch.itemList.length;
+  this.filterPaginateSearch.itemListCurrentPage = 1;
+
+  this.initSearchAndPagination();
+  
+}
+
+onSearch() {
+  if (!this.searchTerm || this.searchTerm.trim() === '') {
+    this.completeData = [...this.masterData];
+    console.log("-Masetr Data", this.completeData)
+
+  } else {
+    const lower = this.searchTerm.toLowerCase();
+    this.completeData = this.masterData.filter(x =>
+      (x?.m_crop?.m_crop_group?.group_name || '').toLowerCase().includes(lower) ||
+      (x?.m_crop?.crop_name || '').toLowerCase().includes(lower) ||
+      (x?.crop || '').toLowerCase().includes(lower) ||
+      (x?.max_lot_size || '').toString().toLowerCase().includes(lower)
+    );
+  }
+
+  console.log("-COmplate Data", this.completeData)
+}
+
+loadData() {
+  this.breederService.getMaximumLotSizeForEachCropReport().subscribe((res: any) => {
+    this.allData = res;
+    this.filterPaginateSearch.itemList = [...this.allData];
+    this.filterPaginateSearch.itemList = this.allData;
+    this.totalIndenters = this.allData.length;
+    this.initSearchAndPagination();
+  });
+}
+
+
+
   clear() {
     // this.ngForm.controls['year'].patchValue("");
     this.ngForm.controls['group_code'].patchValue("");
@@ -255,151 +352,6 @@ export class MaximumLotSizeForEachCropReportComponent implements OnInit {
       });
   }
 
-  // cropGroup(data: string) { { } }
-  // async shortStatename() {
-  //   const route = 'get-state-list';
-  //   const result = await this.breederService.getRequestCreatorNew(route).subscribe((data: any) => {
-  //     this.statename = data && data['EncryptedResponse'] && data['EncryptedResponse'].data ? data['EncryptedResponse'].data : '';
-  //     // console.log('state======>',this.statename);
-
-  //   })
-  // }
-
-  // async submitindentor(loadPageNumberData: number = 1, searchData: any | undefined = undefined) {
-
-  //   const route = 'submit-indents-breeder-seeds-list';
-  //   const result = await this.breederService.postRequestCreator(route, null, {
-  //     page: loadPageNumberData,
-  //     pageSize: this.filterPaginateSearch.itemListPageSize || 10,
-  //     search: searchData
-  //   }).subscribe((apiResponse: any) => {
-  //     if (apiResponse !== undefined
-  //       && apiResponse.EncryptedResponse !== undefined
-  //       && apiResponse.EncryptedResponse.status_code == 200) {
-  //       this.identor = apiResponse.EncryptedResponse.data.data;
-  //       this.data1 = apiResponse.EncryptedResponse.data;
-  //       this.custom_array = [];
-  //       // console.log('this.identorthis.identor',this.identor);
-  //       // arr = arr.data
-  //       let varietyId = []
-  //       for (let value of this.identor) {
-  //         varietyId.push(value.m_crop_variety.variety_name)
-  //       }
-  //       varietyId = [...new Set(varietyId)]
-  //       let newObj = [];
-
-  //       for (let value of varietyId) {
-  //         let keyArr = [];
-  //         for (let val of this.identor) {
-  //           if (val.m_crop_variety.variety_name == value) {
-  //             let state = val.user.agency_detail.m_state.state_short_name;
-  //             keyArr.push({ "state": state, 'value': val.indent_quantity });
-  //           }
-  //         }
-  //         let variety_id = (value).toString();
-  //         newObj.push({ "variety_id": value, 'data': keyArr })
-  //       }
-
-  //       this.finalData = newObj;
-  //       console.log('this.idfinalDatantor', this.finalData);
-
-  //       this.tableId = [];
-  //       for (let id of this.identor) {
-  //         this.tableId.push(id.id);
-  //       }
-  //       // console.log('this.identorthis.identor', this.tableId);
-
-  //       const results = this.identor.filter(element => {
-  //         if (Object.keys(element).length !== 0) {
-  //           return true;
-  //         }
-
-  //         return false;
-  //       });
-  //       // console.log(results, 'resultssssssss');
-  //       if (this.identor === undefined) {
-  //         this.identor = [];
-  //       }
-  //       // let data =[];
-  //       const removeEmpty = (obj) => {
-  //         Object.entries(obj).forEach(([key, val]) =>
-  //           (val && typeof val === 'object') && removeEmpty(val) ||
-  //           (val === null || val === "") && delete obj[key]
-  //         );
-  //         return obj;
-  //       };
-  //       removeEmpty(this.identor)
-  //       this.filterPaginateSearch.Init(results, this, "getPageData", undefined, apiResponse.EncryptedResponse.data.count);
-  //       this.initSearchAndPagination();
-  //     }
-
-  //   });
-  // }
-
-  // freeze() {
-  //   const searchFilters = {
-  //     "search": {
-  //       "id": this.tableId
-  //     }
-  //   };
-  //   const route = "freeze-indent-breeder-seed-data";
-  //   this.service.postRequestCreator(route, null, searchFilters).subscribe((apiResponse: any) => {
-  //     if (apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.status_code
-  //       && apiResponse.EncryptedResponse.status_code == 200) {
-  //       Swal.fire({
-  //         toast: true,
-  //         icon: "success",
-  //         title: "Data Has Been Successfully Updated",
-  //         position: "center",
-  //         showConfirmButton: false,
-  //         showCancelButton: false,
-  //         timer: 2000
-  //       }).then(x => {
-
-  //         this.router.navigate(['/app-maximum-lot-size-for-each-crop-report']);
-  //       })
-  //     }
-  //     else {
-
-  //       Swal.fire({
-  //         toast: true,
-  //         icon: "error",
-  //         title: "An error occured",
-  //         position: "center",
-  //         showConfirmButton: false,
-  //         showCancelButton: false,
-  //         timer: 2000
-  //       })
-  //     }
-
-  //   });
-  // }
-
-  // getSeasonData() {
-  //   const route = "get-season-details";
-  //   const result = this.service.postRequestCreator(route, null).subscribe(data => {
-  //     this.seasonList = data && data.EncryptedResponse && data.EncryptedResponse.data ? data.EncryptedResponse.data : '';
-  //     // console.log(this.seasonList);
-  //   })
-  // }
-  // getCroupCroupList() {
-  //   const route = "crop-group";
-  //   const result = this.service.getPlansInfo(route).then((data: any) => {
-  //     this.response_crop_group = data && data['EncryptedResponse'] && data['EncryptedResponse'].data && data['EncryptedResponse'].data ? data['EncryptedResponse'].data : '';
-  //   })
-  // }
-  // initSearchAndPagination() {
-  //   this.paginationUiComponent.Init(this.filterPaginateSearch);
-  //   if (this.paginationUiComponent === undefined) {
-
-
-  //     setTimeout(() => {
-  //       this.initSearchAndPagination();
-  //     }, 300);
-  //     return;
-  //   }
-  //   // this.indentBreederSeedAllocationSearchComponent.Init(this.filterPaginateSearch);
-  // }
 
   myFunction() {
     document.getElementById("myDropdown").classList.toggle("show");
@@ -424,21 +376,17 @@ export class MaximumLotSizeForEachCropReportComponent implements OnInit {
     }
 
    
-
-    // this.ngForm.controls['year'].value ? (searchData['year'] = this.ngForm.controls['year'].value) : '';
     this.ngForm.controls['group_code'].value ? (searchData['group_code'] = this.ngForm.controls['group_code'].value) : '';
     this.ngForm.controls['crop_name'].value ? (searchData['crop_name'] = this.ngForm.controls['crop_name'].value) : '';
 
     this.service
       .postRequestCreator("get-crop-max-lot-size-data", null, {
-        // pageSize: this.filterPaginateSearch.itemListPageSize || 10,
         search: searchData
       })
       .subscribe((apiResponse: any) => {
         if (apiResponse !== undefined
           && apiResponse.EncryptedResponse !== undefined
           && apiResponse.EncryptedResponse.status_code == 200) {
-          // this.filterPaginateSearch.itemListPageSize = 10;
           this.exportdata = apiResponse.EncryptedResponse.data.rows;
           if (this.exportdata === undefined) {
             this.exportdata = [];
@@ -452,36 +400,18 @@ export class MaximumLotSizeForEachCropReportComponent implements OnInit {
  
     });
   }
+
+  
   exportexcel(): void {
-    /* pass here the table id */
     let element = document.getElementById('excel-table');
     const ws: XLSX.WorkSheet = XLSX.utils.table_to_sheet(element);
 
-    /* generate workbook and add the worksheet */
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-
-    /* save to file */
     XLSX.writeFile(wb, this.fileName);
 
   }
 
-  // download() {
-  //   const name = 'maximum-lot-size-for-each-crop-report';
-  //   const element = document.getElementById('excel-table');
-  //   const options = {
-  //     filename: `${name}.pdf`,
-  //     image: { type: 'jpeg', quality: 1 },
-  //     html2canvas: {
-  //       dpi: 192,
-  //       scale: 4,
-  //       letterRendering: true,
-  //       useCORS: true
-  //     },
-  //     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  //   };
-  //   html2PDF().set(options).from(element).toPdf().save();
-  // }
   download() {  
     let reportDataHeader = [
       { text: 'S/N', bold: true },
@@ -493,7 +423,7 @@ export class MaximumLotSizeForEachCropReportComponent implements OnInit {
     
                           ]
 
-    let reportData = this.exportdata.map((element, index) => {   
+    let reportData = this.completeData.map((element, index) => {   
  
     let reportData =  [
             index+1,                 
@@ -526,11 +456,14 @@ export class MaximumLotSizeForEachCropReportComponent implements OnInit {
 
       content: [
         { text: 'Crope Wise Maximum Lot Size', style: 'header' },
-        { text: ` Crop Group: ${this.selectCrop}  Crop Name: ${this.selectCrop_name}`,  },
+        // { text: ` Crop Group: ${this.selectCrop}  Crop Name: ${this.selectCrop_name}`,  },
+        { 
+  text: `Crop Group : ${this.selectCrop ? this.selectCrop : 'NA'}   Crop Name : ${this.selectCrop_name ? this.selectCrop_name : 'NA'}`,  
+},
+
         {
           style: 'indenterTable',
           table: {
-            // widths: [5,15,10,10,10,10,10,10,10,10],
             body: 
               reportData,
           },
@@ -557,20 +490,7 @@ export class MaximumLotSizeForEachCropReportComponent implements OnInit {
     };
     pdfMake.createPdf(docDefinition).download('crop-wise-maximum-report.pdf');
   }
-  cropGroup(item: any) {
-    console.log('item====>', item);
 
-    this.selectCrop = item.group_name;
-    
-    this.ngForm.controls["crop_text"].setValue("");
-    this.ngForm.controls['group_code'].setValue(item && item.group_code ? item.group_code :"");
-    this.selectCrop_group_code = item.group_code;
-    this.crop_name_data = item.group_name;
-    this.selectCrop_group = "";
-    this.ngForm.controls['crop_name'].setValue('')
-    this.crop_text_check='crop_group'
-    // this.getCroupNameList(item.group_code);
-  }
   cropdatatext(){
  
     this.crop_text_check='';
@@ -588,14 +508,77 @@ export class MaximumLotSizeForEachCropReportComponent implements OnInit {
   cnclick() {
     document.getElementById('crop_name').click();
   }
-  crop_name(item: any) {
-    this.selectCrop_name =item && item['m_crop.crop_name'] ? item['m_crop.crop_name'] :'';
-    console.log("item1", item)
-    
-    this.crop_name_check=''
-    
-    this.ngForm.controls["name_text"].setValue("");
-    this.ngForm.controls['crop_name'].setValue(item && item['m_crop.crop_code'] ? item['m_crop.crop_code'] :'')
+
+  toggleFilter() {
+  this.showFilter = !this.showFilter;
+}
+autoSubmit(loadPageNumberData: number = 1) {
+  let searchData: any = { isSearch: true, isReport: true };
+
+  if (this.ngForm.controls['group_code'].value && this.ngForm.controls['group_code'].value !== 'All') {
+    searchData['group_code'] = this.ngForm.controls['group_code'].value;
+    searchData['isSearch'] = true;
   }
+
+  if (this.ngForm.controls['crop_name'].value && this.ngForm.controls['crop_name'].value !== 'All') {
+    searchData['crop_name'] = this.ngForm.controls['crop_name'].value;
+    searchData['isSearch'] = true;
+  }
+
+  this.service
+    .postRequestCreator("get-crop-max-lot-size-data", null, {
+      page: loadPageNumberData,
+      pageSize: this.filterPaginateSearch.itemListPageSize || 10,
+      search: searchData
+    })
+    .subscribe((apiResponse: any) => {
+      if (apiResponse?.EncryptedResponse?.status_code == 200) {
+        this.allData = apiResponse.EncryptedResponse.data.rows || [];
+        this.masterData = [...apiResponse.EncryptedResponse.data.rows];
+        this.completeData = [...apiResponse.EncryptedResponse.data.rows]; 
+        this.totalIndenters = apiResponse.EncryptedResponse.data.rows.length;
+
+        this.filterPaginateSearch.Init(this.allData, this, "getPageData", undefined, apiResponse.EncryptedResponse.data.count, true);
+        this.initSearchAndPagination();
+      }
+    });
+}
+cropGroup(data: any) {
+  this.selectCrop = data.group_name;
+  this.ngForm.controls['group_code'].setValue(data.group_code);
+
+  if (data.group_code === 'All') {
+    this.isCropName = false;
+    this.selectCrop_name = 'All';
+    this.ngForm.controls['crop_name'].setValue('All');
+    this.searchTerm = ''
+    // this.getPageData();
+  } else {
+    this.getCropName(data.group_code);
+    this.isCropName = true;
+    this.selectCrop_name = '';
+    this.searchTerm = ''
+
+  }
+
+  this.autoSubmit(); 
+}
+
+crop_name(data: any) {
+  this.selectCrop_name = data['m_crop.crop_name'];
+  this.ngForm.controls['crop_name'].setValue(data['m_crop.crop_code']);
+
+  if (data['m_crop.crop_code'] === 'All') {
+    // this.getPageData(); 
+    this.autoSubmit();
+    this.searchTerm = ''
+
+  } else {
+    this.autoSubmit();
+    this.searchTerm = ''
+ 
+  }
+}
+
 
 }

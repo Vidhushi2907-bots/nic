@@ -14,7 +14,7 @@ import { ngbDropdownEvents } from 'src/app/_helpers/ngbDropdownEvents';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { timer } from 'rxjs';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+//pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
   selector: 'app-add-crop-variety-report',
@@ -116,50 +116,138 @@ export class AddCropVarietyReportComponent implements OnInit {
       filed_data: new FormControl('',),
     });
 
-    this.ngForm.controls['crop_group'].valueChanges.subscribe(newValue => {
-      if (newValue) {
+    // this.ngForm.controls['crop_group'].valueChanges.subscribe(newValue => {
+    //   if (newValue) {
 
-        this.getCropNameList(newValue);
-        this.ngForm.controls['crop_name'].enable();
-        this.ngForm.controls["crop_name"].setValue("");
-        this.ngForm.controls["variety_name"].setValue("");
-        this.ngForm.controls["variety_name"].disable()
-        this.crop_names = '';
-        this.variety_names = '';
-        this.disabledfieldcropName = false;
-        this.disabledfieldVariety = true;
-      }
-      else {
-        this.ngForm.controls["crop_name"].disable()
-      }
-    });
+    //     this.getCropNameList(newValue);
+    //     this.ngForm.controls['crop_name'].enable();
+    //     this.ngForm.controls["crop_name"].setValue("");
+    //     this.ngForm.controls["variety_name"].setValue("");
+    //     this.ngForm.controls["variety_name"].disable()
+    //     this.crop_names = '';
+    //     this.variety_names = '';
+    //     this.disabledfieldcropName = false;
+    //     this.disabledfieldVariety = true;
+    //   }
+    //   else {
+    //     this.ngForm.controls["crop_name"].disable()
+    //   }
+    // });
+//     this.ngForm.controls['crop_group'].valueChanges.subscribe(newValue => {
+//   if (newValue) {
+//     this.getCropNameList('A04');
+//     this.ngForm.controls['crop_name'].enable();
+//     this.ngForm.controls["crop_name"].setValue("");
+//     this.ngForm.controls["variety_name"].setValue("");
+//     this.ngForm.controls["variety_name"].disable();
+//     this.disabledfieldcropName = false;
+//     this.disabledfieldVariety = true;
+//   } else {
+//     this.ngForm.controls["crop_name"].disable();
+//   }
+// });
+
+
+this.ngForm.controls['filed_data'].valueChanges.subscribe(newValue => {
+  const userData = localStorage.getItem('BHTCurrentUser');
+  const data = JSON.parse(userData);
+  const user_type = data?.user_type;
+if (user_type === 'OILSEEDADMIN') {
+this.ngForm.controls['crop_group'].patchValue('A04')
+this.ngForm.controls['crop_group'].disable();
+  this.ngForm.controls['crop_text'].patchValue("OILSEEDS");
+  this.ngForm.controls['crop_text'].disable();
+  this.crop_groups = "OILSEEDS";
+    this.ngForm.controls['crop_name'].enable();
+    this.ngForm.controls['crop_name'].setValue("");
+    this.ngForm.controls['variety_name'].setValue("");
+    this.ngForm.controls['variety_name'].disable();
+    this.disabledfieldcropName = false;
+    this.variety_names = '';
+  }
+  if (user_type === 'PULSESSEEDADMIN') {
+    this.ngForm.controls['crop_group'].patchValue('A03');
+    this.ngForm.controls['crop_group'].disable();
+    this.ngForm.controls['crop_text'].patchValue("PULSES");
+    this.ngForm.controls['crop_text'].disable();
+    this.crop_groups = "PULSES";
+    this.ngForm.controls['crop_name'].enable();
+    this.ngForm.controls['crop_name'].setValue("");
+    this.ngForm.controls['variety_name'].setValue("");
+    this.ngForm.controls['variety_name'].disable();
+    this.disabledfieldcropName = false;
+    this.variety_names = '';
+  }
+  
+});
+
+
+this.ngForm.controls['crop_group'].valueChanges.subscribe(newValue => {
+  if (newValue) {
+    this.getCropNameList(newValue);
+    this.ngForm.controls['crop_name'].enable();
+    this.ngForm.controls["crop_name"].setValue("");
+    this.ngForm.controls["variety_name"].setValue("");
+    this.ngForm.controls["variety_name"].disable();
+    this.crop_names = '';
+    this.variety_names = '';
+    this.disabledfieldcropName = false;
+    this.disabledfieldVariety = true;
+    console.log("VAlueeee Later", this.ngForm.controls['crop_group'].value)
+    console.log("VAlueeee crop_text", this.ngForm.controls['crop_text'].value)
+    console.log("this.crop_groups", this.crop_groups)
+
+
+    
+
+  } else {
+    this.ngForm.controls["crop_name"].disable();
+  }
+
+
+});
+
+
+
+    // this.ngForm.controls['crop_name'].valueChanges.subscribe(newValue => {
+    //   if (newValue) {
+    //     this.ngForm.controls["variety_name"].setValue("");
+    //     this.ngForm.controls['variety_name'].enable();
+    //     this.variety_names = '';
+    //     this.getCropVarietyData(newValue);
+    //     this.disabledfieldVariety = false
+    //   }
+    //   else {
+    //     this.ngForm.controls["variety_name"].disable()
+    //   }
+    // });
+    // this.ngForm.controls['crop_text'].valueChanges.subscribe(newValue => {
+    //   if (newValue) {
+    //     console.log(newValue)
+    //     this.cropData = this.cropDataSecond
+    //     let response = this.cropData.filter(x => x.group_name.toLowerCase().startsWith(newValue.toLowerCase()))
+
+    //     this.cropData = response
+
+
+    //   }
+    //   else {
+    //     this.getCropData(null)
+    //   }
+    // });
 
     this.ngForm.controls['crop_name'].valueChanges.subscribe(newValue => {
-      if (newValue) {
-        this.ngForm.controls["variety_name"].setValue("");
-        this.ngForm.controls['variety_name'].enable();
-        this.variety_names = '';
-        this.getCropVarietyData(newValue);
-        this.disabledfieldVariety = false
-      }
-      else {
-        this.ngForm.controls["variety_name"].disable()
-      }
-    });
-    this.ngForm.controls['crop_text'].valueChanges.subscribe(newValue => {
-      if (newValue) {
-        console.log(newValue)
-        this.cropData = this.cropDataSecond
-        let response = this.cropData.filter(x => x.group_name.toLowerCase().startsWith(newValue.toLowerCase()))
+  if (newValue) {
+    this.ngForm.controls["variety_name"].setValue("");
+    this.ngForm.controls['variety_name'].enable();
+    this.variety_names = '';
+    this.getCropVarietyData(newValue);
+    this.disabledfieldVariety = false;
+  } else {
+    this.ngForm.controls["variety_name"].disable();
+  }
+});
 
-        this.cropData = response
-
-
-      }
-      else {
-        this.getCropData(null)
-      }
-    });
     this.ngForm.controls['crop_name_text'].valueChanges.subscribe(newValue => {
       if (newValue) {
         console.log(newValue)
@@ -196,37 +284,63 @@ export class AddCropVarietyReportComponent implements OnInit {
     //   this.disabledfield=false;
     // }
   }
+  // ngOnInit(): void {
+  //   const currentUser = JSON.parse(localStorage.getItem('BHTCurrentUser'));
+  //   this.currentUser.id = currentUser.id
+  //   this.getInsitution()
+  //   this.notifiedvalue('notified');
+  //   this.filterPaginateSearch.itemListPageSize = 50;
+
+  //   this.getCropData(null);
+  //   this.ngForm.controls['crop_name'].disable()
+  //   this.ngForm.controls['variety_name'].disable()
+
+  //   this.dropdownSettings = {
+  //     idField: 'value',
+  //     textField: 'fieldName',
+  //     enableCheckAll: true,
+  //     allowSearchFilter: true,
+  //     limitSelection: -1,
+  //     itemsShowLimit:1
+  //   };
+  // }
+
   ngOnInit(): void {
-    const currentUser = JSON.parse(localStorage.getItem('BHTCurrentUser'));
-    this.currentUser.id = currentUser.id
-    // console.log('hiiiii',this.notifiedValue);
-    this.getInsitution()
-    this.notifiedvalue('notified');
-    // if (!localStorage.getItem('foo')) {
-    //   localStorage.setItem('foo', 'no reload')
-    //   // location.reload()
-    // } else {
-    //   localStorage.removeItem('foo')
-    // }
-    this.filterPaginateSearch.itemListPageSize = 50;
-    // this.getPageData();
+  // 1. Current user को get करना
+  const currentUser = JSON.parse(localStorage.getItem('BHTCurrentUser') || '{}');
+  this.currentUser.id = currentUser.id;
+  const user_type = currentUser.user_type;
+  const username = currentUser.username;
 
-    this.getCropData(null);
-    this.ngForm.controls['crop_name'].disable()
-    this.ngForm.controls['variety_name'].disable()
-    // this.getCropVarietyData();
-    // this.getCropNameList();
+  // 2. जरूरी functions call करना
+  this.getInsitution();
+  this.notifiedvalue('notified');
+  this.filterPaginateSearch.itemListPageSize = 50;
+  this.getCropData(null);
 
-    //multi select dropdown implementation
-    this.dropdownSettings = {
-      idField: 'value',
-      textField: 'fieldName',
-      enableCheckAll: true,
-      allowSearchFilter: true,
-      limitSelection: -1,
-      itemsShowLimit:1
-    };
+  // 3. Form controls disable करना
+  this.ngForm.controls['crop_name'].disable();
+  this.ngForm.controls['variety_name'].disable();
+
+  // 4. OILSEEDADMIN के लिए default Oilseeds select करना
+  if (user_type === 'OILSEEDADMIN' && username === 'OILSEEDADMIN') {
+    this.selectCrop = 'Oilseeds';                        // UI में दिखाने के लिए
+    this.ngForm.controls['crop_group'].setValue('A04');  // backend code value
+    this.ngForm.controls['crop_name'].enable();          // Crop Name enable
+    this.getCropNameList('A04');                         // Crop Name list load
   }
+
+  // 5. Dropdown settings
+  this.dropdownSettings = {
+    idField: 'value',
+    textField: 'fieldName',
+    enableCheckAll: true,
+    allowSearchFilter: true,
+    limitSelection: -1,
+    itemsShowLimit: 1
+  };
+}
+
 
   notifiedvalue(data) {
     
@@ -501,26 +615,8 @@ export class AddCropVarietyReportComponent implements OnInit {
             allData = [];
           }
           // this.finaleDate = arr
-         
-         
-        
-          this.filterPaginateSearch.Init(arr, this, "getPageData", undefined, apiResponse.EncryptedResponse.data.count, true);
-          // this.exportdatas = this.finaleDate
-        //   for(let item of this.exportdatas){
-        //    let items=[]
-        //    if(item.state_data && item.state_data.length>0){
-        //      item.state_data.forEach((el)=>{
-        //        items.push(el.state_name)
-           
-        //            // item.state_data=items
-        //            })
-        //      item.state_data=items
-            
-        //    }
-        //  }
+                   this.filterPaginateSearch.Init(arr, this, "getPageData", undefined, apiResponse.EncryptedResponse.data.count, true);
           this.initSearchAndPagination();
-          // this.getCropNameLists();
-          // this.datas = allData;
         }
       });
   }
@@ -746,56 +842,108 @@ export class AddCropVarietyReportComponent implements OnInit {
 
   }
 
+  // async getCropNameList(newValue) {
+  //   console.log('crop name ========== new value', newValue);
+  //   if (newValue) {
+  //     const userData = localStorage.getItem('BHTCurrentUser');
+  //     const data = JSON.parse(userData);
+  //     const user_type = data.user_type
+
+
+
+  //     const searchFilters = {
+  //       "search": {
+  //         "group_code": newValue,
+  //         "cropNameRaw": true,
+  //         user_type: user_type,
+  //         type: 'reporticar',
+  //         isNotified:this.isNotifiedValue
+  //       }
+  //     };
+
+  //     this._service
+  //       .postRequestCreator("get-distrinct-seed-variety-crop-name", searchFilters, null)
+  //       .subscribe((apiResponse: any) => {
+  //         if (apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.status_code
+  //           && apiResponse.EncryptedResponse.status_code == 200) {
+  //           console.log(apiResponse);
+  //           if (apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.data.rows.length > 0) {
+  //             this.cropNameList = apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.data && apiResponse.EncryptedResponse.data.rows ? apiResponse.EncryptedResponse.data.rows : '';
+  //             this.cropNameListSecond = this.cropNameList
+
+  //           }
+  //           else {
+  //             this.cropNameList = []
+  //           }
+
+
+  //         }
+  //         else {
+
+  //           this.cropNameList = []
+  //         }
+  //       });
+  //   } else {
+  //     this.ngForm.controls["crop_group"].setValue("");
+  //     this.ngForm.controls["crop_name"].setValue("");
+  //     this.ngForm.controls["variety_name"].setValue("");
+  //   }
+
+  // }
+
   async getCropNameList(newValue) {
-    console.log('crop name ========== new value', newValue);
-    if (newValue) {
-      const userData = localStorage.getItem('BHTCurrentUser');
-      const data = JSON.parse(userData);
-      const user_type = data.user_type
+  if (newValue) {
+    const userData = localStorage.getItem('BHTCurrentUser');
+    const data = JSON.parse(userData);
+    const user_type = data.user_type
 
+    const searchFilters = {
+      "search": {
+        "group_code": newValue,
+        "cropNameRaw": true,
+        user_type: user_type,
+        type: 'reporticar',
+        isNotified:this.isNotifiedValue
+      }
+    };
 
+    this._service
+      .postRequestCreator("get-distrinct-seed-variety-crop-name", searchFilters, null)
+      .subscribe((apiResponse: any) => {
+        if (apiResponse?.EncryptedResponse?.status_code == 200) {
 
-      const searchFilters = {
-        "search": {
-          "group_code": newValue,
-          "cropNameRaw": true,
-          user_type: user_type,
-          type: 'reporticar',
-          isNotified:this.isNotifiedValue
+          // Crop Name List set करना
+          this.cropNameList = apiResponse.EncryptedResponse.data?.rows || [];
+          this.cropNameListSecond = [...this.cropNameList];  // backup
+
+          // Form controls reset & enable करना
+          this.ngForm.controls['crop_name'].setValue('');        // Crop Name empty
+          this.ngForm.controls['variety_name'].setValue('');     // Variety empty
+          this.crop_names = '';                                   // UI variable reset
+          this.variety_names = '';
+          this.ngForm.controls['crop_name'].enable();            // enable Crop Name dropdown
+
+        } else {
+          this.cropNameList = [];
+          this.ngForm.controls['crop_name'].setValue('');
+          this.ngForm.controls['variety_name'].setValue('');
+          this.crop_names = '';
+          this.variety_names = '';
+          this.ngForm.controls['crop_name'].disable();
         }
-      };
+      });
 
-      this._service
-        .postRequestCreator("get-distrinct-seed-variety-crop-name", searchFilters, null)
-        .subscribe((apiResponse: any) => {
-          if (apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.status_code
-            && apiResponse.EncryptedResponse.status_code == 200) {
-            console.log(apiResponse);
-            // this.cropName = apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.data  ? apiResponse.EncryptedResponse.data :'' ;
-            if (apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.data.rows.length > 0) {
-              // this.cropName = apiResponse.EncryptedResponse.data.rows;
-              // console.log('this.cropName ===========>',this.cropName );
-              this.cropNameList = apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.data && apiResponse.EncryptedResponse.data.rows ? apiResponse.EncryptedResponse.data.rows : '';
-              this.cropNameListSecond = this.cropNameList
-            }
-            else {
-              this.cropNameList = []
-            }
-
-
-          }
-          else {
-
-            this.cropNameList = []
-          }
-        });
-    } else {
-      this.ngForm.controls["crop_group"].setValue("");
-      this.ngForm.controls["crop_name"].setValue("");
-      this.ngForm.controls["variety_name"].setValue("");
-    }
-
+  } else {
+    // Agar Crop Group empty ho
+    this.ngForm.controls["crop_group"].setValue("");
+    this.ngForm.controls["crop_name"].setValue("");
+    this.ngForm.controls["variety_name"].setValue("");
+    this.crop_names = '';
+    this.variety_names = '';
+    this.ngForm.controls['crop_name'].disable();
   }
+}
+
 
 
 
@@ -1083,5 +1231,23 @@ getInsitution() {
   
   })
 }
+
+// getCropGroupName(code: string) {
+//   const group = this.cropData.find(x => x.group_code === code);
+//   return group ? group.group_name : '';
+// }
+getCropGroupName(value: any) {
+  if (!value) return '';
+  if (value.group_name) return value.group_name;
+
+  // fallback if only code is stored
+  if (this.cropData) {
+    const group = this.cropData.find(x => x.group_code === value);
+    return group ? group.group_name : '';
+  }
+  return '';
+}
+
+
 }
 

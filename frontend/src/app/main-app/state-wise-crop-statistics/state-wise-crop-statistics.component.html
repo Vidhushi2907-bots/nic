@@ -1,0 +1,309 @@
+<div class="container-fluid p-3" [formGroup]="ngFrom">
+  <h4 class="section-heading text-start mb-3 py-2 pl-3">
+   {{ ngFrom.get('reportType')?.value === 'state' ? 'State-wise Crop Statistics' : 'Crop-wise Statistics' }}
+  </h4>
+  <div class="report-toggle d-flex gap-4 mb-3">
+    <label class="custom-radio">
+      <input type="radio" name="reportType" value="state" formControlName="reportType" (change)="switchReport()" />
+      <span class="radio-btn"> <span class="checkmark"></span> State-wise Data </span>
+    </label>
+    <label class="custom-radio">
+      <input type="radio" name="reportType" value="crop" formControlName="reportType" (change)="switchReport()" />
+      <span class="radio-btn"><span class="checkmark"></span>Crop-wise Data</span>
+    </label>
+  </div>
+
+  <div *ngIf="currentLevel === 'state'">
+    <div class="row">
+      <div class="col-12 pt-2 pl-3 for-margin filter-wrapper">
+        <div class="row filter-wrapper">
+          <div class="col-md-12 d-flex justify-content-end mb-3 mr-3">
+            <div class="position-relative">
+              <button class="form-button search mr-3" (click)="showExportOptions = !showExportOptions">
+                Export To  &nbsp;<i class="fa fa-angle-down"
+                aria-hidden="true"> </i> <i class="bi bi-caret-down-fill"></i>
+              </button>
+              <ul class="dropdown-menu show mt-1" *ngIf="showExportOptions" style="display: block; position: absolute; right: 0;">
+                <li><a class="dropdown-item" (click)="downloadPdf('state',false)"> <img
+                  src="assets\icons\pdf-icon.png"
+                  alt=""
+                  width="20px" height="20px"> &nbsp; PDF</a></li>
+                <li><a class="dropdown-item" (click)="downloadExcel('state',false)"> <img
+                  src="assets\icons\excel.jpg"
+                  alt=""
+                  width="20px" alt=""> &nbsp;Excel</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="custom-divider text-white fw-bold text-center py-2 mb-1">State Wise Statistics </div>
+           <div *ngIf="currentLevel !== 'state'" class="mb-2">
+             <button class="btn btn-sm btn-warning" (click)="goBack()"> Back</button>
+           </div>
+          <div class="col-md-4 mt-2 px-0 px-md-1 pr-2 pr-md-2 search-box">
+            <input type="text" class="form-control" placeholder="Search Keyword" formControlName="state_search_filter" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Table -->
+    <div class="table-responsive px-2">
+      <table class="table table-bordered table-hover text-center align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>S.No</th>
+            <th (click)="sortData('state','state_name')" class="cursor-pointer">State
+              <span *ngIf="sortColumn === 'state_name'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+            </th>
+            <th (click)="sortData('state','total_crop_group_count')" class="cursor-pointer"> No. of Crop Group
+              <span *ngIf="sortColumn === 'total_crop_group_count'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+            </th>
+            <th (click)="sortData('state','total_crop_count')" class="cursor-pointer"> No. of Crop
+              <span *ngIf="sortColumn === 'total_crop_count'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+            </th>
+            <th (click)="sortData('state','total_variety_count')" class="cursor-pointer">No. of Varieties
+              <span *ngIf="sortColumn === 'total_variety_count'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody *ngIf="stateWiseDataList?.length > 0; else noData">
+        <tr *ngFor="let data of stateWiseDataList; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ data.state_name || 'NA'}}</td>
+            <td class="text-primary cursor-pointer" (click)="getCropGroupWiseList(data.state_code)">{{ data.total_crop_group_count  || 0}}</td>
+            <td class="text-primary cursor-pointer" (click)="getCropWiseList(data.state_code,this.group_code)">{{ data.total_crop_count || 0 }}</td>
+            <td class="text-primary cursor-pointer" (click)="getVarietyWiseList(data.state_code,this.group_code,this.crop_code)">{{ data.total_variety_count || 0}}</td>
+        </tr>
+        </tbody>
+        <ng-template #noData>
+          <tr>
+            <td colspan="5" class="text-center text-muted">No data found.</td>
+          </tr>
+        </ng-template>
+      </table>
+    </div>
+  </div>
+
+  <!-- GROUP Table -->
+  <div *ngIf="currentLevel === 'group'">
+    <div class="row">
+      <div class="col-12 pt-2 pl-3 for-margin filter-wrapper">
+        <div class="row filter-wrapper">
+          <div class="col-md-12 d-flex justify-content-end mb-3 gx-2">
+            <div class="position-relative">
+              <button class="form-button search" (click)="showExportOptions = !showExportOptions">
+                Export To <i class="bi bi-caret-down-fill"></i>
+              </button>
+              <ul class="dropdown-menu show mt-1" *ngIf="showExportOptions" style="display: block; position: absolute; right: 0;" >
+                <li><a class="dropdown-item" (click)="downloadPdf('group',false)">PDF</a></li>
+                <li><a class="dropdown-item" (click)="downloadExcel('group',false)">Excel</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="custom-divider text-white fw-bold text-center py-2 mb-1">Crop Group wise Statistics </div>
+           <div class="col-md-6 d-flex gap-2 button1">
+              <button class="form-button search mb-3" (click)="goBack()">Back</button>
+            </div>
+          <div class="col-md-4 mt-2 px-0 px-md-1 pr-2 pr-md-2 search-box">
+            <input type="text" class="form-control" placeholder="Search Keyword" formControlName="group_code_search_filter" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="table-responsive px-2">
+      <table class="table table-bordered table-hover text-center align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>S.No</th>
+            <th (click)="sortData('group','state_name')" class="cursor-pointer">State
+              <span *ngIf="sortColumn === 'state_name'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+            </th>
+            <th (click)="sortData('group','group_name')" class="cursor-pointer">Crop Group
+              <span *ngIf="sortColumn === 'group_name'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+            </th>
+            <th (click)="sortData('group','total_crop_count')" class="cursor-pointer"> No. of Crop
+              <span *ngIf="sortColumn === 'total_crop_count'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+            </th>
+            <th (click)="sortData('group','total_variety_count')" class="cursor-pointer">No. of Varieties
+              <span *ngIf="sortColumn === 'total_variety_count'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+            </th>
+          </tr>
+        </thead>
+      <tbody *ngIf="cropGroupWiseDataList?.length > 0; else noData">
+          <tr *ngFor="let data of cropGroupWiseDataList; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ data.state_name || 'NA'}}</td>
+            <td>{{ data.group_name || 'NA' }}</td>
+            <td class="text-primary cursor-pointer" (click)="getCropWiseList(this.state_code,data.group_code)">{{ data.total_crop_count || 0 }}</td>
+            <td class="text-primary cursor-pointer" (click)="getVarietyWiseList(this.state_code,data.group_code,this.crop_code)">{{ data.total_variety_count || 0}}</td>
+          </tr>
+        </tbody>
+        <ng-template #noData>
+          <tr>
+            <td colspan="5" class="text-center text-muted">No data found.</td>
+          </tr>
+        </ng-template>
+      </table>
+    </div>
+  </div>
+
+  <!-- CROP Table -->
+  <div *ngIf="currentLevel === 'crop'">
+    <div class="row">
+      <div class="col-12 pt-2 pl-3 for-margin filter-wrapper">
+        <div class="row filter-wrapper">
+          <div class="col-md-12 d-flex justify-content-end mb-3 gx-2">
+            <div class="position-relative">
+              <button class="form-button search" (click)="showExportOptions = !showExportOptions">
+                Export To <i class="bi bi-caret-down-fill"></i>
+              </button>
+              <ul class="dropdown-menu show mt-1" *ngIf="showExportOptions"
+                  style="display: block; position: absolute; right: 0;">
+                <li><a class="dropdown-item" (click)="downloadPdf('crop',false)">PDF</a></li>
+                <li><a class="dropdown-item" (click)="downloadExcel('crop',false)">Excel</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="custom-divider text-white fw-bold text-center py-2 mb-1">Crop Wise Statistics</div>
+          <div class="col-md-6 d-flex gap-2 button1"><button class="form-button search mb-3" (click)="goBack()">Back</button></div>
+          <div class="col-md-4 mt-2 px-0 px-md-1 pr-2 pr-md-2 search-box">
+            <input type="text" class="form-control" placeholder="Search Keyword" formControlName="crop_search_filter" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="table-responsive px-2">
+      <table class="table table-bordered table-hover text-center align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>S.No</th>
+            <th (click)="sortData('crop','state_name')" class="cursor-pointer">State
+              <span *ngIf="sortColumn === 'state_name'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+            </th>
+            <th (click)="sortData('crop','group_name')" class="cursor-pointer">Crop Group
+              <span *ngIf="sortColumn === 'group_name'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+            </th>
+            <th (click)="sortData('crop','crop_name')" class="cursor-pointer"> Crop Name
+              <span *ngIf="sortColumn === 'Crop_name'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+            </th>
+            <th (click)="sortData('crop','total_variety_count')" class="cursor-pointer">No. of Varieties
+              <span *ngIf="sortColumn === 'total_variety_count'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody *ngIf="cropWiseDataList?.length > 0; else noData">
+          <tr *ngFor="let data of cropWiseDataList; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ data.state_name || 'NA'}}</td>
+            <td>{{ data.group_name || 'NA'}}</td>
+            <td>{{ data.crop_name || 'NA'}}</td>
+            <td class="text-primary cursor-pointer" (click)="getVarietyWiseList(this.state_code,data.group_code,data.crop_code)">{{ data.total_variety_count || 0 }}</td>
+        </tr>
+        </tbody>
+        <ng-template #noData>
+          <tr>
+            <td colspan="5" class="text-center text-muted">No data found.</td>
+          </tr>
+        </ng-template>
+      </table>
+    </div>
+  </div>
+
+  <!-- VARIETY Table -->
+  <div *ngIf="currentLevel === 'variety'">
+    <div class="row mb-2">
+      <div class="col-md-3">
+        <label class="search_text">From Notification Year</label>
+        <select class="form-control" formControlName="year_from">
+          <option value="" disabled>Select Year</option>
+          <option *ngFor="let year of notificationYears">{{ year }}</option>
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <label class="search_text">To Notification Year</label>
+        <select class="form-control" formControlName="year_to">
+          <option value="" disabled>Select Year</option>
+          <option *ngFor="let year of notificationYears">{{ year }}</option>
+        </select>
+      </div>
+    </div>
+    <div class="row align-items-center justify-content-between mb-1">
+      <div class="col-md-6 d-flex gap-2 button1">
+        <button class="form-button search mb-1" (click)="searchFilter()">Search</button>
+        <button class="form-button search clear-form-button ml-3 mb-1" (click)="resetFilters()" >Reset</button>
+      </div>
+
+      <div class="col-md-6 d-flex justify-content-end mr-3">
+        <div class="position-relative">
+          <button class="form-button search" (click)="showExportOptions = !showExportOptions">
+            Export To <i class="bi bi-caret-down-fill"></i>
+          </button>
+          <ul class="dropdown-menu show mt-1" *ngIf="showExportOptions" style="display: block; position: absolute; right: 0;">
+            <li><a class="dropdown-item" (click)="downloadPdf('variety',true)">PDF</a></li>
+            <li><a class="dropdown-item" (click)="downloadExcel('variety',true)">Excel</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="custom-divider1 text-white fw-bold text-center py-2 mb-1"> Variety wise Statistics</div>
+      <div class="row">
+        <div class="col-md-6 d-flex gap-2">
+          <button class="form-button search mb-3 mt-2" (click)="goBack()">Back</button>
+        </div>
+        <div class="col-md-4 mt-2 px-0 px-md-1 pr-2 pr-md-2 search-box">
+          <input type="text" class="form-control" placeholder="Search Keyword" formControlName="variety_search_filter" />
+        </div>
+      </div>
+
+    <div class="table-responsive px-2">
+      <table class="table table-bordered table-hover text-center align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>S.No</th>
+            <th (click)="sortData('variety','state_name')" class="cursor-pointer">State
+              <span *ngIf="sortColumn === 'state_name'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+            </th>
+            <th (click)="sortData('variety','group_name')" class="cursor-pointer">Crop Group
+              <span *ngIf="sortColumn === 'group_name'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+            </th>
+            <th (click)="sortData('variety','crop_name')" class="cursor-pointer"> Crop Name
+              <span *ngIf="sortColumn === 'crop_name'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+            </th>
+            <th (click)="sortData('variety','variety_name')" class="cursor-pointer">Varietie Name
+              <span *ngIf="sortColumn === 'variety_name'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+            </th>
+            <th (click)="sortData('variety','notification_date')" class="cursor-pointer">Notification Date
+              <span *ngIf="sortColumn === 'notification_date'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+            </th>
+            <th (click)="sortData('variety','notification_number')" class="cursor-pointer">Notification Number
+              <span *ngIf="sortColumn === 'notification_number'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+            </th>
+            <th>Action</th>
+         </tr>
+        </thead>
+        <tbody *ngIf="varietyWiseDataList?.length > 0; else noData">
+          <tr *ngFor="let data of varietyWiseDataList; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ data.state_name || 'NA'}}</td>
+            <td>{{ data.group_name || 'NA'}}</td>
+            <td>{{ data.crop_name || 'NA'}}</td>
+            <td>{{ data.variety_name || 'NA'}}</td>
+            <td>{{ formatDate(data.notification_date) }}</td>
+            <td>{{ data.notification_number || 'NA'}}</td>
+            <td>
+              <img src="assets/images/view.svg" role="button" title="View" (click)="viewVarietyDetail(data.variety_code)" />
+            </td>
+          </tr>
+        </tbody>
+        <ng-template #noData>
+          <tr>
+            <td colspan="8" class="text-center text-muted">No data found.</td>
+          </tr>
+        </ng-template>
+      </table>
+    </div>
+  </div>
+</div>

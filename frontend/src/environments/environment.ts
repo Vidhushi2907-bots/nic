@@ -44,10 +44,10 @@ export const environment = {
     apiBaseUrl: 'http://localhost:3006/ms-nb-006-production-center/api/',
     apiUrl: 'http://localhost:3006/ms-nb-006-production-center/api/',
   },
-  ms_nb_07_zsrm: {
-    baseUrl: 'http://localhost:8000/',
-    apiBaseUrl: 'http://localhost:8000/ms-nb-007-zsrm/api/',
-    apiUrl: 'http://localhost:8000/ms-nb-007-zsrm/api/',
+    ms_nb_008_srp: {
+    baseUrl: 'http://localhost:3008/',
+    apiBaseUrl: 'http://localhost:3008/ms-nb-008-srp/api/',
+    apiUrl: 'http://localhost:3008/ms-nb-008-srp/api/',
   }
 };
 

@@ -4,7 +4,7 @@
             <div class="row">
                 <div class="col-12 pl-4 pb-3 px-4 mt-2 ml-1 for-margin">
                     <span class="heading_notofied">
-                        Seed Testing Laboratory
+                       View Seed Testing Laboratory
                     </span>
                     <div [hidden]="true">
                         <app-add-seed-testing-laboratory-search></app-add-seed-testing-laboratory-search>
@@ -163,17 +163,18 @@
                     <!-- <app-dynamic-fields [fieldsList]="fieldsList" [formGroup]="formGroup"></app-dynamic-fields> -->
                     <div class="list-wrapper px-4 py-2">
                         <div class="row d-none d-md-flex data-row-header">
-                            <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle">S/N</div>
-                            <div class="col-6 col-md-4 py-3 d-flex verticle-content-middle">Laboratory Name</div>
-                            <div class="col-6 col-md-4 py-3 d-flex verticle-content-middle">Short Name</div>
-                            <!-- <div class="col-6 col-md-2 py-3 d-flex verticle-content-middle">District</div>
-                            <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle">State </div> -->
-                            <!-- <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle pl-lg-3">Mobile Number</div>
-                            <div class="col-6 col-md-2 py-3 pl-5 d-flex verticle-content-middle ">Status</div> -->
+                            <div class="col-6 col-md-1 py-1 d-flex verticle-content-middle">S/N</div>
+                            <div class="col-6 col-md-2 py-2 d-flex verticle-content-middle">Laboratory Name</div>
+                            <div class="col-6 col-md-2 py-3 d-flex verticle-content-middle">Address </div>
 
-                            <div class="col-6 col-md-3 py-3 d-flex verticle-content-middle justify-content-center">
+                            <div class="col-6 col-md-2 py-2 d-flex verticle-content-middle">Type(Notified/Non-Notified)</div>
+                            <div class="col-6 col-md-2 py-2 d-flex verticle-content-middle">Contact Person</div>
+                            <div class="col-6 col-md-2 py-2 d-flex verticle-content-middle pl-lg-3">Email</div>
+                            <div class="col-6 col-md-1 py-2 pl-5 d-flex verticle-content-middle ">Mobile</div>
+
+                            <!-- <div class="col-6 col-md-3 py-3 d-flex verticle-content-middle justify-content-center">
                                 Action
-                            </div>
+                            </div> -->
                         </div>
                         <div class="row data-row"
                             *ngFor="let data of filterPaginateSearch.itemList; let dataIndex=index">
@@ -184,24 +185,76 @@
                                         filterPaginateSearch.itemListPageSize + dataIndex + 1}}.</span>
                                 </div>
                             </div>
-                            <div class="col-6 col-md-4 py-1 d-flex verticle-content-middle">
+                            <div class="col-6 col-md-2 py-1 d-flex verticle-content-middle">
                                 <div class="w-fit-content">
                                     <label class="d-md-none"><b>Laboratory Name:</b>&nbsp;</label>
                                     <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
                                         data-placement="bottom" title="{{data.labFullName}}">
-                                        {{data && data.labFullName && (data.labFullName.length>20)?
-                                        (data.lab_name.substring(0,20)+ '...')  :
+                                        <!-- {{data && data.labFullName && (data.labFullName.length>30)?
+                                        (data.labFullName.substring(0,20)+ '...')  :
                                         data && data.labFullName ? (data.labFullName|uppercase) :"NA"
-                                        }}</span>
+                                        }} -->
+                                        {{data && data.labFullName ?
+                                            (data.labFullName)  :
+                                            "NA"
+                                            }}
+                                    </span>
                                 </div>
                             </div>
-                          
-                            <div class="col-6 col-md-4 py-1 d-flex verticle-content-middle">
+<!--                           
+                            <div class="col-6 col-md-2 py-1 d-flex verticle-content-middle">
                                 <div class="w-fit-content">
                                     <label class="d-md-none"><b>Short Name:</b>&nbsp;</label>
                                     <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
                                         data-placement="bottom" title="{{data.lab_name}}">{{data && data.lab_name ?
                                         (data.lab_name|uppercase) :"NA"
+                                        }}</span>
+                                </div>
+                            </div> -->
+                            <div class="col-6 col-md-2 py-1 d-flex verticle-content-middle">
+                                <div class="w-fit-content">
+                                    <label class="d-md-none"><b>address:</b>&nbsp;</label>
+                                    <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
+                                        data-placement="bottom" title="{{data.lab_name}}">{{data && data.address ?
+                                        (data.address) :"NA"
+                                        }}</span>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-2 py-1 d-flex verticle-content-middle">
+                                <div class="w-fit-content">
+                                    <label class="d-md-none"><b>type:</b>&nbsp;</label>
+                                    <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
+                                        data-placement="bottom" title="{{data.lab_name}}">{{data && data.type ?
+                                        (data.type) :"NA"
+                                        }}</span>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-2 py-1 d-flex verticle-content-middle">
+                                <div class="w-fit-content">
+                                    <label class="d-md-none"><b>contactPerson:</b>&nbsp;</label>
+                                    <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
+                                        data-placement="bottom" title="{{data.lab_name}}">{{data && data.contactPerson ?
+                                        (data.contactPerson) :"NA"
+                                        }}</span>
+                                </div>
+                            </div>
+                           
+
+                            <div class="col-6 col-md-2 py-1 d-flex verticle-content-middle">
+                                <div class="w-fit-content">
+                                    <label class="d-md-none"><b>email:</b>&nbsp;</label>
+                                    <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
+                                        data-placement="bottom" title="{{data.lab_name}}">{{data && data.email ?
+                                        (data.email) :"NA"
+                                        }}</span>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-1 py-1 d-flex verticle-content-middle">
+                                <div class="w-fit-content">
+                                    <label class="d-md-none"><b>address:</b>&nbsp;</label>
+                                    <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
+                                        data-placement="bottom" title="{{data.lab_name}}">{{data && data.mobile ?
+                                        (data.mobile|uppercase) :"NA"
                                         }}</span>
                                 </div>
                             </div>
@@ -257,22 +310,22 @@
                                 </div>
                             </div> -->
 <!-- {{data.labId.split('-')[0]]}} -->
-                            <div
+                            <!-- <div
                                 class="col-12 col-md-3 py-1 d-flex verticle-content-middle justify-content-md-center phone_view_btn">
                                 <div class="list-action-buttons-wrapper w-fit-content phone_view_action_btn">
                                     <button class="list-action-buttons"
                                         [routerLink]="['/add-seed-testing-laboratory/view', dataIndex,data.labId.split('-')[0]]">
                                         <img src="assets/images/view.svg">
                                     </button>
-                                    <!-- <button class="list-action-buttons"
+                                    <button class="list-action-buttons"
                                         [routerLink]="['/add-seed-testing-laboratory/edit', data.id]">
                                         <img src="assets/images/edit.svg">
                                     </button>
                                     <button class="list-action-buttons" (click)="delete(data.id)">
                                         <img src="assets/images/delete.svg">
-                                    </button> -->
+                                    </button>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                     <div [hidden]="countData!=0" class="px-2 py-3 w-100" style="height: 50px;">

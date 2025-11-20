@@ -1,0 +1,56 @@
+.login-logo{
+  background-color: white;
+  padding: 10px;
+  margin-bottom: 0px;
+  color: #0DC377;
+}
+
+.error-block{
+  color: #DD4B39 ;
+}
+
+.login-page {
+  height: auto;
+  background: #d2d6de;
+}
+
+.login-box {
+  width: 360px;
+  margin: 7% auto;
+}
+
+.login-logo[_ngcontent-jdp-c39] {
+  background-color: #fff;
+  padding: 10px;
+  margin-bottom: 0;
+  color: #0dc377;
+}
+
+.login-logo, .register-logo {
+  font-size: 35px;
+  text-align: center;
+  margin-bottom: 1px;
+  font-weight: 300;
+}
+
+.login-box-body, .register-box-body {
+  background: #fff;
+  padding: 20px;
+  border-top: 0;
+  color: #666;
+}
+
+
+.field-icon {
+  float: right;
+  margin-left: -25px;
+  margin-top: -25px;
+  position: relative;
+  z-index: 2;
+  padding-right: 2em;
+}
+
+.container{
+  padding-top:50px;
+  margin: auto;
+}

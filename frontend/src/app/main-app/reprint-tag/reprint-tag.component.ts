@@ -9,6 +9,7 @@ import Swal from 'sweetalert2';
 import * as html2PDF from 'html2pdf.js';
 import { ProductioncenterService } from 'src/app/services/productionCenter/productioncenter.service';
 import { environment } from 'src/environments/environment';
+import { JsPrintManagerService } from 'src/app/jsprintmanager.service';
 
 @Component({
   selector: 'app-reprint-tag',
@@ -110,7 +111,7 @@ export class ReprintTagComponent implements OnInit {
   selectTable(table: string) {
     this.selectedTable = table;
   }
-  constructor(private service: SeedServiceService, private fb: FormBuilder, private _productionCenter: ProductioncenterService) {
+  constructor(private service: SeedServiceService, private fb: FormBuilder, private _productionCenter: ProductioncenterService,private jsPrintManagerService: JsPrintManagerService) {
     this.createForm();
     this.currentDate = new Date();
   }
@@ -366,6 +367,7 @@ export class ReprintTagComponent implements OnInit {
       year:this.ngForm.controls['year'].value,
       season:this.ngForm.controls['season'].value,
       crop_code:this.ngForm.controls['crop_code'].value,
+      lot_no: this.ngForm.controls['lot_no'].value
     };
     this._productionCenter.postRequestCreator(route, param, null).subscribe(res => {
       if (res.EncryptedResponse.status_code === 200) {
@@ -418,6 +420,7 @@ export class ReprintTagComponent implements OnInit {
     this._productionCenter.postRequestCreator(route, param, null).subscribe(res => {
       if (res.EncryptedResponse.status_code === 200) {
         this.getReprintAllDataList = res.EncryptedResponse && res.EncryptedResponse.data ? res.EncryptedResponse.data : [];
+        console.log(this.getReprintAllDataList);
       }else{
         console.log("data is=====",this.getReprintAllDataList);
         
@@ -695,7 +698,36 @@ export class ReprintTagComponent implements OnInit {
      }, null).subscribe(res => {
       if (res.EncryptedResponse.status_code === 200) {
         console.log(res.EncryptedResponse.data)
-        this.cardData = res && res.EncryptedResponse && res.EncryptedResponse.data ? res.EncryptedResponse.data:[]
+        this.cardData = res && res.EncryptedResponse && res.EncryptedResponse.data ? res.EncryptedResponse.data:[];
+        console.log('cardData=====',this.cardData);
+        let printTagFinalArray = []
+        if (this.cardData && this.cardData.length) {
+          this.cardData.forEach(ele => {
+            printTagFinalArray.push(
+              {
+                companyName: this.agency_name ? this.agency_name : "NA",
+                location: this.district_name ? this.district_name + ', ' : "NA" + this.state_name ? this.state_name : 'NA',
+                seedClass: 'Breeder Seed',
+                qrCodeUrl:this.baseUrl+'tag-number-verification?tagNo='+(ele.tag_no?ele.tag_no:"NA"),
+                crop: this.selectCrop,
+                testDate: ele.date_of_test ? ele.date_of_test : "NA",
+                variety: ele.variety ? ele.variety : "NA",
+                pureSeedPercentage: ele.pure_seed ? ele.pure_seed : "NA",
+                parentalLine: ele.line_variety_name ? ele.line_variety_name : "NA",
+                inertSeedPercentage: ele.inert_matter ? ele.inert_matter : "NA",
+                germinationPercentage: ele.germination ? ele.germination : "NA",
+                lotNumber: ele.lot_no ? ele.lot_no : "NA",
+                tagNumber: ele.tag_no ? ele.tag_no : "NA",
+                bagWeight: ele.bag_weight ? ele.bag_weight : "NA",
+                executiveDirector: this.contactPersonName ? this.contactPersonName : "NA",
+                directorName: this.designation_name ? this.designation_name : "NA",
+                footer: 'This tag is system generated and does not require any signature.'
+              }
+            )
+          })
+        }
+        // console.log('printTagFinalArray',printTagFinalArray);
+        this.jsPrintManagerService.printLabels(printTagFinalArray);
       }
      });
 
@@ -714,7 +746,7 @@ export class ReprintTagComponent implements OnInit {
         this.getReprintTagNoData();
         this.getReprintTagLotNoData();
         this.getBscpData();
-        this.downlodePdf();
+        // this.downlodePdf();
         this.clear();
         this.forRequest = false;
       }

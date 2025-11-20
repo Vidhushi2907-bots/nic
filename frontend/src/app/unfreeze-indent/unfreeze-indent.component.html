@@ -71,7 +71,7 @@
                                                         <option value="">Please Select State</option>
                                                         <option  *ngFor="let data of stateList">{{data && data.display_text ? data.display_text :''}}</option>
                                                     </select> -->
-                                                    <ng-multiselect-dropdown [settings]="dropdownSettings" [data]="stateList" formControlName="state"
+                                                    <ng-multiselect-dropdown [settings]="dropdownSettingsState" [data]="stateList" formControlName="state"
                                                     [placeholder]="'Select State'" class="dropdown"></ng-multiselect-dropdown>
 
                                                 </div>

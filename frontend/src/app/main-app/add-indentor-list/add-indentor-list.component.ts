@@ -46,6 +46,8 @@ export class AddIndentorListComponent implements OnInit {
   districtListSecond: any;
   resultAgencyDataSecond: any;
   Userdata:any;
+  userType: any;
+  isActionBtnDisable: boolean;
   constructor(
     private restService: RestService,
     private fb: FormBuilder,
@@ -55,6 +57,8 @@ export class AddIndentorListComponent implements OnInit {
     private datePipe: DatePipe,
     private service: SeedServiceService) {
     this.createEnrollForm();
+    this.userType = this.masterService?.userBasicData?.user_type ?? 'NA';
+    this.isActionBtnDisable = this.userType === 'SUPERADMIN';
 
   }
 

@@ -738,24 +738,49 @@ class cordinatorController {
             response(res, status.DATA_NOT_AVAILABLE, 500, error)
         }
     }
+    // static getAgencyType = async (req, res) => {
+    //     try {
+
+    //         let data = await db.agencytypeModel.findAll({
+    //             attributes: ['id', 'name'],
+    //             order: [['name', 'ASC']]
+    //         })
+    //         if (data) {
+    //             return response(res, status.DATA_AVAILABLE, 200, data)
+    //         } else {
+    //             return response(res, status.DATA_NOT_AVAILABLE, 200, {})
+    //         }
+
+    //     } catch (error) {
+    //         console.log(error)
+    //         response(res, status.DATA_NOT_AVAILABLE, 500, error)
+    //     }
+    // }
     static getAgencyType = async (req, res) => {
         try {
-
             let data = await db.agencytypeModel.findAll({
                 attributes: ['id', 'name'],
                 order: [['name', 'ASC']]
-            })
+            });
+    
+            // Move "Other Institute" to the end of the list
             if (data) {
-                return response(res, status.DATA_AVAILABLE, 200, data)
+                // Filter out "Other Institute" and append it at the end
+                const otherInstitute = data.filter(item => item.name === "Other Institute");
+                const remainingData = data.filter(item => item.name !== "Other Institute");
+    
+                // Concatenate "Other Institute" to the end of the sorted list
+                const sortedData = [...remainingData, ...otherInstitute];
+    
+                return response(res, status.DATA_AVAILABLE, 200, sortedData);
             } else {
-                return response(res, status.DATA_NOT_AVAILABLE, 200, {})
+                return response(res, status.DATA_NOT_AVAILABLE, 200, {});
             }
-
         } catch (error) {
-            console.log(error)
-            response(res, status.DATA_NOT_AVAILABLE, 500, error)
+            console.log(error);
+            response(res, status.DATA_NOT_AVAILABLE, 500, error);
         }
-    }
+    };
     static getSeedInventoryData = async (req, res) => {
         try {
             // let data =e{}  

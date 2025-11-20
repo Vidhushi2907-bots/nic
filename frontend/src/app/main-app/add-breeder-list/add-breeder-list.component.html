@@ -14,28 +14,32 @@
                                         <label for="Crop Group" class="search_text">State</label>
                                     </div>
                                     <div class="col-12 pr-md-0">
-                                        <div ngbDropdown class="d-inline-block w-100 "
-                            
-                                        >
-                                            <button class="btn takeplacholder w-100 crop toggle-button"
-                                                 id="state" ngbDropdownToggle
-                                                style="text-align: left;font-weight:400;">{{selected_state && (selected_state.length>30) ? (selected_state.substring(0,30)+'...'):selected_state? selected_state :'Select State'}}</button>
-            
-                                            <div class="dropdown-menu w-100" ngbDropdownMenu="state" aria-labelledby="sortMenu">
-                                                <input type="text" class="form-control px-4"  formControlName="state_text" >
+                                        <div ngbDropdown class="d-inline-block w-100 ">
+                                            <button class="btn takeplacholder w-100 crop toggle-button" id="state"
+                                                ngbDropdownToggle
+                                                style="text-align: left;font-weight:400;">{{selected_state &&
+                                                (selected_state.length>30) ?
+                                                (selected_state.substring(0,30)+'...'):selected_state? selected_state
+                                                :'Select State'}}</button>
+
+                                            <div class="dropdown-menu w-100" ngbDropdownMenu="state"
+                                                aria-labelledby="sortMenu">
+                                                <input type="text" class="form-control px-4"
+                                                    formControlName="state_text">
                                                 <button class="dropdown-item" *ngFor="let state of stateList"
-                                                    (click)="state_select(state)" #dropdownItem [attr.data-parent-name]="'state'">
-                                                    {{state && state['state_name'] ?  state['state_name'] :''}}
-                                                 
+                                                    (click)="state_select(state)" #dropdownItem
+                                                    [attr.data-parent-name]="'state'">
+                                                    {{state && state['state_name'] ? state['state_name'] :''}}
+
                                                 </button>
                                             </div>
-            
+
                                         </div>
                                         <div class="pl-0 toggle-button" ngbDropdown
                                             [ngClass]=" disabledfield ? 'disabledfield' : ''">
                                             <i class="fa-solid fa-angle-down downicon" (click)="cnClick()"></i>
                                         </div>
-                                       
+
 
                                     </div>
 
@@ -45,55 +49,64 @@
                                         <label for="Crop Group" class="search_text">District</label>
                                     </div>
                                     <div class="col-12 pr-md-0">
-                                        <div ngbDropdown class="d-inline-block w-100 "
-                            
-                                        >
+                                        <div ngbDropdown class="d-inline-block w-100 ">
                                             <button class="btn takeplacholder w-100 crop toggle-button"
-                                                [ngClass]=" disabledfieldDist   ? 'disabledfield' : ''" id="district" ngbDropdownToggle
-                                                style="text-align: left;">{{selected_district && (selected_district.length>30) ? (selected_district.substring(0,30)+'...'):selected_district? selected_district :'Select District'}}</button>
-            
-                                            <div class="dropdown-menu w-100" ngbDropdownMenu="district" aria-labelledby="sortMenu">
-                                                <input type="text" class="form-control px-4"  formControlName="district_text" >
+                                                [ngClass]=" disabledfieldDist   ? 'disabledfield' : ''" id="district"
+                                                ngbDropdownToggle style="text-align: left;">{{selected_district &&
+                                                (selected_district.length>30) ?
+                                                (selected_district.substring(0,30)+'...'):selected_district?
+                                                selected_district :'Select District'}}</button>
+
+                                            <div class="dropdown-menu w-100" ngbDropdownMenu="district"
+                                                aria-labelledby="sortMenu">
+                                                <input type="text" class="form-control px-4"
+                                                    formControlName="district_text">
                                                 <button class="dropdown-item" *ngFor="let data of districtList"
-                                                    (click)="district_select(data)" #dropdownItem [attr.data-parent-name]="'district'">
+                                                    (click)="district_select(data)" #dropdownItem
+                                                    [attr.data-parent-name]="'district'">
                                                     {{data.district_name}}
                                                     <!-- <input type="hidden" formControlName="crop_code"> -->
                                                 </button>
-                                            </div>    
+                                            </div>
                                         </div>
                                         <div class="pl-0 toggle-button" ngbDropdown
                                             [ngClass]=" disabledfield ? 'disabledfield' : ''">
                                             <i class="fa-solid fa-angle-down downicon" (click)="cdClick()"></i>
-                                        </div>                                     
+                                        </div>
                                     </div>
 
                                 </div>
 
                                 <div class="col-12 col-md-4 pl-1 pl-md-0 pr-1 mt-4 mt-md-3">
                                     <div class="col-12">
-                                        <label for="Crop Group" class="search_text">Name of Co-ordinating Institute</label>
+                                        <label for="Crop Group" class="search_text">Name of Co-ordinating
+                                            Institute</label>
                                     </div>
                                     <div class="col-12">
-                                        <div ngbDropdown class="d-inline-block w-100 "
-                            
-                                        >
+                                        <div ngbDropdown class="d-inline-block w-100 ">
                                             <button class="btn takeplacholder w-100 crop toggle-button"
-                                                [ngClass]=" disabledfieldAgency  ? 'disabledfield' : ''" id="agency" ngbDropdownToggle
-                                                style="text-align: left;">{{selected_agency && (selected_agency.length>30) ? (selected_agency.substring(0,30)+'...'):selected_agency? selected_agency :'Name of Co-ordinating Institute'}}</button>
-            
-                                            <div class="dropdown-menu w-100" ngbDropdownMenu="agency" aria-labelledby="sortMenu">
-                                                <input type="text" class="form-control px-4"  formControlName="agency_text" >
+                                                [ngClass]=" disabledfieldAgency  ? 'disabledfield' : ''" id="agency"
+                                                ngbDropdownToggle style="text-align: left;">{{selected_agency &&
+                                                (selected_agency.length>30) ?
+                                                (selected_agency.substring(0,30)+'...'):selected_agency? selected_agency
+                                                :'Name of Co-ordinating Institute'}}</button>
+
+                                            <div class="dropdown-menu w-100" ngbDropdownMenu="agency"
+                                                aria-labelledby="sortMenu">
+                                                <input type="text" class="form-control px-4"
+                                                    formControlName="agency_text">
                                                 <button class="dropdown-item" *ngFor="let data of agencyNameList"
-                                                    (click)="agency_select(data)" #dropdownItem [attr.data-parent-name]="'agency'">
+                                                    (click)="agency_select(data)" #dropdownItem
+                                                    [attr.data-parent-name]="'agency'">
                                                     {{data.agency_name}}
-                                                </button>                                            
+                                                </button>
                                             </div>
-            
+
                                         </div>
                                         <div class="pl-0 toggle-button" ngbDropdown
                                             [ngClass]=" disabledfieldAgency ? 'disabledfield' : ''">
                                             <i class="fa-solid fa-angle-down downicon" (click)="caClick()"></i>
-                                        </div>                                    
+                                        </div>
                                     </div>
 
                                 </div>
@@ -113,7 +126,7 @@
                             <hr class="separator mr-2 ml-2">
                         </div>
                     </form>
-                
+
 
                     <!-- <div class="col-12 ">
                         
@@ -133,7 +146,8 @@
                         <div class="row d-none d-md-flex data-row-header">
                             <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle">S/N</div>
                             <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle">Name</div>
-                            <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle" style="cursor: pointer; word-break: break-word;">Short Name/Display Name
+                            <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle"
+                                style="cursor: pointer; word-break: break-word;">Short Name/Display Name
                             </div>
                             <div class="col-6 col-md-2 py-3 d-flex verticle-content-middle">Crop Name
                             </div>
@@ -163,7 +177,8 @@
                                     <label class="d-md-none"><b>Name:</b>&nbsp;</label>
                                     <!-- <span>{{ data.contact_person_name? data.contact_person_name :''}}</span> -->
                                     <span style="cursor: pointer;" data-toggle="tooltip" data-placement="bottom"
-                                        title="{{data && data.agency_name? data.agency_name :''}}">{{(data && data.agency_name
+                                        title="{{data && data.agency_name? data.agency_name :''}}">{{(data &&
+                                        data.agency_name
                                         && (data.agency_name.length > 30) ? (data.agency_name.substring(0, 30) +
                                         "..."):(data.agency_name? (data.agency_name|uppercase) :'NA'))}}</span>
                                 </div>
@@ -172,24 +187,27 @@
                                 <div class="w-fit-content">
                                     <label class="d-md-none"><b>Short Name:</b>&nbsp;</label>
                                     <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                        data-placement="bottom" title="{{data && data.short_name?data.short_name:''}}">{{
+                                        data-placement="bottom"
+                                        title="{{data && data.short_name?data.short_name:''}}">{{
                                         data.short_name?(data.short_name|uppercase):'NA'
                                         }}</span>
                                 </div>
                             </div>
-                            <div class="col-6 col-md-2 py-3 d-flex verticle-content-middle" >
-                                <div class="w-fit-content" >
+                            <div class="col-6 col-md-2 py-3 d-flex verticle-content-middle">
+                                <div class="w-fit-content">
                                     <label class="d-md-none"><b>Crop Name:</b>&nbsp;</label>
                                     <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                    data-placement="bottom" title="{{data && data.crop_data  && data.crop_data ? getCropNamefrommlistforTitle(data.crop_data) :'NA'}}">
-                                    <!-- *ngFor="let item of data.crop_data" -->
-                                    <!-- {{(item && item.crop_name
+                                        data-placement="bottom"
+                                        title="{{data && data.crop_data  && data.crop_data ? getCropNamefrommlistforTitle(data.crop_data) :'NA'}}">
+                                        <!-- *ngFor="let item of data.crop_data" -->
+                                        <!-- {{(item && item.crop_name
                                         && (item.crop_name.length > 30) ? (item.crop_name.substring(0, 30) +
                                         "..."):(item.crop_name? (item.crop_name|uppercase) :'NA'))}} -->
                                         {{
-                                            data && data.crop_data  && data.crop_data ? getCropNamefrommlist(data.crop_data) :'NA'
+                                        data && data.crop_data && data.crop_data ? getCropNamefrommlist(data.crop_data)
+                                        :'NA'
                                         }}
-                                
+
                                         <!-- {{(data && data.crop_data  && data.crop_data[dataIndex]
                                             && (data.crop_data[dataIndex].crop_name.length > 30) ? (data.crop_data[dataIndex].crop_name.substring(0, 30) +
                                             "..."):(data && data.crop_data ? (data.crop_data[dataIndex].crop_name) :'NA'))}} -->
@@ -202,7 +220,8 @@
                                     <!-- <span>{{ data.contact_person_name? data.contact_person_name :''}}</span> -->
                                     <span style="cursor: pointer;" data-toggle="tooltip" data-placement="bottom"
                                         title="{{data && data.m_district?data.m_district.district_name:''}}">{{(data &&
-                                        data.m_district && data.m_district.district_name && (data.m_district.district_name.length > 30) ?
+                                        data.m_district && data.m_district.district_name &&
+                                        (data.m_district.district_name.length > 30) ?
                                         ((data.m_district.district_name.substring(0, 30)|uppercase) +
                                         "..."):(data.m_district?(data.m_district.district_name|uppercase):'NA'))}}</span>
                                 </div>
@@ -212,11 +231,13 @@
                                     <label class="d-md-none"><b>State:</b>&nbsp;</label>
                                     <!-- <span>{{ data.contact_person_name? data.contact_person_name :''}}</span> -->
                                     <span style="cursor: pointer;" data-toggle="tooltip" data-placement="bottom"
-                                        title="{{data.m_state?data.m_state.state_name:''}}">{{(data && data.m_state && data.m_state.state_name &&
+                                        title="{{data.m_state?data.m_state.state_name:''}}">{{(data && data.m_state &&
+                                        data.m_state.state_name &&
                                         (data.m_state.state_name.length > 30) ? ((data.m_state.state_name.substring(0,
-                                        30)|uppercase) + "..."):(data.m_state?(data.m_state.state_name|uppercase):'NA'))}}</span>
+                                        30)|uppercase) +
+                                        "..."):(data.m_state?(data.m_state.state_name|uppercase):'NA'))}}</span>
                                 </div>
-                            </div>                           
+                            </div>
 
                             <div class="col-6 col-md-1 py-1 d-flex verticle-content-middle pl-lg-0">
                                 <div class="w-fit-content">
@@ -227,30 +248,32 @@
                                         (data.category=="2") ? "SAU" : (data.category=='3') ? "KVK" :
                                         (data.category=='4') ? "PRIVATE COMPANY" :"NA" :''}}</span> -->
                                     <span title="  ">
-                                    <!-- {{data && data.m_category_of_oragnization && data.m_category_of_oragnization.category_name ? data.m_category_of_oragnization.category_name :''}} -->
-                                    <!-- {{data && data.category ? ((data.category)=="1") ? "ICAR" :
+                                        <!-- {{data && data.m_category_of_oragnization && data.m_category_of_oragnization.category_name ? data.m_category_of_oragnization.category_name :''}} -->
+                                        <!-- {{data && data.category ? ((data.category)=="1") ? "ICAR" :
                                         (data.category=="2") ? "SAU" : (data.category=='3') ? "KVK" :
                                         (data.category=='4') ? "PRIVATE" :"NA" :''}} -->
-                                      
-                                        {{data && data.category && (data.category=='2')?'ICAR' :(data.category=='7')?'CAU':(data.category=='13')?'SAU':'NA' }}
-            
+
+                                        {{data && data.category && (data.category=='2')?'ICAR'
+                                        :(data.category=='7')?'CAU':(data.category=='13')?'SAU':'NA' }}
+
                                     </span>
                                 </div>
                             </div>
-                            
+
                             <div class="col-6 col-md-1 py-1 d-flex verticle-content-middle">
                                 <div class="w-fit-content">
                                     <label class="d-md-none"><b>Status:</b>&nbsp;</label>
                                     <span style="cursor: pointer; word-break: break-word;" data-toggle="tooltip"
-                                        data-placement="bottom" title="{{data && (data.is_active==1)? 'ACTIVE':'INACTIVE'}}">{{data &&
+                                        data-placement="bottom"
+                                        title="{{data && (data.is_active==1)? 'ACTIVE':'INACTIVE'}}">{{data &&
                                         (data.is_active==1)?'ACTIVE':'INACTIVE'}}</span>
                                 </div>
                             </div>
                             <div class="col-6 col-md-1  py-1 d-flex verticle-content-middle w-100 pl-0">
                                 <span style="cursor: pointer; word-break: break-word;" class="statusValue"
                                     data-toggle="tooltip" data-placement="bottom">{{
-                                        data &&  data.user_id ? setlastlogin(data.user_id):"NA"}}</span>
-                               
+                                    data && data.user_id ? setlastlogin(data.user_id):"NA"}}</span>
+
                             </div>
                             <!-- <div class="col-6 col-md-2  py-3 d-flex verticle-content-middle">
                                 <div class="w-fit-content">
@@ -277,7 +300,10 @@
                                         [routerLink]="['/add-breeder/submission/edit', data.id]">
                                         <img src="assets/images/edit.svg">
                                     </button>
-                                    <button *ngIf="data.is_active==1" class="list-action-buttons" (click)="delete(data.id,data.contact_person_name,data,data.crop_data
+                                    <button *ngIf="data.is_active==1" class="list-action-buttons"
+                                        [disabled]="userType === 'SUPERADMIN'"
+                                        [ngClass]="{'btn-disabled': userType !== 'SUPERADMIN','btn-active': userType === 'SUPERADMIN'}"
+                                        (click)="delete(data.id,data.contact_person_name,data,data.crop_data
                                     )">
                                         <img src="assets/images/delete.svg">
                                     </button>

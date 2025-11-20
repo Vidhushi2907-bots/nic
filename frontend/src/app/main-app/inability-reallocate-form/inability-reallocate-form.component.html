@@ -271,7 +271,9 @@
                         <div class="row d-md-flex card-monitoring  data-row-header">
                             <div class="col-6 col-md-3 py-2 d-flex verticle-content-middle">Plot
                                 No.</div>
-                            <div class="col-6 col-md-2 py-1 d-flex verticle-content-middle">Report
+                            <div class="col-6 col-md-1 py-1 d-flex verticle-content-middle">Report
+                            </div>
+                            <div class="col-6 col-md-1 py-1 d-flex verticle-content-middle">Target Qty.
                             </div>
                             <div class="col-6 col-md-2 py-2 d-flex verticle-content-middle">Expected Production Qty.
                                 ({{unit}})
@@ -283,7 +285,7 @@
                                 <!-- ({{unitValue ?
                                 unitValue:''}}) -->
                             </div>
-                            <div class="col-6 col-md-1 py-2 d-flex verticle-content-middle  justify-content-center">Crop
+                            <div class="col-6 col-md-1 py-1 d-flex verticle-content-middle  justify-content-center">Crop
                                 Failure</div>
                             <div class="col-6 col-md-2 py-2 d-flex verticle-content-middle justify-content-center">
                                 Deficit qty. ({{unit}})
@@ -312,14 +314,25 @@
                                             </span>
                                         </div>
                                     </div>
-                                    <div class="col-6 col-md-2 py-2  verticle-content-middle border-line">
+                                    <div class="col-6 col-md-1 py-2  verticle-content-middle border-line">
                                         <div class=" w-fit-content">
                                             <label class="d-md-none text-center"><b>Report</b>&nbsp;</label>
                                             <span>
-                                                {{ngForm.controls['bspc']['controls'][i].controls['reports'].value}}
+                                                {{ngForm.controls['bspc']['controls'][i].controls['reports'].value?ngForm.controls['bspc']['controls'][i].controls['reports'].value:"NA"}}
                                             </span>
                                         </div>
                                     </div>
+                                    <div
+                                    class="col-6 col-md-1 py-2 d-flex justify-content-center align-items-center verticle-content-middle border-line">
+                                    <div class="w-100 d-flex justify-content-center">
+                                        <label class="d-md-none text-center"><b>Target Qty.
+                                                ({{unit}})</b>&nbsp;</label>
+                                        <span>
+                                            {{ngForm.controls['bspc']['controls'][i].controls['target_qnt'].value
+                                            }}
+                                        </span>
+                                    </div>
+                                </div>
                                     <div
                                         class="col-6 col-md-2 py-2 d-flex justify-content-center align-items-center verticle-content-middle border-line">
                                         <div class="w-100 d-flex justify-content-center">
@@ -417,7 +430,8 @@
                                                 <!-- <div class="col-12 col-md-12 col-lg-12 col-lg-12 col-xl-12"> -->
                                                 <!-- availableBSPCsconcat(getSelectedBSPC(i)) -->
                                                 <!-- getFilteredOptions(i)?getFilteredOptions(i) -->
-                                                <div class="col-12 col-md-12 col-lg-12 col-lg-12 col-xl-12">
+
+                                                <!-- <div class="col-12 col-md-12 col-lg-12 col-lg-12 col-xl-12">
                                                     <select class="form-control" (change)="bspcDetails($event,i,null)"
                                                         formControlName="bspc_id">
                                                         <option value="">Please Select</option>
@@ -426,7 +440,19 @@
                                                             {{ bspc.name }}
                                                         </option>
                                                     </select>
+                                                </div> -->
+
+                                                <!-- new code -->
+                                                <div class="col-12 col-md-12 col-lg-12 col-lg-12 col-xl-12">
+                                                    <ng-multiselect-dropdown [placeholder]="'Please Select BSPC'"
+                                                        [settings]="dropdownSettings" [data]="getFilteredOptions(i)"
+                                                        formControlName="bspc_array"
+                                                        (onSelect)="bspcDetails($event,i,null)">
+                                                    </ng-multiselect-dropdown>
                                                 </div>
+
+                                                <!-- (onSelect)="onIndenterSelect1($event)"
+                                                (onSelectAll)="onIndenterSelectAll($event)" -->
 
                                                 <!-- <div class="col-12 col-md-12 col-lg-12 col-lg-12 col-xl-12">
                                                     <div ngbDropdown class="d-inline-block w-100">
@@ -556,17 +582,14 @@
                                                 </div>
                                                 <!-- -12 col-md-12 col-lg-12 col-lg-12 col-xl-12 -->
                                                 <div class="col-12 col-md-12 col-lg-12 col-lg-12 col-xl-12">
-                                                    <input type="text" class="form-control"
+                                                    <input type="number" class="form-control"
                                                         formControlName="assign_target" placeholder="Enter Name">
-                                                    <!-- <div class="errorMsg"
-                                                            *ngIf="submitted || (ngForm.controls['reallocate']['controls'][i].controls['name'].touched)">
-                                                            <span class="text-danger pt-1"
-                                                                    *ngIf="ngForm.controls['bsp1Arr']['controls'][i].controls['name'].value.length>50">Accept
-                                                                    max 50 character</span>
-                                                            <span class="text-danger pt-1"
-                                                                *ngIf="ngForm.controls['reallocate']['controls'][i].controls['name'].invalid">Accept
-                                                                min 3 and max 50 character</span>
-                                                        </div> -->
+                                                    <div class="errorMsg"
+                                                        *ngIf="submitted || (ngForm.controls['reallocate']['controls'][i].controls['assign_target'].touched)">
+                                                        <span class="text-danger pt-1"
+                                                            *ngIf="ngForm.controls['reallocate']['controls'][i].controls['assign_target'].value == 0">Assign
+                                                            Target Should Not Be Zero</span>
+                                                    </div>
                                                 </div>
 
                                             </div>

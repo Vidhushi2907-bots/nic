@@ -276,7 +276,7 @@
                                                         data.variety_name : 'NA' }}</td>
                                                     <td *ngIf="spaIndex === 0 && parentalIndex === 0"
                                                         [attr.rowspan]="data.total_spa_count">{{
-                                                        data.not_year? data.not_year : 'NA' }}
+                                                        data.not_year? (data.not_year | date:'yyyy') : 'NA' }}
                                                     </td>
 
 

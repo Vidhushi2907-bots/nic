@@ -17,12 +17,37 @@ import { GenerateCardQrComponent } from './generate-card-qr/generate-card-qr.com
 import { TagNumberVerificationQrComponent } from './tag-number-verification-qr/tag-number-verification-qr.component';
 
 import { MobileAppComponent } from './mobile-app/mobile-app.component';
+import { InspectionReportBspcvComponent } from './main-app/inspection-report-bspcv/inspection-report-bspcv.component';
 
+import { PrnDownloadComponent } from './prn-download/prn-download.component';
+import { TestPrinterComponent } from './test-printer/test-printer.component';
+import { VarietyCharactersticReportsComponent } from './common/variety-characterstic-reports/variety-characterstic-reports.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { ProfarmaOneQrComponent } from './main-app/profarma-one-qr/profarma-one-qr.component';
+import { BspProformaOneReportQr1Component } from './bsp-proforma-one-report-qr1/bsp-proforma-one-report-qr1.component';
 
 const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent
+  },
+     { path: 'report-data/:data', component: ProfarmaOneQrComponent },
+       { path: 'bsp-proforma-one-report-qr1', component: BspProformaOneReportQr1Component },
+    {
+    path: 'dashboard',
+    component: DashboardComponent
+  },
+  {
+    path: 'print',
+    component: PrnDownloadComponent
+  },
+  {
+    path: 'variety-characterstic-reports-data',
+    component: VarietyCharactersticReportsComponent
+  },
+  {
+    path: 'test-print',
+    component: TestPrinterComponent
   },
   {
     path: 'KISAAN/app',
@@ -36,6 +61,12 @@ const routes: Routes = [
     path: 'inspection-report/:encryptedData',
     component: InspectionReportComponent,
   },
+
+  {
+    path: 'inspection-report-bsp-v/:encryptedData',
+    component: InspectionReportBspcvComponent,
+  },
+
   {
     path: 'bsp-two-second-report/:encryptedData',
     component: BspTwoSecondReportComponent,
@@ -57,8 +88,8 @@ const routes: Routes = [
     path: 'verification-certificate/:id',
     component: BreederSeedCertificateQrComponent
   },
-  
-  
+
+
   {
     path: 'web-login',
     component: WebLoginComponent
@@ -79,7 +110,7 @@ const routes: Routes = [
   {
     path: 'ProcessedRegisterOldStock',
     component: ProcessedRegisterOldStockComponent
-  }, 
+  },
   {
     path: 'generate-card/:id',
     component: GenerateCardQrComponent

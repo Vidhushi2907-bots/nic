@@ -171,6 +171,7 @@
                                         <!-- SNo -->
                                         <td>{{ report.id }}</td>
 
+
                                         <!-- Variety Section -->
                                         <td>
                                             <b>{{ report.variety.name }}<br>
@@ -191,14 +192,14 @@
                                             Unique Code: <b>{{ report.sampleDetails.uniqueCode }}</b><br>
                                             Sample No: <b>{{ report.sampleDetails.sampleNo }}</b><br>
                                             Testing Centre: <b>{{ report.sampleDetails.testingCentre }}</b><br>
-                                            Test No: <b>{{ report.sampleDetails.testCentre }}</b><br>
+                                            <!-- Test No: <b>{{ report.sampleDetails.testCentre }}</b><br> -->
                                             Consignment No: <b>{{ report.sampleDetails.consignmentNo }}</b>
                                         </td>
 
                                         <!-- Other Details Section -->
                                         <td>
-                                            <!-- Area under variety (Ha): <b>{{ report.otherDetails.areaUnderVariety }}</b><br> -->
-                                            <!-- No. of samples taken: <b>{{ report.otherDetails.noOfSamples }}</b><br> -->
+                                            Area under variety (Ha): <b>{{ report.otherDetails.areaUnderVariety }}</b><br>
+                                            <!-- No. of samples taken: <b>{{ report.otherDetails.noOfSamples }}</b><br>-->
                                             Date of BSP I: <b>{{ report.otherDetails.dateOfBspI }}</b><br>
                                             Date of BSP III: <b>{{ report.otherDetails.dateOfBspIII }}</b>
                                         </td>
@@ -215,9 +216,15 @@
                                         <!-- Action Button -->
                                         <td>
                                             <button
-                                                class="w-100 py-3s text-white btn-inventory1 bspc_text d-inline-flex justify-content-center verticle-content-middle mb-3 mt-1">
+                                                class="w-100 py-3s text-white btn-inventory1 bspc_text d-inline-flex justify-content-center verticle-content-middle mb-3 mt-1"  (click)="getreportData(reports,true,report.genrate_id)">
                                                 Download Report
                                             </button>
+
+                                            <!-- <button type="submit"
+                                            class="form-button search2 d-inline-flex justify-content-center verticle-content-middle mt-3"
+                                            (click)="getreportData(reports,true,report.genrate_id)">
+                                            Download Report
+                                        </button> -->
 
                                         </td>
                                     </tr>
@@ -242,3 +249,199 @@
 
     </div>
 </form>
+
+<div class="row my-4 w-100 d-none">
+    <div class="col-12 d-flex justify-content-center verticle-content-middle" id="yourPdfContentId">
+        <div class="main-content-form-wrapper px-0 py-2">
+            <div class="row">
+                <div class="w-100">
+                    <form [formGroup]="ngForm">
+                        <div>
+                            <div class="px-3">
+
+                                <div class="container col-md-12 col-lg-12 col-xl-12 mt-5 ">
+                                    <div class="col-md-12 col-lg-12 col-xl-12 pb-3">
+                                        <div class="col-md-6 col-lg-6 col-xl-6 float-left">
+                                            <img src="assets/images/no_logo.png"
+                                            style="height:8rem;">
+                                        </div>
+                                        <div class="col-md-6 col-lg-6 col-xl-6 float-right ">
+                                            <div style="float: right;">
+                                                <qrcode [qrdata]="qrCodeUrl"
+                                                    [allowEmptyString]="true"
+                                                    [ariaLabel]="'QR Code image with the following content...'"
+                                                    [cssClass]="'top'" [colorDark]="'#000000ff'"
+                                                    [colorLight]="'#FFFFFF'" [elementType]="'canvas'"
+                                                    [errorCorrectionLevel]="'M'" [imageSrc]="" [imageHeight]="80"
+                                                    [imageWidth]="80" [margin]="2" [scale]="1"
+                                                    [title]="'A custom title attribute'" [width]="140">
+                                                </qrcode>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12 col-sm-12 d-flex justify-content-center ">
+                                                <span class="heading_notofied heading1"
+                                                    style="white-space: nowrap;">{{ downloadreportsData?.agency_name || 'Not Available' }}                           
+                                                          
+                                                     </span>
+                                            </div>
+
+                                            <div class="col-md-12 col-sm-12  d-flex justify-content-center addresshead">
+                                                <span class="heading_notofied heading1">{{district}} , {{state}}</span>
+                                            </div>
+
+                                            <div class="col-md-12 col-sm-12   d-flex justify-content-center pt-4">
+                                                <span class="heading_notofied heading1"
+                                                    style="white-space: nowrap;">GROW OUT TEST REPORT
+                                                     ( BSP-V(A))</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr style="border:1px solid #228B22" class="">
+                                <div class="row">
+                                    <div class="col-4 col-md-4 col-lg-6 py-3 d-flex verticle-content-middle pl-5 heading_notofied"
+                                        style="font-size: 15px!important;"><b>Year of Indent :
+                                        </b>&nbsp;{{ downloadreportsData?.year}} - {{(downloadreportsData?.year-2000)+1}} 
+                                    
+                                    <!-- {{ ngForm.controls['season'].value=="K"?"Kharif":"Rabi"}}, 
+                                        {{ (ngForm.controls['year'].value)}}-{{(ngForm.controls['year'].value-2000)+1}} -->
+                                    </div>
+                                    <div class="col-4 col-md-4 col-lg-6 py-3 text-right float-right heading_notofied dateClass pl-0"
+                                        style="font-size: 15px!important;margin-left:-1em;"><b>Reference Number :
+                                        </b>&nbsp;{{ downloadreportsData?.reference_no || 'Not Available' }}
+                                        <!-- {{getFormattedSeason(data &&
+                                        data.season ?
+                                        data.season
+                                        :'')}},{{data && data.year ? data.year + '-' + (data.year +
+                                        1).toString().slice(-2) : '--'}} -->
+                                    </div>
+                                </div>
+
+
+
+                                <div class="row">
+                                    <div class="col-4 col-lg-6 col-md-4  d-flex verticle-content-middle  heading_notofied pl-5 pl-xl-5"
+                                    style="font-size: 15px!important;"> <b>Season : </b> &nbsp;{{ downloadreportsData?.season =="K"?"Kharif":"Rabi"}}
+                                     
+                                </div>
+                                <div class="col-4 col-md-4 col-lg-6 py-3 text-right float-right heading_notofied dateClass pl-0"
+                                        style="font-size: 15px!important;margin-left:-1em;"><b>  Date of Monitoring :
+                                        </b>&nbsp;
+                                        {{ downloadreportsData?.sync_date | date: 'dd/MM/yyyy' }}  <!-- Outputs: 11/07/2024 -->
+                                        <!-- {{getFormattedSeason(data &&
+                                        data.season ?
+                                        data.season
+                                        :'')}},{{data && data.year ? data.year + '-' + (data.year +
+                                        1).toString().slice(-2) : '--'}} -->
+                                    </div>
+                                    
+                                   
+                                
+                               
+                                    
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-4 col-lg-6 col-md-4  d-flex verticle-content-middle  heading_notofied pl-5 pl-xl-5"
+                                    style="font-size: 15px!important;"> <b>Crop : </b> &nbsp;{{ downloadreportsData?.crop_name || 'Not Available' }}
+                                     
+                                </div>
+                                <div class="col-4 col-md-4 col-lg-6 py-3 text-right float-right heading_notofied dateClass pl-0"
+                                        style="font-size: 15px!important;margin-left:-1em;"><b>Date of Printing :
+                                        </b>&nbsp;
+                                      {{formattedDate}}
+                                        <!-- {{getFormattedSeason(data &&
+                                        data.season ?
+                                        data.season
+                                        :'')}},{{data && data.year ? data.year + '-' + (data.year +
+                                        1).toString().slice(-2) : '--'}} -->
+                                    </div>
+                                    
+                                   
+                                
+                               
+                                    
+                                </div>
+
+                                <div class="col-12 px-2">
+                                    <div class="list-wrapper px-2 py-3">
+                                        <div class="middle_line"></div>
+                                        <div class="row data-row" style="margin: 0px 18px 0px 55px;">
+                                            <table class="table table-bordered table-responsive" style="text-align: center;">
+                                                <thead>
+                                                    <tr class="headingofpdftable">
+                                                        <th scope="col" class="py-2 datalist" style="white-space: nowrap;">Variety/Parental line</th>
+                                                        <th scope="col" class="py-2 datalist" style="white-space: nowrap;">Name of Producing Institute</th>
+                                                        <th scope="col" class="py-2 datalist" style="white-space: nowrap;">Name of Testing Institute</th>
+                                                        <th scope="col" class="py-2 datalist" style="white-space: nowrap;">Area Under Variety (Ha)</th>
+                                                        <th scope="col" class="py-2 datalist" style="white-space: nowrap;">Lot No.</th>
+                                                        <th scope="col" class="py-2 datalist" style="white-space: nowrap;">No. of Sample Taken</th>
+                                                        <th scope="col" class="py-2 datalist" style="white-space: nowrap;">Date of <br> BSP I</th>
+                                                        <th scope="col" class="py-2 datalist" style="white-space: nowrap;">Date of <br> BSP-III</th>
+                                                        <th scope="col" class="py-2 datalist" style="white-space: nowrap;">Result of GOT (Genetic Purity %)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- Example Data Row -->
+                                                    <tr>
+                                                        <td>{{ downloadreportsData?.variety_name || 'NA' }} /  <br>
+                                                            {{ downloadreportsData?.variety_line_code || 'NA' }}
+                                                        </td>
+                                                        <td>{{downloadreportsData?.fromuser || 'NA'}}</td>
+                                                        <td>{{ downloadreportsData?.agency_name || 'NA' }}    </td>
+                                                        <td>{{ downloadreportsData?.area_shown || 'NA' }} </td>
+                                                        <td>{{downloadreportsData?.lot_num || "NA"}}</td>
+                                                        <td>{{downloadreportsData?.sample_no || "NA"}}</td>
+                                                        <td>{{downloadreportsData?.date_of_bsp_2 || "NA"}}</td>
+                                                        <td>{{downloadreportsData?.date_of_bsp_3 || "NA"}}</td>
+                                                       <td>{{downloadreportsData?.percentage_true_plant || "NA"}} % </td> 
+                                                    </tr>
+                                                   
+                                                    <!-- Add more rows here -->
+                                                </tbody>
+                                            </table>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                               
+                                <ng-container>
+                                    <div class="grid-container px-3">
+                                      <ng-container *ngFor="let item of moniteringData">
+                                        <div class="grid-item">
+                                          <ng-container>
+                                            <span class="d-flex justify-content-center">-SD-</span>
+                                            <p class="d-flex justify-content-center mb-0">({{ item.monitoringuser }})</p>
+                                            <p class="d-flex justify-content-center mb-0">{{ item.designation }}</p>
+                                            <!-- <p class="d-flex justify-content-center mb-0">{{ item.location }}</p> -->
+                                          </ng-container>
+                                        </div>
+                                      </ng-container>
+                                    </div>
+                                  </ng-container>
+                                  
+
+                                <br><br>
+                           
+                                <footer>
+                                    <p style="padding-bottom: 72px; font-size: 18px; padding-left: 1.5rem; padding-top:1rem">THIS REPORT IS DIGITALLY GENERATED AND DOES NOT REQUIRE ANY SIGNATURE .</p>
+                                </footer>
+                                <!-- <div  id="page-break1"
+                                    style="page-break-after: always;"></div> -->
+
+
+
+                              
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+                <div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -58,6 +58,10 @@ export class BspIIIStatusReportComponent implements OnInit {
   encryptedData: string;
   user_id: any;
   isRemonitorData = false;
+  productionType: string;
+  isDisableNormalReallocate: boolean;
+  isDisableDelay: boolean;
+  isDisableNormal: boolean;
   constructor(private service: SeedServiceService, private breeder: BreederService, private masterService: MasterService, private productioncenter: ProductioncenterService, private fb: FormBuilder, private router: Router) {
     this.createForm();
     const BHTCurrentUser = localStorage.getItem('BHTCurrentUser');
@@ -104,7 +108,7 @@ export class BspIIIStatusReportComponent implements OnInit {
     const BHTCurrentUser = localStorage.getItem('BHTCurrentUser');
     const data = JSON.parse(BHTCurrentUser);
     this.authUserId = data.id;
-    this.getYearData();
+    // this.getYearData();
     this.service.bsp3rdReportData = [];
     let datas = this.service.bsp3rdReportData2;
     console.log(datas, 'datasdatas')
@@ -245,7 +249,8 @@ export class BspIIIStatusReportComponent implements OnInit {
     const route = "bsp-proforma3-year-report";
     const param = {
       "user_id": this.authUserId,
-      "form_type":'report_3'
+      "form_type":'report_3',
+      production_type: this.productionType 
     }
     this.productioncenter.postRequestCreator(route, param, null).subscribe(data => {
       if (data.status === 200) {
@@ -259,7 +264,8 @@ export class BspIIIStatusReportComponent implements OnInit {
     const param = {
       "user_id": this.authUserId,
       "year": this.ngForm.controls['year'].value,
-      "form_type":'report_3'
+      "form_type":'report_3',
+      production_type: this.productionType 
     }
     this.productioncenter.postRequestCreator(route, param, null).subscribe(data => {
       if (data.status === 200) {
@@ -274,7 +280,8 @@ export class BspIIIStatusReportComponent implements OnInit {
       user_id: this.authUserId,
       "year": this.ngForm.controls['year'].value,
       "season": this.ngForm.controls['season'].value?this.ngForm.controls['season'].value:newData?newData:'',
-      "form_type":'report_3'
+      "form_type":'report_3',
+      production_type: this.productionType 
     }
     this.productioncenter.postRequestCreator(route, param, null).subscribe(data => {
       if (data.status === 200) {
@@ -315,6 +322,36 @@ export class BspIIIStatusReportComponent implements OnInit {
       this.getPageData();
     }
   }
+
+
+  productionTypeValue(value) {
+    if (value) {
+      this.productionType = value;
+      if (this.productionType == "NORMAL") {
+        this.isDisableNormal = false;
+        this.isDisableDelay = true;
+        this.isDisableNormalReallocate = true;
+      } else if (this.productionType == "DELAY") {
+        this.isDisableNormal = true;
+        this.isDisableDelay = false;
+        this.isDisableNormalReallocate = true;
+      } else if (this.productionType == "REALLOCATION") {
+        this.isDisableNormal = true;
+        this.isDisableDelay = true;
+        this.isDisableNormalReallocate = false;
+      }
+      else {
+        // this.isDisableNormal= false;
+        // this.isDisableDelay= false;
+        // this.isDisableNormalReallocate= true;
+      }
+    }
+    this.getYearData();
+  }
+  resetRadioBtn() {
+    window.location.reload();
+    this.productionType = ""
+  }
   getPageData(loadPageNumberData: number = 1, searchData: any | undefined = undefined) {
     let varietyCodeArr = [];
     if (this.ngForm.controls["variety"].value && this.ngForm.controls["variety"].value !== undefined && this.ngForm.controls["variety"].value.length > 0) {
@@ -329,6 +366,7 @@ export class BspIIIStatusReportComponent implements OnInit {
         season: this.ngForm.controls['season'].value,
         crop_code: this.ngForm.controls['crop'].value,
         user_id: this.authUserId,
+        production_type: this.productionType 
       }
     };
   

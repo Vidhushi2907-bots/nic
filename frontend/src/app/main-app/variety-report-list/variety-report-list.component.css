@@ -1,0 +1,133 @@
+.data-row-header {
+    background: #E97E15 0% 0% no-repeat padding-box;
+     
+}
+
+.data-row-header * {
+    font: normal Poppins 600 15px/19px;
+    font-weight: 500;
+    letter-spacing: 0px;
+    color: #FFFFFF; 
+    /* margin: 10px; */
+}
+
+.data-row {
+    border: 1px solid #B2C7D7;
+    border-top: none !important; 
+    
+}
+
+.data-row * {
+    font: normal Poppins 15px/18px;
+    letter-spacing: 0px;
+    color: #000000;
+}
+
+.heading_notofied {
+    font: normal Poppins;
+    font-weight: bold;
+    font-size: 20px;
+    letter-spacing: 0px;
+    text-align: left;
+    opacity: 1;
+}
+
+.search_text {
+    text-align: left;
+    font: normal Poppins 16px/25px;
+    letter-spacing: 0px;
+    color:  #2329ff;
+    font-weight: 600;
+
+    opacity: 1;
+
+}
+
+ /* .dropdown-menus{ max-height:250px; overflow:auto; } */
+ /* .selBox{
+    width: 470px !important;
+    height: 40px !important;
+   }
+   select option{
+    color: red!important;
+    height: 1px !important;
+} */
+
+.dropdown-menus {
+    max-height: 10px!important;
+    overflow-y: auto!important;
+}
+.wrapper::-webkit-scrollbar-track-piece:end {
+    background: transparent;
+    margin-bottom: 10px; 
+}
+
+@media  screen and (max-width:45px) {
+    .kapil{
+        padding-top: 15px;
+    }
+    
+}
+span {
+    word-wrap: break-word;
+    word-break: break-all;
+    white-space: normal;
+    cursor: pointer;
+}
+
+.for-margin {
+    /* padding-left: 14px !important; */
+}
+.disabledfield {
+    pointer-events: none;
+}
+.radio-button {
+    width: 25px;
+    height: 25px;
+}
+input[type='radio']{
+    accent-color: #d7720f;
+    top: -6px;
+    left: 12px;
+}
+/* input[type='radio']:after {
+    width: 20px;
+    height: 20px;
+    border-radius: 15px;
+    top: -6px;
+    left: -7px;
+    position: relative;
+    background-color: #d1d3d1;
+    content: '';
+    display: inline-block;
+    visibility: visible;
+    border: 1px solid black;
+}
+
+input[type='radio']:checked:after {
+    width: 20px;
+    height: 20px;
+    border-radius: 15px;
+    top: -6px;
+    left: -7px;
+    position: relative;
+    background-color: #ffa500;
+    content: '';
+    display: inline-block;
+    visibility: visible;
+    border: 1px solid black;
+} */
+
+.pagination-btn{
+    margin: 5px;
+    padding: 10px 20px;
+    background: #d7720f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;   
+}
+.pagination-btn:disabled{
+    /* background: #95a5a6;
+    cursor: not-allowed; */
+}

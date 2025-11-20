@@ -1144,15 +1144,16 @@ export class AddCropVarietyCharactersticsComponent extends ngbDropdownEvents imp
       this.apiResponseData = data && data['EncryptedResponse'] && data['EncryptedResponse'].data && data['EncryptedResponse'].data ? data['EncryptedResponse'].data : '';
       // console.log('reaction_to_pets_json=====',this.apiResponseData[0].m_variety_characteristic['reaction_to_pets_json']);
       this.checkValue = (this.apiResponseData && this.apiResponseData[0] && this.apiResponseData[0].m_variety_characteristic && this.apiResponseData[0].m_variety_characteristic['select_state_release'] ? this.apiResponseData[0].m_variety_characteristic['select_state_release'] : 0);
-      if (this.apiResponseData && this.apiResponseData[0] && this.apiResponseData[0].m_variety_characteristic && this.apiResponseData[0].m_variety_characteristic['is_active'] == 0) {
-        this.ngForm.controls['status_toggle'].patchValue(false);
-        this.isShowDiv = true;
-        this.isActive = 0;
-      }
+      console.log('this.apiResponseData[0].m_variety_characteristic[is_active]=',this.apiResponseData && this.apiResponseData[0] && this.apiResponseData[0].m_variety_characteristic['is_active']);
       if (this.apiResponseData && this.apiResponseData[0] && this.apiResponseData[0].m_variety_characteristic && this.apiResponseData[0].m_variety_characteristic['is_active'] == 1) {
-        this.isShowDiv = false;
         this.ngForm.controls['status_toggle'].patchValue(true);
+        this.isShowDiv = true;
         this.isActive = 1;
+      }
+      if (this.apiResponseData && this.apiResponseData[0] && this.apiResponseData[0].m_variety_characteristic && this.apiResponseData[0].m_variety_characteristic['is_active'] == 0) {
+        this.isShowDiv = false;
+        this.ngForm.controls['status_toggle'].patchValue(false);
+        this.isActive = 0;
       }
       // console.log(this.apiResponseData,'this.apiResponseData')
       this.crop_groups = this.apiResponseData && this.apiResponseData[0] && this.apiResponseData[0].m_crop && this.apiResponseData[0].m_crop.m_crop_group && this.apiResponseData[0].m_crop.m_crop_group.group_name ? this.apiResponseData[0].m_crop.m_crop_group.group_name : '';

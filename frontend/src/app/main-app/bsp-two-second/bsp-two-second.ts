@@ -75,6 +75,7 @@ export class BspTwoSecondtComponent implements OnInit {
   isDisableNormal: boolean;
   response1: any;
   VarietyList1: any;
+  editShowData11: boolean;
 
   @HostListener('window:scroll', ['$event'])
   onWindowScroll(event: Event) {
@@ -1673,7 +1674,40 @@ console.log('editDataValue && showparental:', this.editDataValue && this.showpar
     if (this.is_update) {
       this.employeeIndex = 0
     }
+    let lotno = []
+    let res = this.ngForm.value && this.ngForm.value.bsp2Arr ? this.ngForm.value.bsp2Arr : ''
+    let result = res && res[index] && res[index].total_quantity ? res[index].total_quantity : ''
 
+
+
+    if (res && res.length > 0) {
+      res.forEach((item, i) => {
+        item.total_quantity.forEach((el, index) => {
+
+          if (el && el.tag_no && el.tag_no.length == 1) {
+            if (el.quantity_available == el.quantity_sown) {
+              el.tag_no.forEach((val => {
+                lotno.push(val && val.value ? val.value : '');
+              }))
+            } else {
+
+            }
+
+          }
+          else if (el && el.tag_no && el.tag_no.length > 1) {
+            el.tag_no.forEach((val => {
+              lotno.push(val && val.value ? val.value : '');
+            }))
+          }
+        })
+        // if (item && item.tag_no && item.tag_no.length > 0) {
+        //   item.tag_no.forEach(val => {
+        //     lotno.push(val && val.value ? val.value : '');
+        //   })
+
+        // }
+      })
+    }
     const param = {
       search: {
         seed_class_id: this.showparental ? this.ngForm.controls['bsp2Arr']['controls'][index].controls['total_quantity'].controls[skillIndex].controls.type_of_class.value : this.ngForm.controls['bsp2Arr']['controls'][this.employeeIndex].controls['type_of_class'].value,
@@ -1687,8 +1721,8 @@ console.log('editDataValue && showparental:', this.editDataValue && this.showpar
         variety_code: this.ngForm.controls['variety'].value,
         // variety_line_code: this.ngForm.controls['variety_line_code'].value,
         line_variety_code: this.ngForm.controls['bsp2Arr']['controls'][index].controls['total_quantity'].controls[skillIndex].controls.variety_line_code.value,
-
-
+        lot_id: this.ngForm.controls['bsp2Arr']['controls'][index].controls['total_quantity'].controls[skillIndex].controls.lot_no.value,
+        exclude_tag_range: lotno && (lotno.length > 0) ? (lotno.toString()) : '',
       }
     }
     this.ngForm.controls['bsp2Arr']['controls'][index].controls['total_quantity'].controls[skillIndex].controls.tag_no.setValue('')
@@ -2290,7 +2324,8 @@ console.log('editDataValue && showparental:', this.editDataValue && this.showpar
           id: ['6', '7'].toString(),
           user_id: userData && userData.id ? (userData.id.toString()) : '',
           line_variety_code: this.ngForm.controls['variety_line_code'].value,
-
+          year: this.ngForm.controls['year'].value,
+          season: this.ngForm.controls['season'].value,
         }
       }
       this.productionService.postRequestCreator('get-seed-type-of-seed-inventory', params).subscribe(data => {
@@ -2302,6 +2337,7 @@ console.log('editDataValue && showparental:', this.editDataValue && this.showpar
         //     index === self.findIndex((t) => (t.value === arr.value )))
 
         // }
+        console.log('response===',response);
         let arr = [];
         if (response && response.length > 0) {
           response.forEach(el => {
@@ -2380,6 +2416,7 @@ console.log('editDataValue && showparental:', this.editDataValue && this.showpar
 
     this.productionService.postRequestCreator('get-seed-type-of-seed-inventory', param).subscribe(data => {
       let response = data && data.EncryptedResponse && data.EncryptedResponse.data && data.EncryptedResponse.data.data ? data.EncryptedResponse.data.data : '';
+      console.log('response====',response);
       let breederData = data && data.EncryptedResponse && data.EncryptedResponse.data && data.EncryptedResponse.data.breederData ? data.EncryptedResponse.data.breederData : '';
       let nucleusData = data && data.EncryptedResponse && data.EncryptedResponse.data && data.EncryptedResponse.data.nucleusData ? data.EncryptedResponse.data.nucleusData : '';
       if (response && response.length > 0) {
@@ -3145,6 +3182,7 @@ console.log('editDataValue && showparental:', this.editDataValue && this.showpar
     this.is_update = false;
     this.editShowData = false;
     this.showAddMoreInthisVariety = false;
+    this.editShowData11 = false;
 
   }
 

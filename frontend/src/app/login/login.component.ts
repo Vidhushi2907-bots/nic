@@ -27,16 +27,31 @@ export class LoginComponent implements OnInit {
           && apiResponse.EncryptedResponse.status_code == 200) {
           const data = apiResponse.EncryptedResponse.data;
           localStorage.setItem('BHTCurrentUser', JSON.stringify(data));
+          localStorage.setItem('username', data.user_type);
           // this.router.navigate(['events']);
-          console.log('data',data)
+          console.log('data', data)
           // this.currentUserSubject.next(user.EncryptedResponse.data);
-          if(!data.is_change_password){
+          if (!data.is_change_password) {
             switch (data.user_type) {
               case 'SD': {
                 this.router.navigate(['change-password'])
                 break;
               }
+              case 'PULSESSEEDADMIN': {
+                this.router.navigate(['change-password'])
+                break;
+              }
               case 'SPP': {
+                this.router.navigate(['change-password'])
+                break;
+              }
+              case 'PULSESSEEDADMIN': {
+                // this.router.navigate(['recieved-indent-oil-seed'])
+                this.router.navigate(['change-password'])
+                break;
+              }
+              case 'SUPERADMIN': {
+                // this.router.navigate(['recieved-indent-oil-seed'])
                 this.router.navigate(['change-password'])
                 break;
               }
@@ -67,33 +82,53 @@ export class LoginComponent implements OnInit {
                 this.router.navigate(['change-password'])
                 break;
               }
-  
+
               default: {
                 this.router.navigate(['login'])
                 break;
               }
             }
 
-          }else{
+          } else {
+            console.log('data.user_type====', data.user_type);
             switch (data.user_type) {
               case 'SD': {
-                this.router.navigate(['dashboardSeedSecond'])
+                // this.router.navigate(['dashboardSeedSecond'])
+                this.router.navigate(['dashboard-phase-second']);
                 break;
               }
               case 'SPP': {
                 this.router.navigate(['spp-dashboard'])
                 break;
               }
+              case 'OILSEEDADMIN': {
+                // this.router.navigate(['recieved-indent-oil-seed'])
+                this.router.navigate(['dashboard-phase-second'])
+                break;
+              }
+              case 'PULSESSEEDADMIN': {
+                // this.router.navigate(['recieved-indent-oil-seed'])
+                this.router.navigate(['dashboard-phase-second'])
+                break;
+              }
+              case 'SUPERADMIN': {
+                // this.router.navigate(['recieved-indent-oil-seed'])
+                this.router.navigate(['dashboard-phase-second'])
+                break;
+              }
               case 'ICAR': {
-                this.router.navigate(['nodal-dasboard-seconds'])
+                // this.router.navigate(['nodal-dasboard-seconds'])
+                this.router.navigate(['dashboard-phase-second'])
                 break;
               }
               case 'HICAR': {
-                this.router.navigate(['nodal-dasboard-seconds'])
+                // this.router.navigate(['nodal-dasboard-seconds'])
+                this.router.navigate(['dashboard-phase-second'])
                 break;
               }
               case 'IN': {
-                this.router.navigate(['indentor-seed-dashboard'])
+                // this.router.navigate(['indentor-seed-dashboard'])
+                this.router.navigate(['dashboard-phase-second'])
                 break;
               }
               case 'BR': {
@@ -108,7 +143,7 @@ export class LoginComponent implements OnInit {
                 this.router.navigate(['indent-breeder-seed-allocation-list'])
                 break;
               }
-  
+
               default: {
                 this.router.navigate(['login'])
                 break;

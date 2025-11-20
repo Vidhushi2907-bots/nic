@@ -10,6 +10,8 @@ import { BreederService } from 'src/app/services/breeder/breeder.service';
 import { MasterService } from 'src/app/services/master.service';
 import { ProductioncenterService } from 'src/app/services/productionCenter/productioncenter.service';
 import { SeedServiceService } from 'src/app/services/seed-service.service';
+import { HttpClient } from '@angular/common/http';
+
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 
@@ -19,6 +21,7 @@ import * as XLSX from 'xlsx';
   styleUrls: ['./crop-status-report.component.css']
 })
 export class CropStatusReportComponent implements OnInit {
+  tableData: any[] = [];
   @ViewChild(PaginationUiComponent) paginationUiComponent!: PaginationUiComponent;
   ngForm: FormGroup = new FormGroup([]);
   isSearch: boolean;
@@ -26,7 +29,6 @@ export class CropStatusReportComponent implements OnInit {
   inventorySeasonData: any;
   inventoryVarietyData: any;
   datatodisplay = [];
-
   visibleTable: boolean = false;
   selectVariety: any;
   varietyListSecond: any[];
@@ -39,131 +41,6 @@ export class CropStatusReportComponent implements OnInit {
   dropdownList = [];
   allData: any;
   cropTypes = ['agriculture', 'horticulture'];
-  // allData =[
-  //   { 
-
-  //     "crop_name":"ABC Crop", 
-
-  //     "crop_type":"Agriculture/Horticulture", 
-
-  //     "no_of_varieties":"2", 
-
-  //     "indent_qnt":"200", 
-
-  //     "Unit":"Qt/Kg", 
-
-  //     "pdpc_id":808, 
-
-  //     "pdpc_name":"ABC PDPC", 
-
-  //     "assigned_to_pdpc_crop_status":"Yes/No", 
-
-  //     "bsp_1_status":"Complete/Pending/Working", 
-
-  //     "bspc_status":[ 
-
-  //         { 
-
-  //           "bspc_id":1234, 
-
-  //           "bspc_name":"BSPC 1", 
-
-  //           "bspc_2_status":"Complete/Pending/Working", 
-
-  //           "bspc_3_status":"Complete/Pending/Working" 
-
-  //         }, 
-
-  //         { 
-
-  //           "bspc_id":1235, 
-
-  //           "bspc_name":"BSPC 2", 
-
-  //           "bspc_2_status":"Complete/Pending/Working", 
-
-  //           "bspc_3_status":"Complete/Pending/Working" 
-
-  //         }, 
-
-  //         { 
-
-  //           "bspc_id":1236, 
-
-  //           "bspc_name":"BSPC 3", 
-
-  //           "bspc_2_status":"Complete/Pending/Working", 
-
-  //           "bspc_3_status":"Complete/Pending/Working" 
-
-  //         } 
-
-  //       ] 
-
-  //   } ,
-  //   { 
-
-  //     "crop_name":"ABC Crop", 
-
-  //     "crop_type":"Agriculture/Horticulture", 
-
-  //     "no_of_varieties":"2", 
-
-  //     "indent_qnt":"200", 
-
-  //     "Unit":"Qt/Kg", 
-
-  //     "pdpc_id":808, 
-
-  //     "pdpc_name":"ABC PDPC", 
-
-  //     "assigned_to_pdpc_crop_status":"Yes/No", 
-
-  //     "bsp_1_status":"Complete/Pending/Working", 
-
-  //     "bspc_status":[ 
-
-  //         { 
-
-  //           "bspc_id":1234, 
-
-  //           "bspc_name":"BSPC 1", 
-
-  //           "bspc_2_status":"Complete/Pending/Working", 
-
-  //           "bspc_3_status":"Complete/Pending/Working" 
-
-  //         }, 
-
-  //         { 
-
-  //           "bspc_id":1235, 
-
-  //           "bspc_name":"BSPC 2", 
-
-  //           "bspc_2_status":"Complete/Pending/Working", 
-
-  //           "bspc_3_status":"Complete/Pending/Working" 
-
-  //         }, 
-
-  //         { 
-
-  //           "bspc_id":1236, 
-
-  //           "bspc_name":"BSPC 3", 
-
-  //           "bspc_2_status":"Complete/Pending/Working", 
-
-  //           "bspc_3_status":"Complete/Pending/Working" 
-
-  //         } 
-
-  //       ] 
-
-  //   } ,
-  // ];
-
 
   isDisabled: boolean = true;
   searchClicked = false;
@@ -202,7 +79,7 @@ export class CropStatusReportComponent implements OnInit {
   user_id: any;
   cropListSecond: any;
 
-  constructor(private service: SeedServiceService, private breeder: BreederService, private masterService: MasterService, private productioncenter: ProductioncenterService, private fb: FormBuilder, private formBuilder: FormBuilder, private _productionCenter: ProductioncenterService, private route: Router,
+  constructor(private http: HttpClient,private service: SeedServiceService, private breeder: BreederService, private masterService: MasterService, private productioncenter: ProductioncenterService, private fb: FormBuilder, private formBuilder: FormBuilder, private _productionCenter: ProductioncenterService, private route: Router,
     private renderer: Renderer2) {
     this.createForm();
     const BHTCurrentUser = localStorage.getItem('BHTCurrentUser');
@@ -214,7 +91,7 @@ export class CropStatusReportComponent implements OnInit {
 
 
   ngOnInit(): void {
-
+    this.getCropStatusReport();
     // Ensure the ViewChild is initialized here
     // console.log('Child component:', this.bspTwoSecondtComponent); 
     this.dropdownSettings = {
@@ -396,66 +273,70 @@ export class CropStatusReportComponent implements OnInit {
   }
 
 
-  getPageData(loadPageNumberData: number = 1, searchData: any = {}) {
-    const filters = {
-      search: {
-        year: this.ngForm.controls['year'].value,
-        season: this.ngForm.controls['season'].value,
-        user_id: this.authUserId,
-        crop_type: searchData.crop_type || this.ngForm.controls['crop_type'].value // apply crop_type filter
+  // getPageData(loadPageNumberData: number = 1, searchData: any = {}) {
+  //   const filters = {
+  //     search: {
+  //       year: this.ngForm.controls['year'].value,
+  //       season: this.ngForm.controls['season'].value,
+  //       user_id: this.authUserId,
+  //       crop_type: searchData.crop_type || this.ngForm.controls['crop_type'].value
+  //     }
+  //   };
+
+  //   console.log("Filters applied:", filters);
+
+  //   this.productioncenter.postRequestCreator("crop-status-reports", filters, null)
+  //     .subscribe((apiResponse: any) => {
+  //       if (apiResponse && apiResponse.EncryptedResponse.status_code === 200) {
+  //         const rawData = apiResponse.EncryptedResponse.data || [];
+
+  //         const processedData = rawData.map((item) => {
+  //           const uniqueVarietyCodes = Array.from(new Set(item.variety_codes));
+  //           const uniqueIndentQuantities: number[] = Array.from(new Set(item.indent_quantity));
+
+  //           const totalIndentQuantity = uniqueIndentQuantities.reduce((sum, quantity) => sum + quantity, 0);
+
+  //           const numberOfVarieties = uniqueVarietyCodes.length;
+
+  //           return {
+  //             ...item,
+  //             total_indent_quantity: totalIndentQuantity,
+  //             number_of_varieties: numberOfVarieties,
+  //           };
+  //         });
+
+  //         console.log('Processed Data:', processedData);
+
+  //         this.allData = processedData;
+
+  //       } else if (apiResponse && apiResponse.EncryptedResponse.status_code === 201) {
+  //         this.allData = [];
+  //       }
+  //     });
+  // }
+
+
+getPageData(loadPageNumberData: number = 1, searchData: any = {}) {
+  const payload = {
+    search: {
+      year: this.ngForm.controls['year'].value,
+      season: this.ngForm.controls['season'].value,
+      user_id: this.authUserId,
+      crop_type: searchData.crop_type || this.ngForm.controls['crop_type'].value
+    }
+  };
+
+  this.http.post<any>('http://localhost:3006/ms-nb-006-production-center/api/crop-status-reports', payload)
+    .subscribe(
+      res => {
+        console.log("API Response:", res);
+        this.allData = res.data || [];
+      },
+      err => {
+        console.error("API Error:", err);
       }
-    };
-
-    console.log("Filters applied:", filters);
-
-    this.productioncenter.postRequestCreator("crop-status-reports", filters, null)
-      .subscribe((apiResponse: any) => {
-        if (apiResponse && apiResponse.EncryptedResponse.status_code === 200) {
-          const rawData = apiResponse.EncryptedResponse.data || [];
-
-          // Process data to calculate total unique indent quantities and unique variety codes for each user
-          const processedData = rawData.map((item) => {
-            // Remove duplicate variety codes and indent quantities
-            const uniqueVarietyCodes = Array.from(new Set(item.variety_codes));
-            const uniqueIndentQuantities: number[] = Array.from(new Set(item.indent_quantity));
-
-            // Calculate total indent quantity by summing unique indent quantities
-            const totalIndentQuantity = uniqueIndentQuantities.reduce((sum, quantity) => sum + quantity, 0);
-
-            // Count of unique varieties
-            const numberOfVarieties = uniqueVarietyCodes.length;
-
-            return {
-              ...item,
-              total_indent_quantity: totalIndentQuantity,
-              number_of_varieties: numberOfVarieties,
-            };
-          });
-
-          // Log processed data
-          console.log('Processed Data:', processedData);
-
-          // Assign processed data to your component variable
-          this.allData = processedData;
-
-          // Initialize pagination and search as per your component logic
-          // this.filterPaginateSearch.Init(
-          //   this.allData,
-          //   this,
-          //   "getPageData",
-          //   undefined,
-          //   apiResponse.EncryptedResponse.data.total,
-          //   true
-          // );
-          // this.initSearchAndPagination();
-
-        } else if (apiResponse && apiResponse.EncryptedResponse.status_code === 201) {
-          this.allData = [];
-        }
-      });
-  }
-
-
+    );
+}
 
 
   exportexcel(): void {
@@ -539,5 +420,22 @@ export class CropStatusReportComponent implements OnInit {
     this.unit = value
     return value
 
+  }
+  
+  getCropStatusReport() {
+    const payload = {
+      // yahan apna request body likho
+    };
+
+    this.http.post<any>('http://localhost:3006/ms-nb-006-production-center/api/crop-status-reports', payload)
+      .subscribe(
+        res => {
+          console.log("API Response:", res);
+          this.tableData = res.EncryptedResponse?.data || [];  
+        },
+        err => {
+          console.error("API Error:", err);
+        }
+      );
   }
 }

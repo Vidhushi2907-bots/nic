@@ -1715,12 +1715,17 @@ class reportController {
   static getbspOneYearofIndent = async (req, res) => {
     let returnResponse = {};
     try {
-
+      let cropGroup;
+      if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+        cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+      }
       let condition = {
         attributes: [
           [sequelize.fn('DISTINCT', sequelize.col('bsp_1s.year')), 'year'],
         ],
-        where: {},
+        where: {
+          ...cropGroup
+        },
         raw: true
       }
       condition.order = [[sequelize.col('bsp_1s.year'), 'DESC']]
@@ -1743,12 +1748,17 @@ class reportController {
   static getbspTwoYearofIndent = async (req, res) => {
     let returnResponse = {};
     try {
-
+      let cropGroup;
+      if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+        cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+      }
       let condition = {
         attributes: [
           [sequelize.fn('DISTINCT', sequelize.col('bsp_2.year')), 'year'],
         ],
-        where: {},
+        where: {
+          ...cropGroup
+        },
         raw: true
       }
       condition.order = [[sequelize.col('bsp_2.year'), 'DESC']]
@@ -1772,12 +1782,17 @@ class reportController {
   static getbspfivebYearofIndent = async (req, res) => {
     let returnResponse = {};
     try {
-
+      let cropGroup;
+      if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+        cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+      }
       let condition = {
         attributes: [
           [sequelize.fn('DISTINCT', sequelize.col('bsp_5_b.year')), 'year'],
         ],
-        where: {},
+        where: {
+          ...cropGroup
+        },
         raw: true
       }
       condition.order = [[sequelize.col('bsp_5_b.year'), 'DESC']]
@@ -1801,7 +1816,10 @@ class reportController {
   static getbspfivebVariety = async (req, res) => {
     let returnResponse = {};
     try {
-
+       let cropGroup;
+      if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+        cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+      }
       let condition = {
         include: [
           {
@@ -1827,7 +1845,8 @@ class reportController {
         where: {
           year: req.body.search.year,
           crop_code: req.body.search.crop_code,
-          season: req.body.search.season
+          season: req.body.search.season,
+          ...cropGroup
         },
         raw: true
       }
@@ -1851,6 +1870,10 @@ class reportController {
   static getBsp4ReportData = async (req, res) => {
     let data = {};
     try {
+      let cropGroup;
+      if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+        cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+      }
       let condition = {};
       let varietyId;
       let cropValue;
@@ -1887,7 +1910,9 @@ class reportController {
               }
             ],
             attributes: [],
-            where: {}
+            where: {
+              ...cropGroup
+            }
           }
         ],
         attributes: [
@@ -2345,6 +2370,10 @@ class reportController {
   static getbsp4CropName = async (req, res) => {
     let data = {};
     try {
+      let cropGroup;
+      if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+        cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+      }
       let condition = {}
       condition = {
         include: [
@@ -2367,7 +2396,8 @@ class reportController {
           season: req.body.search.season,
           crop_code: {
             [Op.like]: req.body.search.crop_type + '%'
-          }
+          },
+          ...cropGroup
         },
         raw: true
       }
@@ -2385,6 +2415,10 @@ class reportController {
   static getBsp5aFilterCropType = async (req, res) => {
     let returnResponse = {};
     try {
+      let cropGroup;
+      if (req.body.loginedUserid.user_type === "OILSEEDADMIN") {
+        cropGroup = { crop_code: { [Op.like]: 'A04%' } };
+      }
       let condition = {
         include: [
         ],
@@ -2393,6 +2427,7 @@ class reportController {
         ],
         raw: true,
         where: {
+          ...cropGroup
         }
       }
 
@@ -2445,7 +2480,8 @@ class reportController {
         ],
         raw: true,
         where: {
-          [Op.and]: { crop_code: { [Op.like]: req.body.search.crop_type ? req.body.search.crop_type + "%" : '' } }
+          [Op.and]: { crop_code: { [Op.like]: req.body.search.crop_type ? req.body.search.crop_type + "%" : '' } },
+          ...cropGroup
         }
       }
 

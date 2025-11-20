@@ -98,7 +98,7 @@ export class VarietyPriceListComponent implements OnInit {
 
   varietyList: any;
   selectCrop: any;
-  selectVariety:any;
+  selectVariety: any;
   crop_name_data: any;
   crop_text_check: string;
   lab_text_check: string;
@@ -112,21 +112,21 @@ export class VarietyPriceListComponent implements OnInit {
   varietyLine: any;
   varietyLineSecond: any;
   isEdit: boolean = false;
-  constructor(private service: SeedServiceService, private fb: FormBuilder, private _masters: MasterService,private _productionCenter: ProductioncenterService) {
+  constructor(private service: SeedServiceService, private fb: FormBuilder, private _masters: MasterService, private _productionCenter: ProductioncenterService) {
     this.createForm();
   }
 
   createForm() {
     this.ngForm = this.fb.group({
       id: new FormControl(''),
-      year: new FormControl('',[Validators.required]),
-      season: new FormControl('',[Validators.required]),
+      year: new FormControl('', [Validators.required]),
+      season: new FormControl('', [Validators.required]),
       cropName: new FormControl(''),
-      crop_name: new FormControl('',[Validators.required]),
+      crop_name: new FormControl('', [Validators.required]),
       per_quintal_mrp: new FormControl('',),
       line_variety: new FormControl(''),
       crop_text: new FormControl(''),
-      variety: new FormControl('',[Validators.required]),
+      variety: new FormControl('', [Validators.required]),
       packag_data: this.fb.array([
       ]),
     })
@@ -142,13 +142,13 @@ export class VarietyPriceListComponent implements OnInit {
         this.cropName = this.cropNameSecond
         let response = this.cropName.filter(x => x.crop_name.toLowerCase().includes(newValue.toLowerCase()))
         this.cropName = response
-       // alert("123");
-      
+        // alert("123");
+
       }
       else {
-      
+
         this.cropName = this.cropNameSecond
-        this.selectVariety=""
+        this.selectVariety = ""
         this.ngForm.controls["variety"].setValue("");
       }
     });
@@ -161,14 +161,14 @@ export class VarietyPriceListComponent implements OnInit {
         this.variety = response
       }
       else {
-         this.variety = this.varietySecond
+        this.variety = this.varietySecond
       }
     });
   }
   packagePriceForm(): FormGroup {
     return this.fb.group({
-      per_quintal_mrp: ['',[Validators.required]],
-      packag_size: ['',[Validators.required]],
+      per_quintal_mrp: ['', [Validators.required]],
+      packag_size: ['', [Validators.required]],
       // per_quintal_price:['',[Validators.required]],
     })
   }
@@ -201,9 +201,9 @@ export class VarietyPriceListComponent implements OnInit {
     let param = {
       "search": {
         "crop_code": crop_code,
-        year:this.ngForm.controls['year'].value,
-        season:this.ngForm.controls['season'].value,
-        
+        year: this.ngForm.controls['year'].value,
+        season: this.ngForm.controls['season'].value,
+
       }
     }
     this._productionCenter.postRequestCreator(route, param,).subscribe(res => {
@@ -211,9 +211,9 @@ export class VarietyPriceListComponent implements OnInit {
       if (res && res.EncryptedResponse && res.EncryptedResponse.status_code === 200) {
         this.variety = res && res.EncryptedResponse && res.EncryptedResponse.data ? res.EncryptedResponse.data : []
         this.varietySecond = res && res.EncryptedResponse && res.EncryptedResponse.data ? res.EncryptedResponse.data : []
-      }else{
-        this.variety=[];
-        this.varietySecond =[]
+      } else {
+        this.variety = [];
+        this.varietySecond = []
       }
     })
   }
@@ -224,22 +224,22 @@ export class VarietyPriceListComponent implements OnInit {
     let param = {
       "search": {
         "variety_code": variety_code ? variety_code : '',
-        "crop_code":this.ngForm.controls['crop_name'].value,
-        year:this.ngForm.controls['year'].value,
-        season:this.ngForm.controls['season'].value,
+        "crop_code": this.ngForm.controls['crop_name'].value,
+        year: this.ngForm.controls['year'].value,
+        season: this.ngForm.controls['season'].value,
       }
     }
-    this._productionCenter.postRequestCreator(route,param,null).subscribe(res => {
+    this._productionCenter.postRequestCreator(route, param, null).subscribe(res => {
       if (res && res.EncryptedResponse && res.EncryptedResponse.status_code === 200) {
         this.ngForm.controls['line_variety'].setValue('');
         this.varietyLine = res && res.EncryptedResponse && res.EncryptedResponse.data ? res.EncryptedResponse.data : []
         this.varietyLineSecond = res && res.EncryptedResponse && res.EncryptedResponse.data ? res.EncryptedResponse.data : []
-        if( this.varietyLine &&  this.varietyLine.length){
+        if (this.varietyLine && this.varietyLine.length) {
           this.ngForm.controls['line_variety'].enable();
-        }else{
+        } else {
           this.ngForm.controls['line_variety'].disable();
         }
-      }else{
+      } else {
         this.ngForm.controls['line_variety'].disable();
       }
     })
@@ -267,7 +267,7 @@ export class VarietyPriceListComponent implements OnInit {
         "crop_code": this.ngForm.controls['crop_name'].value ? this.ngForm.controls['crop_name'].value : '',
         "variety_code": this.ngForm.controls['variety'].value ? this.ngForm.controls['variety'].value : ''
       }
-    },null).subscribe((apiResponse: any) => {
+    }, null).subscribe((apiResponse: any) => {
       console.log(apiResponse);
       if (apiResponse !== undefined
         && apiResponse.EncryptedResponse !== undefined
@@ -280,7 +280,7 @@ export class VarietyPriceListComponent implements OnInit {
         }
         this.filterPaginateSearch.Init(this.allData, this, "getPageData", undefined, 8, true);
         this.initSearchAndPagination();
-      }else{
+      } else {
         this.allData = [];
       }
     });
@@ -307,17 +307,17 @@ export class VarietyPriceListComponent implements OnInit {
     this.selectCrop_crop_code = data.crop_cod;
     this.ngForm.controls['variety'].setValue(data.variety_code);
     // this.ngForm.controls['variety_name'].setValue(data.variety_code);
-    this.selectVariety=data.variety_name;
+    this.selectVariety = data.variety_name;
 
-        // this.ngForm.controls['line_variety'].setValue('');
+    // this.ngForm.controls['line_variety'].setValue('');
     this.ngForm.controls['per_quintal_mrp'].setValue(data.per_quintal_mrp);
     // this.ngForm.controls['packag_data'].setValue(data.package_data);
     if (data.package_data && data.package_data.length) {
       this.packag_data.clear();
       for (let i = 0; i < data.package_data.length; i++) {
-        this.addPackageData();        this.ngForm.controls['packag_data']['controls'][i].patchValue({
-          packag_size: data && data.package_data && data.package_data[i] && data.package_data[i]['packag_size'] ? data.package_data[i]['packag_size']:'',
-          per_quintal_mrp: data && data.package_data && data.package_data[i] && data.package_data[i]['per_quintal_mrp'] ? data.package_data[i]['per_quintal_mrp']:''
+        this.addPackageData(); this.ngForm.controls['packag_data']['controls'][i].patchValue({
+          packag_size: data && data.package_data && data.package_data[i] && data.package_data[i]['packag_size'] ? data.package_data[i]['packag_size'] : '',
+          per_quintal_mrp: data && data.package_data && data.package_data[i] && data.package_data[i]['per_quintal_mrp'] ? data.package_data[i]['per_quintal_mrp'] : ''
         });
       }
     }
@@ -334,24 +334,39 @@ export class VarietyPriceListComponent implements OnInit {
     this.ngForm.controls['crop_name'].setValue('');
     this.ngForm.controls['crop_text'].setValue('');
     this.selectCrop = '';
-    this.selectVariety ='';
+    this.selectVariety = '';
     this.selectCrop_crop_code = ''
     this.ngForm.controls['variety'].setValue('');
     this.ngForm.controls['line_variety'].setValue('');
     this.ngForm.controls['per_quintal_mrp'].setValue('');
   }
-
-  save(data) {
-  if(this.ngForm.invalid){
-    Swal.fire({
-      title: '<p style="font-size:25px;">Please Fill All Required Field.</p>',
-      icon: 'warning',
-      confirmButtonText:
-        'OK',
-      confirmButtonColor: '#E97E15'
-    })
-    return;
+  hasDuplicatePackingSize(): boolean {
+    const sizes = this.packag_data.controls.map(control => control.get('packag_size')?.value);
+    return new Set(sizes).size !== sizes.length; // If Set size is different, duplicates exist
   }
+  save(data) {
+    
+    if (this.hasDuplicatePackingSize()) {
+      Swal.fire({
+        title: '<p style="font-size:25px;">Duplicate Packing Size (Kg) detected. Please enter unique values.</p>',
+        icon: 'warning',
+        confirmButtonText:
+          'OK',
+        confirmButtonColor: '#E97E15'
+      })
+      return;
+    }
+
+    if (this.ngForm.invalid) {
+      Swal.fire({
+        title: '<p style="font-size:25px;">Please Fill All Required Field.</p>',
+        icon: 'warning',
+        confirmButtonText:
+          'OK',
+        confirmButtonColor: '#E97E15'
+      })
+      return;
+    }
     let type;
     if (this.isEdit) {
       type = "edit";
@@ -362,9 +377,9 @@ export class VarietyPriceListComponent implements OnInit {
     let datas = JSON.parse(getLocalData)
     let UserId = datas.id
     let route = "add-variety-price-list";
-  console.log( data.value.packag_data,' data.value.packag_data')
+    console.log(data.value.packag_data, ' data.value.packag_data')
     let formData = {
-      id:data && data.value && data.value.id ? data.value.id : '',
+      id: data && data.value && data.value.id ? data.value.id : '',
       year: data && data.value && data.value.year ? data.value.year : '',
       season: data && data.value && data.value.season ? data.value.season : '',
       crop_code: data && data.value && data.value.crop_name ? data.value.crop_name : '',
@@ -373,14 +388,14 @@ export class VarietyPriceListComponent implements OnInit {
       // per_quintal_mrp: data && data.value.per_quintal_mrp ? data.value.per_quintal_mrp : '',
       type: type ? type : '',
       packag_data: data && data.value && data.value.packag_data ? data.value.packag_data : [],
-      user_id:UserId
+      user_id: UserId
       // valid_from:data.value.year
       // is_active:data.value.year
       // created_at
       // updated_at
     }
 
-    this._productionCenter.postRequestCreator(route,formData,null).subscribe(res => {
+    this._productionCenter.postRequestCreator(route, formData, null).subscribe(res => {
       if (res && res.EncryptedResponse && res.EncryptedResponse.status_code == 200) {
         if (this.isEdit) {
           Swal.fire({
@@ -440,7 +455,7 @@ export class VarietyPriceListComponent implements OnInit {
   //   this.selectVariety = item.variety_name;
   //   this.ngForm.controls["variety"].setValue("");
   //   this.variety_code = item.variety_code;
-   
+
   //   this.ngForm.controls['variety_name'].setValue(item.variety_code)
   //   this.getPageData()
   // }
@@ -457,12 +472,12 @@ export class VarietyPriceListComponent implements OnInit {
     console.log(' this.cropNameSecond;', this.cropNameSecond);
   }
 
-  varietydatatext(){
+  varietydatatext() {
     this.varietySecond;
     console.log(' this.varietySecond;', this.varietySecond);
   }
 
-  
+
 
   update() {
 

@@ -144,14 +144,14 @@
                                         <td>
                                             <input type="number" class="form-control" formControlName="no_of_bag"
                                                    [max]="ngForm.controls['bag_details']['controls'][i].controls['spa_no_of_bag'].value"
-                                                   (change)="sumValue($event, i)"/>
+                                                   (ngModelChange)="sumValue($event, i)"/>
                                             <div *ngIf="ngForm.controls['bag_details']['controls'][i].controls['no_of_bag'].errors?.maxBagsExceeded">
                                               <small class="text-danger">Value exceeds the maximum allowed bags</small>
                                             </div>
                                           </td>
                                                           
                                         <td>{{ngForm.controls['bag_details']['controls'][i].controls['spa_packages_size'].value * ngForm.controls['bag_details']['controls'][i].controls['no_of_bag'].value}}</td>
-                                        <td><input type="number" class="form-control" [formControl]="ngForm.controls['bag_details']['controls'][i].controls['spa_per_qnt_mrp']" (change)="sumValue($event,i)"/></td>
+                                        <td><input type="number" class="form-control" [formControl]="ngForm.controls['bag_details']['controls'][i].controls['spa_per_qnt_mrp']" (ngModelChange)="sumValue($event,i)"/></td>
                                         <td class="justify-content-center">{{ngForm.controls['bag_details']['controls'][i].controls['total_amount'].value}}</td>
                                     </tr>
                                 </ng-container>
@@ -206,7 +206,8 @@
                                                 <ng-multiselect-dropdown class="seed-division-variety"
                                                     formControlName="selectedCharges"[(ngModel)]="selectedItems"
                                                     [placeholder]="'Select Charges'" [settings]="dropdownSettings1"
-                                                    [data]="additionalCharges" (onSelect)="onItemSelect($event)">
+                                                    [data]="additionalCharges" (onSelect)="onItemSelect($event)"
+                                                    (onSelectAll)="onSelectAll($event)" (onDeSelectAll)="onDeSelectAll()">
                                                 </ng-multiselect-dropdown>
                                             </div>
                                         </div>
@@ -219,13 +220,13 @@
                                             </div>
                                             <div class="col-12 col-sm-3 col-md-3 col-xl-3 col-lg-3">
                                                 <input type="number" class="form-control" formControlName="mou_amt"
-                                                    (change)="gstCalculateValue($event);calculateCharges();calculategstCharges($event)"
+                                                    (ngModelChange)="gstCalculateValue($event);calculateCharges();calculategstCharges($event)"
                                                     placeholder="  ">
                                             </div>
                                             <div class="col-12 col-sm-2 col-md-2 col-xl-2 col-lg-2">
                                                 <input type="number" class="form-control"
                                                     formControlName="mougst_amt"
-                                                    (change)="gstCalculateValue($event);calculateCharges();calculategstCharges($event)"
+                                                    (ngModelChange)="gstCalculateValue($event);calculateCharges();calculategstCharges($event)"
                                                     placeholder="GST %">
                                             </div>
                                             <div class="col-12 col-sm-3 col-md-3 col-xl-3 col-lg-3">
@@ -250,13 +251,13 @@
                                             <div class="col-12 col-sm-3 col-md-3 col-xl-3 col-lg-3">
                                                 <input type="number" class="form-control"
                                                     formControlName="licence_amt"
-                                                    (change)="gstCalculateValue(null);calculateCharges();calculategstCharges($event)"
+                                                    (ngModelChange)="gstCalculateValue(null);calculateCharges();calculategstCharges($event)"
                                                     placeholder="">
                                             </div>
                                             <div class="col-12 col-sm-2 col-md-2 col-xl-2 col-lg-2">
                                                 <input type="number" class="form-control"
                                                     formControlName="licencegst_amt"
-                                                    (change)="gstCalculateValue(null);calculateCharges();calculategstCharges($event)"
+                                                    (ngModelChange)="gstCalculateValue(null);calculateCharges();calculategstCharges($event)"
                                                     placeholder="GST %">
                                             </div>
                                             <div class="col-12 col-sm-3 col-md-3 col-xl-3 col-lg-3">
@@ -280,13 +281,13 @@
                                             </div>
                                             <div class="col-12 col-sm-3 col-md-3 col-xl-3 col-lg-3">
                                                 <input type="number" class="form-control" formControlName="ppv_amt"
-                                                    (change)="gstCalculateValue(null);calculateCharges();calculategstCharges($event)"
+                                                    (ngModelChange)="gstCalculateValue(null);calculateCharges();calculategstCharges($event)"
                                                     placeholder="">
                                             </div>
                                             <div class="col-12 col-sm-2 col-md-2 col-xl-2 col-lg-2">
                                                 <input type="number" class="form-control"
                                                     formControlName="ppvgst_amt"
-                                                    (change)="gstCalculateValue(null);calculateCharges();calculategstCharges($event)"
+                                                    (ngModelChange)="gstCalculateValue(null);calculateCharges();calculategstCharges($event)"
                                                     placeholder="GST %">
                                             </div>
                                             <div class="col-12 col-sm-3 col-md-3 col-xl-3 col-lg-3">
@@ -310,13 +311,13 @@
                                             </div>
                                             <div class="col-12 col-sm-3 col-md-3 col-xl-3 col-lg-3">
                                                 <input type="number" class="form-control" formControlName="rlt_amt"
-                                                    (change)="gstCalculateValue(null);calculateCharges();calculategstCharges($event)"
+                                                    (ngModelChange)="gstCalculateValue(null);calculateCharges();calculategstCharges($event)"
                                                     placeholder="" >
                                             </div>
                                             <div class="col-12 col-sm-2 col-md-2 col-xl-2 col-lg-2">
                                                 <input type="number" class="form-control"
                                                     formControlName="rltgst_amt"
-                                                    (change)="gstCalculateValue(null);calculateCharges();calculategstCharges($event)"
+                                                    (ngModelChange)="gstCalculateValue(null);calculateCharges();calculategstCharges($event)"
                                                     placeholder="GST %">
                                             </div>
                                             <div class="col-12 col-sm-3 col-md-3 col-xl-3 col-lg-3">
@@ -339,11 +340,11 @@
                                             </div>
                                             <div class="col-12 col-sm-3 col-md-3 col-xl-3 col-lg-3">
                                                 <input type="number" class="form-control"
-                                                    formControlName="gst_amt" (change)="gstCalculateValue(null);calculateCharges();calculategstCharges($event)" placeholder="">
+                                                    formControlName="gst_amt" (ngModelChange)="gstCalculateValue(null);calculateCharges();calculategstCharges($event)" placeholder="">
                                             </div>
                                             <div class="col-12 col-sm-2 col-md-2 col-xl-2 col-lg-2">
                                                 <input type="number" class="form-control" formControlName="gstGst_amt"
-                                                (change)="gstCalculateValue(null);calculateCharges();calculategstCharges($event)" placeholder="GST %">
+                                                (ngModelChange)="gstCalculateValue(null);calculateCharges();calculategstCharges($event)" placeholder="GST %">
                                             </div>
                                             <div class="col-12 col-sm-3 col-md-3 col-xl-3 col-lg-3">
                                                 <input type="number" class="form-control"
@@ -371,8 +372,12 @@
                                                 <label for="" class="label-inventory text-right">Grand Total:</label>
                                             </div>
                                             <div class="col-12 col-sm-3 col-md-3 col-xl-3 col-lg-3">
-                                                <input type="text" class="form-control" 
-                                                    value="{{(this.ngForm.controls['final_grand_total_amt'].value ? this.ngForm.controls['final_grand_total_amt'].value: grandTotal ? grandTotal : this.ngForm.controls['grand_total_amt'].value ? this.ngForm.controls['grand_total_amt'].value : 0)}}">
+                                                <input type="text" class="form-control"  disabled
+                                                    value="{{(this.ngForm.controls['final_grand_total_amt'].value ? 
+                                                       this.ngForm.controls['final_grand_total_amt'].value:
+                                                     grandTotal ? 
+                                                       grandTotal : 
+                                                     this.ngForm.controls['grand_total_amt'].value ? this.ngForm.controls['grand_total_amt'].value : 0)}}">
                                             </div>
                                             <div class="col-12 col-sm-1 col-md-1 col-xl-1 col-lg-1">
                                             </div>
@@ -529,8 +534,7 @@
                                         </div>
                                       </td>
                                       <!-- Details of Breeder Stock kept for SPA -->
-                                      <!-- *ngIf="spaData && spaData.bag_details && spaData.bag_details.length > 0; else noData" -->
-                                      <td class="verticle-content-middle">
+                                      <!-- <td class="verticle-content-middle">
                                         <ng-container *ngIf="spaData && spaData.length > 0; else noData">
                                           <span *ngFor="let bagData of spaData">
                                             <ng-container *ngIf="bagData && bagData.spa_no_of_bag && bagData.spa_no_of_bag != 0">
@@ -540,11 +544,8 @@
                                           </span>
                                         </ng-container>
                                         <ng-template #noData>NA</ng-template>
-                                      </td>
-                                      
-                                      
-                                      
-                                      <!-- <td>
+                                      </td> -->
+                                      <td>
                                         <ng-container *ngIf="spaData.bag_details && spaData.bag_details.length > 0; else noData">
                                           <span *ngFor="let bagData of spaData.bag_details">
                                             <ng-container *ngIf="bagData && bagData.number_of_bag && bagData.number_of_bag != 0 && bagData.number_of_bag != ''">
@@ -553,9 +554,8 @@
                                             </ng-container>
                                           </span>
                                         </ng-container>
-                                        </span>
                                         <ng-template #noData>NA</ng-template>
-                                      </td> -->
+                                      </td>
                                 <!-- Invoice Amount (INR) -->
                                       <td>
                                         {{ spaData.invoice_amount ? spaData.invoice_amount : '--' }}

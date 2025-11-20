@@ -350,7 +350,7 @@ export class CarryOverSeedComponent implements OnInit {
 
   fetchData() {
     // this.getPageData();
-   
+
     this.getStatelist();
     this.getUserData();
     // this.checkReferenceData();
@@ -566,7 +566,7 @@ export class CarryOverSeedComponent implements OnInit {
     return this.ngForm.get('bsp2Arrseedsowndetails') as FormArray;
   }
   getYear() {
-    this.master.postRequestCreator('get-bsp-performa1-year', null,{search:{production_type:this.productionType}}).subscribe(data => {
+    this.master.postRequestCreator('get-bsp-performa1-year', null, { search: { production_type: this.productionType } }).subscribe(data => {
       this.yearOfIndent = data && data.EncryptedResponse && data.EncryptedResponse.data ? data.EncryptedResponse.data : ''
     })
   }
@@ -574,7 +574,7 @@ export class CarryOverSeedComponent implements OnInit {
     const param = {
       search: {
         year: this.ngForm.controls['year'].value,
-        production_type:this.productionType
+        production_type: this.productionType
       }
     }
     this.master.postRequestCreator('get-bsp-performa1-season', null, param).subscribe(data => {
@@ -586,7 +586,7 @@ export class CarryOverSeedComponent implements OnInit {
       search: {
         year: this.ngForm.controls['year'].value,
         season: this.ngForm.controls['season'].value,
-        production_type:this.productionType
+        production_type: this.productionType
       }
     }
     this.master.postRequestCreator('get-bsp-performa1-crop', null, param).subscribe(data => {
@@ -791,7 +791,7 @@ export class CarryOverSeedComponent implements OnInit {
         season: this.ngForm.controls['season'].value,
         crop_code: this.ngForm.controls['crop'].value,
         user_id: UserId ? UserId.toString() : '',
-        production_type:this.productionType
+        production_type: this.productionType
       }
 
     }
@@ -821,7 +821,7 @@ export class CarryOverSeedComponent implements OnInit {
         user_id: UserId ? UserId.toString() : '',
         variety_code: this.ngForm.controls['variety'].value ? this.ngForm.controls['variety'].value : '',
         exclude_bsp2_id: this.editId ? (this.editId.toString()) : '',
-        production_type:this.productionType
+        production_type: this.productionType
       }
     }
 
@@ -861,7 +861,28 @@ export class CarryOverSeedComponent implements OnInit {
     if (this.is_update) {
       this.employeeIndex = 0
     }
-
+    let lotno = []
+    let res = this.ngForm.value && this.ngForm.value.carry_over ? this.ngForm.value.carry_over : '';
+    if (this.lotNolist && this.lotNolist.length > 0) {
+      let lotId = this.lotNolist.filter(x => x.lot_id == this.ngForm.controls['carry_over']['controls'][i].controls['lot_no'].value);
+      this.ngForm.controls['carry_over']['controls'][i].controls['lot_name'].setValue(lotId && lotId[0] && lotId[0].display_text ? lotId[0].display_text : '')
+    }
+    if (res && res.length > 0) {
+      res.forEach((el, i) => {
+        // if (el && el.tag_no && el.tag_no.length == 1) {
+        //   if (el.qty_available == el.qty_recieved) {
+        //     el.tag_no.forEach((val => {
+        //       lotno.push(val && val.value ? val.value : '');
+        //     }))
+        //   }
+        // }
+        if (el && el.tag_no && el.tag_no.length > 0) {
+          el.tag_no.forEach((val => {
+            lotno.push(val && val.value ? val.value : '');
+          }))
+        }
+      })
+    }
     const param = {
       search: {
         user_id: userData && userData.id ? (userData.id.toString()) : '',
@@ -871,8 +892,9 @@ export class CarryOverSeedComponent implements OnInit {
         line_variety_code: this.ngForm.controls['variety_line_code'].value,
         stage_id: this.ngForm.controls['carry_over']['controls'][i].controls['stage'].value,
         year: this.ngForm.controls['carry_over']['controls'][i].controls['year'].value,
-        season: this.ngForm.controls['carry_over']['controls'][i].controls['season'].value
-
+        season: this.ngForm.controls['carry_over']['controls'][i].controls['season'].value,
+        lot_id: this.ngForm.controls['carry_over']['controls'][i].controls['lot_no'].value ? this.ngForm.controls['carry_over']['controls'][i].controls['lot_no'].value : '',
+        exclude_tag_range: lotno && (lotno.length > 0) ? (lotno.toString()) : '',
       }
     }
     // this.ngForm.controls['carry_over']['controls'][index].controls['total_quantity'].controls[skillIndex].controls.tag_no.setValue('')
@@ -1075,8 +1097,6 @@ export class CarryOverSeedComponent implements OnInit {
                   if (formArray && formArray.controls && formArray.controls[i] && formArray.controls[i]['controls'] && formArray.controls[i]['controls'].tag_no && formArray.controls[i]['controls'].tag_no.tag_noList) {
 
                     item.tag_no.forEach((items) => {
-                      console.log('items', items)
-
                       this.ngForm.controls['carry_over']['controls'][i]['controls'].tag_no.tag_noList.push(items);
                       this.ngForm.controls['carry_over']['controls'][i]['controls'].tag_no.tag_noList = this.ngForm.controls['carry_over']['controls'][i]['controls'].tag_no.tag_noList.filter((arr, index, self) =>
                         index === self.findIndex((t) => (t.value === arr.value)))
@@ -1109,8 +1129,6 @@ export class CarryOverSeedComponent implements OnInit {
 
                         return 0; // If all parts are equal
                       });
-                      console.log(this.ngForm.controls['carry_over']['controls'][i]['controls'].tag_no.tag_noList, 'tag_noList')
-
                     }
                   }
                 }
@@ -1241,6 +1259,7 @@ export class CarryOverSeedComponent implements OnInit {
     const formattedDate = `${year}-${month}-${day}`;
     return formattedDate
   }
+
   getBsp2List() {
     if ((!this.ngForm.controls["year"].value)) {
       Swal.fire({
@@ -1297,152 +1316,97 @@ export class CarryOverSeedComponent implements OnInit {
           crop_code: this.ngForm.controls['crop'].value,
           variety_code: varieytyData && (varieytyData.length > 0) ? varieytyData : '',
           user_id: userData && userData.id ? (userData.id.toString()) : '',
-          production_type:this.productionType
+          production_type: this.productionType
         }
       }
       this.productionService.postRequestCreator('get-seed-processing-reg-carry', param).subscribe(data => {
-        let response = data && data.EncryptedResponse && data.EncryptedResponse.data && data.EncryptedResponse.data.data && data.EncryptedResponse.data.data ? data.EncryptedResponse.data.data : '';
-        this.dummyData = response ? response : '';
-        // console.log(this.dummyData,'this.dummyData')
-        let bsp1VarietyListArr = data && data.EncryptedResponse && data.EncryptedResponse.data && data.EncryptedResponse.data.bsp1VarietyListArr ? (data.EncryptedResponse.data.bsp1VarietyListArr) : '';
-        let directIndentVarietyListTotalArr = data && data.EncryptedResponse && data.EncryptedResponse.data && data.EncryptedResponse.data.directIndentVarietyListTotalArr ? (data.EncryptedResponse.data.directIndentVarietyListTotalArr) : '';
-        bsp1VarietyListArr = bsp1VarietyListArr ? bsp1VarietyListArr.flat() : '';
+        let response = data?.EncryptedResponse?.data?.data ?? '';
+        this.dummyData = response || [];
+
+        let bsp1VarietyListArr = data?.EncryptedResponse?.data?.bsp1VarietyListArr?.flat() ?? [];
         if (this.dummyData && this.dummyData[0] && this.dummyData[0].is_freezed && (this.dummyData[0].is_freezed == 1)) {
           this.freezeData = true
         }
         else {
           this.freezeData = false
         }
-        let combineArrays;
-        let combineArrays2;
-        directIndentVarietyListTotalArr = directIndentVarietyListTotalArr ? directIndentVarietyListTotalArr.flat() : '';
-        if (bsp1VarietyListArr && bsp1VarietyListArr.length > 0 && directIndentVarietyListTotalArr && directIndentVarietyListTotalArr.length > 0) {
-          // if (directIndentVarietyListTotalArr && directIndentVarietyListTotalArr.length > 0) {
-          combineArrays = this.combineArrays3(bsp1VarietyListArr, directIndentVarietyListTotalArr)
-          combineArrays2 = this.combineArrays3(bsp1VarietyListArr, directIndentVarietyListTotalArr)
-          // }
-        }
-        else if (bsp1VarietyListArr && bsp1VarietyListArr.length > 0 && directIndentVarietyListTotalArr.length < 1) {
-          bsp1VarietyListArr = bsp1VarietyListArr.filter((arr, index, self) =>
-            index === self.findIndex((t) => (t.id === arr.id && t.variety_code === arr.variety_code)))
-          bsp1VarietyListArr.forEach((el, i) => {
-            el['total_targeted_qty'] = el && el.total_quantity ? el.total_quantity : 0
-          })
-          combineArrays = bsp1VarietyListArr
-        }
-        else if (bsp1VarietyListArr && bsp1VarietyListArr.length < 1 && directIndentVarietyListTotalArr.length > 0) {
-          directIndentVarietyListTotalArr = directIndentVarietyListTotalArr.filter((arr, index, self) =>
-            index === self.findIndex((t) => (t.indent_of_brseed_direct_line_ids === arr.indent_of_brseed_direct_line_ids && t.variety_code === arr.variety_code)))
-          directIndentVarietyListTotalArr.forEach((el, i) => {
-            el['total_targeted_qty'] = el && el.total_quantity ? el.total_quantity : 0
-          })
-          combineArrays = directIndentVarietyListTotalArr
-        }
-        console.log(combineArrays,'combineArrays')
-        if (combineArrays && combineArrays.length > 0) {
-          combineArrays.forEach((el, i) => {
-            el['quantity'] = el && el['quantity'] ? el['quantity'] : 0
-            el['target_quantity'] = el && el['target_quantity'] ? el['target_quantity'] : 0;
-            el['total_qty'] = el && el['total_qty'] ? el['total_qty'] : 0;
-            
-            // console.log(el,'')
-            if (
-              (el && el.variety_line_code != '' && el.variety_line_code != null && el.variety_line_code != undefined && el.variety_line_code != ' ' && el.variety_line_code != 'NULL' && el.variety_line_code != 'N/A')
-              ||
-              el && el.variety_code_line != '' && el.variety_code_line != null && el.variety_code_line != undefined && el.variety_code_line != ' ' && el.variety_code_line != 'NULL' && el.variety_code_line != 'N/A'
+        let directIndentVarietyListTotalArr = data?.EncryptedResponse?.data?.directIndentVarietyListTotalArr?.flat() ?? [];
 
-            
-            ) {
-              if (bsp1VarietyListArr && bsp1VarietyListArr.length > 0 && directIndentVarietyListTotalArr && directIndentVarietyListTotalArr.length > 0) {}
-              else if (bsp1VarietyListArr && bsp1VarietyListArr.length > 0 && directIndentVarietyListTotalArr.length < 1) {}
-              else if (bsp1VarietyListArr && bsp1VarietyListArr.length < 1 && directIndentVarietyListTotalArr.length > 0) {
-                // el.total_targeted_qty =el && el.total_qty ? el.total_qty:''
-              }
-              el.total_targeted_qty = el && el.target_quantity ? (el.target_quantity + el.quantity) : el && el.quantity ? el.quantity:'';
-            } else {
-              if(el && el.target_quantity && el.total_qty){
+        // Check freeze status
+        // this.freezeData = !!(this.dummyData?.[0]?.is_freezed === 1);
 
-                el.total_targeted_qty = el && el.target_quantity ? (el.target_quantity + el.total_qty) : el && el.total_qty ? (el.total_qty + el.quantity) : '';
-              }else{
-                el.total_targeted_qty = el && el.target_quantity ? (el.target_quantity) : el && el.total_qty ? (el.total_qty + el.quantity) : '';
-              }
-            }
-          })
-        }
-        if (combineArrays && combineArrays.length > 0) {
-          combineArrays.forEach((el)=>{
-            if(el && !el.variety_line_code){
-              el.variety_line_code=el && el.line_variety_code ? el.line_variety_code :el && el.variety_code_line ? el.variety_code_line :'';
-            }else{
-              el.variety_line_code=el &&  el.variety_line_code ?  el.variety_line_code :''
-            }
-          })
-        }
-        // console.log(combineArrays,'combineArrays')
-        if (combineArrays && combineArrays.length > 0) {
-          if (this.dummyData && this.dummyData.length > 0) {
-            this.dummyData = this.dummyData.map(item => {
-              if (item.variety_line_code || item.line_variety_code || item.variety_code_line) {
-                const matchedItem = combineArrays.find(data => (data.variety_code === item.variety_code && data.variety_line_code === item.line_variety_code)
-                // || (data.variety_code === item.variety_code && data.variety_code_line === item.variety_code_line)
-                // || (data.variety_code === item.variety_code && data.variety_code_line === item.line_variety_code)
-                );
-                if (matchedItem) {
-                  item.total_targeted_qty = matchedItem.total_targeted_qty;
-                }
-              } else {
-                const matchedItem = combineArrays.find(data => data.variety_code === item.variety_code && !item.variety_line_code);
-                if (matchedItem) {
-                  item.total_targeted_qty = matchedItem.total_targeted_qty;
-                }
-
-              }
-              return item;
-
-            })
-            // this.dummyData = this.dummyData.map(item1 => {
-            //   let match = combineArrays.find(item2 => item2.variety_code === item1.variety_code);
-            //   if (match) {
-            //     item1.total_targeted_qty = (item1.total_targeted_qty || 0) + match.total_targeted_qty;
-            //   }
-            //   if (item1.line_variety_code !== null && item1.line_variety_code !== "") {
-            //     item1.variety_code = item1.line_variety_code + '-' + item1.variety_code;
-            //   }
-            //   return item1;
-            // });
+        // Sum up `total_qty` for each `variety_code`
+        let varietyTotalQtyMap: { [key: string]: number } = {};
+        directIndentVarietyListTotalArr.forEach(item => {
+          if (item.variety_code) {
+            varietyTotalQtyMap[item.variety_code] = (varietyTotalQtyMap[item.variety_code] || 0) + (item.total_qty || 0);
           }
+        });
+
+        // Combine arrays logic
+        let combineArrays = [];
+        if (bsp1VarietyListArr.length > 0 && directIndentVarietyListTotalArr.length > 0) {
+          combineArrays = this.combineArrays3(bsp1VarietyListArr, directIndentVarietyListTotalArr);
+        } else if (bsp1VarietyListArr.length > 0) {
+          combineArrays = bsp1VarietyListArr.filter((arr, index, self) =>
+            index === self.findIndex(t => t.id === arr.id && t.variety_code === arr.variety_code));
+        } else if (directIndentVarietyListTotalArr.length > 0) {
+          combineArrays = directIndentVarietyListTotalArr.filter((arr, index, self) =>
+            index === self.findIndex(t => t.indent_of_brseed_direct_line_ids === arr.indent_of_brseed_direct_line_ids && t.variety_code === arr.variety_code));
         }
-        console.log(this.dummyData,'dummyData')
 
-        this.getBsp2ListVariety()
-        // for (let data of this.dummyData) {
-        //   // let bsplength = data.carry_over.length;
-        //   // data.bsplength = bsplength
-        //   // let bsp2_Deteials= e
-        //   let sum = 0;
-        //   if (data && data.bsp2_Deteials && data.bsp2_Deteials.length > 0) {
-        //     data.bsp2_Deteials.forEach((el, i) => {
+        // Update `total_targeted_qty` correctly
+        combineArrays.forEach(el => {
+          let totalQtyFromIndent = varietyTotalQtyMap[el.variety_code] || 0;
+          el.total_targeted_qty = (el.target_quantity || 0) + totalQtyFromIndent + (el.quantity || 0);
+        });
 
-        //       sum += el && el.quantity_of_bs_shown ? el.quantity_of_bs_shown : 0
-        //       // el.quantity_sown= sum;
-        //     })
+        // Correct `variety_line_code`
+        combineArrays.forEach(el => {
+          el.variety_line_code = el.variety_line_code || el.line_variety_code || el.variety_code_line || '';
+        });
+
+        // Ensure correct display in the table
+        // old code commented is 20 /08/2025
+        // this.dummyData = this.dummyData.map(item => {
+        //   let matchedItem = combineArrays.find(data => data.variety_code === item.variety_code || data.variety_code_line == item.line_variety_code);
+        //   if (matchedItem) {
+        //     if (!item.line_variety_code) {
+        //       item.total_targeted_qty = matchedItem.total_targeted_qty;
+        //     }
+        //     else {
+        //       item.total_targeted_qty = matchedItem.total_qty;
+        //       item.quantity = matchedItem.quantity;
+        //     }
         //   }
-        //   data.bsp2_Deteials.forEach((el, i) => {
-        //     // sum+=el && el.quantity_sown ? el.quantity_sown :0
-        //     el.quantity_sown = sum;
-        //   })
+        //   return item;
+        // });
 
-        //   data.bsp2_Deteials = data.bsp2_Deteials.filter((arr, index, self) =>
-        //     index === self.findIndex((t) => (t.bsp_proforma_2_id === arr.bsp_proforma_2_id && t.field_code == arr.field_code)))
-        //   let bsplength = data.bsp2_Deteials.length;
-        //   data.bsplength = bsplength;
-
-        // }
-      })
+        this.dummyData = this.dummyData.map(item => {
+          // match line_variety_code first
+          let matchedItem = combineArrays.find(
+            data => data.variety_code === item.variety_code && data.variety_code_line === item.line_variety_code
+          );
+          // If line_variety_code is not there then match only variety_code
+          if (!matchedItem && !item.line_variety_code) {
+            matchedItem = combineArrays.find(data => data.variety_code === item.variety_code);
+          }
+          if (matchedItem) {
+            if (item.line_variety_code) {
+              // when line_variety_code is present
+              item.total_targeted_qty = matchedItem.total_targeted_qty;
+              item.quantity = matchedItem.quantity;
+            } else {
+              // When only variety_code matches (there is no line)
+              item.total_targeted_qty = matchedItem.total_targeted_qty;
+            }
+          }
+          return item;
+        });
+        
+        this.getBsp2ListVariety();
+      });
     }
-
-
-
   }
 
   getBsp2ListVariety() {
@@ -1454,7 +1418,7 @@ export class CarryOverSeedComponent implements OnInit {
         season: this.ngForm.controls['season'].value,
         crop_code: this.ngForm.controls['crop'].value,
         user_id: userData && userData.id ? (userData.id.toString()) : '',
-        production_type:this.productionType
+        production_type: this.productionType
       }
     }
     this.productionService.postRequestCreator('get-carry-over-variety-grid', param).subscribe(data => {
@@ -1701,7 +1665,7 @@ export class CarryOverSeedComponent implements OnInit {
     datasValue.variely_line = this.selectParental;
     datasValue.variety = this.ngForm.controls['variety'].value;
     datasValue.line_variety_code = this.ngForm.controls['variety_line_code'].value;
-    datasValue.production_type = this.productionType ? this.productionType:"NORMAL";
+    datasValue.production_type = this.productionType ? this.productionType : "NORMAL";
     if (datasValue && datasValue.carry_over && datasValue.carry_over.length > 0) {
       if (this.unit == 'Qt') {
         datasValue.total_breederseed = datasValue && datasValue.total_breederseed ? (this.checkDecimal(datasValue.total_breederseed)) : ''
@@ -1979,7 +1943,7 @@ export class CarryOverSeedComponent implements OnInit {
         season: this.ngForm.controls['season'].value,
         crop_code: this.ngForm.controls['crop'].value,
         user_id: UserId,
-        production_type:this.productionType
+        production_type: this.productionType
 
       }
     }).subscribe((apiResponse: any) => {
@@ -2014,13 +1978,12 @@ export class CarryOverSeedComponent implements OnInit {
           combineArrays.forEach((el, i) => {
             el['quantity'] = el && el['quantity'] ? el['quantity'] : 0
             if (el && el.variety_line_code != '' && el.variety_line_code != null && el.variety_line_code != undefined && el.variety_line_code != ' ' && el.variety_line_code != 'NULL' && el.variety_line_code != 'N/A') {
-              el.total_targeted_qty = el && el.target_quantity ? (el.target_quantity + el.quantity) : el && el.quantity ? el.quantity:'';
+              el.total_targeted_qty = el && el.target_quantity ? (el.target_quantity + el.quantity) : el && el.quantity ? el.quantity : '';
             } else {
               el.total_targeted_qty = el && el.target_quantity ? (el.target_quantity + el.quantity) : el && el.total_qty ? (el.total_qty + el.quantity) : '';
             }
           })
         }
-        console.log(combineArrays,'combineArrays')
         if (combineArrays && combineArrays.length > 0) {
           if (reportDataArr && reportDataArr.length > 0) {
             let reportDataArrsss;
@@ -2240,7 +2203,7 @@ export class CarryOverSeedComponent implements OnInit {
           id: item1.id,
           variety_code: item1.variety_code,
           variety_line_code: item1.variety_line_code,
-          target_quantity: item1 && item1.target_quantity ? item1.target_quantity :0,
+          target_quantity: item1 && item1.target_quantity ? item1.target_quantity : 0,
           quantity: matchingItem.quantity || 0,
           total_qty: matchingItem.total_qty || 0
         });
@@ -2250,7 +2213,7 @@ export class CarryOverSeedComponent implements OnInit {
           id: item1.id,
           variety_code: item1.variety_code,
           variety_line_code: item1.variety_line_code || '',
-          target_quantity: item1 &&  item1.target_quantity ?  item1.target_quantity :0,
+          target_quantity: item1 && item1.target_quantity ? item1.target_quantity : 0,
           total_qty: 0 // Since no match found, total_qty defaults to 0
         });
       }
@@ -2324,7 +2287,6 @@ export class CarryOverSeedComponent implements OnInit {
       // Format it to display two decimal places
       let aFormatted = aNumber.toFixed(2);
       return aFormatted
-      // console.log(aFormatted);
     } else {
       return a
 
@@ -2515,51 +2477,50 @@ export class CarryOverSeedComponent implements OnInit {
   }
   getTagNoData(item) {
     if (item && item.length > 1) {
-      // console.log(item,'item')
       let data = []
       item.forEach((el, i) => {
         data.push(el && el.display_text ? el.display_text : '')
       })
-    
+
       const arr2 = data.map(str => {
         const match = str.match(/(.*?)(\d+)$/); // Match any characters (lazy) followed by the number
         if (match === null) {
-            return str; // Return the original string if no match
+          return str; // Return the original string if no match
         } else {
-            return match ? { prefix: match[1], number: parseInt(match[2]) } : null; // Extract prefix and number
+          return match ? { prefix: match[1], number: parseInt(match[2]) } : null; // Extract prefix and number
         }
-    });
-    
-    const groupedByPrefix: Record<string, number[]> = arr2.reduce((acc, obj) => {
+      });
+
+      const groupedByPrefix: Record<string, number[]> = arr2.reduce((acc, obj) => {
         if (typeof obj === 'string') { // If it's a string, directly use it as prefix
-            acc[obj] = acc[obj] || [];
+          acc[obj] = acc[obj] || [];
         } else { // If it's an object, extract prefix
-            acc[obj.prefix] = acc[obj.prefix] || [];
-            acc[obj.prefix].push(obj.number);
+          acc[obj.prefix] = acc[obj.prefix] || [];
+          acc[obj.prefix].push(obj.number);
         }
         return acc;
-    }, {});
-    
-    // Generate the result
-    const result = Object.entries(groupedByPrefix).map(([prefix, numbers]) => {
+      }, {});
+
+      // Generate the result
+      const result = Object.entries(groupedByPrefix).map(([prefix, numbers]) => {
         const sortedNumbers = (numbers as number[]).sort((a, b) => a - b);
         const ranges = [];
         let start = sortedNumbers[0];
         let end = start;
         for (let i = 1; i < sortedNumbers.length; i++) {
-            if (sortedNumbers[i] === end + 1) {
-                end = sortedNumbers[i];
-            } else {
-                ranges.push(end === start ? `${prefix}${start}` : `${prefix}${start}-${end}`);
-                start = end = sortedNumbers[i];
-            }
+          if (sortedNumbers[i] === end + 1) {
+            end = sortedNumbers[i];
+          } else {
+            ranges.push(end === start ? `${prefix}${start}` : `${prefix}${start}-${end}`);
+            start = end = sortedNumbers[i];
+          }
         }
         ranges.push(end === start ? `${prefix}${start}` : `${prefix}${start}-${end}`);
         return ranges;
-    }).flat();
-    
-    return result && result.length > 0 ? result.toString() : 'NA';
-    
+      }).flat();
+
+      return result && result.length > 0 ? result.toString() : 'NA';
+
     } else if (item && item.length == 1) {
       let data = []
       item.forEach((el, i) => {
@@ -2593,7 +2554,6 @@ export class CarryOverSeedComponent implements OnInit {
       let bspProforma2Data = response && response.bspProforma2Data ? response.bspProforma2Data : '';
       let datas = []
       let req_data = bspProforma2Data && bspProforma2Data.req_data ? bspProforma2Data.req_data : response && response.req_data ? response.req_data : '';
-      // console.log(req_data,'req_data',response)
       this.req_data = req_data
       if (req_data) {
         datas.push(req_data)
@@ -2796,10 +2756,10 @@ export class CarryOverSeedComponent implements OnInit {
 
     this.productionService.postRequestCreator('get-class-quantity', param).subscribe(data => {
       let response = data && data.EncryptedResponse && data.EncryptedResponse.data ? data.EncryptedResponse.data : '';
-      if(this.unit=='Qt'){
-        this.ngForm.controls['qty_of_nucleus_seed'].setValue(response && response.nucleusData && response.nucleusData[0] && response.nucleusData[0].quantity ? (response.nucleusData[0].quantity/100) : '0');
-        this.ngForm.controls['qty_of_breeeder_seed'].setValue(response && response.nucleusData && response.breederData[0] && response.breederData[0].quantity ? (response.breederData[0].quantity/100): '0');
-      }else{
+      if (this.unit == 'Qt') {
+        this.ngForm.controls['qty_of_nucleus_seed'].setValue(response && response.nucleusData && response.nucleusData[0] && response.nucleusData[0].quantity ? (response.nucleusData[0].quantity / 100) : '0');
+        this.ngForm.controls['qty_of_breeeder_seed'].setValue(response && response.nucleusData && response.breederData[0] && response.breederData[0].quantity ? (response.breederData[0].quantity / 100) : '0');
+      } else {
         this.ngForm.controls['qty_of_nucleus_seed'].setValue(response && response.nucleusData && response.nucleusData[0] && response.nucleusData[0].quantity ? response.nucleusData[0].quantity : '0');
         this.ngForm.controls['qty_of_breeeder_seed'].setValue(response && response.nucleusData && response.breederData[0] && response.breederData[0].quantity ? response.breederData[0].quantity : '0');
       }
@@ -2809,13 +2769,13 @@ export class CarryOverSeedComponent implements OnInit {
         this.ngForm.controls['permission_of_production'].setValue('NA')
       }
       else {
-        if(this.ngForm.controls['qty_of_breeeder_seed'].value!=0){
+        if (this.ngForm.controls['qty_of_breeeder_seed'].value != 0) {
           this.ngForm.controls['permission_of_production'].setValue(permission.isPermission == true ? 'Yes' : 'No');
-        }else{
+        } else {
           this.ngForm.controls['permission_of_production'].setValue('NA');
         }
       }
-      if (parseFloat(this.ngForm.controls['qty_of_breeeder_seed'].value) <=0) {
+      if (parseFloat(this.ngForm.controls['qty_of_breeeder_seed'].value) <= 0) {
         this.classOfSeed = [
         ]
       } else {
@@ -2855,7 +2815,7 @@ export class CarryOverSeedComponent implements OnInit {
       position: "center",
       cancelButtonColor: "#DD6B55",
     }).then(x => {
-      if(x.isConfirmed){
+      if (x.isConfirmed) {
         this.productionService.postRequestCreator('freeze-data-carry-over', param).subscribe(apiResponse => {
           if (apiResponse && apiResponse.EncryptedResponse && apiResponse.EncryptedResponse.status_code
             && apiResponse.EncryptedResponse.status_code == 200) {
@@ -2867,17 +2827,17 @@ export class CarryOverSeedComponent implements OnInit {
               confirmButtonColor: '#E97E15'
             }).then(x => {
               this.getBsp2List();
-  
+
               if (this.Variety.length < 1) {
                 this.ngForm.controls['variety'].setValue('');
                 this.ngForm.controls['variety_line_code'].setValue('');
                 this.selectParental = '';
                 this.selectVariety = '';
                 this.editDataValue = false;
-  
+
               }
             })
-  
+
             // this.getPageData(this.filterPaginateSearch.itemListCurrentPage);
           } else {
             Swal.fire({
@@ -2890,7 +2850,7 @@ export class CarryOverSeedComponent implements OnInit {
           }
         })
       }
-   
+
     })
   }
   convertToQty(item) {
@@ -2904,23 +2864,23 @@ export class CarryOverSeedComponent implements OnInit {
       return item
     }
   }
-  productionTypeValue(value){
+  productionTypeValue(value) {
     if (value) {
       this.productionType = value;
-      if( this.productionType=="NORMAL"){
-        this.isDisableNormal= false;
-        this.isDisableDelay= true;
-        this.isDisableNormalReallocate= true;
-      }else if( this.productionType=="DELAY"){
-        this.isDisableNormal= true;
-        this.isDisableDelay= false;
-        this.isDisableNormalReallocate= true;
-      }else if( this.productionType=="REALLOCATION"){
-        this.isDisableNormal= true;
-        this.isDisableDelay= true;
-        this.isDisableNormalReallocate= false;
+      if (this.productionType == "NORMAL") {
+        this.isDisableNormal = false;
+        this.isDisableDelay = true;
+        this.isDisableNormalReallocate = true;
+      } else if (this.productionType == "DELAY") {
+        this.isDisableNormal = true;
+        this.isDisableDelay = false;
+        this.isDisableNormalReallocate = true;
+      } else if (this.productionType == "REALLOCATION") {
+        this.isDisableNormal = true;
+        this.isDisableDelay = true;
+        this.isDisableNormalReallocate = false;
       }
-      else{
+      else {
         // this.isDisableNormal= false;
         // this.isDisableDelay= false;
         // this.isDisableNormalReallocate= true;
@@ -2928,8 +2888,8 @@ export class CarryOverSeedComponent implements OnInit {
     }
     this.getYear();
   }
-  resetRadioBtn(){
+  resetRadioBtn() {
     window.location.reload();
-    this.productionType=""
+    this.productionType = ""
   }
 }     

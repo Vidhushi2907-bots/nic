@@ -66,18 +66,18 @@ db.assignCropNewFlow = require('./assign_crop_new_flow.model')(sequelize, Sequel
 db.assignBspcCropNewFlow = require('./assign_crop_bspc_new_flow.model')(sequelize, Sequelize);
 db.seedForProductionModel = require('./seed_for_production.model')(sequelize, Sequelize);
 db.monitoringTeamPdpc = require('./monitoring_team_pdpc.model')(sequelize, Sequelize);
-db.monitoringTeamPdpcDetails=require('./monitoring_team_pdpc_details.model.js')(sequelize, Sequelize);
-db.agencytypeModel=require('./agency_type.model.js')(sequelize, Sequelize);
-db.seedClassModel=require('./seed_class.model.js')(sequelize, Sequelize);
-db.bspPerformaBspOne=require('./bsp_proforma_1.model.js')(sequelize, Sequelize);
-db.bspPerformaBspTwo=require('./bsp_proforma_2.model.js')(sequelize, Sequelize);
-db.bspPerformaBspTwoSeed=require('./bsp_proforma_2_seed.model')(sequelize, Sequelize);
-db.bspPerformaBspThree=require('./bsp_proforma_3.model.js')(sequelize, Sequelize);
-db.bspProformaOneBspc=require('./bsp_proforma_one_bspc.model')(sequelize, Sequelize);
-db.seedInventoryTags=require('./seed_inveontory_tags.model.js')(sequelize, Sequelize);
-db.seedInventoryTagDetails=require('./seed_inventry_tag_details.model.js')(sequelize, Sequelize);
-db.monitoringTeamOfBspcMember=require('./monitoring_team_of_bspc_member.model')(sequelize, Sequelize);
-db.monitoringTeamOfBspc=require('./monitoring_team_of_bspc.model')(sequelize, Sequelize);
+db.monitoringTeamPdpcDetails = require('./monitoring_team_pdpc_details.model.js')(sequelize, Sequelize);
+db.agencytypeModel = require('./agency_type.model.js')(sequelize, Sequelize);
+db.seedClassModel = require('./seed_class.model.js')(sequelize, Sequelize);
+db.bspPerformaBspOne = require('./bsp_proforma_1.model.js')(sequelize, Sequelize);
+db.bspPerformaBspTwo = require('./bsp_proforma_2.model.js')(sequelize, Sequelize);
+db.bspPerformaBspTwoSeed = require('./bsp_proforma_2_seed.model')(sequelize, Sequelize);
+db.bspPerformaBspThree = require('./bsp_proforma_3.model.js')(sequelize, Sequelize);
+db.bspProformaOneBspc = require('./bsp_proforma_one_bspc.model')(sequelize, Sequelize);
+db.seedInventoryTags = require('./seed_inveontory_tags.model.js')(sequelize, Sequelize);
+db.seedInventoryTagDetails = require('./seed_inventry_tag_details.model.js')(sequelize, Sequelize);
+db.monitoringTeamOfBspcMember = require('./monitoring_team_of_bspc_member.model')(sequelize, Sequelize);
+db.monitoringTeamOfBspc = require('./monitoring_team_of_bspc.model')(sequelize, Sequelize);
 db.directIndent = require('./direct_indent.model.js')(sequelize, Sequelize);
 db.varietLineModel = require('./variety_line.model.js')(sequelize, Sequelize);
 db.mVarietyLinesModel = require("./m_variety_lines.model.js")(sequelize, Sequelize);
@@ -121,6 +121,8 @@ db.mReactionToMajorInsectPestsModel = require('./m_reaction_to_major_insect_pest
 db.varietyCategoryModel = require('./variety_category.model.js')(sequelize, Sequelize);
 db.cropCharactersticsModel = require("./crop_characteristics.model")(sequelize, Sequelize);
 db.varietyCategoryMappingModel = require("./variety_category_mapping.model.js")(sequelize, Sequelize);
+db.responsibleInsitutionModel = require("./responsible_insitution.model.js")(sequelize, Sequelize);
+db.liftingSeedDetailsModel = require('./lifting_seed_details.model.js')(sequelize, Sequelize);
 
 db.allocationToSPASeed.belongsTo(db.cropModel, {
     foreignKey: 'crop_code',
@@ -718,37 +720,37 @@ db.agencyDetailModel.belongsTo(db.centralModel, {
 
 
 })
-db.indentOfSpa.belongsTo(db.userModel,{
+db.indentOfSpa.belongsTo(db.userModel, {
     foreignKey: 'user_id',
     targetKey: 'id'
 })
-db.indentOfSpa.belongsTo(db.agencyDetailModel,{
+db.indentOfSpa.belongsTo(db.agencyDetailModel, {
     foreignKey: 'user_id',
     targetKey: 'user_id'
 })
-db.userModel.belongsTo(db.indentOfBreederseedModel,{
+db.userModel.belongsTo(db.indentOfBreederseedModel, {
     foreignKey: 'id',
     targetKey: 'user_id'
 })
-db.indentOfBreederseedModel.belongsTo(db.allocationToIndentorProductionCenterSeed,{
+db.indentOfBreederseedModel.belongsTo(db.allocationToIndentorProductionCenterSeed, {
     foreignKey: 'id',
     targetKey: 'indent_of_breeder_id'
 })
-db.indentOfBreederseedModel.belongsTo(db.allocationtoIndentorliftingseeds,{
+db.indentOfBreederseedModel.belongsTo(db.allocationtoIndentorliftingseeds, {
     foreignKey: 'id',
     targetKey: 'user_id'
 })
 
-db.allocationtoIndentorliftingseeds.belongsTo(db.allocationToIndentorProductionCenterSeed,{
+db.allocationtoIndentorliftingseeds.belongsTo(db.allocationToIndentorProductionCenterSeed, {
     foreignKey: 'id',
     targetKey: 'allocation_to_indentor_for_lifting_seed_id'
 })
-db.agencyDetailModel.belongsTo(db.allocationtoIndentorliftingseeds,{
+db.agencyDetailModel.belongsTo(db.allocationtoIndentorliftingseeds, {
     foreignKey: 'id',
     targetKey: 'user_id'
 })
 
-db.userModel.belongsTo(db.allocationToIndentorProductionCenterSeed,{
+db.userModel.belongsTo(db.allocationToIndentorProductionCenterSeed, {
     foreignKey: 'agency_id',
     targetKey: 'indent_of_breeder_id'
 })
@@ -756,11 +758,11 @@ db.agencyDetailModel.belongsTo(db.indentOfBreederseedModel, {
     foreignKey: 'user_id',
     targetKey: 'user_id',
 });
-db.stateModel.belongsTo(db.districtModel,{
+db.stateModel.belongsTo(db.districtModel, {
     foreignKey: 'state_code',
     targetKey: 'state_code'
 });
-db.indentOfSpa.belongsTo(db.allocationToSPAProductionCenterSeed,{
+db.indentOfSpa.belongsTo(db.allocationToSPAProductionCenterSeed, {
     foreignKey: 'spa_code',
     targetKey: 'spa_code'
 })
@@ -840,42 +842,42 @@ db.breederCropModel.belongsTo(db.userModel, {
 });
 
 // --------------------lot number relation with crop tabel------------//
-db.lotNumberModel.belongsTo(db.cropModel,{
-    foreignKey:'crop_code',
-    targetKey:'crop_code'
+db.lotNumberModel.belongsTo(db.cropModel, {
+    foreignKey: 'crop_code',
+    targetKey: 'crop_code'
 
 })
 
 //--------------end crop and lot number relation -------------//
 // --------------------lot number relation with varierty tabel------------//
-db.lotNumberModel.belongsTo(db.varietyModel,{
-    foreignKey:'variety_id',
-    targetKey:'id'
+db.lotNumberModel.belongsTo(db.varietyModel, {
+    foreignKey: 'variety_id',
+    targetKey: 'id'
 
 })
 
 //--------------end varierty and lot number relation -------------//
 // --------------------lot number relation with seedTestingReport tabel------------//
-db.lotNumberModel.belongsTo(db.seedTestingReportsModel,{
-    foreignKey:'id',
-    targetKey:'lot_number'
+db.lotNumberModel.belongsTo(db.seedTestingReportsModel, {
+    foreignKey: 'id',
+    targetKey: 'lot_number'
 
 })
 
 //--------------end seedTestingReport and lot number relation -------------//
 
 // --------------------crop  relation with bsp4 tabel------------//
-db.bsp4Model.belongsTo(db.cropModel,{
-    foreignKey:'crop_code',
-    targetKey:'crop_code'
+db.bsp4Model.belongsTo(db.cropModel, {
+    foreignKey: 'crop_code',
+    targetKey: 'crop_code'
 
 })
 
 //--------------end crop  relation with bsp4 relation -------------//
 // --------------------user  relation with bsp4 tabel------------//
-db.bsp4Model.belongsTo(db.userModel,{
-    foreignKey:'production_center_id',
-    targetKey:'id'
+db.bsp4Model.belongsTo(db.userModel, {
+    foreignKey: 'production_center_id',
+    targetKey: 'id'
 
 })
 
@@ -893,40 +895,40 @@ db.bsp4ToPlant.belongsTo(db.plantDetails, {
 //     targetKey: 'state_code'
 // })
 //--------------end user  relation -------------//
-db.userModel.hasMany(db.bsp5aModel,{
+db.userModel.hasMany(db.bsp5aModel, {
     foreignKey: 'production_center_id',
 })
 
-db.bsp5aModel.belongsTo(db.userModel,{
+db.bsp5aModel.belongsTo(db.userModel, {
     foreignKey: 'production_center_id',
     targetKey: 'id'
 })
 
-db.userModel.hasMany(db.bsp5bModel,{
+db.userModel.hasMany(db.bsp5bModel, {
     foreignKey: 'production_center_id',
 })
 
-db.bsp5bModel.belongsTo(db.userModel,{
+db.bsp5bModel.belongsTo(db.userModel, {
     foreignKey: 'production_center_id',
     targetKey: 'id'
 })
-db.bsp5bModel.belongsTo(db.indentOfBreederseedModel,{
+db.bsp5bModel.belongsTo(db.indentOfBreederseedModel, {
     foreignKey: 'indent_of_breederseed_id',
     targetKey: 'id'
 })
-db.seedInventory.belongsTo(db.cropModel,{
+db.seedInventory.belongsTo(db.cropModel, {
     foreignKey: 'crop_code',
     targetKey: 'crop_code'
 })
-db.seedInventory.belongsTo(db.varietyModel,{
+db.seedInventory.belongsTo(db.varietyModel, {
     foreignKey: 'variety_code',
     targetKey: 'variety_code'
 })
-db.seedInventory.belongsTo(db.agencyDetailModel,{
+db.seedInventory.belongsTo(db.agencyDetailModel, {
     foreignKey: 'bspc_id',
     targetKey: 'user_id'
 })
-db.seedInventory.belongsTo(db.stageModel,{
+db.seedInventory.belongsTo(db.stageModel, {
     foreignKey: 'stage_id',
     targetKey: 'id'
 })
@@ -996,10 +998,10 @@ db.monitoringTeamPdpc.belongsTo(db.monitoringTeamPdpcDetails, {
 });
 
 // TableA.hasMany(TableB, { foreignKey: 'columnA', sourceKey: 'columnB' });
-db.monitoringTeamPdpcDetails.belongsTo(db.stateModel,{
+db.monitoringTeamPdpcDetails.belongsTo(db.stateModel, {
     foreignKey: 'state_code',
     targetKey: 'state_code',
-  
+
 })
 // db.stateModel.belongsTo(db.monitoringTeamPdpcDetails,{
 //     foreignKey: 'state_code',
@@ -1007,28 +1009,28 @@ db.monitoringTeamPdpcDetails.belongsTo(db.stateModel,{
 // db.monitoringTeamPdpcDetails.hasOne(db.districtModel,{
 //     foreignKey: 'district_code',
 // })
-db.monitoringTeamPdpcDetails.belongsTo(db.districtModel,{
+db.monitoringTeamPdpcDetails.belongsTo(db.districtModel, {
     foreignKey: 'district_code',
-    targetKey:'district_code'
+    targetKey: 'district_code'
 
 })
 
-db.monitoringTeamPdpcDetails.belongsTo(db.agencytypeModel,{
+db.monitoringTeamPdpcDetails.belongsTo(db.agencytypeModel, {
     foreignKey: 'agency_type_id',
-    targetKey:'id'
+    targetKey: 'id'
 })
-db.monitoringTeamPdpc.belongsTo(db.cropModel,{
+db.monitoringTeamPdpc.belongsTo(db.cropModel, {
     foreignKey: 'crop_code',
-    targetKey:'crop_code'
+    targetKey: 'crop_code'
 
 })
-db.seedInventory.belongsTo(db.seedClassModel,{
+db.seedInventory.belongsTo(db.seedClassModel, {
     foreignKey: 'seed_class_id',
-    targetKey:'id'
+    targetKey: 'id'
 });
-db.seedInventory.belongsTo(db.seasonModel,{
+db.seedInventory.belongsTo(db.seasonModel, {
     foreignKey: 'season',
-    targetKey:'season_code'
+    targetKey: 'season_code'
 });
 
 //indent of SPA and state
@@ -1058,18 +1060,18 @@ db.monitoringTeamOfBspcMember.belongsTo(db.monitoringTeamOfBspc, {
     targetKey: 'id'
 });
 
-db.monitoringTeamPdpc.belongsTo(db.stateModel,{
+db.monitoringTeamPdpc.belongsTo(db.stateModel, {
     foreignKey: 'state_code',
-    targetKey:'state_code'
+    targetKey: 'state_code'
 
 })
-db.seedInventory.belongsTo(db.seedInventoryTags,{
+db.seedInventory.belongsTo(db.seedInventoryTags, {
     foreignKey: 'id',
-    targetKey:'seed_inventry_id'
+    targetKey: 'seed_inventry_id'
 });
-db.bspPerformaBspOne.belongsTo(db.cropModel,{
+db.bspPerformaBspOne.belongsTo(db.cropModel, {
     foreignKey: 'crop_code',
-    targetKey:'crop_code'
+    targetKey: 'crop_code'
 
 })
 db.monitoringTeamOfBspc.belongsTo(db.monitoringTeamOfBspcMember, {
@@ -1171,20 +1173,20 @@ db.indentOfBreederseedModel.belongsTo(db.indentOfBrseedLines, {
 
 db.indentOfBreederseedModel.belongsTo(db.agencyDetailModel, {
     foreignKey: 'user_id',
-    targetKey: 'user_id', 
+    targetKey: 'user_id',
     as: 'agencyDetails'
-  });
-  db.bspPerformaBspTwo.belongsTo(db.varietLineModel, {
+});
+db.bspPerformaBspTwo.belongsTo(db.varietLineModel, {
     foreignKey: 'variety_line_code',
-    targetKey: 'line_variety_code', 
+    targetKey: 'line_variety_code',
     // as: 'agencyDetails'
-  });
-  db.bspPerformaBspOne.belongsTo(db.bspProformaOneBspc, {
+});
+db.bspPerformaBspOne.belongsTo(db.bspProformaOneBspc, {
     foreignKey: 'id',
-    targetKey: 'bspc_proforma_1_id', 
+    targetKey: 'bspc_proforma_1_id',
     // as: 'agencyDetails'
-  });
-  db.varietyModel.hasMany(db.seedForProductionModel, {
+});
+db.varietyModel.hasMany(db.seedForProductionModel, {
     foreignKey: 'variety_code',
     targetKey: 'variety_code',
 });
@@ -1228,12 +1230,12 @@ db.agencyDetailModel.belongsTo(db.designationModelSecond, {
 db.bspPerformaBspOne.belongsTo(db.seedForProductionModel, {
     foreignKey: 'variety_code',
     targetKey: 'variety_code',
-    as:'seed_for_production'
+    as: 'seed_for_production'
 });
 db.bspPerformaBspTwo.belongsTo(db.carryOverSeedModel, {
     foreignKey: 'variety_code',
     targetKey: 'variety_code',
-    as:'bsp2CarryOver'
+    as: 'bsp2CarryOver'
 });
 
 db.indentOfSpaLinesModel.belongsTo(db.varietLineModel, {
@@ -1260,16 +1262,16 @@ db.varietyPriceList.belongsTo(db.cropModel, {
     foreignKey: 'crop_code',
     targetKey: 'crop_code',
 })
-db.varietyPriceList.belongsTo(db.varietyPriceListPackagesModel,{
+db.varietyPriceList.belongsTo(db.varietyPriceListPackagesModel, {
     foreignKey: 'id',
     targetKey: 'variety_priece_list_id',
 })
 
-db.mAgroEcologicalRegionsModel.belongsTo(db.mAgroLogicalRegionstatesModel,{
+db.mAgroEcologicalRegionsModel.belongsTo(db.mAgroLogicalRegionstatesModel, {
     foreignKey: 'id',
     targetKey: 'm_agro_logical_region_id',
 })
-db.mAgroLogicalRegionstatesModel.belongsTo(db.stateModel,{
+db.mAgroLogicalRegionstatesModel.belongsTo(db.stateModel, {
     foreignKey: 'state_code',
     targetKey: 'state_code',
 })
@@ -1280,25 +1282,65 @@ db.mAgroLogicalRegionstatesModel.belongsTo(db.stateModel,{
 db.cropCharactersticsModel.hasMany(db.varietyModel, {
     foreignKey: 'variety_code',
     sourceKey: 'variety_code'
-  });
-  
-  db.varietyModel.belongsTo(db.cropCharactersticsModel, {
+});
+
+db.varietyModel.belongsTo(db.cropCharactersticsModel, {
     foreignKey: 'variety_code',
     targetKey: 'variety_code'
-  });
+});
 // //-----Crop Variety Relation Ends-------
 
 // //Category Mapping Start
-db.varietyModel.hasMany(db.varietyCategoryMappingModel, {
+// db.varietyModel.hasMany(db.varietyCategoryMappingModel, {
+//     foreignKey: 'variety_code',
+//     sourceKey: 'variety_code'
+// });
+
+
+db.cropCharactersticsModel.belongsTo(db.responsibleInsitutionModel, {
+    foreignKey: 'responsible_insitution_for_breeder_seed',
+    targetKey: 'id'
+});
+
+// db.varietyModel.hasMany(db.varietyCategoryMappingModel, {
+//     foreignKey: 'variety_code',
+//     targetKey: 'variety_code'
+//     // sourceKey: 'variety_code',
+//     // as: 'category',
+// });
+db.varietyModel.belongsTo(db.varietyCategoryMappingModel, {
     foreignKey: 'variety_code',
-    sourceKey: 'variety_code'
-  });
-  
-  db.varietyCategoryMappingModel.belongsTo(db.varietyModel, {
-    foreignKey: 'variety_code',
-    targetKey: 'variety_code'
+    targetKey: 'variety_code',
+    // sourceKey: 'variety_code',
+    // as: 'category',
+});
+// db.varietyCategoryMappingModel.belongsTo(db.varietyModel, {
+//     foreignKey: 'variety_code',
+//     targetKey: 'variety_code'
+// });
+
+db.varietyCategoryMappingModel.belongsTo(db.varietyCategoryModel, {
+    foreignKey: 'm_variety_category_id',
+    targetKey: 'id',
   });
 
-//category mapping ends
-  
+db.allocationtoIndentorliftingseeds.hasMany(db.allocationToIndentorProductionCenterSeed, {
+    foreignKey: 'allocation_to_indentor_for_lifting_seed_id',
+});
+
+db.allocationToIndentorProductionCenterSeed.belongsTo(db.allocationtoIndentorliftingseeds, {
+    targetKey: 'id',
+    foreignKey: 'allocation_to_indentor_for_lifting_seed_id'
+});
+db.allocationToIndentorProductionCenterSeed.belongsTo(db.agencyDetailModel, {
+  foreignKey: 'indent_of_breeder_id',
+  targetKey: 'user_id',
+//   as: 'agencyDetails'
+});
+db.seedProcessingRegister.belongsTo(db.agencyDetailModel, {
+  foreignKey: 'user_id',
+  targetKey: 'user_id',
+//   as: 'agencyDetails'
+});
+
 module.exports = db;

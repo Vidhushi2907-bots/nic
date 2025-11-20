@@ -1,0 +1,267 @@
+<form [formGroup]="ngForm" class="pt-2">
+    <div class="main-inventory my-4 w-90  pt-2">
+        <span class="title-inventory1 pt-3 ">
+            Intake Verification Register Report
+        </span>
+        <br>
+                <div class="col-12 mt-3">
+                    <div class="row px-2 pt-1 pb-1">
+                        <div class="col-lg-10 col-md-12 col-12">
+                            <div class="row">
+                                <div class="col-md-2 col-sm-2 col-md-2 col-lg-3  ">
+                                    <div class="form-check">
+                                        <!-- checked -->
+                                        <!-- [checked]="ngForm.controls['willing_to_produce'].value=='yes'" -->
+                                        <input class="radio-button form-check-input radio-btn" name="notifiedValue"
+                                            type="radio" (change)="productionTypeValue('NORMAL')" [ngClass]="isDisableNormal?'disableField':''" [disabled]="isDisableNormal" id="flexRadioDefault1"
+                                            value="non-notified" >
+                                        <label class="form-check-label pl-4" for="flexRadioDefault1">
+                                            <b>Normal Varieties</b>
+                                        </label>
+                                    </div>
+                                </div>
+                                <!-- [(ngModel)]="notifiedValue" -->
+                                <!-- checked -->
+                                <!-- [checked]="ngForm.controls['willing_to_produce'].value=='no' && ngForm.controls['variety'].value" -->
+                                <div class="col-md-2 col-sm-2 col-md-2 col-lg-3   ">
+                                    <div class="form-check">
+                                        <input class="radio-button form-check-input radio-btn" name="notifiedValue"
+                                            type="radio" (change)="productionTypeValue('DELAY')"[ngClass]="isDisableDelay?'disableField':''" [disabled]="isDisableDelay" id="flexRadioDefault2" >
+                                        <label class="form-check-label pl-4" for="flexRadioDefault2">
+                                            <b>Delayed Varieties</b> 
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3 col-md-3 col-lg-4  ">
+                                    <div class="form-check">
+                                        <input class="radio-button form-check-input radio-btn" name="notifiedValue"
+                                            type="radio" (change)="productionTypeValue('REALLOCATION')"[ngClass]="isDisableNormalReallocate?'disableField':''" [disabled]="isDisableNormalReallocate" id="flexRadioDefault2">
+                                        <label class="form-check-label pl-4" for="flexRadioDefault2">
+                                            <b>Reallocated Varieties</b> 
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-1 col-sm-1 col-md-1 col-lg-1 ">
+                                    <!-- form-button btn-inventory search d-inline-flex justify-content-center verticle-content-middle mb-3 -->
+                                    <button (click)="resetRadioBtn()"
+                                        class="btn-reset w-50 search text-white inline-flex justify-content-center verticle-content-middle" title="Reset"><i class="fa fa-refresh" style="font-size:20px;color:rgb(255, 255, 255)"></i>
+                                    </button>
+                                    <!-- (click)="search()" -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        <!-- first card ui -->
+        <div class="col-12 col-sm-12 col-md-12 col-lg-12 pb-2 pt-2 pr-0">
+            <div class="row  card-inventory form-group formargin">
+                <!-- start sectio 1 -->
+                <div class="col-12 col-md-10 col-lg-10 col-sm-12 pt-1 pl-4 formargin">
+                    <div class="row">
+                        <!-- year of indent -->
+                        <div class="col-12 col-md-4 col-lg-4 col-xl-4 col-sm-12">
+                            <div class="row">
+                                <div class="col-12 col-md-12 col-lg-12 col-lg-12 col-xl-12">
+                                    <label for="year" class="label-inventory required">Year of Indent</label>
+                                </div>
+                                <div class="col-12 col-md-12 col-lg-12 col-lg-12 col-xl-12">
+                                    <select class=" form-control input-inventory" formControlName="year">
+                                        <option value="">Please Select Year</option>
+                                        <option *ngFor="let year of yearData" value="{{year.year}}">
+                                            {{ year.year }}-{{ ((year.year % 100) + 1) < 10 ? '0' : '' }}{{
+                                                (year.year % 100) + 1 }} </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- season -->
+                        <div class="col-12 col-md-4 col-lg-4 col-sm-12 col-xl-4">
+                            <div class="row">
+                                <div class="col-12 col-md-12 col-lg-12 col-xl-12">
+                                    <label for="year" class="label-inventory required">Season</label>
+                                </div>
+                                <div class="col-12 col-md-12 col-lg-12 col-xl-12">
+                                    <select class=" form-control input-inventory" formControlName="season">
+                                        <option value="">Select Season</option>
+                                        <option *ngFor="let seasons of seasonData"
+                                                value="{{seasons && seasons.season}}">
+                                                {{seasons && seasons.season== 'K'? "Kharif": "Rabi" }}
+                                            </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- crop -->
+                        <div class="col-12 col-md-4 col-lg-4 col-sm-6 col-xl-4">
+                            <div class="row">
+                                <div class="col-12 col-md-12 col-lg-12 col-xl-12">
+                                    <label for="year" class="left-heading required">Crop</label>
+                                </div>
+                                <div class="col-12 col-md-12 col-lg-12 col-xl-12">
+                                    <div ngbDropdown class="d-inline-block w-100"
+                                        [ngClass]="!ngForm.controls['season'].value ? 'disableButton' : ''">
+                                        <button class="btn takeplacholder w-100 crop toggle-button input-inventory"
+                                            [disabled]="!ngForm.controls['season'].value" id="crop"
+                                            ngbDropdownToggle style="text-align: left;">
+                                            {{ selectCrop && (selectCrop.length > 30) ? (selectCrop.substring(0,23)
+                                            + '...') : selectCrop ? selectCrop : 'Select Crop' }}
+                                        </button>
+
+                                        <div class="dropdown-menu w-100 mr-5" ngbDropdownMenu="crop"
+                                            aria-labelledby="sortMenu">
+                                            <input type="text" class="form-control px-4" formControlName="crop_text" (click)="cropdatatext()">
+                                            <button class="dropdown-item" *ngFor="let item of cropData"
+                                                (click)="crop(item)" #dropdownItem [attr.data-parent-name]="'crop'">
+                                                {{ item && item.m_crop.crop_name ? item.m_crop.crop_name : '' }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="pl-0 toggle-button" ngbDropdown>
+                                        <i class="fa-solid fa-angle-down downicon" (click)="cClick()"></i>
+                                    </div>
+                                    <div class=" errorMessage"
+                                        *ngIf="submitted || ngForm.controls['crop'].invalid && (ngForm.controls['crop'].dirty || ngForm.controls['crop'].touched)">
+                                        <span *ngIf="ngForm.controls['crop'].errors?.['required']">
+                                            Please Select crop Name.
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                          
+                    </div>
+                </div>
+                <div class="col-lg-2 expa col-md-2 col-sm-12 col-12 pt-4 mt-3 pr-4 formargin">
+                    <div class="row">
+                        <div class="col-12 col-md-12 col-lg-12  ">
+                            <button class="w-100 py-2 text-white btn-inventory1 bspc_text d-inline-flex justify-content-center verticle-content-middle mb-3"
+                                (click)="searchData()">
+                                Search
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="col-lg-2 expa col-md-2 col-sm-12 col-12 pt-4 mt-2 pr-4 formargin">
+                    <div class="row">
+                        <div class="col-12 col-md-12 col-lg-12  ">
+                            <div class="col-lg-2 expa col-md-2 col-sm-12 col-12 pt-4 mt-2 pr-4 formargin">
+                                <div class="row">
+                                    <div class="col-12 col-md-12 col-lg-12  ">
+                                        <button
+                        <div class="d-flex align-items-end justify-content-center h-100">
+                            <button class="btn btn-inventory search2" style="width: 10rem; color: white; position: relative;"
+                                (click)="searchData()">Search</button>
+                        </div>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+
+        <!--  Second Card ui --> 
+        <div class="col-12 col-sm-12 col-md-12 col-lg-12  pt-3 pr-0" *ngIf="isSearchClicked">
+            <div class="row card-inventory form-group pb-2 pl-0 ">
+                <div class="col-12 ">
+                    <div class="col-12 col-md-12 col-lg-12 ">
+                        <!-- <div class="col-12 col-md-10 col-lg-10 col-sm-12 formargin  pt-1 pb-1">
+
+                            <div class="row">
+                                <div class="col-12 col-md-12 col-lg-12 mt-1">
+                                    <div class="col-12 col-md-12 col-lg-12 col-sm-12 formargin  pt-1 pb-1">
+                                        <div class="row">
+                                             
+                                            <div class="col-12 col-md-3 col-lg-3  col-sm-12">
+                                                <div class="row">
+                                                 
+                                                    <div class="col-12 pb-1 pl-0 pr-2 ml-2 ">
+                                                        <ng-multiselect-dropdown [settings]="dropdownSettings" [data]="varietyData"
+                                                        formControlName="variety" [placeholder]="'Select Variety'" class="dropdown"
+                                                        (onSelect)="getPageData()" (onDeSelect)="getPageData()"
+                                                        (onSelectAll)="selcetAll($event)"
+                                                        (onDeSelectAll)="getPageData()">
+                                                       </ng-multiselect-dropdown>
+                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-md-3 col-lg-3  col-sm-12">
+                                                
+                                            </div>
+                                            <div class="col-12 col-md-3 col-lg-3  col-sm-12">
+                                                 
+                                            </div>
+                                            <div class="col-12 col-md-1 col-lg-1 col-xl-1 col-sm-12">
+                                                 
+                                            </div> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col=12 col-md-2 col-lg-2">
+                        </div> -->
+                        <!-- *ngIf="searchClicked" -->
+                        <div class="row data-row pt-2 " *ngIf="isSearchClicked">
+                            <table class="table border-top-0 col-12 col-sm-6 col-md-12 col-lg-12 col-xl-12 pl-0 pr-0 m-0">
+                                <thead class="w-100 pl-0 table-bordered">
+                                  <tr class="data-row-header">
+                                    <th scope="col" class="col-md-1 py-2 text-white verticle-content-middle heading">S.No.</th>
+                                    <th scope="col" class="col-md-2 py-2 text-white verticle-content-middle heading">BSPC Code</th>
+                                    <th scope="col" class="col-md-3 py-2 text-white verticle-content-middle heading">BSPC Name</th>
+                                    <th scope="col" class="col-md-3 py-2 text-white verticle-content-middle heading">Status</th>
+                                    <th scope="col" class="col-md-2 py-2 text-white verticle-content-middle heading">Submission Date</th>
+                                    <!-- <th scope="col" class="col-md-1 py-2 text-white verticle-content-middle heading">Download PDF</th> -->
+                                  </tr>
+                                </thead>
+                                <tbody class="border-top-0 table-bordered col-md-1 py-2 text-white verticle-content-middle heading data-row">
+                                      <!-- Check if allData has any entries -->
+                                   <ng-container *ngIf="allData && allData.length > 0; else noDataTemplate">
+                                    <ng-container *ngFor="let data of allData; let i = index">
+                                      <tr>
+                                        <td class="col-md-1 py-2 verticle-content-middle">
+                                            <b class="font-weight-bold text-center verticle-content-middle">{{ i+1 }}</b>
+                                          </td>
+                                        <td class="col-md-2 py-2 verticle-content-middle">
+                                          <b class="font-weight-bold text-center verticle-content-middle">{{ data.bspcCode }}</b>
+                                        </td>
+                                        <td class="col-md-3 py-2 verticle-content-middle">
+                                          <b class="font-weight-bold text-center verticle-content-middle">{{ data.bspcName }}</b>
+                                        </td>
+                                        <td class="col-md-3 py-2 verticle-content-middle">
+                                          <b class="font-weight-bold text-center verticle-content-middle" 
+                                             [ngClass]="{ 'text-green': data.status === 'Completed',
+                                                          'text-yellow': data.status === 'Working',
+                                                          'text-red': data.status === 'Pending'
+                                                        }">
+                                              {{ data.status }}</b>
+                                        </td>
+                                        <td class="col-md-2 py-2 verticle-content-middle">
+                                          <b class="font-weight-bold text-center verticle-content-middle">
+                                            <!-- Show submissionDate only if status is 'completed' --> 
+                                           {{ data.status === 'Completed' ? data.submissionDate : '' }}
+                                          </b>
+                                        </td>
+                                        <!-- <td class="col-md-1 py-2 verticle-content-middle" [ngClass]="{'disabled-link': data.status !== 'Completed'}"> 
+                                            <button (click)="downloadPdf(data.user_id)" 
+                                            class="form-button text-white btn-inventory search d-inline-flex justify-content-center verticle-content-middle mb-3':'disableBtn'">Download</button>
+                                          </td> -->
+                                      </tr>
+                                    </ng-container>
+                                   </ng-container>
+                                    <!-- Template to show when no data is available -->
+                                    <ng-template #noDataTemplate>
+                                    <tr *ngIf="allData && allData.length < 1">
+                                       <td colspan="4" class="text-center py-2">
+                                            <b class="font-weight-bold text-center verticle-content-middle">No Data Found</b>
+                                        </td>
+                                    </tr>
+                                    </ng-template>
+                                  </tbody>
+                              </table>               
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<app-bsp-third class="d-none"></app-bsp-third>

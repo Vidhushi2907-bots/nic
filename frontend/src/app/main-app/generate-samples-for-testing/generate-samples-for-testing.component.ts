@@ -220,6 +220,7 @@ control: any;
   checkboxCheckedgot: any;
   useragencttype: any;
   state_code: any;
+  is_potato: boolean=false;
   // masterService: any;
   // seedProcessRegisterDta = [
   //   {
@@ -871,6 +872,11 @@ control: any;
     this.selectCrop = item.crop_name;
     this.ngForm.controls["crop_text"].setValue("");
     this.ngForm.controls['crop_code'].setValue(item.crop_code);
+    if (item.crop_code == "H1101") {
+      this.is_potato = false;
+      } else {
+      this.is_potato = true;
+    }
     this.selectCrop_crop_code = item.crop_code;
     this.crop_name_data = item.crop_name;
     this.selectCrop_group = "";

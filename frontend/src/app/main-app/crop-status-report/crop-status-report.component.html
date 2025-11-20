@@ -108,7 +108,7 @@
                       'NA'}}</td>
                       <td class="col-md-1"></td><td class="col-md-1"></td>
                       <td class="col-md-2">
-                        Crop_Type: {{
+                        Crop Type: {{
                           !ngForm.controls['crop_type'].value 
                             ? 'NA'
                             : ngForm.controls['crop_type'].value === 'agriculture'
@@ -159,7 +159,7 @@
                         }">{{ data.bsp_1_status }}</td>
 
                         <td class="col-md-1 py-2 verticle-content-middle">
-                          {{ bspc.bspc_name }}
+                          {{ bspc.bspc_name || 'N/A'}}
                         </td>
                         <td class="col-md-1 py-2 verticle-content-middle" [ngClass]="{ 'text-green': bspc.bsp_2_status === 'Completed',
                         'text-yellow': bspc.bsp_2_status === 'Working',

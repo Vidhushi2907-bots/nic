@@ -298,7 +298,12 @@ export class IntakeVerificationComponent implements OnInit {
     // const getLocalData = localSetorage.getItem('BHTCurrentUser');
     // let data = JSON.parse(getLocalData)
     let UserIds = datas.code
-    let rangeData = this.getRangeData(this.dataVerify.actualHarvest_date, this.dataVerify.code, UserIds ? UserIds : 'NA', this.lotNo, this.dataVerify.max_lot_size, this.ngForm.controls['received_quantity'].value)
+    let rangeData;
+    if(this.lotNo){
+      rangeData = this.getRangeData(this.dataVerify.actualHarvest_date, this.dataVerify.code, UserIds ? UserIds : 'NA', this.lotNo, this.dataVerify.max_lot_size, this.ngForm.controls['received_quantity'].value)
+    }else{
+      rangeData = this.getRangeData(this.dataVerify.actualHarvest_date, this.dataVerify.code, UserIds ? UserIds : 'NA', 1, this.dataVerify.max_lot_size, this.ngForm.controls['received_quantity'].value)
+    }
     param.rangeData = rangeData;
     param.range_data = this.provisonal_lot;
     param.provisonal_lot = this.provisonal_lot
@@ -1110,6 +1115,8 @@ export class IntakeVerificationComponent implements OnInit {
     return formattedDate
   }
   getRangeData(actualData, user_id, UserId, plotIndex, maxlot, qty) {
+    console.log('lot_no',plotIndex);
+    let plotIndexValue = plotIndex ?parseInt(plotIndex):1;
     const getLocalData = localStorage.getItem('BHTCurrentUser');
     let data = JSON.parse(getLocalData)
     let UserIds = data.code
@@ -1180,14 +1187,14 @@ export class IntakeVerificationComponent implements OnInit {
         resultArray.forEach((el, i) => {
 
           qtyData.push(el)
-          results.push(`${actualData ? actualData.toUpperCase() : 'NA'}-${user_id}-${UserIds}-${plotIndex}(${toRoman(Math.ceil(i + 1))})(${el}${this.unit})`)
+          results.push(`${actualData ? actualData.toUpperCase() : 'NA'}-${user_id}-${UserIds}-${plotIndexValue}(${toRoman(Math.ceil(i + 1))})(${el}${this.unit})`)
         })
       }
       else {
         resultArray.forEach((el, i) => {
           qtyData.push(el)
 
-          results.push(`${actualData ? actualData.toUpperCase() : 'NA'}-${user_id}-${UserIds}-${plotIndex}(${el}${this.unit})`)
+          results.push(`${actualData ? actualData.toUpperCase() : 'NA'}-${user_id}-${UserIds}-${plotIndexValue}(${el}${this.unit})`)
         })
       }
       // this.range_data= data;
@@ -1211,8 +1218,8 @@ export class IntakeVerificationComponent implements OnInit {
     else if (qty) {
       let result = [];
       let resultData = []
-      console.log('plotIndex', plotIndex)
-      result.push(`${actualData ? actualData.toUpperCase() : 'NA'}-${user_id}-${UserIds}-${plotIndex}(${qty}${this.unit})`)
+      console.log('plotIndex', plotIndexValue)
+      result.push(`${actualData ? actualData.toUpperCase() : 'NA'}-${user_id}-${UserIds}-${plotIndexValue}(${qty}${this.unit})`)
       if (result && result.length > 0) {
         result.forEach(el => {
           resultData.push(
@@ -1232,6 +1239,7 @@ export class IntakeVerificationComponent implements OnInit {
       return 'NA'
     }
   }
+  
   getStack(id) {
     if (this.investVerifyStackComposition && this.investVerifyStackComposition.length > 0) {
       let item = this.investVerifyStackComposition.filter(x => x.invest_verify_id == id);

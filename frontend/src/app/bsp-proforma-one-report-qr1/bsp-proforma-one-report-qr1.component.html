@@ -1,0 +1,147 @@
+<div class="container-fluid report-container p-3 ">
+  
+
+   <div class="header-row">
+    <div class="logo">Logo</div>
+    <div class="title">
+      <h3><b>BSPC TEST FOUR</b></h3>
+      <h3><B>AGRA, UTTAR PRADESH</B></h3>
+      <diV class="testing"> <h3><b>"Seed Testing Lab Report"</b></h3></diV>
+    </div>
+    
+    <div class="qr1"><div class="row d-flex justify-content-end">
+  <div class="col-auto pt-3 pdf" title="download-pdf">
+  </div>
+</div></div>
+
+
+  </div>
+
+  <hr class="divider">
+  <div class="sub-header">
+  <div class="left">
+    Year of Indent:{{ year }} <br>
+    <div class="season">Season: {{ season }}</div>
+  </div>
+  <div class="center">
+    Crop: <b>{{ crop }}</b>
+  </div>
+  <div class="right">
+    <div class="date">
+
+        Date: <span>{{ today | date:'dd-MM-yyyy' }}</span> <br>
+    </div>
+    <div class="season">
+      Reference Number: <b>{{referenceNumber }}</b>
+    </div>
+  </div>
+</div>
+
+
+  <div class="table-responsive" *ngIf="reportData.length > 0" class="table-responsive">
+    
+    <table class="table custom-table">
+      <thead>
+        <tr>
+          <th rowspan="2">SNo.</th>
+          <th colspan="2">Sample Details</th>
+          <th colspan="2">Testing Details</th>
+          <th colspan="4">Physical Purity (% by Weight)</th>
+          <th colspan="4">Determination By (No./Kg)</th>
+          <th colspan="5">Germination (%)</th>
+          <th colspan="3">Seed Health</th>
+          <th colspan="2">Others</th>
+        </tr>
+        <tr>
+          <th>Variety</th>
+          <th>Lot No.</th>
+          <th>Lab Name</th>
+          <th>Date of Test</th>
+          <th>PS</th>
+          <th>WS(P)</th>
+          <th>OCS(P)</th>
+          <th>IM</th>
+          <th>WS</th>
+          <th>OWS</th>
+          <th>OCS</th>
+          <th>ODV</th>
+          <th>NS</th>
+          <th>AS</th>
+          <th>DS</th>
+          <th>HS</th>
+          <th>FS</th>
+          <th>ID</th>
+          <th>Disease</th>
+          <th>NG</th>
+          <th>Moisture</th>
+          <th>HS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of reportData; let i = index">
+          <td>{{ i+1 }}</td>
+          <td>{{ row.m_crop_variety?.variety_name || '-' }}</td>
+                                                <td>{{ row.lot_no }}</td>
+                                                <td>{{ row.seedLabtest?.lab_name }}</td>
+                                                <td>{{ row.date_of_test }}</td>
+                                                <td>{{ row.pure_seed }}</td>
+                                                <td>{{ row.weed_seed_purity }}</td>
+                                                <td>{{ row.other_crop_purity }}</td>
+                                                <td>{{ row.inert_matter }}</td>
+                                                <td>{{ row.weed_seed }}</td>
+                                                <td>{{ row.other_seed }}</td>
+                                                <td>{{ row.other_crop_seed }}</td>
+                                                <td>{{ row.other_distinguisable_varieties }}</td>
+                                            <td>{{ row.normal_seeding }}</td>
+                                            <td>{{ row.abnormal_seeding }}</td>
+                                            <td>{{ row.dead_seed }}</td>
+                                            <td>{{ row.hard_seed }}</td>
+                                            <td>{{ row.fs }}</td>
+                                            <td>{{ row.insect_damage }}</td>
+                                            <td>NA</td>
+                                            <td>NA</td>
+                                            <td>{{ row.m }}</td>
+                                            <td>{{ row.husk }}</td>
+
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+    <div class="footer">
+    <div class="signature">
+      <p><b>--SD--</b></p>
+      <p>(Dr. Parimal Tripathi)</p>
+      <p><b>Deputy Director</b></p>
+    </div>
+
+    <div class="legend">
+  <div class="legend-row">
+    <b>PS:</b> Pure Seed,&nbsp;&nbsp; 
+    <b>IM:</b> Inert Matter,&nbsp;&nbsp; 
+    <b>WS:</b> Weed Seed,&nbsp;&nbsp; 
+    <b>M:</b> Moisture,&nbsp;&nbsp; 
+    <b>OWS:</b> Objectionable Weed Seed (No/Kg),&nbsp;&nbsp; 
+    <b>OCSP:</b> Other Crop Seed Purity(%) &nbsp;&nbsp;
+    <b>AS:</b> Abnormal Seedling(%) &nbsp;&nbsp;
+    <b>DS:</b> Dead Seed(%)
+
+  </div>
+  <div class="legend-row">
+    <b>HS:</b> Hard Seed(%) &nbsp;&nbsp; 
+    <b>FS:</b> Fresh Ungerminated(%) &nbsp;&nbsp;
+        <b>D:</b> Disease(%) &nbsp;&nbsp; 
+    <b>ODV:</b> Other Distinguishable Varieties (Bio/No/Kg)
+  </div>
+</div>
+    <p class="note">
+      *Note: This is an electronically generated report and does not require signature.
+    </p>
+  </div>
+</div>
+<!-- //////////////////////////////////////////////// -->
+
+
+
+

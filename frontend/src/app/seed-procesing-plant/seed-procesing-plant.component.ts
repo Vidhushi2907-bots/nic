@@ -179,6 +179,7 @@ export class SeedProcesingPlantComponent implements OnInit {
   line_variety_name: any;
   carry_over_user_id: any;
   checkStackNoRunningNo: any;
+  is_potato: boolean ;
   get generateDefaultMonth(): string {
     let date = { year: this.todayDate.getFullYear(), month: (this.todayDate.getMonth() + 1), day: this.todayDate.getDate() + 1 }
 
@@ -280,6 +281,20 @@ export class SeedProcesingPlantComponent implements OnInit {
 
         this.selectVariety = '';
         this.selectParentalLine = '';
+        if (newvalue == "H1101") {
+          this.is_potato = false;
+          this.ngForm.controls['under_size'].setValue(0)
+          this.ngForm.controls['processing_loss'].setValue(0)
+          this.ngForm.controls['total_rejected'].setValue(0)
+          this.under_sizepercent = 0;
+          this.ngForm.controls['spp']['controls'][0].controls['bags'].setValue(50)
+          this.getLossQty();
+        } else {
+          this.is_potato = true;
+        }
+
+        console.log('is_potato======',this.is_potato);
+
         if (newvalue.slice(0, 1) == "A") {
           this.unit = "Qt";
         } else {
@@ -502,27 +517,33 @@ export class SeedProcesingPlantComponent implements OnInit {
 
   }
   submit() {
+    
     if (this.LotPageDetails == 1) {
       let sppData = this.ngForm.value ? this.ngForm.value.spp : '';
       let stackData = this.ngForm.value ? this.ngForm.value.stack : '';
-      if (sppData && sppData.length > 0) {
-        for (let key in sppData) {
-          if (sppData[key].no_of_bags == '' || sppData[key].bags == ''
-            || sppData[key].bags == '' || sppData[key].type_of_seed == ''
-            || sppData[key].qty == '' || !this.ngForm.controls['under_size'].value
-          ) {
-            Swal.fire({
-              title: '<p style="font-size:25px;">Please Fill The Form Properly.</p>',
-              icon: 'error',
-              confirmButtonText:
-                'OK',
-              confirmButtonColor: '#B64B1D'
-            })
-            return;
-
+      if (this.ngForm.controls['crop'].value == "H1101") {
+        this.ngForm.controls['under_size'].patchValue(0)
+      }else{
+        if (sppData && sppData.length > 0) {
+          for (let key in sppData) {
+            if (sppData[key].no_of_bags == '' || sppData[key].bags == ''
+              || sppData[key].bags == '' || sppData[key].type_of_seed == ''
+              || sppData[key].qty == '' || !this.ngForm.controls['under_size'].value
+            ) {
+              Swal.fire({
+                title: '<p style="font-size:25px;">Please Fill The Form Properly.</p>',
+                icon: 'error',
+                confirmButtonText:
+                  'OK',
+                confirmButtonColor: '#B64B1D'
+              })
+              return;
+  
+            }
           }
         }
       }
+     
       if (parseFloat(this.raw_seed_produced_data) < this.ngForm.controls['total_breeder_qty'].value) {
         Swal.fire({
           title: '<p style="font-size:25px;">Please Fill The Form Properly.</p>',
@@ -648,6 +669,11 @@ export class SeedProcesingPlantComponent implements OnInit {
           this.ngForm.controls['variety_level_2'].setValue('')
           this.ngForm.controls['lot_no'].setValue('');
           this.under_sizepercent = ''
+          if(!this.is_potato){
+            this.ngForm.controls['spp']['controls'][0].controls['bags'].setValue(50)
+          }else{
+            this.ngForm.controls['spp']['controls'][0].controls['bags'].setValue('')
+          }
         })
       } else {
         Swal.fire({
@@ -683,7 +709,11 @@ export class SeedProcesingPlantComponent implements OnInit {
     this.ngForm.controls['variety_level_2'].setValue('')
     this.ngForm.controls['lot_no'].setValue('');
     this.under_sizepercent = '';
-
+    if(!this.is_potato){
+      this.ngForm.controls['spp']['controls'][0].controls['bags'].setValue(50)
+    }else{
+      this.ngForm.controls['spp']['controls'][0].controls['bags'].setValue('')
+    }
     // total_breeder_qty: [''],
     //   under_size: [''],
     //   processing_loss: [''],
@@ -1515,31 +1545,49 @@ export class SeedProcesingPlantComponent implements OnInit {
     // Call function to update the dropdown with the total number of bags
     this.getBagMarkaData(totalBags);
   }
+  // remove(rowIndex: number) {
+  //   this.sppData().removeAt(rowIndex);
+
+  //   // Recalculate total quantities and bags after removing a row
+  //   this.recalculateTotals();
+  //   // Recalculate the total rejected quantity after removing the row
+  //   this.calculateTotalRejectedQty();
+  // }
   remove(rowIndex: number) {
     this.sppData().removeAt(rowIndex);
 
-    // Recalculate total quantities and bags after removing a row
-    this.recalculateTotals();
-    // Recalculate the total rejected quantity after removing the row
-    this.calculateTotalRejectedQty();
-  }
+    const stackControls = this.ngForm.get('stack') as FormArray;
+    if (stackControls.length > rowIndex) {
+        stackControls.removeAt(rowIndex); // Remove corresponding stack row
+    }
+
+    // Ensure calculations run after Angular updates the form
+    setTimeout(() => {
+        this.recalculateTotals();
+        this.calculateTotalRejectedQty(); // Ensure recalculates after form update
+        this.getLossQty();
+    }, 100);  // Slight delay to allow form update
+}
+  
   calculateTotalRejectedQty() {
     let totalRejectedQty = 0;
     const data = this.ngForm.value;
 
-    // Check if spp exists and has rows
-    if (data && data.spp && data.spp.length > 0) {
-      data.spp.forEach((el) => {
-        // Check if total_rejected field exists and is a number
-        if (el && el.total_rejected) {
-          totalRejectedQty += parseFloat(el.total_rejected) || 0; // Fallback to 0 if NaN
-        }
-      });
+    // console.log("Ttlrjcteddata", data);
+
+    if (data?.spp?.length > 0) {
+        data.spp.forEach((el) => {
+            let rejectedStr = el?.total_rejected || "0"; // Default to "0" if empty
+            let rejectedNum = parseFloat(rejectedStr.split(" ")[0]) || 0; // Extract numeric value
+            totalRejectedQty += rejectedNum;
+        });
     }
 
-    // Update the total rejected quantity in the form control
     this.ngForm.controls['total_rejected'].setValue(totalRejectedQty.toFixed(2));
-  }
+    // console.log("Total Rejected Quantity:", totalRejectedQty);
+}
+
+
 
 
   recalculateTotals() {
@@ -1562,32 +1610,51 @@ export class SeedProcesingPlantComponent implements OnInit {
   trackByFn(index: number, item: any): number {
     return index; // or use a unique identifier for better performance
   }
+  // getBagMarkaData(totalBags) {
+  //   let bag_markaData = [];
+
+  //   // Generate the `bag_markaData` array based on the total number of bags
+  //   if (totalBags) {
+  //     for (let index = 1; index <= totalBags; index++) {
+  //       bag_markaData.push({
+  //         id: index,
+  //         bags: index
+  //       });
+  //     }
+  //   }
+
+  //   const stackControls = this.ngForm.get('stack') as FormArray; // Cast to FormArray
+
+  //   // Update all rows' dropdowns with the total number of bags
+  //   (this.ngForm.get('spp') as FormArray).controls.forEach((control, i) => {
+  //     stackControls.at(i).get('bagData').setValue(bag_markaData);
+  //   });
+
+  //   this.BagMarka = bag_markaData;
+  // }
   getBagMarkaData(totalBags) {
     let bag_markaData = [];
 
     // Generate the `bag_markaData` array based on the total number of bags
     if (totalBags) {
-      for (let index = 1; index <= totalBags; index++) {
-        bag_markaData.push({
-          id: index,
-          bags: index
-        });
-      }
+        for (let index = 1; index <= totalBags; index++) {
+            bag_markaData.push({ id: index, bags: index });
+        }
     }
 
     const stackControls = this.ngForm.get('stack') as FormArray; // Cast to FormArray
+    const sppControls = this.ngForm.get('spp') as FormArray; // Get spp FormArray
 
-    // Update all rows' dropdowns with the total number of bags
-    (this.ngForm.get('spp') as FormArray).controls.forEach((control, i) => {
-      stackControls.at(i).get('bagData').setValue(bag_markaData);
+    // Ensure stackControls has enough entries before accessing
+    sppControls.controls.forEach((control, i) => {
+        if (stackControls.at(i)) { // Check if it exists before accessing
+            stackControls.at(i).get('bagData')?.setValue(bag_markaData);
+        }
     });
 
     this.BagMarka = bag_markaData;
-  }
-
-
-
-
+}
+  
   getUnit() {
     let crop_code = this.ngForm.controls['crop'].value;
     let unit;
@@ -1596,11 +1663,7 @@ export class SeedProcesingPlantComponent implements OnInit {
     }
     this.unit = unit;
   }
-  // callFunctionAfterDelay(i): void {
-  //   setTimeout(() => {
-  //     this.getBagMarkaData(i);
-  //   }, 5000); // 5000 milliseconds = 5 seconds
-  // }
+  
   myFunction(under_size, under_sizepercent) {
     // Your function code here
     this.ngForm.controls['under_size'].setValue(`${under_size ? under_size : ''} (${under_sizepercent ? under_sizepercent.toFixed(2) : ""}%)`)
@@ -1608,25 +1671,7 @@ export class SeedProcesingPlantComponent implements OnInit {
     // Set the flag to true after the function is called
   }
 
-
-  // getBagMarkaData(i) {
-  //   let bag_markaData = []
-
-
-  //   if (this.highestNumber) {
-  //     for (let index = 1; index <= Number(this.highestNumber); index++) {
-  //       bag_markaData.push(
-  //         {
-  //           id: index,
-  //           bags: index
-  //         }
-  //       )
-  //     }
-  //   }
-  //   this.ngForm.controls['stack']['controls'][i].controls['bagData'].setValue(bag_markaData)
-  //   // this.ngForm.controls['']
-  //   this.BagMarka = bag_markaData;
-  // }
+ 
   getStackData() {
     const getLocalData = localStorage.getItem('BHTCurrentUser');
     let datas = JSON.parse(getLocalData);
@@ -1636,7 +1681,7 @@ export class SeedProcesingPlantComponent implements OnInit {
         "year": this.ngForm.controls["year"].value,
         "season": this.ngForm.controls["season"].value,
         "crop_code": this.ngForm.controls["crop"].value,
-        "variety_code": this.ngForm.controls["variety"].value,
+        // "variety_code": this.ngForm.controls["variety"].value,
         user_id: UserId
 
       }
@@ -1790,110 +1835,117 @@ export class SeedProcesingPlantComponent implements OnInit {
     //  }
 
   }
+   
   // getLossQty() {
-
+  //   console.log("loss called");
+    
   //   let total_breeder_qty = this.ngForm.controls['total_breeder_qty'].value;
   //   let under_size = this.ngForm.controls['under_size'].value;
   //   let totalQty = parseFloat(this.raw_seed_produced_data) - parseFloat(this.totalQty);
-  //   if (under_size) {
-  //     let under_sizepercent = (under_size / this.raw_seed_produced_data) * 100;
-  //     this.alreadyCalled = false;
-  //     this.under_sizepercent = under_sizepercent;
-  //     // callMyFunctionAfterDelay():void {
-  //     // if (!this.alreadyCalled) {
-  //     //   this.zone.runOutsideAngular(() => {
-  //     //     setTimeout(() => {
-  //     //       // this.myFunction(under_size,under_sizepercent);
-  //     //     }, 3000);
-  //     //   });
-  //     // }
-  //     // }
 
-  //     // setTimeout(() => {
-  //     //   this.ngForm.controls['under_size'].setValue(`${under_size ? under_size:''} (${under_sizepercent ? under_sizepercent.toFixed(2):""}%)`)
-  //     // },3000)
-  //   }
-  //   // let processing_loss= this.ngForm.controls['processing_loss'].value;
-  //   // let total_rejected= this.ngForm.controls['total_rejected'].value;
-  //   let processing_loss = (Number(totalQty)) - (Number(under_size));
-  //   let total_rejected = totalQty;
-  //   if (parseFloat(under_size) > Number(totalQty)) {
-  //     Swal.fire({
-  //       title: '<p style="font-size:25px;">UnderSize Quantity .</p>',
-  //       icon: 'error',
-  //       confirmButtonText:
-  //         'OK',
-  //       confirmButtonColor: '#B64B1D'
-  //     }).then(x => {
-  //       this.totalQtyErr = true;
-  //     })
+  //   if (under_size) {
+  //       let under_sizepercent = (under_size / this.raw_seed_produced_data) * 100;
+  //       this.under_sizepercent = under_sizepercent;
   //   } else {
-  //     this.totalQtyErr = false;
+  //       // Reset under_sizepercent if under_size is empty
+  //       this.under_sizepercent = 0;
   //   }
-  //   let processing_lossqty = processing_loss ? processing_loss.toFixed(2) : '';
+
+  //   // Calculate processing_loss
+  //   let processing_loss = totalQty - under_size;
+  //   let total_rejected = totalQty;
+
+  //   if (parseFloat(under_size) > Number(totalQty)) {
+  //       Swal.fire({
+  //           title: '<p style="font-size:25px;">UnderSize Quantity Exceeds Total.</p>',
+  //           icon: 'error',
+  //           confirmButtonText: 'OK',
+  //           confirmButtonColor: '#B64B1D'
+  //       }).then(x => {
+  //           this.totalQtyErr = true;
+  //       });
+  //   } else {
+  //       this.totalQtyErr = false;
+  //   }
+
+  //   // Check for processing_loss condition when under_size equals totalQty
+  //   if (under_size === totalQty) {
+  //       processing_loss = 0;
+  //   }
+
+  //   // Update processing_loss and total_rejected in form controls
+  //   let processing_lossqty = processing_loss ? processing_loss.toFixed(2) : '0';
   //   let percentQty = (Number(processing_lossqty) / this.raw_seed_produced_data) * 100;
   //   let percentTotalRejected = (Number(totalQty) / this.raw_seed_produced_data) * 100;
+
   //   this.processing_loss = Number(processing_lossqty);
   //   this.total_rejected = total_rejected;
-  //   if (parseFloat(processing_lossqty) > 0) {
-  //     this.ngForm.controls['processing_loss'].setValue(`${processing_lossqty ? (parseFloat(processing_lossqty).toFixed(2)) : ''} (${percentQty ? (percentQty.toFixed(2)) : ''} %)`);
+  //  console.log("gettotalrejected",total_rejected);
+   
+  //   if (parseFloat(processing_lossqty) >= 0) {
+  //       this.ngForm.controls['processing_loss'].setValue(`${processing_lossqty} (${percentQty.toFixed(2)}%)`);
   //   }
+
   //   if (Number(total_rejected) > 0) {
-  //     this.ngForm.controls['total_rejected'].setValue(`${total_rejected ? (total_rejected.toFixed(2)) : ''} (${percentTotalRejected ? (percentTotalRejected.toFixed(2)) : ''} %)`);
+  //       this.ngForm.controls['total_rejected'].setValue(`${total_rejected.toFixed(2)} (${percentTotalRejected.toFixed(2)}%)`);
   //   }
   // }
   getLossQty() {
-    let total_breeder_qty = this.ngForm.controls['total_breeder_qty'].value;
-    let under_size = this.ngForm.controls['under_size'].value;
-    let totalQty = parseFloat(this.raw_seed_produced_data) - parseFloat(this.totalQty);
+    console.log("loss called");
+
+    // Ensure values are numeric to prevent calculation issues
+    let total_breeder_qty = parseFloat(this.ngForm.controls['total_breeder_qty'].value) || 0;
+    let under_size = parseFloat(this.ngForm.controls['under_size'].value) || 0;
+    let raw_seed_produced = parseFloat(this.raw_seed_produced_data) || 0;
+    let totalQty = raw_seed_produced - total_breeder_qty || 0;
 
     if (under_size) {
-        let under_sizepercent = (under_size / this.raw_seed_produced_data) * 100;
+        let under_sizepercent = (under_size / raw_seed_produced) * 100;
         this.under_sizepercent = under_sizepercent;
     } else {
-        // Reset under_sizepercent if under_size is empty
         this.under_sizepercent = 0;
     }
 
-    // Calculate processing_loss
-    let processing_loss = totalQty - under_size;
-    let total_rejected = totalQty;
+    // Fix processing_loss calculation
+    let processing_loss = Math.max(totalQty - under_size, 0);
+    let total_rejected = Math.max(totalQty, 0);
 
-    if (parseFloat(under_size) > Number(totalQty)) {
+    // Validate under_size does not exceed totalQty
+    if (under_size > totalQty) {
         Swal.fire({
             title: '<p style="font-size:25px;">UnderSize Quantity Exceeds Total.</p>',
             icon: 'error',
             confirmButtonText: 'OK',
             confirmButtonColor: '#B64B1D'
-        }).then(x => {
+        }).then(() => {
             this.totalQtyErr = true;
         });
     } else {
         this.totalQtyErr = false;
     }
 
-    // Check for processing_loss condition when under_size equals totalQty
+    // Ensure processing_loss is 0 if under_size equals totalQty
     if (under_size === totalQty) {
         processing_loss = 0;
     }
 
-    // Update processing_loss and total_rejected in form controls
-    let processing_lossqty = processing_loss ? processing_loss.toFixed(2) : '0';
-    let percentQty = (Number(processing_lossqty) / this.raw_seed_produced_data) * 100;
-    let percentTotalRejected = (Number(totalQty) / this.raw_seed_produced_data) * 100;
+    // Convert to percentage
+    let processing_loss_percent = (processing_loss / raw_seed_produced) * 100;
+    let total_rejected_percent = (total_rejected / raw_seed_produced) * 100;
 
-    this.processing_loss = Number(processing_lossqty);
+    // Update variables and form controls
+    this.processing_loss = processing_loss;
     this.total_rejected = total_rejected;
 
-    if (parseFloat(processing_lossqty) >= 0) {
-        this.ngForm.controls['processing_loss'].setValue(`${processing_lossqty} (${percentQty.toFixed(2)}%)`);
-    }
+    console.log("gettotalrejected", total_rejected);
 
-    if (Number(total_rejected) > 0) {
-        this.ngForm.controls['total_rejected'].setValue(`${total_rejected.toFixed(2)} (${percentTotalRejected.toFixed(2)}%)`);
-    }
-}
-gettentativeRecovery() {
+    setTimeout(() => {
+        this.ngForm.controls['processing_loss'].setValue(`${processing_loss.toFixed(2)} (${processing_loss_percent.toFixed(2)}%)`);
+        this.ngForm.controls['total_rejected'].setValue(`${total_rejected.toFixed(2)} (${total_rejected_percent.toFixed(2)}%)`);
+    }, 100); // Ensure form updates before setting values
+  }
+
+  gettentativeRecovery() {
     let tentative_recovery = this.ngForm.controls['tentative_recovery'].value;
     // let under_size = this.ngForm.controls['under_size'].value;
     let totalQty = parseFloat(tentative_recovery);

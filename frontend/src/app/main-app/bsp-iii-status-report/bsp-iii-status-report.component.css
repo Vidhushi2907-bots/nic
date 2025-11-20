@@ -242,6 +242,7 @@ thead .table-bordered  {
     height: 37px;
     outline: none;
     background: #B64B1D;
+    margin-top: -4px;
 } 
 .btn-disabled {
     background-color: #d3d3d3; 
@@ -599,3 +600,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size: 15px;
     font-weight: 500;
 }
+.form-check-label {
+  position: relative;
+  top: -5px; 
+}
+

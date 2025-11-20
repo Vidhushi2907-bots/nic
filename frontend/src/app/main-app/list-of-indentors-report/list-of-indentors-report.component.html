@@ -1,408 +1,251 @@
+<!-- ================= MAIN WRAPPER ================= -->
 <div class="row my-4 w-100 mx-0">
     <div class="col-12 d-flex justify-content-center verticle-content-middle">
-        <div class="main-content-form-wrapper px-0 py-2">
-            <div class="row">
-
-                <div class="col-12 pl-4 pb-3 px-4 mt-2 ml-2">
-
-                    <span class="heading_notofied">
-                        List of Indenters
-                    </span>
-
-                    <!-- {{AddCrop ? "Add Crop  To Add New Crop" : ''}} -->
-                    <div class="col-12 pl-3">
-                        <form [formGroup]="ngForm">
-                            <div class="row ">
-                                <!-- <div class="col-12 col-md-4 mt-2 px-0 pr-4">
-                                    <div class="col-12 px-0">
-                                        <label for="Crop Group" class="search_text"
-                                            style="font: normal Poppins 16px/25px !important;">Year of indent</label>
-                                    </div>
-                                    <div class="col-12  mt-0 px-0">
-                                        <select class="form-control" aria-label="Default select example"
-                                            formControlName="year">
-                                            <option value="">Select Year</option>
-                                            <option *ngFor="let data of yearOfIndent" value="{{data.value}}">
-                                                {{data.name}}
-                                            </option>
-                                        </select>
-                                        <div class="pl-0 toggle-button" ngbDropdown>
-                                            <img src="assets/images/16.svg" alt="" srcset="">
-                                            <i class="fa-solid fa-angle-down downicon"></i>
-                                        </div>
-                                    </div>
-                                </div> -->
-
-                                <div class="col-12 col-md-4 mt-3 px-0 pr-3 pl-0">
-                                    <div class="col-12 px-0">
-                                        <label for="Crop Group" class="search_txt">State Name</label>
-                                    </div>
-                                    <div class="col-12  mt-0 px-0">
-                                        <div ngbDropdown class="d-inline-block w-100 "
-                            
-                                        >
-                                            <button class="btn takeplacholder w-100 crop toggle-button"
-                                                 id="state" ngbDropdownToggle
-                                                style="text-align: left;font-weight:400;">{{selected_state && (selected_state.length>30) ? (selected_state.substring(0,30)+'...'):selected_state? selected_state :'Select State'}}</button>
-            
-                                            <div class="dropdown-menu w-100" ngbDropdownMenu="state" aria-labelledby="sortMenu">
-                                                <input type="text" class="form-control px-4"  formControlName="state_text" >
-                                                <button class="dropdown-item" *ngFor="let data of stateList"
-                                                    (click)="state_select(data)" #dropdownItem [attr.data-parent-name]="'state'">
-                                                    {{data && data.state_name ? data.state_name :''}}
-                                                </button>
-                                            </div>
-            
-                                        </div>
-                                        <div class="pl-0 toggle-button" ngbDropdown
-                                            >
-                                            <i class="fa-solid fa-angle-down downicon" (click)="cnClick()"></i>
-                                        </div>
-                                        <!-- <select class="form-select form-control" aria-label="Default select example"
-                                            formControlName="state_id">
-                                            <option value="" disabled>Select State</option>
-                                            <option *ngFor="let state of stateList" value="{{state.state_code}}">
-                                                {{state.state_name}}</option>
-                                        </select>
-                                        <div class="pl-0 toggle-button" ngbDropdown>
-                                            <img src="assets/images/16.svg" alt="" srcset="">
-                                        </div> -->
-                                    </div>
-
-                                </div>
-
-                                <div class="col-12 col-md-4 pr-2 mt-2 px-2">
-
-
-                                </div>
-                                <div class="col-12 col-md-4 pl-1 mt-2 px-4 pr-2">
-
-
-
-                                </div>
-
-                                <div class="col-12 pt-md-4 pl-0 ml-0 search-cancle-button buttons-phone pt-3">
-                                    <button _ngcontent-cvx-c131=""
-                                        class="form-button   search ml-0 d-inline-flex justify-content-center verticle-content-middle mb-3 mx-0"
-                                        (click)="search()"> Search </button>
-
-                                    <button _ngcontent-cvx-c131="" (click)="click()"
-                                        class="clear-form-button ml-3 d-inline-flex justify-content-center verticle-content-middle mb-3">
-                                        Clear
-                                    </button>
-
-
-                                    <div class="dropdown float-right export_dropdown">
-                                        <button type="button" (click)="myFunction()"
-                                            class="form-button  search ml-1 d-inline-flex justify-content-center verticle-content-middle mb-2 mx-0"
-                                            style="font-size: 87%;">Export To &nbsp;<i class="fa fa-angle-down"
-                                                aria-hidden="true"> </i></button>
-                                        <div id="myDropdown" class="dropdown-content">
-                                            <a (click)="download()"> <img src="assets\icons\pdf-icon.png" alt=""
-                                                    width="20px" height="20px"> PDF</a>
-                                            <a (click)="exportexcel()"> <img src="assets\icons\excel.jpg" alt=""
-                                                    width="20px" alt=""> Excel</a>
-                                        </div>
-                                    </div>
-
-
-                                </div>
-                                <div class="col-12 px-0">
-                                    <hr class="separator m-0 mr-3">
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- table for exel Download start -->
-                <table id="excel-table" style="display:none">
-                    <thead *ngIf="isSearchData">
-                        <tr>
-                            <td>
-                                List of Indenters
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="col" class="col-md-0 sn-report">Selected State Name</th>
-                        </tr>
-                        
-                    </thead>
-                    <tbody *ngIf="isSearchData">
-                        <tr>
-                            <td>
-                                {{ngForm.controls['state_id'].value ? getStateListData(ngForm.controls['state_id'].value) :'NA'}}
-                            </td>
-                        </tr>
-                    </tbody>
+      <div class="main-content-form-wrapper px-0 py-2">
+        <div class="row">
   
+          <!-- ================= FILTER SECTION ================= -->
+          <div class="col-12 pl-4 pb-3 px-4 mt-2 ml-2">
 
-                    <thead>
-                        <tr>
-                            <th scope="col" class=" col-md-0 py-3">S/N</th>
-                                        <th scope="col" class="col-md-2 py-3">Agency Name</th>
-                                        <th scope="col" class="col-md-1 py-3">Short Name</th>
-                                        <th scope="col" class="col-md-2 py-3">State</th>
-                                        <th scope="col" class="col-md-1 py-3">District</th>
-                                        
-                                        <th scope="col" class="col-md-1 py-3">Address</th>
-                                        <!-- <th scope="col" class="col-md-2">Category Of Agency</th> -->
-                                        <th scope="col" class="col-md-1 py-3">Contact Person Name</th>
-                                        <th scope="col" class="col-md-1 py-3">Contact Person Designation</th>
-                                        <th scope="col" class="col-md-1 py-3">Mobile</th>
-                                        <th scope="col" class="col-md-2 py-3">Email ID</th>
-                                        <th scope="col" class="col-md-2 py-3">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody *ngFor="let data of exportdata; let dataIndex=index">
-                        <tr>
-
-                            <td class="sn-td-report">{{ (filterPaginateSearch.itemListCurrentPage - 1) *
-                                filterPaginateSearch.itemListPageSize + dataIndex + 1}}.</td>
-                            <td title="{{data &&(  data.agency_name) ?
-                                data.agency_name : 'NA'}}">{{(data && data.agency_name) ?
-                                data.agency_name : 'NA'}}</td>
-                                <td title="{{(data && data.short_name) ?
-                                    data.short_name : 'NA'}}">{{data &&(data && data.short_name) ?
-                                    data.short_name : 'NA'}}</td>
-                            
-                                
-
-
-                                <td title="{{data && data.m_state  &&
-                                    data.m_state.state_name 
-                                    ? data.m_state.state_name :'NA'}}">
-                                    {{data && ( data.m_state &&                                               
-                                    data.m_state.state_name.length > 0) ?
-                                    data.m_state.state_name : 'NA'}}</td>
-                                    
-
-                            <td title="{{data  && data.m_district &&
-                                 
-                                data.m_district.district_name ? data.m_district.district_name :''}}">{{data &&(  data.m_district &&
-                                data.m_district.district_name &&
-                                data.m_district.district_name.length > 0) ?
-                                data.m_district.district_name : 'NA'}}</td>
-
-
-                                    <td title="{{data &&( data.address) ?
-                                        data.address : 'NA'}}">{{data &&( data.address) ?
-                                        data.address : 'NA'}}</td>
-
-                                <!-- <td title="{{(data && data.agency_detail &&
-                                    data.agency_detail.m_category_of_oragnization &&
-                                    data.agency_detail.m_category_of_oragnization.category_name) ?
-                                    data.agency_detail.m_category_of_oragnization.category_name : 'NA'}}">{{(data && data.agency_detail &&
-                                    data.agency_detail.m_category_of_oragnization &&
-                                    data.agency_detail.m_category_of_oragnization.category_name) ?
-                                    data.agency_detail.m_category_of_oragnization.category_name : 'NA'}}</td> -->
-
-                       
-
-
-                          
-
-                            <td title="{{data &&(  data.contact_person_name) ?
-                                data.contact_person_name : 'NA'}}">{{data &&( data.contact_person_name) ?
-                                data.contact_person_name : 'NA'}}</td>
-                                <td title="{{data &&( data.designation_id) ?
-                                    data.designation_id : 'NA'}}">{{data &&(
-                                          data.designation_id) ?
-                                    data.designation_id : 'NA'}}</td>
-
-                            <td title="{{data &&( data.mobile_number) ?
-                                data.mobile_number : 'NA'}}">{{(data && data.mobile_number) ?
-                                data.mobile_number : 'NA'}}</td>
-                            <td title="{{(data && data.email) ?
-                                data.email : 'NA'}}">{{data &&(  data.email) ?
-                                data.email : 'NA'}}</td>
-                                <td title="{{(data && data.is_active && data.is_active==1 ? 'Active':'ISACTIVE') 
-                                    }}">{{(data && data.is_active && data.is_active==1 ? 'ACTIVE':'ISACTIVE') }}</td>
-
-                            
-                        </tr>
-                    </tbody>
-                </table>
-                <!-- table for exel Download end -->
-
-                <div class="col-12 px-4" >
-                    <!-- <app-dynamic-fields [fieldsList]="fieldsList" [formGroup]="formGroup"></app-dynamic-fields> -->
-                    <div class="list-wrapper px-4 py-0">
-                        <div class="row d-md-flex data-row-header extra-header">
-                            <!-- <div class="col-6 col-md-2 py-3 d-flex verticle-content-middle">
-                            </div> -->
-                            <div class="col-12 col-md-12 py-3 d-flex justify-content-center">List of Indenters</div>
-                            <!-- <div class="col-6 col-md-2 py-3 d-flex verticle-content-middle">
-                            </div> -->
-                        </div>
-                        <br>
-
-                        <!-- <div class="row  d-md-flex data-row-header">
-                            <div class="col-8 col-md-8 col-sm-8 py-3 d-flex verticle-content-middle">State :
-                                {{year?year:'2022'}}</div>
-
-                            <div class="col-4 col-md-4  col-sm-4 py-3 d-flex justify-content-end">As on Date:
-                                {{todayData
-                                | date:"dd-MM-YYYY"}}</div>
-
-                        </div>
-                        <div class="middle_line"></div> -->
-
-                        <div class="row data-row">
-                            <table class="table table-bordered table-responsive">
-                                <thead>
-                                    <tr class="data-row-header">
-                                        <th scope="col" class=" col-md-0 py-3">S/N</th>
-                                        <th scope="col" class="col-md-2 py-3">Agency Name</th>
-                                        <th scope="col" class="col-md-1 py-3">Short Name</th>
-                                        <th scope="col" class="col-md-2 py-3">State</th>
-                                        <th scope="col" class="col-md-1 py-3">District</th>
-                                        
-                                        <th scope="col" class="col-md-1 py-3">Address</th>
-                                        <!-- <th scope="col" class="col-md-2">Category Of Agency</th> -->
-                                        <th scope="col" class="col-md-1 py-3">Contact Person Name</th>
-                                        <th scope="col" class="col-md-1 py-3">Contact Person Designation</th>
-                                        <th scope="col" class="col-md-1 py-3">Mobile</th>
-                                        <th scope="col" class="col-md-2 py-3">Email ID</th>
-                                        <th scope="col" class="col-md-2 py-3">Status</th>
-
-
-                                    </tr>
-                                </thead>
-                                <tbody *ngFor="let data of filterPaginateSearch.itemList; let dataIndex=index">
-                                    <tr>
-
-                                        <td class="sn-td-report">{{ (filterPaginateSearch.itemListCurrentPage - 1) *
-                                            filterPaginateSearch.itemListPageSize + dataIndex + 1}}.</td>
-                                        <td title="{{data &&(  data.agency_name) ?
-                                            data.agency_name : 'NA'}}">{{(data && data.agency_name) ?
-                                            data.agency_name : 'NA'}}</td>
-                                            <td title="{{(data && data.short_name) ?
-                                                data.short_name : 'NA'}}">{{data &&(data && data.short_name) ?
-                                                data.short_name : 'NA'}}</td>
-                                        
-                                            
-
-
-                                            <td title="{{data && data.m_state  &&
-                                                data.m_state.state_name 
-                                                ? data.m_state.state_name :'NA'}}">
-                                                {{data && ( data.m_state &&                                               
-                                                data.m_state.state_name.length > 0) ?
-                                                data.m_state.state_name : 'NA'}}</td>
-                                                
-
-                                        <td title="{{data  && data.m_district &&
-                                             
-                                            data.m_district.district_name ? data.m_district.district_name :''}}">{{data &&(  data.m_district &&
-                                            data.m_district.district_name &&
-                                            data.m_district.district_name.length > 0) ?
-                                            data.m_district.district_name : 'NA'}}</td>
-
-    
-                                                <td title="{{data &&( data.address) ?
-                                                    data.address : 'NA'}}">{{data &&( data.address) ?
-                                                    data.address : 'NA'}}</td>
-
-                                            <!-- <td title="{{(data && data.agency_detail &&
-                                                data.agency_detail.m_category_of_oragnization &&
-                                                data.agency_detail.m_category_of_oragnization.category_name) ?
-                                                data.agency_detail.m_category_of_oragnization.category_name : 'NA'}}">{{(data && data.agency_detail &&
-                                                data.agency_detail.m_category_of_oragnization &&
-                                                data.agency_detail.m_category_of_oragnization.category_name) ?
-                                                data.agency_detail.m_category_of_oragnization.category_name : 'NA'}}</td> -->
-
-                                   
-
-
-                                      
-
-                                        <td title="{{data &&(  data.contact_person_name) ?
-                                            data.contact_person_name : 'NA'}}">{{data &&( data.contact_person_name) ?
-                                            data.contact_person_name : 'NA'}}</td>
-                                            <td title="{{data &&( data.designation_id) ?
-                                                data.designation_id : 'NA'}}">{{data &&(
-                                                      data.designation_id) ?
-                                                data.designation_id : 'NA'}}</td>
-
-                                        <td title="{{data &&( data.mobile_number) ?
-                                            data.mobile_number : 'NA'}}">{{(data && data.mobile_number) ?
-                                            data.mobile_number : 'NA'}}</td>
-                                        <td title="{{(data && data.email) ?
-                                            data.email : 'NA'}}">{{data &&(  data.email) ?
-                                            data.email : 'NA'}}</td>
-                                            <td title="{{(data && data.is_active && data.is_active==1 ? 'Active':'ISACTIVE') 
-                                                }}">{{(data && data.is_active && data.is_active==1 ? 'ACTIVE':'ISACTIVE') }}</td>
-
-                                        
-                                    </tr>
-                                </tbody>
-
-
-                            </table>
-                        </div>
-                        <!-- <table class="table table-bordered border-primary table-responsive text-center">
-                                    <thead style="display:none;">
-                                        <tr style="background-color: #eb9777;">
-                                            <td>Year: {{year?year:'2022'}}</td>
-                                            <td>Season: {{season?season:'Kharif'}}</td>
-                                            <td>Crop Name: {{crop?crop:'BULB VEGETABLES'}}</td>
-                                            <td>As on Date: {{todayData | date:"dd-MM-YYYY"}}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Variety</td>
-                                            <td>Indent Needed</td>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <div *ngFor="let data of finalData; let dataIndex=index">
-                                            <tr class="v1">
-                                                <td rowspan="0" title="{{(data.variety_id?data.variety_id:'NA')}}"
-                                                    width="30%">{{(data && data.variety_id && (data.variety_id.length >
-                                                    30) ? (data.variety_id.substring(0, 30) +
-                                                    "..."):(data.variety_id?data.variety_id:'NA'))}}</td>
-                                                <td rowspan="0" title="{{(data.season?data.season:'NA')}}" width="30%">
-                                                    {{(data && data.season && (data.season.length>
-                                                    30) ? (data.season.substring(0, 30) +
-                                                    "..."):(data.season?data.season:'NA'))}}</td>
-                                                <td rowspan="0" title="{{(data.variety_id?data.variety_id:'NA')}}"
-                                                    width="80%">{{(data && data.variety_id && (data.variety_id.length >
-                                                    30) ? (data.variety_id.substring(0, 30) +
-                                                    "..."):(data.variety_id?data.variety_id:'NA'))}}</td>
-                                                <td rowspan="0" title="{{(data.variety_id?data.variety_id:'NA')}}"
-                                                    width="80%">{{(data && data.variety_id && (data.variety_id.length >
-                                                    30) ? (data.variety_id.substring(0, 30) +
-                                                    "..."):(data.variety_id?data.variety_id:'NA'))}}</td>
-                                                <td rowspan="0" title="{{(data.variety_id?data.variety_id:'NA')}}"
-                                                    width="30%">{{(data && data.variety_id && (data.variety_id.length >
-                                                    30) ? (data.variety_id.substring(0, 30) +
-                                                    "..."):(data.variety_id?data.variety_id:'NA'))}}</td>
-                                                <td rowspan="0" title="{{(data.variety_id?data.variety_id:'NA')}}"
-                                                    width="80%">{{(data && data.variety_id && (data.variety_id.length >
-                                                    30) ? (data.variety_id.substring(0, 30) +
-                                                    "..."):(data.variety_id?data.variety_id:'NA'))}}</td>
-                                               
-                                            </tr>
-                                        </div>
-                                    </tbody>
-                                </table> -->
-
-
-                    </div>
-                </div>
-
-
-                <div class="col-12 px-4 px-md-3 py-3">
-                    <app-pagination-ui></app-pagination-ui>
-                </div>
-                <div *ngIf="filterPaginateSearch && filterPaginateSearch.initialized &&(!filterPaginateSearch.itemList || filterPaginateSearch.itemList.length < 1)"
-                    class="px-2 py-3 w-100" style="height: 50px;">
-
-                    <div class="d-flex verticle-content-middle justify-content-center w-100">
-                        No Data Found.
-                    </div>
-                </div>
+            <!-- Filter Button -->
+            <div class="col-12 d-flex justify-content-start mb-0 filting">
+              <button class="filter-btn" (click)="toggleFilter()">
+                <i class="fa fa-filter"></i> Filter Options
+              </button>
             </div>
-        </div>
-    </div>
+  
+            <!-- Filter Dropdown -->
+            <div *ngIf="showFilter" class="col-12 pl-3">
+              <form [formGroup]="ngForm">
+                <div class="row">
+  
+                  <!-- State Dropdown -->
+                  <div class="col-12 col-md-4 mt-3 px-0 pr-3 pl-0">
+                    <div class="col-12 px-0">
+                      <label for="Crop Group" class="search_txt">State Name</label>
+                    </div>
+                    <div class="col-12 mt-0 px-0">
+                      <div ngbDropdown class="d-inline-block w-100">
+                        <button class="btn takeplacholder w-100 crop toggle-button"
+                                id="state"
+                                ngbDropdownToggle
+                                style="text-align: left;font-weight:400;">
+                          {{selected_state && (selected_state.length>30)
+                            ? (selected_state.substring(0,30)+'...')
+                            : selected_state ? selected_state :'Select State'}}
+                        </button>
+  
+                        <div class="dropdown-menu w-100"
+                             ngbDropdownMenu="state"
+                             aria-labelledby="sortMenu">
+                          <input type="text"
+                                 class="form-control px-4"
+                                 formControlName="state_text">
+  
+                          <!-- Loop State List -->
+                          <button class="dropdown-item"
+                                  *ngFor="let data of stateList"
+                                  (click)="state_select(data)"
+                                  #dropdownItem
+                                  [attr.data-parent-name]="'state'">
+                            {{data && data.state_name ? data.state_name : ''}}
+                          </button>
+                        </div>
+                      </div>
+  
+                      <!-- Dropdown Icon -->
+                      <div class="pl-0 toggle-button" ngbDropdown>
+                        <i class="fa-solid fa-angle-down downicon" (click)="cnClick()"></i>
+                      </div>
+                    </div>
+                  </div>
+  
+                  <!-- Placeholder for additional filters -->
+                  <div class="col-12 col-md-4 pr-2 mt-2 px-2"></div>
+                  <div class="col-12 col-md-4 pl-1 mt-2 px-4 pr-2"></div>
+  
+                  <!-- Separator -->
+                  <!-- <div class="col-12 px-0">
+                    <hr class="separator m-0 mr-3">
+                  </div> -->
+                </div>
+              </form>
+            </div>
+          </div>
+          <!-- ================= END FILTER SECTION ================= -->
+  
+  
+          <!-- ================= EXCEL EXPORT HIDDEN TABLE ================= -->
+          <table id="excel-table" style="display:none">
+  
+            <!-- Extra Info when exporting -->
+            <thead *ngIf="isSearchData">
+              <tr>
+                <td>List of Indenters</td>
+              </tr>
+              <tr>
+                <th scope="col" class="col-md-0 sn-report">Selected State Name</th>
+              </tr>
+            </thead>
+            <tbody *ngIf="isSearchData">
+              <tr>
+                <td>
+                  {{ngForm.controls['state_id'].value
+                    ? getStateListData(ngForm.controls['state_id'].value)
+                    : 'NA'}}
+                </td>
+              </tr>
+            </tbody>
+  
+            <!-- Column Headers -->
+            <thead>
+              <tr>
+                <th scope="col" class="col-md-0 py-3">S/N</th>
+                <th scope="col" class="col-md-2 py-3">Agency Name</th>
+                <th scope="col" class="col-md-1 py-3">Short Name</th>
+                <th scope="col" class="col-md-2 py-3">State</th>
+                <th scope="col" class="col-md-1 py-3">District</th>
+                <th scope="col" class="col-md-1 py-3">Address</th>
+                <th scope="col" class="col-md-1 py-3">Contact Person Name</th>
+                <th scope="col" class="col-md-1 py-3">Contact Person Designation</th>
+                <th scope="col" class="col-md-1 py-3">Mobile</th>
+                <th scope="col" class="col-md-2 py-3">Email ID</th>
+                <th scope="col" class="col-md-2 py-3">Status</th>
+              </tr>
+            </thead>
+  
+            <!-- Data Rows (completeData used for Excel Export) -->
+            <tbody *ngFor="let data of completeData; let dataIndex=index">
+              <tr>
+                <td class="sn-td-report">{{ dataIndex + 1 }}.</td>
+                <td title="{{data?.agency_name || 'NA'}}">{{data?.agency_name || 'NA'}}</td>
+                <td title="{{data?.short_name || 'NA'}}">{{data?.short_name || 'NA'}}</td>
+                <td title="{{data?.m_state?.state_name || 'NA'}}">
+                  {{data?.m_state?.state_name?.length > 0 ? data.m_state.state_name : 'NA'}}
+                </td>
+                <td title="{{data?.m_district?.district_name || 'NA'}}">
+                  {{data?.m_district?.district_name?.length > 0 ? data.m_district.district_name : 'NA'}}
+                </td>
+                <td title="{{data?.address || 'NA'}}">{{data?.address || 'NA'}}</td>
+                <td title="{{data?.contact_person_name || 'NA'}}">{{data?.contact_person_name || 'NA'}}</td>
+                <td title="{{data?.designation_id || 'NA'}}">{{data?.designation_id || 'NA'}}</td>
+                <td title="{{data?.mobile_number || 'NA'}}">{{data?.mobile_number || 'NA'}}</td>
+                <td title="{{data?.email || 'NA'}}">{{data?.email || 'NA'}}</td>
+                <td title="{{data?.is_active == 1 ? 'Active' : 'ISACTIVE'}}">
+                  {{data?.is_active == 1 ? 'ACTIVE' : 'ACTIVE'}}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <!-- ================= END EXCEL EXPORT HIDDEN TABLE ================= -->
+  
+  
+          <!-- ================= LIST HEADER ================= -->
+          <div class="col-12 px-4">
+            <div class="list-wrapper px-4 py-3">
+  
+              <!-- List Header -->
+              <div class="row d-md-flex data-row-header extra-header">
+                <div class="col-12 col-md-12 py-3 d-flex justify-content-between align-items-center text-white">
+                  <div class="mx-auto">List of Indenters</div>
+                  <div>(Total Indenters: {{ countData }})</div>
+                </div>
+              </div>
+  
+              <!-- Search & Export -->
+              <div class="col-12 pt-3">
+                <div class="search-export-container mb-2">
+                  <!-- Search Box -->
+                  <input type="text"
+                         class="form-control search-input input1"
+                         placeholder="Search Keyboard"
+                         [(ngModel)]="searchText"
+                         (input)="onSearch()"/>
+  
+                  <!-- Export Dropdown -->
+                  <div class="dropdown float-right export_dropdown drop1">
+                    <button type="button"
+                            (click)="myFunction()"
+                            class="form-button search ml-1 d-inline-flex justify-content-center verticle-content-middle mb-2 mx-0"
+                            style="font-size: 87%;">
+                      Export To &nbsp;<i class="fa fa-angle-down" aria-hidden="true"></i>
+                    </button>
+                    <div id="myDropdown" class="dropdown-content">
+                      <a (click)="download()">
+                        <img src="assets/icons/pdf-icon.png" width="20" height="20"> PDF
+                      </a>
+                      <a (click)="exportexcel()">
+                        <img src="assets/icons/excel.jpg" width="20"> Excel
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+                    
+                 
+                  <div class="row data-row">
+  <table class="table table-bordered table-responsive">
+    <thead>
+      <tr class="data-row-header">
+        <th class="col-md-0 height sn-report">S/N</th>
+        <th class="col-md-1 height">Agency Name</th>
+        <th class="col-md-2 height">Short Name</th>
+        <th class="col-md-2 height">State</th>
+        <th class="col-md-1 height">District</th>
+        <th class="col-md-1 height">Address</th>
+        <th class="col-md-1 height">Contact Person Name</th>
+        <th class="col-md-1 height">Contact Person Designation</th>
+        <th class="col-md-1 height">Mobile</th>
+        <th class="col-md-1 height">Email ID</th>
+        <th class="col-md-1 height">Status</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <!-- Data Rows -->
+      <tr *ngFor="let data of completeData; let dataIndex=index">
+        <td class="sn-td-report">
+          {{ (filterPaginateSearch.itemListCurrentPage - 1) *
+             filterPaginateSearch.itemListPageSize + dataIndex + 1 }}.
+        </td>
+        <td title="{{data?.agency_name || 'NA'}}">{{data?.agency_name || 'NA'}}</td>
+        <td title="{{data?.short_name || 'NA'}}">{{data?.short_name || 'NA'}}</td>
+        <td title="{{data?.m_state?.state_name || 'NA'}}">
+          {{data?.m_state?.state_name?.length > 0 ? data.m_state.state_name : 'NA'}}
+        </td>
+        <td title="{{data?.m_district?.district_name || 'NA'}}">
+          {{data?.m_district?.district_name?.length > 0 ? data.m_district.district_name : 'NA'}}
+        </td>
+        <td title="{{data?.address || 'NA'}}">{{data?.address || 'NA'}}</td>
+        <td title="{{data?.contact_person_name || 'NA'}}">{{data?.contact_person_name || 'NA'}}</td>
+        <td title="{{data?.designation_id || 'NA'}}">{{data?.designation_id || 'NA'}}</td>
+        <td title="{{data?.mobile_number || 'NA'}}">{{data?.mobile_number || 'NA'}}</td>
+        <td title="{{data?.email || 'NA'}}">{{data?.email || 'NA'}}</td>
+        <td title="{{data?.is_active == 1 ? 'Active' : 'ACTIVE'}}">
+          <!-- {{data?.is_active == 1 ? 'ACTIVE' : 'ISACTIVE'}} -->
+           {{data?.is_active == 1 ? 'ACTIVE' : 'ACTIVE'}}
+        </td>
+      </tr>
+
+    </tbody>
+  </table>
 </div>
+
+
+    <div class="col-12 px-3 py-3">
+          <!-- <app-pagination-ui></app-pagination-ui> -->
+        </div>
+  
+        <div *ngIf="completeData && completeData.length < 1"
+             class="px-2 py-3 w-100" style="height: 50px;">
+          <div class="d-flex verticle-content-middle justify-content-center w-100">
+            No Data Found.
+          </div>
+        </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

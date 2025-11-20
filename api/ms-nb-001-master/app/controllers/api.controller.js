@@ -6,10 +6,17 @@ let Validator = require('validatorjs');
 var https = require('https');
 const axios = require('axios');
 const { fn, col } = require('sequelize');
-
+const path = require("path");
+const fs = require("fs");
+const alloallocationToIndentorProductionCenterSeed = db.allocationToIndentorProductionCenterSeed
+const { allocationToSPASeed, allocationToSPAProductionCenterSeed, indenterSPAModel, indentOfBrseedDirectLineModel, sectorModel, deleteIndenteOfSpaModel, deleteIndenteOfBreederSeedModel, bspPerformaBspTwo, bspPerformaBspThree, bspPerformaBspOne, bspProformaOneBspc, monitoringTeamOfBspcMember, monitoringTeamOfBspc, seedInventory, seedClassModel, stageModel, seedInventoryTag, seedInventoryTagDetail, bspPerformaBspTwoSeed, varietyLineModel, mVarietyLinesModel } = require('../models');
 const indentOfSpaModel = db.indentOfSpa;
+const allocationToIndentorProductionCenterSeed = db.allocationToIndentorProductionCenterSeed
+const allocationToIndentorSeed = db.allocationtoIndentorliftingseeds;
+const seedProcessingRegisterModel = db.seedProcessingRegister;
+const liftingSeedDetailsModel = db.liftingSeedDetailsModel;
 
-const { deleteIndenteOfSpaModel, deleteIndenteOfBreederSeedModel, stateModel, userModel, indentOfBreederseedModel, sectorModel, cropModel, varietyModel, agencyDetailModel, mVarietyLinesModel, seasonModel } = require('../models');
+const { stateModel, userModel, indentOfBreederseedModel, cropModel, varietyModel, agencyDetailModel, seasonModel } = require('../models');
 const SeedUserManagement = require('../_helpers/create-user')
 // db.deleteIndenteOfSpaModel = require("../deleted_indent_of_spa.model")(sequelize, Sequelize);
 // db.deleteIndenteOfBreederSeedModel = require("./deleted_indent_of_indenter.model")(sequelize, Sequelize);
@@ -266,8 +273,9 @@ class ApiController {
         { 'name': 'NDDB', 'state_code': 209 },
         { 'name': 'NFL', 'state_code': 210 },
         { 'name': 'NHRDF', 'state_code': 211 },
-        { 'name': 'SOPA', 'state_code': 212 },
+        { 'name': 'SOPA PRIVATE', 'state_code': 212 },
         { 'name': 'PRIVATE', 'state_code': 213 },
+        { 'name': 'INDIVIDUAL', 'state_code': 213 },
         { 'name': 'NSAI', 'state_code': 213 },
         { 'name': 'PRIVATE COMPANY', 'state_code': 213 },
         { 'name': 'BBSSL', 'state_code': 214 },
@@ -936,8 +944,9 @@ class ApiController {
         { 'name': 'NDDB', 'state_code': 209 },
         { 'name': 'NFL', 'state_code': 210 },
         { 'name': 'NHRDF', 'state_code': 211 },
-        { 'name': 'SOPA', 'state_code': 212 },
+        { 'name': 'SOPA PRIVATE', 'state_code': 212 },
         { 'name': 'PRIVATE', 'state_code': 213 },
+        { 'name': 'INDIVIDUAL', 'state_code': 213 },
         { 'name': 'NSAI', 'state_code': 213 },
         { 'name': 'PRIVATE COMPANY', 'state_code': 213 },
         { 'name': 'BBSSL', 'state_code': 214 }
@@ -1070,8 +1079,9 @@ class ApiController {
         { 'name': 'NDDB', 'state_code': 209 },
         { 'name': 'NFL', 'state_code': 210 },
         { 'name': 'NHRDF', 'state_code': 211 },
-        { 'name': 'SOPA', 'state_code': 212 },
+        { 'name': 'SOPA PRIVATE', 'state_code': 212 },
         { 'name': 'PRIVATE', 'state_code': 213 },
+        { 'name': 'INDIVIDUAL', 'state_code': 213 },
         { 'name': 'NSAI', 'state_code': 213 },
         { 'name': 'PRIVATE COMPANY', 'state_code': 213 },
         { 'name': 'BBSSL', 'state_code': 214 },
@@ -1856,8 +1866,9 @@ class ApiController {
         { 'name': 'NDDB', 'state_code': 209 },
         { 'name': 'NFL', 'state_code': 210 },
         { 'name': 'NHRDF', 'state_code': 211 },
-        { 'name': 'SOPA', 'state_code': 212 },
+        { 'name': 'SOPA PRIVATE', 'state_code': 212 },
         { 'name': 'PRIVATE', 'state_code': 213 },
+        { 'name': 'INDIVIDUAL', 'state_code': 213 },
         { 'name': 'NSAI', 'state_code': 213 },
         { 'name': 'PRIVATE COMPANY', 'state_code': 213 },
         { 'name': 'BBSSL', 'state_code': 214 },
@@ -2027,22 +2038,294 @@ class ApiController {
         }
       };
       let indentPermission = await db.mIndentPermissionsModel.findOne(condition1);
-      // ====================================================
-      if (cropExistingData) {
-        let spaInsertData = {};
-        //edit indnt of SPA DATA
-        let errorMsg;
-        let getSpaIndentData;
-        let varietyExistingData;
-        if (req.params && req.params["id"]) {
-          let date;
-          if (indentPermission && indentPermission['is_allowed_update'] && indentPermission['is_allowed_update'] === 1) {
-            let checkId = await indentOfSpaModel.findOne({ where: { id: req.params["id"] } });
-            console.log('SPA ID', checkId);
-            if (!checkId) {
-              return response(res, "Id Does Not Exist", 404, []);
+
+      let isFreezeCheck = await indentOfBreederseedModel.findAll({
+        include: [
+          {
+            model: userModel,
+            attributes: [],
+            include: [
+              {
+                model: agencyDetailModel,
+                attributes: [],
+                where: {
+                  state_id: req.body.state_code,
+                }
+              }
+            ],
+          }
+        ],
+        attributes: ['is_freeze', 'icar_freeze'],
+        where: {
+          year: yearOfIndent,
+          season: seasoneCode,
+          crop_code: req.body.crop_code,
+        },
+        raw: true
+      });
+
+      let isDataModifyAllowed = false;
+      if (isFreezeCheck && isFreezeCheck.length) {
+        isFreezeCheck.forEach((ele) => {
+          if (ele.is_freeze === 1) {
+            isDataModifyAllowed = true;
+            return;
+          } else {
+            isDataModifyAllowed = false;
+          }
+        })
+      }
+
+      if (isDataModifyAllowed) {
+        return response(res, "No further changes can be made as indents have been freezed for the selected Year, Season, and Crop by Seed Division"
+          , 400, [])
+      } else {
+        // ====================================================
+        if (cropExistingData) {
+          let spaInsertData = {};
+          //edit indnt of SPA DATA
+          let errorMsg;
+          let getSpaIndentData;
+          let varietyExistingData;
+          if (req.params && req.params["id"]) {
+            let date;
+            if (indentPermission && indentPermission['is_allowed_update'] && indentPermission['is_allowed_update'] === 1) {
+              let checkId = await indentOfSpaModel.findOne({ where: { id: req.params["id"] } });
+              console.log('SPA ID', checkId);
+              if (!checkId) {
+                return response(res, "Id Does Not Exist", 404, []);
+              } else {
+                req.body.varieties.forEach(async (items) => {
+                  if (items.variety_code) {
+                    varietyExistingData = await varietyModel.findAll(
+                      {
+                        where: {
+                          variety_code: items.variety_code,
+                        },
+                        raw: true
+                      }
+                    );
+                    date = new Date(varietyExistingData[0]['not_date']).getFullYear();
+                  }
+
+                  const dataRow = {
+                    year: yearOfIndent,
+                    crop_type: cropType,
+                    season: seasoneCode,
+                    variety_id: varietyExistingData[0]['id'],
+                    // variety_code:  varietyExistingData[0]['variety_code'],
+                    variety_notification_year: date,
+                    indent_quantity: items.indent_quantity ? items.indent_quantity : 0,
+                    user_id: userId,//user id should be dynamic
+                    unit: unitKgQ,
+                    state_code: req.body.state_code,
+                    spa_code: req.body.spa_code,
+                    crop_code: req.body.crop_code,
+                    group_code: req.body.cropGroup
+                  };
+                  let stateCode;
+                  let tabledAlteredSuccessfully = false;
+                  getSpaIndentData = await indentOfSpaModel.findAll({ where: { id: req.params["id"] } });
+                  if (getSpaIndentData && getSpaIndentData[0] && getSpaIndentData[0].dataValues) {
+                    if (req.body.state_code) {
+                      stateCode = {
+                        where: {
+                          state_id: req.body.state_code,
+                        }
+                      }
+                    }
+
+                    let IndentBreederData = await indentOfBreederseedModel.findAll(
+                      {
+                        include: [
+                          {
+                            model: userModel,
+                            include: [{
+                              model: agencyDetailModel,
+                              ...stateCode
+                            }],
+                          }
+                        ],
+                        where: {
+                          user_id: breederUserIdData[0].id,
+                          crop_code: req.body.crop_code,
+                          year: yearOfIndent,
+                          variety_id: varietyExistingData[0]['id'],
+                          season: seasoneCode
+                        }
+                      }
+                    );
+
+                    if (IndentBreederData && IndentBreederData[0] && IndentBreederData[0].dataValues) {
+                      let IndentDataNew;
+                      dataRow.indente_breederseed_id = IndentBreederData[0].dataValues.id;
+                      dataRow.indenter_id = IndentBreederData[0].dataValues.user_id;
+                      returnResponse = dataRow
+                      let temp = IndentBreederData[0].dataValues.indent_quantity - getSpaIndentData[0].dataValues.indent_quantity;
+                      if (items && items.variety_type && items.variety_type.toLowerCase().trim() == 'hybrid') {
+                        if (items.lines && items.lines.length) {
+                          let sumOfLineQnty = 0;
+                          let spaLinesData;
+                          let indenterLineData;
+                          for (let ele of items.lines) {
+                            let getSpaIndentLineData = await db.indentOfSpaLinesModel.findAll({ where: { indent_of_spa_id: req.params["id"], variety_code_line: ele.variety_code_line } });
+                            let indenterLineDataList = await db.indentOfBrseedLines.findAll({
+                              where: {
+                                indent_of_breederseed_id: IndentBreederData[0].dataValues.id,
+                                variety_code_line: ele.variety_code_line,
+                              },
+                              raw: true
+                            })
+                            if (indenterLineDataList && indenterLineDataList.length) {
+                              let temp1 = indenterLineDataList[0].quantity - getSpaIndentLineData[0].dataValues.quantity;
+                              console.log('temp1==', temp1)
+                              indenterLineData = await db.indentOfBrseedLines.update({
+                                quantity: temp1 + ele.quantity
+                              }, {
+                                where: {
+                                  indent_of_breederseed_id: IndentBreederData[0].dataValues.id,
+                                  variety_code_line: ele.variety_code_line,
+                                }
+                              })
+                            }
+                            sumOfLineQnty += parseFloat(ele.quantity);
+                            spaLinesData = await db.indentOfSpaLinesModel.update(
+                              { quantity: ele.quantity },
+                              {
+                                where: {
+                                  indent_of_spa_id: req.params["id"],
+                                  variety_code_line: ele.variety_code_line,
+                                }
+                              }
+                            );
+                          }
+
+                          if (spaLinesData) {
+                            await indentOfSpaModel.update({ indent_quantity: sumOfLineQnty ? sumOfLineQnty : 0 }, { where: { id: req.params["id"] } });
+                          }
+                          IndentDataNew = await indentOfBreederseedModel.update(
+                            {
+                              indent_quantity: temp + sumOfLineQnty
+                            },
+                            {
+                              where: {
+                                user_id: breederUserIdData[0].id,
+                                crop_code: req.body.crop_code,
+                                year: yearOfIndent,
+                                variety_code: items.variety_code,
+                                season: seasoneCode
+                              }
+                            });
+                        }
+                      }
+                      else {
+                        console.log('else case');
+
+                        spaInsertData = await indentOfSpaModel.update(dataRow, { where: { id: req.params["id"] } });
+                        IndentDataNew = await indentOfBreederseedModel.update(
+                          {
+                            indent_quantity: temp + items.indent_quantity
+                          },
+                          {
+                            where: {
+                              user_id: breederUserIdData[0].id,
+                              crop_code: req.body.crop_code,
+                              year: yearOfIndent,
+                              variety_id: varietyExistingData[0]['id'],
+                              season: seasoneCode,
+                            }
+                          });
+                      }
+                    }
+                  }
+                });
+                let spaUpdatedData = await indentOfSpaModel.findOne({
+                  attributes: ['id', 'crop_code', 'variety_code', 'state_code', 'indent_quantity',
+                    'season', 'spa_code', [sequelize.col('year'), 'year_of_indent']],
+                  where: { id: req.params["id"] }
+                });
+                if (spaInsertData) {
+                  //return response(res, status.DATA_UPDATED, 200, spaUpdatedData, internalCall);
+                  return response(res, status.DATA_UPDATED, 200, returnResponse, internalCall);
+                } else {
+                  return response(res, "Data Not Updated", 401, [], internalCall);
+                }
+              }
             } else {
+              return response(res, "Permission Declined", 401, [], internalCall);
+            }
+          }
+          // indnt of SPA DATA
+          else {
+            if (indentPermission && indentPermission['is_allowed_new'] && indentPermission['is_allowed_new'] === 1) {
+              //uncommnet after code complition
+              let varietyLineCodeArray = [];
+              let varietyCodeArray = [];
+              if (req.body.varieties && req.body.varieties.length) {
+                req.body.varieties.forEach((items) => {
+                  if (items.variety_code || items.variety_code !== undefined || items.variety_code !== null) {
+                    varietyCodeArray.push(items.variety_code);
+                    if (items.lines && items.lines.length) {
+                      items.lines.forEach((item) => {
+                        if (item.variety_code_line || item.variety_code_line !== undefined || item.variety_code_line !== null) {
+                          varietyLineCodeArray.push(item.variety_code_line);
+                        }
+                      })
+                    }
+                  }
+                });
+              }
+              let varietyLineCodeArrayValue;
+              let varietyCodeArrayValue;
+              if (varietyLineCodeArray && varietyLineCodeArray.length) {
+                varietyLineCodeArrayValue = {
+                  include: [
+                    {
+                      model: db.indentOfSpaLinesModel,
+                      where: {
+                        variety_code_line: {
+                          [Op.in]: varietyLineCodeArray
+                        }
+                      }
+                    }
+                  ],
+                }
+              }
+              console.log("10571057105710571057")
+              let spaDataCheck = await indentOfSpaModel.findAll(
+                {
+                  ...varietyLineCodeArrayValue,
+                  where: {
+                    year: yearOfIndent,
+                    season: seasoneCode,
+                    state_code: req.body.state_code,
+                    spa_code: req.body.spa_code,
+                    variety_code: {
+                      [Op.in]: varietyCodeArray
+                    }
+                  }
+                }
+              );
+              console.log("spaDataCheckspaDataCheck", spaDataCheck)
+              if (spaDataCheck.length) {
+                return response(res, "Already indented for same variety.", 404, [])
+
+              }
+
+              let date;
+              let IndentBreederData;
+              let IndentDataNew;
+              let data;
+              let varietyExistingData = {};
+              console.log("req.body", req.body)
               req.body.varieties.forEach(async (items) => {
+                // if(items.lines && items.lines.length){
+                //   items.lines.forEach((item)=>{
+                //     if(item.variety_code_line || item.variety_code_line !== undefined ||item.variety_code_line !== null){
+
+                //     }
+                //   })
+                // }
                 if (items.variety_code) {
                   varietyExistingData = await varietyModel.findAll(
                     {
@@ -2054,374 +2337,27 @@ class ApiController {
                   );
                   date = new Date(varietyExistingData[0]['not_date']).getFullYear();
                 }
-
                 const dataRow = {
                   year: yearOfIndent,
                   crop_type: cropType,
                   season: seasoneCode,
                   variety_id: varietyExistingData[0]['id'],
-                  // variety_code:  varietyExistingData[0]['variety_code'],
                   variety_notification_year: date,
-                  indent_quantity: items.indent_quantity ? items.indent_quantity : 0,
-                  user_id: userId,//user id should be dynamic
+                  indent_quantity: items.indent_quantity,
+                  user_id: userId,
                   unit: unitKgQ,
                   state_code: req.body.state_code,
                   spa_code: req.body.spa_code,
                   crop_code: req.body.crop_code,
-                  group_code: req.body.cropGroup
+                  group_code: req.body.crop_group,
+                  variety_code: items.variety_code
                 };
-                let stateCode;
-                let tabledAlteredSuccessfully = false;
-                getSpaIndentData = await indentOfSpaModel.findAll({ where: { id: req.params["id"] } });
-                if (getSpaIndentData && getSpaIndentData[0] && getSpaIndentData[0].dataValues) {
-                  if (req.body.state_code) {
-                    stateCode = {
-                      where: {
-                        state_id: req.body.state_code,
-                      }
-                    }
-                  }
-
-                  let IndentBreederData = await indentOfBreederseedModel.findAll(
-                    {
-                      include: [
-                        {
-                          model: userModel,
-                          include: [{
-                            model: agencyDetailModel,
-                            ...stateCode
-                          }],
-                        }
-                      ],
-                      where: {
-                        user_id: breederUserIdData[0].id,
-                        crop_code: req.body.crop_code,
-                        year: yearOfIndent,
-                        variety_id: varietyExistingData[0]['id'],
-                        season: seasoneCode
-                      }
-                    }
-                  );
-
-                  if (IndentBreederData && IndentBreederData[0] && IndentBreederData[0].dataValues) {
-                    let IndentDataNew;
-                    dataRow.indente_breederseed_id = IndentBreederData[0].dataValues.id;
-                    dataRow.indenter_id = IndentBreederData[0].dataValues.user_id;
-                    returnResponse = dataRow
-                    let temp = IndentBreederData[0].dataValues.indent_quantity - getSpaIndentData[0].dataValues.indent_quantity;
-                    if (items.variety_type.toLowerCase().trim() == 'hybrid') {
-                      if (items.lines && items.lines.length) {
-                        let sumOfLineQnty = 0;
-                        let spaLinesData;
-                        let indenterLineData;
-                        for (let ele of items.lines) {
-                          let getSpaIndentLineData = await db.indentOfSpaLinesModel.findAll({ where: { indent_of_spa_id: req.params["id"], variety_code_line: ele.variety_code_line } });
-                          let indenterLineDataList = await db.indentOfBrseedLines.findAll({
-                            where: {
-                              indent_of_breederseed_id: IndentBreederData[0].dataValues.id,
-                              variety_code_line: ele.variety_code_line,
-                            },
-                            raw: true
-                          })
-                          if (indenterLineDataList && indenterLineDataList.length) {
-                            let temp1 = indenterLineDataList[0].quantity - getSpaIndentLineData[0].dataValues.quantity;
-                            console.log('temp1==', temp1)
-                            indenterLineData = await db.indentOfBrseedLines.update({
-                              quantity: temp1 + ele.quantity
-                            }, {
-                              where: {
-                                indent_of_breederseed_id: IndentBreederData[0].dataValues.id,
-                                variety_code_line: ele.variety_code_line,
-                              }
-                            })
-                          }
-                          sumOfLineQnty += parseFloat(ele.quantity);
-                          spaLinesData = await db.indentOfSpaLinesModel.update(
-                            { quantity: ele.quantity },
-                            {
-                              where: {
-                                indent_of_spa_id: req.params["id"],
-                                variety_code_line: ele.variety_code_line,
-                              }
-                            }
-                          );
-                        }
-
-                        if (spaLinesData) {
-                          await indentOfSpaModel.update({ indent_quantity: sumOfLineQnty ? sumOfLineQnty : 0 }, { where: { id: req.params["id"] } });
-                        }
-                        IndentDataNew = await indentOfBreederseedModel.update(
-                          {
-                            indent_quantity: temp + sumOfLineQnty
-                          },
-                          {
-                            where: {
-                              user_id: breederUserIdData[0].id,
-                              crop_code: req.body.crop_code,
-                              year: yearOfIndent,
-                              variety_code: items.variety_code,
-                              season: seasoneCode
-                            }
-                          });
-                      }
-                    }
-                    else {
-                      console.log('else case');
-
-                      spaInsertData = await indentOfSpaModel.update(dataRow, { where: { id: req.params["id"] } });
-                      IndentDataNew = await indentOfBreederseedModel.update(
-                        {
-                          indent_quantity: temp + items.indent_quantity
-                        },
-                        {
-                          where: {
-                            user_id: breederUserIdData[0].id,
-                            crop_code: req.body.crop_code,
-                            year: yearOfIndent,
-                            variety_id: varietyExistingData[0]['id'],
-                            season: seasoneCode,
-                          }
-                        });
-                    }
-                  }
-                }
-              });
-              let spaUpdatedData = await indentOfSpaModel.findOne({
-                attributes: ['id', 'crop_code', 'variety_code', 'state_code', 'indent_quantity',
-                  'season', 'spa_code', [sequelize.col('year'), 'year_of_indent']],
-                where: { id: req.params["id"] }
-              });
-              if (spaInsertData) {
-                //return response(res, status.DATA_UPDATED, 200, spaUpdatedData, internalCall);
-                return response(res, status.DATA_UPDATED, 200, returnResponse, internalCall);
-              } else {
-                return response(res, "Data Not Updated", 401, [], internalCall);
-              }
-            }
-          } else {
-            return response(res, "Permission Declined", 401, [], internalCall);
-          }
-        }
-        // indnt of SPA DATA
-        else {
-          if (indentPermission && indentPermission['is_allowed_new'] && indentPermission['is_allowed_new'] === 1) {
-            //uncommnet after code complition
-            let varietyLineCodeArray = [];
-            let varietyCodeArray = [];
-            if (req.body.varieties && req.body.varieties.length) {
-              req.body.varieties.forEach((items) => {
-                if (items.variety_code || items.variety_code !== undefined || items.variety_code !== null) {
-                  varietyCodeArray.push(items.variety_code);
-                  if (items.lines && items.lines.length) {
-                    items.lines.forEach((item) => {
-                      if (item.variety_code_line || item.variety_code_line !== undefined || item.variety_code_line !== null) {
-                        varietyLineCodeArray.push(item.variety_code_line);
-                      }
-                    })
-                  }
-                }
-              });
-            }
-            let varietyLineCodeArrayValue;
-            let varietyCodeArrayValue;
-            if (varietyLineCodeArray && varietyLineCodeArray.length) {
-              varietyLineCodeArrayValue = {
-                include: [
-                  {
-                    model: db.indentOfSpaLinesModel,
+                if (req.body.state_id) {
+                  stateCode = {
                     where: {
-                      variety_code_line: {
-                        [Op.in]: varietyLineCodeArray
-                      }
+                      state_id: req.body.state_code,
                     }
                   }
-                ],
-              }
-            }
-            console.log("10571057105710571057")
-            let spaDataCheck = await indentOfSpaModel.findAll(
-              {
-                ...varietyLineCodeArrayValue,
-                where: {
-                  year: yearOfIndent,
-                  season: seasoneCode,
-                  state_code: req.body.state_code,
-                  spa_code: req.body.spa_code,
-                  variety_code: {
-                    [Op.in]: varietyCodeArray
-                  }
-                }
-              }
-            );
-            console.log("spaDataCheckspaDataCheck", spaDataCheck)
-            if (spaDataCheck.length) {
-              return response(res, "Already indented for same variety.", 404, [])
-
-            }
-
-            let date;
-            let IndentBreederData;
-            let IndentDataNew;
-            let data;
-            let varietyExistingData = {};
-            console.log("req.body", req.body)
-            req.body.varieties.forEach(async (items) => {
-              // if(items.lines && items.lines.length){
-              //   items.lines.forEach((item)=>{
-              //     if(item.variety_code_line || item.variety_code_line !== undefined ||item.variety_code_line !== null){
-
-              //     }
-              //   })
-              // }
-              if (items.variety_code) {
-                varietyExistingData = await varietyModel.findAll(
-                  {
-                    where: {
-                      variety_code: items.variety_code,
-                    },
-                    raw: true
-                  }
-                );
-                date = new Date(varietyExistingData[0]['not_date']).getFullYear();
-              }
-              const dataRow = {
-                year: yearOfIndent,
-                crop_type: cropType,
-                season: seasoneCode,
-                variety_id: varietyExistingData[0]['id'],
-                variety_notification_year: date,
-                indent_quantity: items.indent_quantity,
-                user_id: userId,
-                unit: unitKgQ,
-                state_code: req.body.state_code,
-                spa_code: req.body.spa_code,
-                crop_code: req.body.crop_code,
-                group_code: req.body.crop_group,
-                variety_code: items.variety_code
-              };
-              if (req.body.state_id) {
-                stateCode = {
-                  where: {
-                    state_id: req.body.state_code,
-                  }
-                }
-              }
-              IndentBreederData = await indentOfBreederseedModel.findAll(
-                {
-                  include: [
-                    {
-                      model: userModel,
-                      include: [{
-                        model: agencyDetailModel,
-                        ...stateCode
-                      }],
-                    }
-                  ],
-                  where: {
-                    user_id: breederUserIdData[0].id,
-                    crop_code: req.body.crop_code,
-                    year: yearOfIndent,
-                    variety_code: items.variety_code,
-                    season: seasoneCode
-                  }
-                }
-              );
-              if (IndentBreederData && IndentBreederData[0] && IndentBreederData[0].dataValues) {
-                dataRow.indente_breederseed_id = IndentBreederData[0].dataValues.id;
-                dataRow.indenter_id = IndentBreederData[0].dataValues.user_id;
-                returnResponse = dataRow;
-                if (items && items.variety_type && items.variety_type.toLowerCase().trim() == 'hybrid') {
-                  if (items.lines && items.lines.length) {
-                    console.log('if case');
-                    dataRow.indent_quantity = 0;
-                    data = indentOfSpaModel.build(dataRow);
-                    await data.save();
-                    let sumOfLineQnty = 0;
-                    let spaLinesData;
-                    let indenterLineData;
-                    for (let ele of items.lines) {
-                      let indenterLineDataList = await db.indentOfBrseedLines.findAll({
-                        where: {
-                          indent_of_breederseed_id: IndentBreederData[0].dataValues.id,
-                          variety_code_line: ele.variety_code_line,
-                        },
-                        raw: true
-                      })
-                      if (indenterLineDataList && indenterLineDataList.length) {
-                        indenterLineData = await db.indentOfBrseedLines.update({
-                          quantity: indenterLineDataList[0].quantity + ele.quantity
-                        }, {
-                          where: {
-                            indent_of_breederseed_id: IndentBreederData[0].dataValues.id,
-                            variety_code_line: ele.variety_code_line,
-                          }
-                        })
-                      } else {
-                        indenterLineData = await db.indentOfBrseedLines.create({
-                          indent_of_breederseed_id: IndentBreederData[0].dataValues.id,
-                          variety_code_line: ele.variety_code_line,
-                          quantity: ele.quantity
-                        })
-                      }
-                      sumOfLineQnty += parseFloat(ele.quantity);
-                      spaLinesData = await db.indentOfSpaLinesModel.build(
-                        {
-                          indent_of_spa_id: data.dataValues.id,
-                          variety_code_line: ele.variety_code_line,
-                          quantity: ele.quantity
-                        }
-                      );
-                      await spaLinesData.save();
-                    }
-                    if (spaLinesData) {
-                      indentOfSpaModel.update({ indent_quantity: sumOfLineQnty }, { where: { id: data.dataValues.id } });
-                    }
-                    IndentDataNew = await indentOfBreederseedModel.update(
-                      {
-                        indent_quantity: IndentBreederData[0].dataValues.indent_quantity + sumOfLineQnty
-                      },
-                      {
-                        where: {
-                          user_id: breederUserIdData[0].id,
-                          crop_code: req.body.crop_code,
-                          year: yearOfIndent,
-                          variety_code: items.variety_code,
-                          season: seasoneCode
-                        }
-                      });
-                  }
-                }
-                else {
-                  IndentDataNew = await indentOfBreederseedModel.update(
-                    {
-                      indent_quantity: IndentBreederData[0].dataValues.indent_quantity + items.indent_quantity
-                    },
-                    {
-                      where: {
-                        user_id: breederUserIdData[0].id,
-                        crop_code: req.body.crop_code,
-                        year: yearOfIndent,
-                        variety_code: items.variety_code,
-                        season: seasoneCode
-                      }
-                    });
-                  data = indentOfSpaModel.build(dataRow);
-                  await data.save();
-                }
-              }
-              else {
-                if (items.variety_code) {
-                  varietyExistingData = await varietyModel.findAll(
-                    {
-                      where: {
-                        variety_code: items.variety_code,
-                      },
-                      raw: true
-                    }
-                  );
-                  // .variety_code
-                  // console.log("varietyExistingData", varietyExistingData[0]['variety_code']);
-
                 }
                 IndentBreederData = await indentOfBreederseedModel.findAll(
                   {
@@ -2443,73 +2379,75 @@ class ApiController {
                     }
                   }
                 );
-                IndentDataNew = await indentOfBreederseedModel.create({
-                  "user_id": breederUserIdData[0].id,
-                  "year": yearOfIndent,
-                  "season": seasoneCode,
-                  "crop_code": req.body.crop_code,
-                  "crop_name": cropExistingData.dataValues.crop_name,
-                  "group_name": cropExistingData.dataValues.crop_group,
-                  "group_code": cropExistingData.dataValues.group_code,
-                  "variety_notification_year": varietyExistingData[0]['not_date'],
-                  "indent_quantity": items.indent_quantity ? items.indent_quantity : 0,
-                  "unit": unitKgQ,
-                  "variety_name": varietyExistingData[0]['variety_name'],
-                  "variety_id": varietyExistingData[0]['id'],
-                  "crop_type": cropType,
-                  "season_id": req.body.season_id,
-                  "variety_code": items.variety_code
-                })
-                if (items && items.variety_type && items.variety_type.toLowerCase().trim() == 'hybrid') {
-                  if (items.lines && items.lines.length) {
-                    console.log('if case');
-                    dataRow.indent_quantity = 0;
-                    data = indentOfSpaModel.build(dataRow);
-                    const result = await data.save();
-
-                    let sumOfLineQnty = 0;
-                    let spaLinesData;
-                    let indenterLineData;
-                    for (let ele of items.lines) {
-                      let indenterLineDataList = await db.indentOfBrseedLines.findAll({
-                        where: {
-                          indent_of_breederseed_id: IndentDataNew.dataValues.id,
-                          variety_code_line: ele.variety_code_line,
-                        },
-                        raw: true
-                      })
-                      if (indenterLineDataList && indenterLineDataList.length) {
-                        indenterLineData = await db.indentOfBrseedLines.update({
-                          quantity: indenterLineDataList[0].quantity + ele.quantity
-                        }, {
+                if (IndentBreederData && IndentBreederData[0] && IndentBreederData[0].dataValues) {
+                  dataRow.indente_breederseed_id = IndentBreederData[0].dataValues.id;
+                  dataRow.indenter_id = IndentBreederData[0].dataValues.user_id;
+                  returnResponse = dataRow;
+                  if (items && items.variety_type && items.variety_type.toLowerCase().trim() == 'hybrid') {
+                    if (items.lines && items.lines.length) {
+                      console.log('if case');
+                      dataRow.indent_quantity = 0;
+                      data = indentOfSpaModel.build(dataRow);
+                      await data.save();
+                      let sumOfLineQnty = 0;
+                      let spaLinesData;
+                      let indenterLineData;
+                      for (let ele of items.lines) {
+                        let indenterLineDataList = await db.indentOfBrseedLines.findAll({
                           where: {
-                            indent_of_breederseed_id: IndentDataNew.dataValues.id,
+                            indent_of_breederseed_id: IndentBreederData[0].dataValues.id,
                             variety_code_line: ele.variety_code_line,
-                          }
+                          },
+                          raw: true
                         })
-                      } else {
-                        indenterLineData = await db.indentOfBrseedLines.create({
-                          indent_of_breederseed_id: IndentDataNew.dataValues.id,
-                          variety_code_line: ele.variety_code_line,
-                          quantity: ele.quantity
-                        })
-                      }
-                      sumOfLineQnty += parseFloat(ele.quantity);
-                      spaLinesData = await db.indentOfSpaLinesModel.build(
-                        {
-                          indent_of_spa_id: data.dataValues.id,
-                          variety_code_line: ele.variety_code_line,
-                          quantity: ele && ele.quantity ? ele.quantity : 0
+                        if (indenterLineDataList && indenterLineDataList.length) {
+                          indenterLineData = await db.indentOfBrseedLines.update({
+                            quantity: indenterLineDataList[0].quantity + ele.quantity
+                          }, {
+                            where: {
+                              indent_of_breederseed_id: IndentBreederData[0].dataValues.id,
+                              variety_code_line: ele.variety_code_line,
+                            }
+                          })
+                        } else {
+                          indenterLineData = await db.indentOfBrseedLines.create({
+                            indent_of_breederseed_id: IndentBreederData[0].dataValues.id,
+                            variety_code_line: ele.variety_code_line,
+                            quantity: ele.quantity
+                          })
                         }
-                      );
-                      await spaLinesData.save();
+                        sumOfLineQnty += parseFloat(ele.quantity);
+                        spaLinesData = await db.indentOfSpaLinesModel.build(
+                          {
+                            indent_of_spa_id: data.dataValues.id,
+                            variety_code_line: ele.variety_code_line,
+                            quantity: ele.quantity
+                          }
+                        );
+                        await spaLinesData.save();
+                      }
+                      if (spaLinesData) {
+                        indentOfSpaModel.update({ indent_quantity: sumOfLineQnty }, { where: { id: data.dataValues.id } });
+                      }
+                      IndentDataNew = await indentOfBreederseedModel.update(
+                        {
+                          indent_quantity: IndentBreederData[0].dataValues.indent_quantity + sumOfLineQnty
+                        },
+                        {
+                          where: {
+                            user_id: breederUserIdData[0].id,
+                            crop_code: req.body.crop_code,
+                            year: yearOfIndent,
+                            variety_code: items.variety_code,
+                            season: seasoneCode
+                          }
+                        });
                     }
-                    if (spaLinesData) {
-                      indentOfSpaModel.update({ indent_quantity: sumOfLineQnty }, { where: { id: data.dataValues.id } });
-                    }
+                  }
+                  else {
                     IndentDataNew = await indentOfBreederseedModel.update(
                       {
-                        indent_quantity: IndentDataNew.dataValues.indent_quantity + sumOfLineQnty
+                        indent_quantity: IndentBreederData[0].dataValues.indent_quantity + items.indent_quantity
                       },
                       {
                         where: {
@@ -2520,6 +2458,131 @@ class ApiController {
                           season: seasoneCode
                         }
                       });
+                    data = indentOfSpaModel.build(dataRow);
+                    await data.save();
+                  }
+                }
+                else {
+                  if (items.variety_code) {
+                    varietyExistingData = await varietyModel.findAll(
+                      {
+                        where: {
+                          variety_code: items.variety_code,
+                        },
+                        raw: true
+                      }
+                    );
+                    // .variety_code
+                    // console.log("varietyExistingData", varietyExistingData[0]['variety_code']);
+
+                  }
+                  IndentBreederData = await indentOfBreederseedModel.findAll(
+                    {
+                      include: [
+                        {
+                          model: userModel,
+                          include: [{
+                            model: agencyDetailModel,
+                            ...stateCode
+                          }],
+                        }
+                      ],
+                      where: {
+                        user_id: breederUserIdData[0].id,
+                        crop_code: req.body.crop_code,
+                        year: yearOfIndent,
+                        variety_code: items.variety_code,
+                        season: seasoneCode
+                      }
+                    }
+                  );
+                  IndentDataNew = await indentOfBreederseedModel.create({
+                    "user_id": breederUserIdData[0].id,
+                    "year": yearOfIndent,
+                    "season": seasoneCode,
+                    "crop_code": req.body.crop_code,
+                    "crop_name": cropExistingData.dataValues.crop_name,
+                    "group_name": cropExistingData.dataValues.crop_group,
+                    "group_code": cropExistingData.dataValues.group_code,
+                    "variety_notification_year": varietyExistingData[0]['not_date'],
+                    "indent_quantity": items.indent_quantity ? items.indent_quantity : 0,
+                    "unit": unitKgQ,
+                    "variety_name": varietyExistingData[0]['variety_name'],
+                    "variety_id": varietyExistingData[0]['id'],
+                    "crop_type": cropType,
+                    "season_id": req.body.season_id,
+                    "variety_code": items.variety_code
+                  })
+                  if (items && items.variety_type && items.variety_type.toLowerCase().trim() == 'hybrid') {
+                    if (items.lines && items.lines.length) {
+                      console.log('if case');
+                      dataRow.indent_quantity = 0;
+                      data = indentOfSpaModel.build(dataRow);
+                      const result = await data.save();
+
+                      let sumOfLineQnty = 0;
+                      let spaLinesData;
+                      let indenterLineData;
+                      for (let ele of items.lines) {
+                        let indenterLineDataList = await db.indentOfBrseedLines.findAll({
+                          where: {
+                            indent_of_breederseed_id: IndentDataNew.dataValues.id,
+                            variety_code_line: ele.variety_code_line,
+                          },
+                          raw: true
+                        })
+                        if (indenterLineDataList && indenterLineDataList.length) {
+                          indenterLineData = await db.indentOfBrseedLines.update({
+                            quantity: indenterLineDataList[0].quantity + ele.quantity
+                          }, {
+                            where: {
+                              indent_of_breederseed_id: IndentDataNew.dataValues.id,
+                              variety_code_line: ele.variety_code_line,
+                            }
+                          })
+                        } else {
+                          indenterLineData = await db.indentOfBrseedLines.create({
+                            indent_of_breederseed_id: IndentDataNew.dataValues.id,
+                            variety_code_line: ele.variety_code_line,
+                            quantity: ele.quantity
+                          })
+                        }
+                        sumOfLineQnty += parseFloat(ele.quantity);
+                        spaLinesData = await db.indentOfSpaLinesModel.build(
+                          {
+                            indent_of_spa_id: data.dataValues.id,
+                            variety_code_line: ele.variety_code_line,
+                            quantity: ele && ele.quantity ? ele.quantity : 0
+                          }
+                        );
+                        await spaLinesData.save();
+                      }
+                      if (spaLinesData) {
+                        indentOfSpaModel.update({ indent_quantity: sumOfLineQnty }, { where: { id: data.dataValues.id } });
+                      }
+                      IndentDataNew = await indentOfBreederseedModel.update(
+                        {
+                          indent_quantity: IndentDataNew.dataValues.indent_quantity + sumOfLineQnty
+                        },
+                        {
+                          where: {
+                            user_id: breederUserIdData[0].id,
+                            crop_code: req.body.crop_code,
+                            year: yearOfIndent,
+                            variety_code: items.variety_code,
+                            season: seasoneCode
+                          }
+                        });
+                      spaUpdatedData = await indentOfSpaModel.findAll({
+                        attributes: ['id', 'crop_code', 'variety_code', 'state_code', 'indent_quantity',
+                          'season', 'spa_code', [sequelize.col('year'), 'year_of_indent']],
+                        where: { id: result.id }
+                      });
+                      returnResponse = spaUpdatedData[0]
+                    }
+                  } else {
+                    data = indentOfSpaModel.build(dataRow);
+                    const result = await data.save();
                     spaUpdatedData = await indentOfSpaModel.findAll({
                       attributes: ['id', 'crop_code', 'variety_code', 'state_code', 'indent_quantity',
                         'season', 'spa_code', [sequelize.col('year'), 'year_of_indent']],
@@ -2527,28 +2590,20 @@ class ApiController {
                     });
                     returnResponse = spaUpdatedData[0]
                   }
-                } else {
-                  data = indentOfSpaModel.build(dataRow);
-                  const result = await data.save();
-                  spaUpdatedData = await indentOfSpaModel.findAll({
-                    attributes: ['id', 'crop_code', 'variety_code', 'state_code', 'indent_quantity',
-                      'season', 'spa_code', [sequelize.col('year'), 'year_of_indent']],
-                    where: { id: result.id }
-                  });
-                  returnResponse = spaUpdatedData[0]
+
+
                 }
-
-
-              }
-            });
-            return response(res, status.DATA_SAVE, 200, [], internalCall);
-          } else {
-            return response(res, "Permission Declined", 401, [], internalCall);
+              });
+              return response(res, status.DATA_SAVE, 200, [], internalCall);
+            } else {
+              return response(res, "Permission Declined", 401, [], internalCall);
+            }
           }
+        } else {
+          return response(res, "crop is not assign or not exist ", 404, [])
         }
-      } else {
-        return response(res, "crop is not assign or not exist ", 404, [])
       }
+
     }
     catch (error) {
       console.log("error", error);
@@ -2896,8 +2951,9 @@ class ApiController {
         { 'name': 'NDDB', 'state_code': 209 },
         { 'name': 'NFL', 'state_code': 210 },
         { 'name': 'NHRDF', 'state_code': 211 },
-        { 'name': 'SOPA', 'state_code': 212 },
+        { 'name': 'SOPA PRIVATE', 'state_code': 212 },
         { 'name': 'PRIVATE', 'state_code': 213 },
+        { 'name': 'INDIVIDUAL', 'state_code': 213 },
         { 'name': 'NSAI', 'state_code': 213 },
         { 'name': 'PRIVATE COMPANY', 'state_code': 213 },
         { 'name': 'BBSSL', 'state_code': 214 }
@@ -2958,7 +3014,9 @@ class ApiController {
         },
         attributes: [
           // indents of SPA table data
-          [sequelize.col('indent_of_spas.id'), 'id'],
+          // [sequelize.col('indent_of_spas.id'), 'id'],
+          [sequelize.fn('DISTINCT', sequelize.col('indent_of_spas.id')), 'id'],
+
           [sequelize.col('indent_of_spas.year'), 'year'],
           [sequelize.col('indent_of_spas.crop_type'), 'crop_type'],
           [sequelize.col('indent_of_spas.created_at'), 'generate_date'],
@@ -3152,8 +3210,9 @@ class ApiController {
         { 'name': 'NDDB', 'state_code': 209 },
         { 'name': 'NFL', 'state_code': 210 },
         { 'name': 'NHRDF', 'state_code': 211 },
-        { 'name': 'SOPA', 'state_code': 212 },
+        { 'name': 'SOPA PRIVATE', 'state_code': 212 },
         { 'name': 'PRIVATE', 'state_code': 213 },
+        { 'name': 'INDIVIDUAL', 'state_code': 213 },
         { 'name': 'NSAI', 'state_code': 213 },
         { 'name': 'PRIVATE COMPANY', 'state_code': 213 },
         { 'name': 'BBSSL', 'state_code': 214 }
@@ -3589,8 +3648,9 @@ class ApiController {
         { 'name': 'NDDB', 'state_code': 209 },
         { 'name': 'NFL', 'state_code': 210 },
         { 'name': 'NHRDF', 'state_code': 211 },
-        { 'name': 'SOPA', 'state_code': 212 },
+        { 'name': 'SOPA PRIVATE', 'state_code': 212 },
         { 'name': 'PRIVATE', 'state_code': 213 },
+        { 'name': 'INDIVIDUAL', 'state_code': 213 },
         { 'name': 'NSAI', 'state_code': 213 },
         { 'name': 'PRIVATE COMPANY', 'state_code': 213 },
         { 'name': 'BBSSL', 'state_code': 214 }
@@ -3973,7 +4033,7 @@ class ApiController {
       let cropValue;
       let varietyValue;
       let lineVarietyValue;
-      console.log(req.body.loginedUserid.id,'req.body.loginedUserid.id')
+      console.log(req.body.loginedUserid.id, 'req.body.loginedUserid.id')
       const data = db.varietyPriceList.build({
         year: req.body.year ? req.body.year : '',
         season: req.body.season ? req.body.season : '',
@@ -3983,8 +4043,8 @@ class ApiController {
         // per_quintal_mrp: req.body.per_quintal_mrp ? req.body.per_quintal_mrp : '',
         package_data: req.body.packag_data ? req.body.packag_data : '',
         // valid_from:Date.now(),
-        user_id: req.body.user_id ? req.body.user_id: req.body.loginedUserid.id,
-        is_active: 1,
+        user_id: req.body.user_id ? req.body.user_id : req.body.loginedUserid.id,
+        is_active: true,
         created_at: Date.now(),
         updated_at: Date.now()
       });
@@ -4020,14 +4080,14 @@ class ApiController {
         let priceListData = await db.varietyPriceList.findOne(condition);
 
         if (priceListData) {
-          db.varietyPriceListPackagesModel.update({ is_active: false }, { where: { variety_priece_list_id:  req.body.id } })
+          db.varietyPriceListPackagesModel.update({ is_active: false }, { where: { variety_priece_list_id: req.body.id } })
           db.varietyPriceList.update(
             {
               is_active: false
             },
             {
               where: {
-                id:  req.body.id,
+                id: req.body.id,
                 ...yearValue,
                 ...seasonValue,
                 ...cropValue,
@@ -4039,14 +4099,14 @@ class ApiController {
           let dataValue = await data.save();
           if (req.body.packag_data && req.body.packag_data.length) {
             for (let key of req.body.packag_data) {
-              console.log(((key.per_quintal_mrp/100)*key.packag_size))
+              console.log(((key.per_quintal_mrp / 100) * key.packag_size))
               db.varietyPriceListPackagesModel.create({
                 variety_priece_list_id: dataValue['dataValues'].id,
                 // per_qnt_mrp:((1100/100)*11),
-                per_qnt_mrp: ((key.per_quintal_mrp/100)*key.packag_size), 
+                per_qnt_mrp: ((key.per_quintal_mrp / 100) * key.packag_size),
                 // per_qnt_mrp: ((key.per_quintal_mrp/100)*key.packag_size).toFixed(2), 
                 packages_size: key.packag_size,
-                per_quintal_price:key.per_quintal_mrp,
+                per_quintal_price: key.per_quintal_mrp,
               })
             }
           }
@@ -4067,9 +4127,9 @@ class ApiController {
               per_qnt_mrp: (ey.per_quintal_mrp),
               packages_size: key.packag_size,
               // per_quintal_price:key.per_quintal_mrp,
-              per_quintal_price:((key.per_quintal_mrp /100)*key.packag_size).toFixed(2),
+              per_quintal_price: ((key.per_quintal_mrp / 100) * key.packag_size).toFixed(2),
               // per_qnt_mrp: key.per_quintal_mrp,
-              
+
               // packages_size: key.packag_size
             })
           }
@@ -4114,7 +4174,7 @@ class ApiController {
           //   attributes:[]
           // },
         ],
-       
+
         attributes: [
           [sequelize.col('variety_price_lists.id'), 'id'],
           [sequelize.col('variety_price_lists.year'), 'year'],
@@ -4131,8 +4191,8 @@ class ApiController {
           // [sequelize.col('variety_price_list_package.per_qnt_mrp'), 'per_qnt_mrp'],
           // [sequelize.col('variety_price_list_package.packages_size'), 'packages_size']
         ],
-        where:{
-          user_id:req.body.loginedUserid.id
+        where: {
+          user_id: req.body.loginedUserid.id
         },
         raw: true
       }
@@ -4188,7 +4248,7 @@ class ApiController {
   }
 
 
-  static getVarietyCategoryList = async (req, res ) => {
+  static getVarietyCategoryList = async (req, res) => {
     try {
       let categories = await db.varietyCategoryModel.findAll();
       if (categories.length > 0) {
@@ -4200,104 +4260,104 @@ class ApiController {
       console.log(error);
       return response(res, status.DATA_NOT_AVAILABLE, 500, { error: 'Internal Server Error' });
     }
-  
-}
-static getVarietyChractersticsDetails1 = async (req, res) => {
-  try {
-    const { crop_code, notification_year, category } = req.body;
 
-    // Validate required fields
-    if (!crop_code || crop_code.length === 0) {
-      return response(res, status.CROP_CODE_REQUIRED, 400, null);
-    }
-    if (!notification_year) {
-      return response(res, status.NOTIFICATION_YEAR_REQUIRED, 400, null);
-    }
+  }
+  static getVarietyChractersticsDetails1 = async (req, res) => {
+    try {
+      const { crop_code, notification_year, category } = req.body;
 
-    // Construct the date range
-      let dateCondition = {};
-    if (notification_year) {
-      const [startYear, endYear] = notification_year.split('-').map(Number);
-      dateCondition = {
-        notification_year: {
-          [Op.between]: [startYear, endYear]
-        }
-      };
-    }
-    // Construct the where clause
-    const whereClause = {
-      crop_code,
-      ...dateCondition,
-    };
-
-    let categoryArrayData;
-    if (category && category.length) {
-      categoryArrayData = {
-        m_variety_category_id: {
-          [Op.in]: category
-        }
-      };
-    }
-
-    // Helper function to build where clause dynamically
-    const buildWhereClause = (whereClause, categoryArrayData) => {
-      const where = { ...whereClause };
-      if (category && category.length) {
-        where['$m_variety_category_mappings.m_variety_category_id$'] = categoryArrayData.m_variety_category_id;
+      // Validate required fields
+      if (!crop_code || crop_code.length === 0) {
+        return response(res, status.CROP_CODE_REQUIRED, 400, null);
       }
-      return where;
-    };
+      if (!notification_year) {
+        return response(res, status.NOTIFICATION_YEAR_REQUIRED, 400, null);
+      }
 
-    let mVarietyCharacteristics = await db.varietyModel.count({
-      distinct: true,
-      col: 'id',
-     
-          include: [
-            {
-              model: db.varietyCategoryMappingModel,
-              required: true,
-              attributes: [],
-              required: false
-            }
-          ],
-      
-          where: buildWhereClause(whereClause, categoryArrayData),
-    });
+      // Construct the date range
+      let dateCondition = {};
+      if (notification_year) {
+        const [startYear, endYear] = notification_year.split('-').map(Number);
+        dateCondition = {
+          notification_year: {
+            [Op.between]: [startYear, endYear]
+          }
+        };
+      }
+      // Construct the where clause
+      const whereClause = {
+        crop_code,
+        ...dateCondition,
+      };
 
-    let publicSectorCount = await db.varietyModel.count({
-      distinct: true,
-      col: 'variety_code',
-      include: [
-        {
-          model: db.varietyCategoryMappingModel,
-          required: false, // LEFT OUTER JOIN
-          attributes: [],
+      let categoryArrayData;
+      if (category && category.length) {
+        categoryArrayData = {
+          m_variety_category_id: {
+            [Op.in]: category
+          }
+        };
+      }
+
+      // Helper function to build where clause dynamically
+      const buildWhereClause = (whereClause, categoryArrayData) => {
+        const where = { ...whereClause };
+        if (category && category.length) {
+          where['$m_variety_category_mappings.m_variety_category_id$'] = categoryArrayData.m_variety_category_id;
         }
-      ],
-      where: {
-        ...buildWhereClause(whereClause, categoryArrayData),
-        developed_by: 'Public Sector',
-      },
-      
-    });
+        return where;
+      };
 
-    let privateSectorCount = await db.varietyModel.count({
-      distinct: true,
-      col: 'variety_code',
-      include: [
-        {
-          model: db.varietyCategoryMappingModel,
-          required: false, // LEFT OUTER JOIN
-          attributes: [],
-        }
-      ],
-      where: {
-        ...buildWhereClause(whereClause, categoryArrayData),
-        developed_by: 'Private Sector',
-      },
-    });
-    // Get distinct states and their varieties
-    let sqlQuery = `
+      let mVarietyCharacteristics = await db.varietyModel.count({
+        distinct: true,
+        col: 'id',
+
+        include: [
+          {
+            model: db.varietyCategoryMappingModel,
+            required: true,
+            attributes: [],
+            required: false
+          }
+        ],
+
+        where: buildWhereClause(whereClause, categoryArrayData),
+      });
+
+      let publicSectorCount = await db.varietyModel.count({
+        distinct: true,
+        col: 'variety_code',
+        include: [
+          {
+            model: db.varietyCategoryMappingModel,
+            required: false, // LEFT OUTER JOIN
+            attributes: [],
+          }
+        ],
+        where: {
+          ...buildWhereClause(whereClause, categoryArrayData),
+          developed_by: 'Public Sector',
+        },
+
+      });
+
+      let privateSectorCount = await db.varietyModel.count({
+        distinct: true,
+        col: 'variety_code',
+        include: [
+          {
+            model: db.varietyCategoryMappingModel,
+            required: false, // LEFT OUTER JOIN
+            attributes: [],
+          }
+        ],
+        where: {
+          ...buildWhereClause(whereClause, categoryArrayData),
+          developed_by: 'Private Sector',
+        },
+      });
+      // Get distinct states and their varieties
+      let sqlQuery = `
       SELECT DISTINCT y.x->>'state_code' AS state_code,
                       mvc.variety_name,
                       mvc.variety_code
@@ -4314,196 +4374,196 @@ static getVarietyChractersticsDetails1 = async (req, res) => {
       AND json_typeof(mvc.state_data) = 'array'
       AND mcv.notification_year BETWEEN :start_date AND :end_date`;
 
-    // Add the category condition if it exists
-    if (categoryArrayData && categoryArrayData.m_variety_category_id) {
-      sqlQuery += `
+      // Add the category condition if it exists
+      if (categoryArrayData && categoryArrayData.m_variety_category_id) {
+        sqlQuery += `
       AND mvcm.m_variety_category_id IN (:category_ids)`;
+      }
+
+      // Prepare replacements object
+      const replacements = {
+        crop_codes: crop_code, // Replace with the actual value or an array of crop codes
+        start_date: dateCondition.notification_year ? dateCondition.notification_year[Op.between][0] : 1994,
+        end_date: dateCondition.notification_year ? dateCondition.notification_year[Op.between][1] : 1996
+      };
+
+      if (categoryArrayData && categoryArrayData.m_variety_category_id) {
+        replacements.category_ids = categoryArrayData.m_variety_category_id[Op.in];
+      }
+
+      // Execute the query
+      const query = await db.sequelize.query(sqlQuery, {
+        type: sequelize.QueryTypes.SELECT,
+        replacements: replacements,
+      });
+
+
+      // Process the result to the desired format
+      const stateMap = {};
+
+      query.forEach(record => {
+        const { state_code, variety_name, variety_code } = record;
+
+        if (!stateMap[state_code]) {
+          stateMap[state_code] = {
+            state_code: state_code,
+            varieties: []
+          };
+        }
+
+        stateMap[state_code].varieties.push({
+          variety_name: variety_name,
+          variety_code: variety_code
+        });
+      });
+
+      const stateList = Object.values(stateMap);
+
+      console.log({
+        state: stateList
+      });
+
+      // Get counts of varieties and hybrids
+      let varietyCount = await db.varietyModel.count({
+        distinct: true,
+        col: 'id',
+        include: [
+          {
+            model: db.varietyCategoryMappingModel,
+            required: false,
+            attributes: [],
+            required: false
+          }
+        ],
+        where: {
+          ...buildWhereClause(whereClause, categoryArrayData),
+          status: 'variety'
+        },
+      });
+
+      let hybridCount = await db.varietyModel.count({
+        distinct: true,
+        col: 'id',
+        include: [
+          {
+            model: db.varietyCategoryMappingModel,
+            required: false,
+            attributes: [],
+            required: false
+          }
+        ],
+        where: {
+          ...buildWhereClause(whereClause, categoryArrayData),
+          status: 'hybrid'
+        },
+      });
+
+      // Query for category counts
+      let categoryCounts = await db.varietyModel.findAll({
+        attributes: [
+          // 'm_variety_category_id',
+          [sequelize.col('m_variety_category_mappings.m_variety_category_id'), 'm_variety_category_id'],
+
+          [sequelize.fn('COUNT', sequelize.col('m_variety_category_mappings.variety_code')), 'count'],
+
+        ],
+        where: {
+          ...buildWhereClause(whereClause, categoryArrayData),
+        },
+        include: [
+          // {
+          //   model: db.cropCharactersticsModel,
+          //   required:true,
+
+          //   attributes: [],
+          //   where: whereClause
+          // },
+          {
+            model: db.varietyCategoryMappingModel,
+            attributes: [],
+            required: true,
+            raw: true,
+            nest: true,
+            // where: {
+            //   ...categoryArrayData
+            // },
+
+          },
+        ],
+        group: [sequelize.col('m_variety_category_mappings.m_variety_category_id')],
+        raw: true,
+        nest: true
+      });
+      // Transform categoryCounts to a more readable format
+      let categoryCountResults = {};
+      categoryCounts.forEach(item => {
+        categoryCountResults[item.m_variety_category_id] = parseInt(item.count, 10);
+      });
+
+      let total_data = {
+        total_variety: mVarietyCharacteristics,
+        state: stateList,
+        public_sector: publicSectorCount,
+        private_sector: privateSectorCount,
+        hybrid: hybridCount,
+        variety: varietyCount,
+        category: categoryCountResults
+      };
+      return response(res, status.DATA_AVAILABLE, 200, total_data);
+    } catch (error) {
+      console.log(error);
+      return response(res, status.DATA_NOT_AVAILABLE, 500, { error: 'Internal Server Error' });
     }
+  }
 
-    // Prepare replacements object
-    const replacements = {
-      crop_codes: crop_code, // Replace with the actual value or an array of crop codes
-      start_date: dateCondition.notification_year ? dateCondition.notification_year[Op.between][0] : 1994,
-      end_date: dateCondition.notification_year ? dateCondition.notification_year[Op.between][1] : 1996
-    };
+  static getVarietyChractersticsDetails = async (req, res) => {
+    try {
+      const { crop_code, notification_year, category } = req.body;
 
-    if (categoryArrayData && categoryArrayData.m_variety_category_id) {
-      replacements.category_ids = categoryArrayData.m_variety_category_id[Op.in];
-    }
+      // Validate required fields
+      if (!crop_code || crop_code.length === 0) {
+        return response(res, status.CROP_CODE_REQUIRED, 400, null);
+      }
+      if (!notification_year) {
+        return response(res, status.NOTIFICATION_YEAR_REQUIRED, 400, null);
+      }
 
-    // Execute the query
-    const query = await db.sequelize.query(sqlQuery, {
-      type: sequelize.QueryTypes.SELECT,
-      replacements: replacements,
-    });
-
-
-    // Process the result to the desired format
-    const stateMap = {};
-
-    query.forEach(record => {
-      const { state_code, variety_name, variety_code } = record;
-
-      if (!stateMap[state_code]) {
-        stateMap[state_code] = {
-          state_code: state_code,
-          varieties: []
+      // Construct the date range
+      let dateCondition = {};
+      if (notification_year) {
+        const [startYear, endYear] = notification_year.split('-').map(Number);
+        dateCondition = {
+          notification_year: {
+            [Op.between]: [startYear, endYear],
+          },
         };
       }
 
-      stateMap[state_code].varieties.push({
-        variety_name: variety_name,
-        variety_code: variety_code
-      });
-    });
-
-    const stateList = Object.values(stateMap);
-
-    console.log({
-      state: stateList
-    });
-
-    // Get counts of varieties and hybrids
-    let varietyCount = await db.varietyModel.count({
-      distinct: true,
-      col: 'id',
-        include: [
-          {
-            model: db.varietyCategoryMappingModel,
-            required: false,
-            attributes: [],
-            required: false
-          }
-        ],
-      where: {
-        ...buildWhereClause(whereClause, categoryArrayData),
-         status: 'variety'
-      },
-    });
-
-    let hybridCount = await db.varietyModel.count({
-      distinct: true,
-      col: 'id',
-        include: [
-          {
-            model: db.varietyCategoryMappingModel,
-            required: false,
-            attributes: [],
-            required: false
-          }
-        ],
-      where: {
-        ...buildWhereClause(whereClause, categoryArrayData),
-         status: 'hybrid'
-      },
-    });
-
-    // Query for category counts
-    let categoryCounts = await db.varietyModel.findAll({
-      attributes: [
-        // 'm_variety_category_id',
-        [ sequelize.col('m_variety_category_mappings.m_variety_category_id'), 'm_variety_category_id'],
-
-        [sequelize.fn('COUNT', sequelize.col('m_variety_category_mappings.variety_code')), 'count'],
-        
-      ],
-      where: {
-        ...buildWhereClause(whereClause, categoryArrayData),
-      },
-      include: [
-        // {
-        //   model: db.cropCharactersticsModel,
-        //   required:true,
-
-        //   attributes: [],
-        //   where: whereClause
-        // },
-        {
-        model: db.varietyCategoryMappingModel,
-        attributes: [],
-        required:true,
-        raw: true,
-        nest: true,
-        // where: {
-        //   ...categoryArrayData
-        // },
-       
-      },
-    ],
-    group: [sequelize.col('m_variety_category_mappings.m_variety_category_id')],
-      raw: true,
-      nest: true
-    });
-    // Transform categoryCounts to a more readable format
-    let categoryCountResults = {};
-    categoryCounts.forEach(item => {
-      categoryCountResults[item.m_variety_category_id] = parseInt(item.count, 10);
-    });
-
-    let total_data = {
-      total_variety: mVarietyCharacteristics,
-      state: stateList,
-      public_sector: publicSectorCount,
-      private_sector: privateSectorCount,
-      hybrid: hybridCount,
-      variety: varietyCount,
-      category: categoryCountResults
-    };
-    return response(res, status.DATA_AVAILABLE, 200, total_data);
-  } catch (error) {
-    console.log(error);
-    return response(res, status.DATA_NOT_AVAILABLE, 500, { error: 'Internal Server Error' });
-  }
-}
-
-static getVarietyChractersticsDetails = async (req, res) => {
-  try {
-    const { crop_code, notification_year, category } = req.body;
-
-    // Validate required fields
-    if (!crop_code || crop_code.length === 0) {
-      return response(res, status.CROP_CODE_REQUIRED, 400, null);
-    }
-    if (!notification_year) {
-      return response(res, status.NOTIFICATION_YEAR_REQUIRED, 400, null);
-    }
-
-    // Construct the date range
-    let dateCondition = {};
-    if (notification_year) {
-      const [startYear, endYear] = notification_year.split('-').map(Number);
-      dateCondition = {
-        notification_year: {
-          [Op.between]: [startYear, endYear],
-        },
+      // Construct the where clause
+      const whereClause = {
+        crop_code,
+        ...dateCondition,
       };
-    }
 
-    // Construct the where clause
-    const whereClause = {
-      crop_code,
-      ...dateCondition,
-    };
-
-    let categoryArrayData;
-    if (category && category.length) {
-      categoryArrayData = {
-        m_variety_category_id: {
-          [Op.in]: category,
-        },
-      };
-    }
-
-    // Helper function to build where clause dynamically
-    const buildWhereClause = (whereClause, categoryArrayData) => {
-      const where = { ...whereClause };
+      let categoryArrayData;
       if (category && category.length) {
-        where['$m_variety_category_mappings.m_variety_category_id$'] = categoryArrayData.m_variety_category_id;
+        categoryArrayData = {
+          m_variety_category_id: {
+            [Op.in]: category,
+          },
+        };
       }
-      return where;
-    };
-    // SQL query to fetch additional data
-    let sqlQuery = `SELECT mcv.variety_name,
+
+      // Helper function to build where clause dynamically
+      const buildWhereClause = (whereClause, categoryArrayData) => {
+        const where = { ...whereClause };
+        if (category && category.length) {
+          where['$m_variety_category_mapping.m_variety_category_id$'] = categoryArrayData.m_variety_category_id;
+        }
+        return where;
+      };
+      // SQL query to fetch additional data
+      let sqlQuery = `SELECT mcv.variety_name,
                            mcv.variety_code,
                            mvcc.category,
                            mcv.developed_by,
@@ -4518,9 +4578,9 @@ static getVarietyChractersticsDetails = async (req, res) => {
                         ON mvcc.id = mvcm.m_variety_category_id
                     WHERE mcv.crop_code IN (:crop_codes)
                       AND mcv.notification_year BETWEEN :start_date AND :end_date`;
-   
-    // SQL query to fetch state codes
-    let stateDataQuery = `
+
+      // SQL query to fetch state codes
+      let stateDataQuery = `
                           SELECT DISTINCT y.x->>'state_code' AS state_code, mcv.variety_code
                           FROM m_crop_varieties as mcv 
                           LEFT JOIN m_variety_characteristics AS mvc
@@ -4532,211 +4592,604 @@ static getVarietyChractersticsDetails = async (req, res) => {
                           WHERE mcv.crop_code IN (:crop_codes)
                             AND mcv.notification_year BETWEEN :start_date AND :end_date`;
 
-    // Add the category condition if it exists
-    if (categoryArrayData && categoryArrayData.m_variety_category_id) {
-      sqlQuery += ` AND mvcm.m_variety_category_id IN (:category_ids)`;
-    }
-    // Prepare replacements object
-    const replacements = {
-      crop_codes: crop_code,
-      start_date: dateCondition.notification_year ? dateCondition.notification_year[Op.between][0] : 1994,
-      end_date: dateCondition.notification_year ? dateCondition.notification_year[Op.between][1] : 2090,
-    };
-    if (categoryArrayData && categoryArrayData.m_variety_category_id) {
-      replacements.category_ids = categoryArrayData.m_variety_category_id[Op.in];
-    }
-
-    // Execute the main query
-    const mainQueryResult = await db.sequelize.query(sqlQuery, {
-      type: sequelize.QueryTypes.SELECT,
-      replacements: replacements,
-    });
-    // Execute the state data query
-    const stateQueryResult = await db.sequelize.query(stateDataQuery, {
-      type: sequelize.QueryTypes.SELECT,
-      replacements: replacements,
-    });
-
-    // Process the result to the desired format
-    const stateMap = {};
-    mainQueryResult.forEach((record) => {
-      const { variety_name, variety_code, state_code, developed_by, status, category, category_id } = record;
-
-      // Create an entry for each variety code
-      if (!stateMap[variety_code]) {
-        stateMap[variety_code] = {
-          varietyName: variety_name,
-          varietyCode: variety_code,
-          state: [],
-          developedBy: developed_by,
-          type: status === 'variety' ? 'VARIETY' : 'HYBRID',
-          category: [],
-        };
+      // Add the category condition if it exists
+      if (categoryArrayData && categoryArrayData.m_variety_category_id) {
+        sqlQuery += ` AND mvcm.m_variety_category_id IN (:category_ids)`;
+      }
+      // Prepare replacements object
+      const replacements = {
+        crop_codes: crop_code,
+        start_date: dateCondition.notification_year ? dateCondition.notification_year[Op.between][0] : 1994,
+        end_date: dateCondition.notification_year ? dateCondition.notification_year[Op.between][1] : 2090,
+      };
+      if (categoryArrayData && categoryArrayData.m_variety_category_id) {
+        replacements.category_ids = categoryArrayData.m_variety_category_id[Op.in];
       }
 
-      // Add state codes
-      if (state_code) {
-        if (!stateMap[variety_code].state.includes(state_code)) {
-          stateMap[variety_code].state.push(state_code);
+      // Execute the main query
+      const mainQueryResult = await db.sequelize.query(sqlQuery, {
+        type: sequelize.QueryTypes.SELECT,
+        replacements: replacements,
+      });
+      // Execute the state data query
+      const stateQueryResult = await db.sequelize.query(stateDataQuery, {
+        type: sequelize.QueryTypes.SELECT,
+        replacements: replacements,
+      });
+
+      // Process the result to the desired format
+      const stateMap = {};
+      mainQueryResult.forEach((record) => {
+        const { variety_name, variety_code, state_code, developed_by, status, category, category_id } = record;
+
+        // Create an entry for each variety code
+        if (!stateMap[variety_code]) {
+          stateMap[variety_code] = {
+            varietyName: variety_name,
+            varietyCode: variety_code,
+            state: [],
+            developedBy: developed_by,
+            type: status === 'variety' ? 'VARIETY' : 'HYBRID',
+            category: [],
+          };
+        }
+
+        // Add state codes
+        if (state_code) {
+          if (!stateMap[variety_code].state.includes(state_code)) {
+            stateMap[variety_code].state.push(state_code);
+          }
+        }
+
+        // Add unique categories based on `category_id` (categoryNumber)
+        if (!stateMap[variety_code].category.find(cat => cat.categoryNumber === category_id)) {
+          stateMap[variety_code].category.push({
+            type: category,
+            categoryNumber: category_id,
+          });
+        }
+      });
+
+      // Add state data to the state map
+      stateQueryResult.forEach((record) => {
+        const { variety_code, state_code } = record;
+        if (stateMap[variety_code]) {
+          if (state_code && !stateMap[variety_code].state.includes(state_code)) {
+            stateMap[variety_code].state.push(state_code);
+          }
+        }
+      });
+
+      const stateList = Object.values(stateMap);
+
+      // Count data as required
+      const mVarietyCharacteristics = await db.varietyModel.count({
+        distinct: true,
+        col: 'id',
+        where: buildWhereClause(whereClause, categoryArrayData),
+        include: [
+          {
+            model: db.varietyCategoryMappingModel,
+            attributes: [],
+            required: false,
+          },
+        ],
+      });
+
+      const publicSectorCount = await db.varietyModel.count({
+        distinct: true,
+        col: 'variety_code',
+        where: {
+          ...buildWhereClause(whereClause, categoryArrayData),
+          developed_by: 'Public Sector',
+        },
+        include: [
+          {
+            model: db.varietyCategoryMappingModel,
+            attributes: [],
+            required: false,
+          },
+        ],
+      });
+      const privateSectorCount = await db.varietyModel.count({
+        distinct: true,
+        col: 'variety_code',
+        where: {
+          ...buildWhereClause(whereClause, categoryArrayData),
+          developed_by: 'Private Sector',
+        },
+        include: [
+          {
+            model: db.varietyCategoryMappingModel,
+            attributes: [],
+            required: false,
+          },
+        ],
+      });
+
+      const varietyCount = await db.varietyModel.count({
+        distinct: true,
+        col: 'id',
+        where: {
+          ...buildWhereClause(whereClause, categoryArrayData),
+          status: 'variety',
+        },
+        include: [
+          {
+            model: db.varietyCategoryMappingModel,
+            attributes: [],
+            required: false,
+          },
+        ],
+      });
+
+      const hybridCount = await db.varietyModel.count({
+        distinct: true,
+        col: 'id',
+        where: {
+          ...buildWhereClause(whereClause, categoryArrayData),
+          status: 'hybrid',
+        },
+        include: [
+          {
+            model: db.varietyCategoryMappingModel,
+            attributes: [],
+            required: false,
+          },
+        ],
+      });
+
+      let categoryCounts = await db.varietyModel.findAll({
+        attributes: [
+          [sequelize.col('m_variety_category_mapping.m_variety_category_id'), 'm_variety_category_id'],
+          [sequelize.fn('COUNT', sequelize.col('m_variety_category_mapping.variety_code')), 'count'],
+        ],
+        where: {
+          ...buildWhereClause(whereClause, categoryArrayData),
+        },
+        include: [
+          {
+            model: db.varietyCategoryMappingModel,
+            attributes: [],
+            required: true,
+          },
+        ],
+        group: [sequelize.col('m_variety_category_mapping.m_variety_category_id')],
+        raw: true,
+        nest: true,
+      });
+
+      let categoryCountResults = {};
+      categoryCounts.forEach((item) => {
+        categoryCountResults[item.m_variety_category_id] = parseInt(item.count, 10);
+      });
+
+
+      // Construct the response
+      const total_data = {
+        total_variety: mVarietyCharacteristics,
+        state: stateList,
+        public_sector: publicSectorCount,
+        private_sector: privateSectorCount,
+        hybrid: hybridCount,
+        variety: varietyCount,
+        category: categoryCountResults,
+      };
+
+      // Return the response in the desired format
+      return response(res, status.DATA_AVAILABLE, 200, total_data);
+      // return response(res, status.DATA_AVAILABLE, 200, {
+      //   EncryptedResponse: {
+      //     status_code: 200,
+      //     message: "Data found successfully",
+      //     data: total_data,
+      //   }
+      // });
+
+    } catch (error) {
+      console.log("error", error)
+      return response(res, status.DATA_NOT_AVAILABLE, 500, {
+        EncryptedResponse: {
+          status_code: 500,
+          message: "Internal Server Error",
+          data: { error: 'Internal Server Error' }
+        }
+      });
+    }
+  };
+  static getCropCharactersticsWithId = async (req, res) => {
+    try {
+      let condition = {}
+      condition = {
+        include: [
+          {
+            model: db.cropModel,
+            attributes: [],
+            where: {
+              is_active: 1
+            },
+            left: true,
+            include: [
+              {
+                model: db.cropGroupModel,
+                attributes: []
+              }
+            ],
+            // attributes: ['crop_name']
+          },
+          {
+            model: db.cropCharactersticsModel,
+            attributes: [],
+            include: [
+
+              {
+                model: db.responsibleInsitutionModel,
+                attributes: []
+              }
+            ]
+          },
+          {
+            model: db.varietyCategoryMappingModel,
+            attributes: [],
+            // as: 'category',
+            include: [
+              {
+                model: db.varietyCategoryModel,
+                attributes: [],
+                require: true
+              },
+            ],
+          },
+        ],
+        attributes: [
+          'id',
+          [sequelize.col('m_crop.crop_code'), 'crop_code'],
+          [sequelize.col('m_crop.crop_name'), 'crop_name'],
+          [sequelize.col('m_crop.botanic_name'), 'botanic_name'],
+          [sequelize.col('m_crop.hindi_name'), 'hindi_name'],
+          [sequelize.col('m_crop_varieties.variety_code'), 'variety_code'],
+          [sequelize.col('m_crop_varieties.variety_name'), 'variety_name'],
+          [sequelize.col('m_crop_varieties.is_notified'), 'is_notified'],
+          [sequelize.col('m_crop_varieties.developed_by'), 'developed_by'],
+          [sequelize.col('m_variety_characteristic->responsible_insitution.insitution_name'), 'responsible_insitution'],
+          [sequelize.col('m_crop_varieties.status'), 'status'],
+          [sequelize.col('m_crop_varieties.meeting_number'), 'meeting_number'],
+          [sequelize.col('m_crop_varieties.not_date'), 'notification_date'],
+          [sequelize.col('m_crop_varieties.not_number'), 'notification_number'],
+          [sequelize.col('m_crop_varieties.type'), 'type'],
+          [sequelize.col('m_variety_characteristic.state_data'), 'state_data'],
+          [sequelize.col('m_variety_characteristic.gi_tagged_reg_no'), 'gi_tagged_reg_no'],
+          // [sequelize.col('m_variety_characteristic.type'),'type'],
+          [sequelize.col('m_variety_characteristic.ip_protected_reg_no'), 'ip_protected_reg_no'],
+          [sequelize.col('"m_variety_category_mapping.m_variety_category.id'), 'category_id'],
+          [sequelize.col('"m_variety_category_mapping.m_variety_category.category'), 'category'],
+        ],
+        left: true,
+        // nest:true,
+        raw: true,
+        where: {}
+      }
+
+      let { page, pageSize } = req.query;
+      // if (page === undefined) page = 1;
+      // if (pageSize === undefined) pageSize = 50;
+
+      // if (page > 0 && pageSize > 0) {
+      //   condition.limit = pageSize;
+      //   condition.offset = (page * pageSize) - pageSize;
+      // }
+
+      const sortOrder = req.body.sort ? req.body.sort : 'id';
+      const sortDirection = req.body.order ? req.body.order : 'DESC';
+
+      condition.order = [[sortOrder, sortDirection]];
+      if (req.query) {
+        if (req.query.crop_code) {
+          condition.where.crop_code = req.query.crop_code
+        }
+        if (req.query.variety_code) {
+          condition.where.variety_code = req.query.variety_code
         }
       }
 
-      // Add unique categories based on `category_id` (categoryNumber)
-      if (!stateMap[variety_code].category.find(cat => cat.categoryNumber === category_id)) {
-        stateMap[variety_code].category.push({
-          type: category,
-          categoryNumber: category_id,
+      const data = await db.varietyModel.findAll(condition);
+      if (!data) {
+        return response(res, status.DATA_NOT_AVAILABLE, 404);
+      } else {
+        data.forEach((element, i) => {
+          if (element.crop_code.slice(0, 1) == "H") {
+            data[i]['crop_type'] = "horticulture"
+          } else {
+            data[i]['crop_type'] = "Agriculture"
+          }
+
+          if (element.ip_protected_reg_no == null || element.ip_protected_reg_no == undefined || element.ip_protected_reg_no == '') {
+            data[i]['is_ip_protected'] = false
+          } else {
+            data[i]['is_ip_protected'] = true
+          }
+
+          if (element.gi_tagged_reg_no == null || element.gi_tagged_reg_no == undefined || element.gi_tagged_reg_no == '') {
+            data[i]['is_gi_tagged'] = false
+          } else {
+            data[i]['is_gi_tagged'] = true
+          }
+          // if (element.state_data && element.state_data.length) {
+          //   data.rows[i]['state_code'] = element.state_data[0].state_code
+          //   data.rows[i]['state_name'] = element.state_data[0].state_name
+          //   delete element.state_data;
+          // } else {
+          //   data.rows[i]['state_code'] = ""
+          //   data.rows[i]['state_name'] = ""
+          // }
         });
-      }
-    });
+        // data
+        const filteredData = [];
+        data.forEach(el => {
+          const spaIndex = filteredData.findIndex(item => item.variety_code == el.variety_code);
+          if (spaIndex === -1) {
+            filteredData.push({
+              "id": el.id,
+              "crop_code": el.crop_code,
+              "crop_name": el.crop_name,
+              "botanic_name": el.botanic_name,
+              "hindi_name": el.hindi_name,
+              "variety_code": el.variety_code,
+              "variety_name": el.variety_name,
+              "is_notified": el.is_notified,
+              "developed_by": el.developed_by,
+              "responsible_insitution": el.responsible_insitution,
+              "status": el.status,
+              "meeting_number": el.meeting_number,
+              "notification_date": el.notification_date,
+              "notification_number": el.notification_number,
+              "type": el.type,
+              "state_data": el.state_data,
+              "gi_tagged_reg_no": el.gi_tagged_reg_no,
+              "ip_protected_reg_no": el.ip_protected_reg_no,
+              "crop_type": el.crop_type,
+              "is_ip_protected": el.is_ip_protected,
+              "is_gi_tagged": el.is_gi_tagged,
+              "category": [
+                {
+                  "category_id": el.category_id,
+                  "category": el.category,
 
-    // Add state data to the state map
-    stateQueryResult.forEach((record) => {
-      const { variety_code, state_code } = record;
-      if (stateMap[variety_code]) {
-        if (state_code && !stateMap[variety_code].state.includes(state_code)) {
-          stateMap[variety_code].state.push(state_code);
+                }
+              ]
+            });
+          } else {
+            const cropIndex = filteredData[spaIndex].category.findIndex(item => item.category_id == el.category_id);
+
+            if (cropIndex === -1) {
+              filteredData[spaIndex].category.push(
+                {
+                  "category_id": el.category_id,
+                  "category": el.category,
+                }
+              );
+            } else {
+
+              // "category_id": el.category_id,
+              //   "category": el.category,
+
+            }
+          }
+        });
+
+        return response(res, status.DATA_AVAILABLE, 200, filteredData);
+      }
+    }
+    catch (error) {
+      console.log(error);
+      const returnResponse = {
+        message: error.message,
+      };
+      return response(res, status.UNEXPECTED_ERROR, 500, returnResponse);
+    }
+  }
+
+  static printTag = async (req, res) => {
+    try {
+      let condition = {}
+      const { productName, serialNumber } = req.body;
+      const date = new Date().toISOString().split("T")[0];
+
+      // PRN File Content (Zebra ZPL Example)
+      const prnContent = `
+    ^XA
+    ^FO50,50^A0N,30,30^FD${productName}^FS
+    ^FO50,100^A0N,25,25^FDSerial: ${serialNumber}^FS
+    ^FO50,150^A0N,25,25^FDDate: ${date}^FS
+    ^FO50,200^B3N,N,100,Y,N^FD${serialNumber}^FS
+    ^XZ
+    `;
+
+      const filePath = path.join(__dirname, "label.prn");
+      console.log("filePath", filePath)
+      // Write PRN file to disk
+      fs.writeFile(filePath, prnContent, (err) => {
+        if (err) {
+          return res.status(500).json({ message: "Error generating PRN file" });
+        }
+        res.download(filePath, "label.prn");
+      });
+
+      // return response(res, status.DATA_AVAILABLE, 200, []);
+
+    }
+    catch (error) {
+      console.log(error);
+      const returnResponse = {
+        message: error.message,
+      };
+      return response(res, status.UNEXPECTED_ERROR, 500, returnResponse);
+    }
+  }
+  static getTotalIndentQuantity = async (req, res) => {
+    try {
+      const { year, season, state_code } = req.query;
+      let whereCondition = {};
+      let whereConditionSecond = {};
+
+      if (year) {
+        whereCondition.year = year;
+        whereConditionSecond.year = year
+      }
+      if (season) {
+        const capitalizedSeason = season.charAt(0).toUpperCase();
+        whereCondition.season = capitalizedSeason;
+        whereConditionSecond.season = capitalizedSeason
+      }
+      let stateCode;
+       let liftingStateCode;
+      if (state_code) {
+        whereCondition['$agencyDetails.state_id$'] = state_code;
+        stateCode = {
+          state_id: state_code
+        }
+        liftingStateCode = {
+          spa_state_code: state_code
         }
       }
-    });
 
-    const stateList = Object.values(stateMap);
+      // indent quantity
+      const indentQuantities = await indentOfBreederseedModel.findAll({
+        attributes: [
+          'indent_quantity',
+          'unit',
+        ],
+        where: whereCondition,
+        include: [
+          {
+            model: agencyDetailModel,
+            attributes: [],
+            as: 'agencyDetails'
+          }
+        ]
+      });
 
-    // Count data as required
-    const mVarietyCharacteristics = await db.varietyModel.count({
-      distinct: true,
-      col: 'id',
-      where: buildWhereClause(whereClause, categoryArrayData),
-      include: [
-        {
-          model: db.varietyCategoryMappingModel,
-          attributes: [],
-          required: false,
+      let indent_quantity = 0;
+      indentQuantities.forEach((indent) => {
+        if (indent.unit === 'kilogram') {
+          indent_quantity += indent.indent_quantity / 100;
+        } else {
+          indent_quantity += indent.indent_quantity;
+        }
+      });
+      indent_quantity = parseFloat(indent_quantity.toFixed(2));
+
+      // Allocated quantity calculation with crop_code logic
+      const TotalAllocated = await allocationToIndentorSeed.findAll({
+        attributes: [
+          [
+            sequelize.fn(
+              'SUM',
+              sequelize.col('allocation_to_indentor_for_lifting_seed_production_cnter.allocated_quantity')
+            ),
+            'allocated_quantity'
+          ],
+          'crop_code'
+        ],
+        where: {
+          is_active: 1,
+          is_variety_submitted: 1,
+          ...whereConditionSecond
         },
-      ],
-    });
-    
-    const publicSectorCount = await db.varietyModel.count({
-      distinct: true,
-      col: 'variety_code',
-      where: {
-        ...buildWhereClause(whereClause, categoryArrayData),
-        developed_by: 'Public Sector',
-      },
-      include: [
-        {
-          model: db.varietyCategoryMappingModel,
-          attributes: [],
-          required: false,
-        },
-      ],
-    });
+        include: [
+          {
+            model: allocationToIndentorProductionCenterSeed,
+            as: 'allocation_to_indentor_for_lifting_seed_production_cnter',
+            attributes: [],
+            include: [
+              {
+                model: db.agencyDetailModel,
+                attributes:[],
+                where: {
+                  ...stateCode
+                }
+              }
+            ]
+          },
+        ],
+        // group: ['crop_code'],
+        group: ['crop_code', 'allocation_to_indentor_for_lifting_seed_production_cnter.agency_detail_model.user_id'],
+        raw: true,
+      });
 
-    const privateSectorCount = await db.varietyModel.count({
-      distinct: true,
-      col: 'variety_code',
-      where: {
-        ...buildWhereClause(whereClause, categoryArrayData),
-        developed_by: 'Private Sector',
-      },
-      include: [
-        {
-          model: db.varietyCategoryMappingModel,
-          attributes: [],
-          required: false,
-        },
-      ],
-    });
-
-    const varietyCount = await db.varietyModel.count({
-      distinct: true,
-      col: 'id',
-      where: {
-        ...buildWhereClause(whereClause, categoryArrayData),
-        status: 'variety',
-      },
-      include: [
-        {
-          model: db.varietyCategoryMappingModel,
-          attributes: [],
-          required: false,
-        },
-      ],
-    });
-    const hybridCount = await db.varietyModel.count({
-      distinct: true,
-      col: 'id',
-      where: {
-        ...buildWhereClause(whereClause, categoryArrayData),
-        status: 'hybrid',
-      },
-      include: [
-        {
-          model: db.varietyCategoryMappingModel,
-          attributes: [],
-          required: false,
-        },
-      ],
-    });
-
-    let categoryCounts = await db.varietyModel.findAll({
-      attributes: [
-        [sequelize.col('m_variety_category_mappings.m_variety_category_id'), 'm_variety_category_id'],
-        [sequelize.fn('COUNT', sequelize.col('m_variety_category_mappings.variety_code')), 'count'],
-      ],
-      where: {
-        ...buildWhereClause(whereClause, categoryArrayData),
-      },
-      include: [
-        {
-          model: db.varietyCategoryMappingModel,
-          attributes: [],
-          required: true,
-        },
-      ],
-      group: [sequelize.col('m_variety_category_mappings.m_variety_category_id')],
-      raw: true,
-      nest: true,
-    });
-
-    let categoryCountResults = {};
-    categoryCounts.forEach((item) => {
-      categoryCountResults[item.m_variety_category_id] = parseInt(item.count, 10);
-    });
-
-
-    // Construct the response
-    const total_data = {
-      total_variety: mVarietyCharacteristics,
-      state: stateList,
-      public_sector: publicSectorCount,
-      private_sector: privateSectorCount,
-      hybrid: hybridCount,
-      variety: varietyCount,
-      category: categoryCountResults,
-    };
-
-    // Return the response in the desired format
-    return response(res, status.DATA_AVAILABLE, 200, total_data);
-    // return response(res, status.DATA_AVAILABLE, 200, {
-    //   EncryptedResponse: {
-    //     status_code: 200,
-    //     message: "Data found successfully",
-    //     data: total_data,
-    //   }
-    // });
-
-  } catch (error) {
-    return response(res, status.DATA_NOT_AVAILABLE, 500, {
-      EncryptedResponse: {
-        status_code: 500,
-        message: "Internal Server Error",
-        data: { error: 'Internal Server Error' }
+      let finalAllocatedQty = 0;
+      for (const row of TotalAllocated) {
+        const cropCode = row.crop_code || '';
+        const qty = Number(row.allocated_quantity) || 0;
+        finalAllocatedQty += cropCode.startsWith('H') ? qty / 100 : qty;
       }
-    });
-  }
-};
 
+
+      // Produced quantity calculation with crop_code logic
+      const TotalProduced = await seedProcessingRegisterModel.findAll({
+        include:[
+          {
+            model:db.agencyDetailModel,
+            attributes:[],
+            where:{
+               ...stateCode
+            }
+          }
+        ],
+        attributes: [
+          [sequelize.fn('SUM', sequelize.col('seed_processing_register.total_processed_qty')), 'produced_quantity'],
+          'crop_code'
+        ],
+        where: {
+          ...whereConditionSecond,
+          is_active: 1
+        },
+        group: ['crop_code'],
+        raw: true
+      });
+
+      let finalProducedQty = 0;
+      for (const row of TotalProduced) {
+        const cropCode = row.crop_code || '';
+        const qty = Number(row.produced_quantity) || 0;
+        finalProducedQty += cropCode.startsWith('H') ? qty / 100 : qty;
+      }
+
+
+      // Lifted quantity calculation with crop_code logic
+      const rawLiftingData = await liftingSeedDetailsModel.findAll({
+        attributes: ['no_of_bag', 'bag_weight', 'crop_code'],
+        where: {
+          ...whereConditionSecond,
+          ...liftingStateCode
+        },
+        raw: true,
+      });
+
+      let finalLiftedQty = 0;
+      for (const row of rawLiftingData) {
+        const noOfBags = Number(row.no_of_bag) || 0;
+        const bagWeight = Number(row.bag_weight) || 0;
+        const cropCode = row.crop_code || '';
+        const total = noOfBags * bagWeight;
+        finalLiftedQty += total / 100;
+      }
+
+      response(res, status.DATA_AVAILABLE, 200, {
+        total_indent: `${Number(indent_quantity?.toFixed(3))} (Qnt)` || "0 (Qnt)",
+        allocatedQuantity: `${Number(finalAllocatedQty.toFixed(3))} (Qnt)`,
+        producedQuantity: `${Number(finalProducedQty.toFixed(3))} (Qnt)`,
+        liftedQuantity: `${Number(finalLiftedQty.toFixed(3))} (Qnt)`
+      });
+
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        status: 'INTERNAL_SERVER_ERROR',
+        message: 'Error fetching total indent quantity'
+      });
+    }
+  };
 }
 module.exports = ApiController
 

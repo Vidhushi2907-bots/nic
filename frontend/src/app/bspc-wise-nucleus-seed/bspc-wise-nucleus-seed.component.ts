@@ -16,7 +16,7 @@ import Swal from 'sweetalert2';
 import { ProductioncenterService } from 'src/app/services/productionCenter/productioncenter.service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+//pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
   selector: 'app-bspc-wise-nucleus-seed',

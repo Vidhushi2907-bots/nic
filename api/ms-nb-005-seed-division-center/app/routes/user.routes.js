@@ -28,7 +28,7 @@ module.exports = app => {
     app.post(`${process.env.MICRO_SERVICE}/api/add-crop`, auth,  users.addCrop);
     app.post(`${process.env.MICRO_SERVICE}/api/update-crop`, auth,  users.editupdateCrop);
 
-    app.post(`${process.env.MICRO_SERVICE}/api/crop-group`, auth, users.viewCropGroup);
+    app.post(`${process.env.MICRO_SERVICE}/api/crop-group`, users.viewCropGroup);
     app.get(`${process.env.MICRO_SERVICE}/api/get-distinct-crop`, auth,  users.distinctCrop);
     app.post(`${process.env.MICRO_SERVICE}/api/get-crop-name`, auth,  users.cropName);
     app.post(`${process.env.MICRO_SERVICE}/api/get-crop-indenting-data`,  users.cropIndentingdata);
@@ -85,9 +85,9 @@ module.exports = app => {
     app.post(`${process.env.MICRO_SERVICE}/api/get-breeder-name-by-district`, auth,  users.getBreederNameByDistrict);
     app.post(`${process.env.MICRO_SERVICE}/api/get-distrinct-crop-name`, auth,  users.getCropNameData);
     app.post(`${process.env.MICRO_SERVICE}/api/get-distrinct-seed-variety-crop-name`, auth,  users.getSeedVarietyCropNameData);
-    app.post(`${process.env.MICRO_SERVICE}/api/get-distrinct-crop-name-characterstics`, auth, users.getCropNamecharacterData);
+    app.post(`${process.env.MICRO_SERVICE}/api/get-distrinct-crop-name-characterstics`, users.getCropNamecharacterData);
     app.post(`${process.env.MICRO_SERVICE}/api/get-distrinct-variety-name`, auth, users.getVarietyNameData);
-    app.post(`${process.env.MICRO_SERVICE}/api/get-distrinct-variety-name-characterstics`,auth,  users.getVarietyNamecharacterData);
+    app.post(`${process.env.MICRO_SERVICE}/api/get-distrinct-variety-name-characterstics`,  users.getVarietyNamecharacterData);
 
     // app.post(`${process.env.MICRO_SERVICE}/api/getAllIndentorsList`, auth,  users.getAllIndentorsList);
 
@@ -100,10 +100,10 @@ module.exports = app => {
     app.get(`${process.env.MICRO_SERVICE}/api/utils/file-download`, auth,  users.getFile);
     app.post(`${process.env.MICRO_SERVICE}/api/edit-crop-variety`, auth,  users.editcropVarietyCharacterstics);
     app.post(`${process.env.MICRO_SERVICE}/api/get-crop-name-of-seed-multiplication`, auth,  users.getSeedMultiplicationCropNameData)
-    app.post(`${process.env.MICRO_SERVICE}/api/getdistinctCropNameInVariety`, auth,  users.getdistinctCropNameInVariety)
-    app.post(`${process.env.MICRO_SERVICE}/api/getdistinctVariettyNameIncharacterstics`, auth,  users.getdistinctVariettyNameIncharacterstics)
+    app.post(`${process.env.MICRO_SERVICE}/api/getdistinctCropNameInVariety`, auth, users.getdistinctCropNameInVariety)
+    app.post(`${process.env.MICRO_SERVICE}/api/getdistinctVariettyNameIncharacterstics`,  users.getdistinctVariettyNameIncharacterstics)
     app.post(`${process.env.MICRO_SERVICE}/api/distinctCropNamegrid`, auth,  users.distinctCropNamegrid)
-    app.post(`${process.env.MICRO_SERVICE}/api/getdistinctVariettyNameIncharactersticsfromCharacterstics`, auth,  users.getdistinctVariettyNameIncharactersticsfromCharacterstics)
+    app.post(`${process.env.MICRO_SERVICE}/api/getdistinctVariettyNameIncharactersticsfromCharacterstics`,  users.getdistinctVariettyNameIncharactersticsfromCharacterstics)
     app.post(`${process.env.MICRO_SERVICE}/api/getCropDataList`, auth,  users.getCropDataList)
     app.post(`${process.env.MICRO_SERVICE}/api/viewCropGroupReport`, auth,  users.viewCropGroupReport)
     app.post(`${process.env.MICRO_SERVICE}/api/getCropListReport`, auth,  users.getCropListReport)
@@ -112,8 +112,8 @@ module.exports = app => {
     app.post(`${process.env.MICRO_SERVICE}/api/islastLogin`,auth,users.useridByLogOn)
     
     // variety charaterstic data 
-    app.post(`${process.env.MICRO_SERVICE}/api/get-no-year-character-data`,auth,  users.getNoYearcharacterData);
-    app.post(`${process.env.MICRO_SERVICE}/api/get-masters-institute-list`,auth,  users.getMastersInstituteList);
+    app.post(`${process.env.MICRO_SERVICE}/api/get-no-year-character-data`,  users.getNoYearcharacterData);
+    app.post(`${process.env.MICRO_SERVICE}/api/get-masters-institute-list`,  users.getMastersInstituteList);
     
     // app.post(`${process.env.MICRO_SERVICE}/api/distinctCropNameinCharacterstics`, auth,  users.distinctCropNameinCharacterstics)
 };

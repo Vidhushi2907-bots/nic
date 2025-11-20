@@ -210,11 +210,11 @@ export class BreederSeedWillingToProduceComponent implements OnInit {
           this.nculeusSeedText = "Tentative"
           this.ngForm.controls['nucleus_willing_qnt'].enable()
         } else {
-          if(this.ngForm.controls['nucleus_avail_qnt'].value >0){
+          if (this.ngForm.controls['nucleus_avail_qnt'].value > 0) {
             this.nculeusSeedText = ""
             this.ngForm.controls['nucleus_willing_qnt'].enable();
             this.ngForm.controls['nucleus_willing_qnt'].setValue(0);
-          }else{
+          } else {
             this.nculeusSeedText = ""
             this.ngForm.controls['nucleus_willing_qnt'].disable()
             this.ngForm.controls['nucleus_willing_qnt'].setValue(0);
@@ -233,6 +233,8 @@ export class BreederSeedWillingToProduceComponent implements OnInit {
   getParentalData() {
     const param = {
       search: {
+        year: this.ngForm.controls["year"].value,
+        season: this.ngForm.controls["season"].value,
         crop_code: this.ngForm.controls['crop'].value,
         variety_code: this.ngForm.controls['variety'].value,
       }
@@ -284,15 +286,15 @@ export class BreederSeedWillingToProduceComponent implements OnInit {
     this._productionCenter.postRequestCreator(route, param, null).subscribe(data => {
       if (data.EncryptedResponse.status_code === 200) {
         this.getDirectIndentAndIventryValue = data.EncryptedResponse.data
-        this.ngForm.controls['nucleus_avail_qnt'].patchValue(this.getDirectIndentAndIventryValue && this.getDirectIndentAndIventryValue.nucleus_qnt ? (this.getDirectIndentAndIventryValue.nucleus_qnt) : 0);
-        this.ngForm.controls['breeder_avail_qnt'].patchValue(this.getDirectIndentAndIventryValue && this.getDirectIndentAndIventryValue.iventry_qnt ? (this.getDirectIndentAndIventryValue.iventry_qnt) : 0);
-        this.ngForm.controls['direct_avail_qnt'].patchValue(this.getDirectIndentAndIventryValue && this.getDirectIndentAndIventryValue.dierct_indent ? (this.getDirectIndentAndIventryValue.dierct_indent) : 0);
+        this.ngForm.controls['nucleus_avail_qnt'].patchValue(this.getDirectIndentAndIventryValue && this.getDirectIndentAndIventryValue.nucleus_qnt ? (this.unitValue == 'Qt' ? (this.getDirectIndentAndIventryValue.nucleus_qnt.toFixed(3)) / 100 : this.getDirectIndentAndIventryValue.nucleus_qnt.toFixed(3)) : 0);
+        this.ngForm.controls['breeder_avail_qnt'].patchValue(this.getDirectIndentAndIventryValue && this.getDirectIndentAndIventryValue.iventry_qnt ? (this.unitValue == 'Qt' ? (this.getDirectIndentAndIventryValue.iventry_qnt.toFixed(3)) / 100 : this.getDirectIndentAndIventryValue.iventry_qnt.toFixed(3)) : 0);
+        this.ngForm.controls['direct_avail_qnt'].patchValue(this.getDirectIndentAndIventryValue && this.getDirectIndentAndIventryValue.dierct_indent ? (this.getDirectIndentAndIventryValue.dierct_indent.toFixed(3)) : 0);
       }
-      if(this.ngForm.controls['nucleus_avail_qnt'].value >0){
+      if (this.ngForm.controls['nucleus_avail_qnt'].value > 0) {
         this.nculeusSeedText = ""
         this.ngForm.controls['nucleus_willing_qnt'].enable();
         // this.ngForm.controls['nucleus_willing_qnt'].setValue(0);
-      }else{
+      } else {
         this.nculeusSeedText = ""
         this.ngForm.controls['nucleus_willing_qnt'].disable()
         this.ngForm.controls['nucleus_willing_qnt'].setValue(0);
@@ -577,7 +579,7 @@ export class BreederSeedWillingToProduceComponent implements OnInit {
       this.ngForm.controls['reason'].reset();
       this.ngForm.get('reason').clearValidators();
       this.ngForm.get('reason').updateValueAndValidity();
-      this.nculeusSeedText=''
+      this.nculeusSeedText = ''
       this.reasonTypeValue = "WILL_TO_PRODUCE"
       this.getCommentData()
     } else {
@@ -596,7 +598,7 @@ export class BreederSeedWillingToProduceComponent implements OnInit {
       this.ngForm.get('expected_date').clearValidators();
       this.ngForm.get('reason_for_delay').updateValueAndValidity();
       this.ngForm.get('expected_date').updateValueAndValidity();
-      this.nculeusSeedText=''
+      this.nculeusSeedText = ''
       this.reasonTypeValue = "WILL_TO_PRODUCE"
       this.getCommentData()
     }
@@ -609,11 +611,11 @@ export class BreederSeedWillingToProduceComponent implements OnInit {
       this.ngForm.get('reason_for_delay').setValidators([Validators.required]);
       this.ngForm.get('expected_date').setValidators([Validators.required]);
       this.nculeusSeedText = '';
-      if(parseFloat(this.ngForm.controls['nucleus_avail_qnt'].value) > 0.0){
+      if (parseFloat(this.ngForm.controls['nucleus_avail_qnt'].value) > 0.0) {
         this.nculeusSeedText = ""
         this.ngForm.controls['nucleus_willing_qnt'].enable();
         this.ngForm.controls['nucleus_willing_qnt'].setValue(0);
-      }else{
+      } else {
         this.nculeusSeedText = ""
         this.ngForm.controls['nucleus_willing_qnt'].disable()
         this.ngForm.controls['nucleus_willing_qnt'].setValue(0);
@@ -627,11 +629,11 @@ export class BreederSeedWillingToProduceComponent implements OnInit {
       this.ngForm.get('expected_date').updateValueAndValidity();
       this.reasonTypeValue = "WILL_TO_PRODUCE";
       this.isProductionDelay = false;
-      if(parseFloat(this.ngForm.controls['nucleus_avail_qnt'].value) >0.0){
+      if (parseFloat(this.ngForm.controls['nucleus_avail_qnt'].value) > 0.0) {
         this.nculeusSeedText = ""
         this.ngForm.controls['nucleus_willing_qnt'].enable();
         this.ngForm.controls['nucleus_willing_qnt'].setValue(0);
-      }else{
+      } else {
         this.nculeusSeedText = ""
         this.ngForm.controls['nucleus_willing_qnt'].disable()
         this.ngForm.controls['nucleus_willing_qnt'].setValue(0);

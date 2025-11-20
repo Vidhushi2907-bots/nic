@@ -217,7 +217,9 @@
                                         [routerLink]="['/add-maximum-lot-size/edit/', data.id]">
                                         <img src="assets/images/edit.svg">
                                     </button>
-                                    <button class="list-action-buttons" (click)="delete(data.id)">
+                                    <button class="list-action-buttons" [disabled]="userType === 'SUPERADMIN'"
+                                        [ngClass]="{'btn-disabled': userType !== 'SUPERADMIN','btn-active': userType === 'SUPERADMIN'}"
+                                        (click)="delete(data.id)">
                                         <img src="assets/images/delete.svg">
                                     </button>
                                     <!-- </div> -->

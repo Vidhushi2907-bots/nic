@@ -47,15 +47,21 @@ export class AddFreezeTimelineComponent implements OnInit {
   activitiesList: any;
   yearOfIndent: any;
   seasonsList: any;
+  userType: any;
+  isActionBtnDisable: boolean;
   // dateLessThan: any;
   constructor(
     private restService: RestService,
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private masterService: MasterService,
-    private service: SeedServiceService
+    private service: SeedServiceService,
+    private _master: MasterService
   ) {
     this.createEnrollForm();
+    this.userType = this._master?.userBasicData?.user_type ?? 'NA';
+    this.isActionBtnDisable = this.userType === 'SUPERADMIN';
+
   }
 
   createEnrollForm() {

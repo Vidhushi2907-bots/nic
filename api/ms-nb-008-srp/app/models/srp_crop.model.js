@@ -6,7 +6,6 @@ module.exports = (sql, Sequelize) => {
       allowNull: false,
       primaryKey: true,
       autoIncrement: true
-
     },
     year: {
       type: Sequelize.INTEGER,
@@ -24,16 +23,17 @@ module.exports = (sql, Sequelize) => {
       type: Sequelize.STRING,
       allowNull: false,
     },
+    user_id: {
+      type: Sequelize.INTEGER
+    },
     total_area: {
       type: Sequelize.DOUBLE,
       allowNull: false,
-
     },
     total_required: {
       type: Sequelize.DOUBLE,
       allowNull: false,
     },
-
     is_active: {
       type: Sequelize.BOOLEAN,
       allowNull: false,

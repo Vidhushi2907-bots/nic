@@ -261,6 +261,7 @@ import { SeedReport2Component } from './seed-report2/seed-report2.component';
 import { SeedRollingPlaningCropWiseComponent } from './seed-rolling-planing/indentor-login/seed-rolling-planing-crop-wise/seed-rolling-planing-crop-wise.component';
 import { SeedRollingPlaningVarietyWiseComponent } from './seed-rolling-planing/indentor-login/seed-rolling-planing-variety-wise/seed-rolling-planing-variety-wise.component';
 import { StateLoginReplanningComponent } from './state-login-replanning/state-login-replanning.component';
+import { SeedRollingPlaningWillingnessScreenComponent } from './seed-rolling-planing/pdpc-login/seed-rolling-planing-willingness-screen/seed-rolling-planing-willingness-screen.component';
 // import { ProfarmaOneQrComponent } from './profarma-one-qr/profarma-one-qr.component';
 const routes: Routes = [
   // {
@@ -1685,14 +1686,22 @@ const routes: Routes = [
         path: 'seed-rolling-planing-crop-wise',
         component: SeedRollingPlaningCropWiseComponent
       },
+  //     {
+  //       path: 'seed-rolling-planing-variety-wise',
+  //       component: SeedRollingPlaningVarietyWiseComponent,
+  //  // canActivate: [IndenterGuard]
+  //     },
       {
         path: 'seed-rolling-planing-variety-wise',
-        component: SeedRollingPlaningVarietyWiseComponent
+        component: SeedRollingPlaningVarietyWiseComponent,
+        // canActivate: [IndenterGuard]
       },
-      {
-        path: 'seed-rolling-planing-variety-wise/:id/:crop_code',
-        component: SeedRollingPlaningVarietyWiseComponent
+        {
+        path: 'seed-rolling-planning-willingness',
+        component: SeedRollingPlaningWillingnessScreenComponent,
+        // canActivate: [ProductionCenterGuard]
       },
+     
       {
         path: 'state-login-replanning',
         component: StateLoginReplanningComponent

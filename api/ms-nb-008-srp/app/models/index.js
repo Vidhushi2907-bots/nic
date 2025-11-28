@@ -11,8 +11,8 @@ db.stateModel = require("./state.model")(sequelize, Sequelize);
 db.districtModel = require("./district.model")(sequelize, Sequelize);
 db.userModel = require("./user.model")(sequelize, Sequelize);
 db.cropModel = require("./crop.model")(sequelize, Sequelize);
-db.srp_cropModel=require("./srp_crop.model")(sequelize, Sequelize);
-db.srp_varietyModel=require("./srp_variety.model")(sequelize, Sequelize);
+
+db.srpVarietyModel = require("./srp_variety.model")(sequelize, Sequelize);
 // db.seedRollingPlanVarietyWises = require("./srp_variety.model")(sequelize, Sequelize);
 
 db.srpCropModel = require("./srp_crop.model")(sequelize, Sequelize);
@@ -133,6 +133,8 @@ db.liftingSeedDetailsModel = require('./lifting_seed_details.model.js')(sequeliz
 db.seedRollingPlanCropWisesModel = require('./srp_crop.model.js')(sequelize, Sequelize);
 db.seedMultiplicationRatioModel = require('./seed_multiplication_ratio.model.js')(sequelize, Sequelize)
 db.seasonModel = require('./season.model.js')(sequelize, Sequelize);
+db.srpWillingnessModel = require('./srp_willingnesses.model.js')(sequelize, Sequelize);
+db.srpWillingnessReplaceModel = require('./srp_willingness_replaces.js')(sequelize, Sequelize);
 // Here
 // table first
 //table second
@@ -140,41 +142,119 @@ db.seasonModel = require('./season.model.js')(sequelize, Sequelize);
 
 
 
-db.srpCropModel.belongsTo(db.seasonModel,{
-    foreignKey:"season",
-    targetKey:"season"
+db.srpCropModel.belongsTo(db.seasonModel, {
+    foreignKey: "season",
+    targetKey: "season"
 })
-db.seasonModel.hasMany(db.srpCropModel,{
-    foreignKey:"season",
-    sourceKey:"season"
+db.seasonModel.hasMany(db.srpCropModel, {
+    foreignKey: "season",
+    sourceKey: "season"
 })
-db.srpCropModel.belongsTo(db.srpYearModel,{
-    foreignKey:"year",
-    targetKey:"year"
+db.srpCropModel.belongsTo(db.srpYearModel, {
+    foreignKey: "year",
+    targetKey: "year"
 })
-db.srpYearModel.hasMany(db.srpCropModel,{
-     foreignKey:"year",
-    sourceKey:"year"
+db.srpYearModel.hasMany(db.srpCropModel, {
+    foreignKey: "year",
+    sourceKey: "year"
 })
 db.srpCropModel.belongsTo(db.cropModel, {
-  foreignKey: "crop_code",
-  targetKey: "crop_code",
-  
+    foreignKey: "crop_code",
+    targetKey: "crop_code",
+
 });
 db.cropModel.hasMany(db.srpCropModel, {
-  foreignKey: "crop_code",
-  sourceKey: "crop_code",
+    foreignKey: "crop_code",
+    sourceKey: "crop_code",
 
 });
 db.cropGroupModel.hasMany(db.srpCropModel, {
-  foreignKey: "group_code",   // column in srpCrop table
-  sourceKey: "group_code",    // column in cropGroup table
+    foreignKey: "group_code",   // column in srpCrop table
+    sourceKey: "group_code",    // column in cropGroup table
 });
 db.srpCropModel.belongsTo(db.cropGroupModel, {
-  foreignKey: "group_code",
-  targetKey: "group_code",
+    foreignKey: "group_code",
+    targetKey: "group_code",
 });
+db.varietyModel.hasMany(db.srpVarietyModel, {
+    foreignKey: "variety_code",
+    sourceKey: "variety_code",
+
+});
+
+db.srpVarietyModel.belongsTo(db.varietyModel, {
+    foreignKey: "variety_code",
+    targetKey: "variety_code",
+
+});
+db.srpCropModel.belongsTo(db.userModel, {
+    foreignKey: 'user_id',
+    targetKey: 'id',
+});
+db.userModel.hasMany(db.srpCropModel, {
+    foreignKey: 'user_id',
+    targetKey: 'user_id',
+});
+
+db.userModel.hasMany(db.srpWillingnessModel, {
+    foreignKey: "user_id", // child table FK
+    targetKey: "id",
+    // parent table PK
+});
+db.srpWillingnessModel.belongsTo(db.userModel, {
+    foreignKey: "user_id",
+    sourceKey: "id"
+})
+
+db.srpWillingnessModel.hasMany(db.srpWillingnessReplaceModel, {
+    foreignKey: "srp_willingness_id",
+    sourceKey: "id",
+    as: "seed_rolling_plan_willingness"
+});
+
+db.srpWillingnessReplaceModel.belongsTo(db.srpWillingnessModel, {
+    foreignKey: "srp_willingness_id",
+    targetKey: "id",
+    as: "seed_rolling_plan_willingness"  // 🔥 MUST MATCH EXACTLY
+});
+db.srpWillingnessModel.belongsTo(db.cropModel, {
+    foreignKey: "crop_code",
+    targetKey: "crop_code",
+
+});
+db.cropModel.hasMany(db.srpWillingnessModel, {
+    foreignKey: "crop_code",
+    sourceKey: "crop_code",
+
+});
+db.varietyModel.hasMany(db.srpWillingnessModel, {
+    foreignKey: "variety_code",
+    sourceKey: "variety_code",
+
+});
+
+db.srpWillingnessModel.belongsTo(db.varietyModel, {
+    foreignKey: "variety_code",
+    targetKey: "variety_code",
+
+});
+// db.srpVarietyModel.belongsTo(db.srpCropModel, {
+//   foreignKey: "srp_crop_wise_id", // FK column inside variety table
+//   targetKey: "id"                 // references parent PK
+// });
 //=============== for Reletion ==================
+
+db.srpCropModel.hasMany(db.srpVarietyModel, {
+    foreignKey: "srp_crop_wise_id",
+    sourceKey: "id",
+    as: "seed_rolling_plan_crop_wises"
+});
+
+db.srpVarietyModel.belongsTo(db.srpCropModel, {
+    foreignKey: "srp_crop_wise_id",
+    targetKey: "id",
+    as: "seed_rolling_plan_crop_wises"  // 🔥 MUST MATCH EXACTLY
+});
 
 
 db.allocationToSPASeed.belongsTo(db.cropModel, {
@@ -240,16 +320,17 @@ db.userModel.belongsTo(db.agencyDetailModel, {
 //     foreignKey: 'crop_code',
 //     targetKey:'crop_code'
 // });
-  
+
 // });
 // db.varietyModel.belongsTo(db.srp_varietyModel, {
 //   foreignKey: 'variety_code',
 //   targetKey: 'variety_code'
 // });
-db.varietyModel.belongsTo(db.srp_varietyModel, {
-  foreignKey: 'variety_code',
-  targetKey: 'variety_code'
-});
+
+// db.varietyModel.belongsTo(db.srp_varietyModel, {
+//   foreignKey: 'variety_code',
+//   targetKey: 'variety_code'
+// });
 
 // db.varietyModel.hasMany(db.srp_varietyModel, {
 //   foreignKey: 'variety_code',
@@ -1407,7 +1488,7 @@ db.varietyModel.belongsTo(db.varietyCategoryMappingModel, {
 db.varietyCategoryMappingModel.belongsTo(db.varietyCategoryModel, {
     foreignKey: 'm_variety_category_id',
     targetKey: 'id',
-  });
+});
 
 db.allocationtoIndentorliftingseeds.hasMany(db.allocationToIndentorProductionCenterSeed, {
     foreignKey: 'allocation_to_indentor_for_lifting_seed_id',
@@ -1418,19 +1499,19 @@ db.allocationToIndentorProductionCenterSeed.belongsTo(db.allocationtoIndentorlif
     foreignKey: 'allocation_to_indentor_for_lifting_seed_id'
 });
 db.allocationToIndentorProductionCenterSeed.belongsTo(db.agencyDetailModel, {
-  foreignKey: 'indent_of_breeder_id',
-  targetKey: 'user_id',
-//   as: 'agencyDetails'
+    foreignKey: 'indent_of_breeder_id',
+    targetKey: 'user_id',
+    //   as: 'agencyDetails'
 });
 db.seedProcessingRegister.belongsTo(db.agencyDetailModel, {
-  foreignKey: 'user_id',
-  targetKey: 'user_id',
-//   as: 'agencyDetails'
+    foreignKey: 'user_id',
+    targetKey: 'user_id',
+    //   as: 'agencyDetails'
 });
-db.srp_cropModel.belongsTo(db.cropModel, {
-  foreignKey: 'crop_code',
-  targetKey: 'crop_code',
-//   as: 'agencyDetails'
-});
+// db.srpCropModel.belongsTo(db.cropModel, {
+//   foreignKey: 'crop_code',
+//   targetKey: 'crop_code',
+// //   as: 'agencyDetails'
+// });
 
 module.exports = db;

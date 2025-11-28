@@ -1,0 +1,416 @@
+<div class="main-inventory">
+    <div class="row">
+        <div class="col-12 col-md-12 col-lg-12 title-inventory pl-2 pb-3 pt-0">
+            <span class="ml-3">
+                PD/PC or BSPC Login Screen
+            </span>
+            <form [formGroup]="ngForm">
+
+                <!-- first card ui  -->
+                <div class="col-12 col-md-12 col-lg-12">
+                    <div class="row card-inventory form-group align-items-end">
+                        <!-- Year of Indent -->
+                        <div class="col-12 col-xl-10 col-md-12 col-lg-12 pt-4">
+                            <div class="row">
+                                <!-- year of indent -->
+                                <div class="col-12 col-md-12 col-lg-12 col-xl-4 col-sm-12 mb-3 ">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <label for="year" class="label-inventory required">Year</label>
+                                        </div>
+                                        <div class="col-12">
+                                            <select class="form-control input-inventory" formControlName="year">
+                                                <option value="">Please Select Year</option>
+
+                                                <option *ngFor="let year of inventoryYearData" [value]="year.year">
+                                                    {{ year.year }}
+                                                </option>
+                                                <!-- <option value="2029-30">2029-30</option>
+                                                <option value="2028-29">2028-29</option> -->
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- season  -->
+                                <div class="col-12 col-md-12 col-lg-12 col-xl-4 col-sm-12 mb-3">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <label for="year" class="label-inventory required">Season</label>
+                                        </div>
+                                        <div class="col-12">
+                                            <select class="form-control input-inventory" formControlName="season">
+                                                <option value="">Please Select Season</option>
+                                                <option *ngFor="let s of inventorySeasonData" [value]="s.season">
+                                                    {{ s.season }}
+                                                </option>
+                                                <!-- <option value="Kharif">Kharif</option>
+                                                <option value="Rabi">Rabi</option> -->
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- crop -->
+                                <div class="col-12 col-md-4 col-lg-4 col-sm-12 mb-3">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <label for="year" class="label-inventory required">Crop</label>
+                                        </div>
+                                        <div class="col-12">
+                                            <select class="form-control input-inventory" formControlName="crop_code">
+                                                <option value="">Please Select Crop</option>
+                                                <option *ngFor="let c of inventoryCropData" [value]="c.crop_code">
+                                                    {{ c.crop_name }}
+                                                </option>
+                                                <!-- <option value="Kharif">Kharif</option>
+                                                <option value="Rabi">Rabi</option> -->
+
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 col-lg-2 col-sm-12 col-xl-2 px-2 mb-3">
+                            <div class="row">
+                                <div class="col-12 col-md-12 col-lg-12">
+                                    <p><span style="color:transparent;">.</span></p>
+                                </div>
+                                <div class="col-12 col-md-12 col-lg-12 col-xl-12 pl-2  pr-md-3">
+                                    <!-- form-button btn-inventory search d-inline-flex justify-content-center verticle-content-middle mb-3 -->
+                                    <button id="isSubmitBtn"
+                                        class="form-button btn-inventory search d-inline-flex justify-content-center verticle-content-middle"
+                                        (click)="getPageData()">Search</button>
+                                    <!-- (click)="search()" -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- second ui  -->
+                <div class="col-12 col-md-12 col-lg-12 pt-3" *ngIf="isCrop">
+                    <div class="row card-inventory form-group">
+                        <div class="col-12">
+                            <div class="row">
+                                <!-- Search and Filter Container -->
+                                <div
+                                    class="col-12 d-flex align-items-center justify-content-end flex-wrap mb-2 gap-3 pt-3">
+                                    <!-- Search Input -->
+                                    <div class="d-flex align-items-end gap-2 flex-wrap">
+                                        <input type="text" class="form-control search-input rounded-pill px-3"
+                                            placeholder="Search Keyword" formControlName="global_search"
+                                            style="max-width: 250px; border: 1px solid #c96a2b; height: 38px;" />
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--third ui -->
+                <div class="col-12 col-md-12 col-lg-12 pt-0" *ngIf="isCrop">
+                    <div class="row card-inventory form-group">
+                        <div class="col-12 col-md-12 col-lg-12 col-sm-12 col-xl-12">
+                            <div class="list-wrapper">
+                                <!-- Header Row -->
+                                <div class="row d-none d-md-flex data-row-header">
+
+                                    <div
+                                        class="col-6 col-md-1 py-3 d-flex verticle-content-middle  justify-content-center">
+                                        S/No
+                                    </div>
+
+                                    <div
+                                        class="col-md-3 d-flex align-items-center justify-content-center border-end justify-content-center">
+                                        Variety Name
+                                    </div>
+
+                                    <div class="col-md-3 d-flex align-items-center justify-content-center border-end">
+                                        Target Breeder Seed Quantity (qtl)
+                                    </div>
+
+                                    <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle">
+                                        Willingness
+                                    </div>
+
+                                    <div class="col-md-3 d-flex align-items-center justify-content-center border-end">
+                                        Tentative Breeder Seed Quantity (qtl)
+                                    </div>
+
+                                    <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle">
+                                        Add Replacement Varieties
+                                    </div>
+                                </div>
+
+
+                                <!-- Dynamic Rows -->
+                                <div formArrayName="bspc" *ngIf="bspc && bspc.controls">
+                                    <div class="row data-row" *ngFor="let data of bspc.controls; let i = index"
+                                        [formGroupName]="i">
+                                        <!-- S.No -->
+                                        <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle  justify-content-center"
+                                            [ngClass]="{'disabled-row': !ngForm.controls['bspc']['controls'][i].controls['status_toggle'].value}">
+                                            <label class="d-md-none"><b>S.No:</b>&nbsp;</label>
+                                            <span>{{ i + 1 }}</span>
+                                        </div>
+
+                                        <!-- Variety Name -->
+                                        <div class="col-md-3 d-flex align-items-center justify-content-center border-end justify-content-center"
+                                            [ngClass]="{'disabled-row': !ngForm.controls['bspc']['controls'][i].controls['status_toggle'].value}">
+                                            <label class="d-md-none"><b>Variety Name:</b>&nbsp;</label>
+                                            <span>
+                                                {{ ngForm.controls['bspc']['controls'][i].controls['variety_name'].value
+                                                }}
+                                            </span>
+                                        </div>
+
+                                        <!-- Target Breeder Seed Quantity -->
+                                        <div class="col-md-3 d-flex align-items-center justify-content-center border-end text-center"
+                                            [ngClass]="{'disabled-row': !ngForm.controls['bspc']['controls'][i].controls['status_toggle'].value}"
+                                            style="position: relative;">
+
+                                            <div class="form-group w-100 px-2">
+                                                <label class="d-md-none">
+                                                    <b>Target Breeder Seed Quantity:</b>
+                                                </label>
+
+                                                <!-- CLICK Event Only -->
+                                                <span (click)="onQuantityClick(i, $event)" class="quantity-link">
+                                                    {{
+                                                    ngForm.controls['bspc']['controls'][i].controls['total_seed_required'].value
+                                                    }}
+                                                </span>
+
+                                                <!-- Popup ONLY when clicked -->
+                                                <div *ngIf="popupIndex === i" class="custom-popup">
+                                                    <div *ngFor="let d of inventoryIndentorData">
+                                                        <b>{{ d.user_name }}</b>: {{ d.breeder_seed }}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                        <!-- Willingness Toggle -->
+                                        <div
+                                            class="col-6 col-md-1 py-3 d-flex verticle-content-middle align-items-center justify-content-center">
+                                            <label class="switch small-switch mb-0">
+                                                <input type="checkbox" formControlName="status_toggle" />
+                                                <span class="slider round"></span>
+                                            </label>
+                                        </div>
+
+                                        <!-- Tentative Breeder Seed Quantity -->
+                                        <div class="col-md-3 d-flex align-items-center justify-content-center border-end justify-content-center "
+                                            [ngClass]="{'disabled-row': !ngForm.controls['bspc']['controls'][i].controls['status_toggle'].value}">
+                                            <div class="form-group w-100 px-2">
+                                                <label class="d-md-none"><b>Tentative Quantity:</b>&nbsp;</label>
+                                                <input type="number" class="form-control target-input-field"
+                                                    (keypress)="checkDecimal($event)"
+                                                    (keypress)="checkLength($event, 10)"
+                                                    formControlName="tentative_quantity" />
+                                            </div>
+                                        </div>
+
+                                        <!-- Button Add Replacement Variety -->
+                                        <div class="ccol-6 col-md-1 py-3 d-flex verticle-content-middle"
+                                            [ngClass]="{'disabled-row': ngForm.controls['bspc']['controls'][i].controls['status_toggle'].value}"
+                                            style="padding-right: 2rem!important;">
+                                            <button
+                                                class="form-button d-flex justify-content-center verticle-content-middle"
+                                                style="width: 100px !important; background-color: #B64B1D; color: white; border: none; border-radius: 6px;"
+                                                [disabled]="bspc.controls[i].get('status_toggle')?.value === 1
+                                              " (click)="toggleCropSection(i)">
+                                                Add
+                                            </button>
+                                        </div>
+
+
+                                        <div class="col-12 px-3" *ngIf="openCropIndexes.includes(i)">
+    
+    <div class="row card-inventory form-group inner-row"
+         formArrayName="innerBspc"
+         *ngFor="let group of innerBspc.controls; let j = index"
+         [formGroupName]="j">
+
+        <div class="col-xl-11 col-lg-11 col-md-11 col-12 pt-3">
+            <div class="row">
+
+                <div class="col-12 col-md-6 mb-3">
+                    <label>Variety Name</label>
+                    <select class="form-control"
+                        formControlName="variety1_code">
+                        <option value="">Please Select Variety</option>
+                        <option *ngFor="let v of varietyData" 
+                            [value]="v.variety_code">
+                            {{ v.variety_name }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-6 mb-3">
+                    <label>Tentative Quantity (Qtl.)</label>
+                    <input type="number"
+                        class="form-control"
+                        formControlName="tentative_quantity"
+                        placeholder="Enter Quantity">
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Add/Delete Buttons -->
+        <div class="col-xl-1 col-lg-1 col-md-1 col-12 d-flex align-items-center justify-content-center pt-3">
+            <!-- ADD Always show -->
+    <button class="list-action-buttons-second" (click)="addInnerRow()">
+        <img src="assets/images/Add.png" width="24" height="24">
+    </button>
+
+    <!-- DELETE Always show but disable if only 1 row -->
+    <button class="list-action-buttons-second"
+        [disabled]="innerBspc.length === 0"
+        (click)="deleteInnerRow(j)">
+        <img src="assets/images/delete.png" width="24" height="24">
+    </button>
+        </div>
+
+    </div>
+
+</div>
+
+
+                                    </div>
+
+
+                                </div>
+
+
+
+
+                            </div>
+
+                            <!-- No Data Message -->
+                            <div *ngIf="
+          filterPaginateSearch &&
+          filterPaginateSearch.initialized &&
+          (!filterPaginateSearch.itemList || filterPaginateSearch.itemList.length < 1)
+        " class="px-2 py-3 w-100 text-center" style="height: 50px;">
+                                No Data Found.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- fourth ui -->
+                <div class="col-12 col-md-12 col-lg-12" *ngIf="isCrop">
+                    <div class="row card-inventory form-group align-items-end">
+                        <div class="col-12 col-md-12 col-lg-12 col-sm-12 col-xl-12">
+                            <div class="card-inventory-2 form-group mt-2 mb-2">
+                                <div class="col-12 col-md-12 col-lg-12 col-sm-12 col-xl-12">
+                                    <h6 class="pt-1 ">Add New Variety</h6>
+                                    <p>As a PDPC, you can add new varieties here that you are capable of producing.
+                                        This allows states to select alternate varieties in case the breeder seed
+                                        for any planned variety cannot be produced.</p>
+
+                                </div>
+
+                            </div>
+
+
+
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- fifth ui -->
+                <div class="col-12 px-3" *ngIf="isCrop">
+                    <div class="row card-inventory form-group ">
+                        <ng-container>
+                            <div class="col-xl-11 col-lg-11 col-md-11 col-12 pt-3">
+                                <div class="row">
+
+                                    <!-- Row 1: Variety Name and Tentative Quantity -->
+                                    <div class="col-12 col-md-6 col-lg-6 mb-3">
+                                        <label class="label-inventory required">Variety
+                                            Name</label>
+                                        <select class="form-control input-inventory" formControlName="variety2_code">
+                                            <option value="">Please Select Variety</option>
+                                            <option *ngFor="let v of varietyData" [value]="v.variety_code">
+                                                {{ v.variety_name }}
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-12 col-md-6 col-lg-6 mb-3">
+                                        <label class="label-inventory required">Tentative Quantity (Qtl.)</label>
+                                        <input type="number" class="form-control input-inventory"
+                                            formControlName="tentative_quantity" placeholder="Enter Quantity" min="0" />
+                                    </div>
+
+                                    <!-- Row 2: Additional Note -->
+                                    <div class="col-12 mb-3">
+                                        <label class="label-inventory">Additional Note</label>
+                                        <input type="text" class="form-control input-inventory"
+                                            formControlName="additional_note" placeholder="Enter Note"
+                                            maxlength="200" />
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Add / Remove Buttons -->
+                            <div
+                                class="col-xl-1 col-lg-1 col-md-1 col-12 d-flex align-items-center justify-content-center pt-3">
+                                <button class="list-action-buttons-second">
+                                    <img src="assets/images/Add.png" alt="Add">
+                                </button>
+                                <button class="list-action-buttons-second">
+                                    <img src="assets/images/delete.png" alt="Delete">
+                                </button>
+                            </div>
+
+                            <div class="col-12 px-4">
+                                <hr class="separator m-0">
+                            </div>
+                        </ng-container>
+
+                    </div>
+                </div>
+
+
+
+                <!-- Buttons -->
+                <!-- <div *ngIf="isCrop" class="col-12 pt-2">
+                        <div class="row justify-content-end">
+                            <div class="col-auto">
+                                <button [disabled]="isFinalSubmit" class="clear-form-button btn-inventory mb-3"
+                                    (click)="revertDataCancelation()">
+                                    Cancel
+                                </button>
+                            </div>
+                            <div class="col-auto">
+                                <button [disabled]="isFinalSubmit" class="clear-form-button btn-inventory mb-3">
+                                    Save as Draft
+                                </button>
+                            </div>
+                            <div class="col-auto">
+                                <button [disabled]="isFinalSubmit" class="clear-form-button btn-inventory mb-3">
+                                    Submit
+                                </button>
+                            </div>
+                        </div>
+                    </div> -->
+
+            </form>
+        </div>
+
+    </div>
+</div>

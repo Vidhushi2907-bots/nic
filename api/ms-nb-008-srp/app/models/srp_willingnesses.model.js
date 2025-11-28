@@ -44,7 +44,7 @@ module.exports = (sql, Sequelize) => {
         },
         remarks: {
             type: Sequelize.STRING,
-            allowNUll:true
+        
         },
         is_active:{
             type: Sequelize.BOOLEAN,

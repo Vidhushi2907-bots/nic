@@ -570,6 +570,37 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
 
   }
 
+ srrValidation(event: any, index: number) {
+  const input = event.target as HTMLInputElement;
+  let value = input.value;
+
+  // 🔵 Allow only numbers + 2 decimals
+  const regex = /^[0-9]*\.?[0-9]{0,2}$/;
+
+  if (!regex.test(value)) {
+    // remove last wrong character
+    value = value.slice(0, -1);
+    input.value = value;
+  }
+
+  // 🔴 Max value 100
+  const numValue = parseFloat(value);
+  if (numValue > 100) {
+    Swal.fire({
+      title: '<p style="font-size:25px;">Error: SRR Target must be 100 or less.</p>',
+      icon: 'error',
+      confirmButtonText: 'OK',
+      confirmButtonColor: '#E97E15'
+    });
+
+    // input.value = "100"; // set back to 100
+    // this.ngForm.controls['srpCropWise']['controls'][index].controls['srr'].setValue(100);
+  }
+
+  // 🔵 Call your calculation function
+  this.calculateTotalSeed(index);
+}
+
   // getCroupCroupList(year1: number, season: string) {
   //   if (!year1 || !season) {
   //     this.response_crop_group = [];
@@ -647,6 +678,9 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
   // your existing form array
   ngOnInit(): void {
     // Initialize form first
+    const userData = localStorage.getItem('BHTCurrentUser');
+  const data = JSON.parse(userData);
+  this.userId = data.id;
     this.ngForm = this.fb.group({
       year: [''],
       season: [''],
@@ -664,7 +698,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
         this.getPageData(); // reload data automatically when dropdown changes
       });
     }
-
+ 
     // Load years and seasons for dropdowns
     this.loadYears();
     this.loadSeasons();

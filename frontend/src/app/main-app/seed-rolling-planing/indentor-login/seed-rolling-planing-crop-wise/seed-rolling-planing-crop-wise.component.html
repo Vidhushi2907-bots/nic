@@ -138,13 +138,14 @@
                           {{ ngForm.controls['srpCropWise']['controls'][i].controls['crop_name'].value }}
                         </span>
 
-                        <ng-template #link>
-                          <a class="underline-link"
-                            [routerLink]="['/seed-rolling-planing-variety-wise',getCropId(i),getCropCode(i)]">
+                       <ng-template #link>
+  <a class="underline-link"
+     [routerLink]="['/seed-rolling-planing-variety-wise']"
+     [queryParams]="{ id: ngForm.controls['srpCropWise']['controls'][i].controls['id'].value }">
 
-                            {{ ngForm.controls['srpCropWise']['controls'][i].controls['crop_name'].value }}
-                          </a>
-                        </ng-template>
+     {{ ngForm.controls['srpCropWise']['controls'][i].controls['crop_name'].value }}
+  </a>
+</ng-template>
                       </div>
 
 
@@ -205,8 +206,8 @@
                           </label>
 
                           <input type="number" class="form-control target-input-field" (keypress)="checkDecimal($event)"
-                            (keypress)="checkLength($event, 10)" formControlName="srr" (input)="calculateTotalSeed(i)"
-                            [readonly]="ngForm.controls['srpCropWise']['controls'][i].controls['is_final_submit'].value || (
+                            (keypress)="checkLength($event, 10)" formControlName="srr"
+                            (input)=" srrValidation($event,i)" [readonly]="ngForm.controls['srpCropWise']['controls'][i].controls['is_final_submit'].value || (
       ngForm.controls['srpCropWise']['controls'][i].controls['id'].value &&
       !ngForm.controls['srpCropWise']['controls'][i].controls['is_active'].value
     )

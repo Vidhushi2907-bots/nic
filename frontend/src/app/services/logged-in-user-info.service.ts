@@ -233,7 +233,7 @@ export class LoggedInUserInfoService {
       );
     }
     // || this.userRole == "OILSEEDADMIN"
-    if (this.userRole == "SD" || this.userRole == "OILSEEDADMIN" || this.userRole == "PULSESSEEDADMIN" ||this.userRole == "SUPERADMIN") {
+    if (this.userRole == "SD" || this.userRole == "OILSEEDADMIN" || this.userRole == "PULSESSEEDADMIN" || this.userRole == "SUPERADMIN") {
 
       subMenuCollection.push(
 
@@ -609,7 +609,7 @@ export class LoggedInUserInfoService {
           },
         )
       }
-  
+
       if (this.userRole == "PULSESSEEDADMIN") {
         subMenuCollection.push(
           {
@@ -658,6 +658,12 @@ export class LoggedInUserInfoService {
           "href": "/assigned-crop-variety-report",
           "icon": "Add_Breeder.svg"
         },
+        {
+          "name": "Seed Rolling Plan",
+          "href": "/seed-rolling-planing-willingness",
+          "icon": "Add_Breeder.svg"
+        },
+
 
         {
           "name": "Created LOT Numbers",
@@ -1789,6 +1795,23 @@ export class LoggedInUserInfoService {
             active: false,
             subMenus: this.getReportsSubMenu
           },
+          {
+
+            icon: "Add_Breeder.svg",
+            name: "Seed Rolling Plan",
+            href: "javascript:void(0)",
+            active: false,
+            subMenus: [
+              {
+                icon: "crop.svg",
+                name: "seed-rolling-planing-crop-wise",
+                href: "/seed-rolling-planing-crop-wise",
+                subMenus: undefined
+              },
+
+            ]
+
+          }
           // {
           //   "name": "Availability of Breeder Seeds (BSP IV Report)",
           //   "href": '/bsp-four-report-availability',
@@ -1867,7 +1890,24 @@ export class LoggedInUserInfoService {
               },
             ]
           },
+          {
 
+
+            icon: "Add_Breeder.svg",
+            name: "Seed Rolling Plan",
+            href: "javascript:void(0)",
+            active: false,
+            subMenus: [
+              {
+                icon: "crop.svg",
+                name: "seed-rolling-plan-willingness",
+                href: "/seed-rolling-planning-willingness",
+                subMenus: undefined
+              },
+
+            ]
+
+          }
 
 
           //Old Form

@@ -4,7 +4,8 @@
   "description": "Mastres API",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start":"nodemon app.js"
   },
   "keywords": [
     "nodejs",
@@ -37,7 +38,6 @@
     "jsonwebtoken": "^8.5.1",
     "mkdirp": "^1.0.4",
     "moment": "^2.29.1",
- 
     "mysql": "^2.17.1",
     "mysql2": "^2.1.0",
     "nodemailer": "^6.4.10",
@@ -55,6 +55,6 @@
     "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.6"
+    "nodemon": "^2.0.22"
   }
 }

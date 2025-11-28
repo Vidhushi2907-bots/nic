@@ -1,6 +1,6 @@
 module.exports = (sql, Sequelize) => {
 
-    const seedRollingWillingness = sql.define('seed_rolling_plan_willingness', {
+    const seedRollingWillingness = sql.define('seed_rolling_plan_willingnesses', {
         id: {
             type: Sequelize.INTEGER,
             allowNull: false,
@@ -23,7 +23,7 @@ module.exports = (sql, Sequelize) => {
         },
         variety_code: {
             type: Sequelize.STRING,
-            allowNull: false,
+          
         },
         user_id: {
             type: Sequelize.INTEGER,
@@ -31,7 +31,7 @@ module.exports = (sql, Sequelize) => {
         },
         willingness: {
             type: Sequelize.BOOLEAN,
-            allowNull: false,
+            
         },
         quantity: {
             type: Sequelize.DOUBLE ,
@@ -40,15 +40,21 @@ module.exports = (sql, Sequelize) => {
 
         is_additional: {
             type: Sequelize.BOOLEAN,
-            allowNull: false,
+            defaultValue:false,
         },
         remarks: {
             type: Sequelize.STRING,
-            allowNull: false,
+            allowNUll:true
         },
         is_active:{
             type: Sequelize.BOOLEAN,
-            allowNull: false, 
+           
+        },
+        is_draft:{
+            type: Sequelize.BOOLEAN,
+        },
+        is_final_submit:{
+             type: Sequelize.BOOLEAN,
         },
         createdAt: { type: Sequelize.DATE, field: 'created_at' },
         updatedAt: { type: Sequelize.DATE, field: 'updated_at' },

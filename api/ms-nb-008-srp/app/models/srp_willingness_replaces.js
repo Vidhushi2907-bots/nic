@@ -1,6 +1,6 @@
 module.exports = (sql, Sequelize) => {
 
-    const seedRollingPlanWillingnessReplacement = sql.define('seed_rolling_plan_willingness_replacement', {
+    const seedRollingPlanWillingnessReplacement = sql.define('seed_rolling_plan_willingness_replaces', {
         id: {
             type: Sequelize.INTEGER,
             allowNull: false,
@@ -14,13 +14,8 @@ module.exports = (sql, Sequelize) => {
             allowNull: false,
         },
 
-        variety_code_replace: {
+        replace_variety_code: {
             type: Sequelize.STRING,
-            allowNull: false,
-        },
-
-        user_id: {
-            type: Sequelize.INTEGER,
             allowNull: false,
         },
 

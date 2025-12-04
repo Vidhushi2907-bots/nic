@@ -19,4 +19,5 @@ module.exports = app => {
     app.post(`${process.env.MICRO_SERVICE}/api/srp-variety-wise-indentor-list`,auth,crop.getSrpWillingnessIndentorName);
      app.get(`${process.env.MICRO_SERVICE}/api/get-variety-details`,auth,crop.getVarietyData);
     app.post(`${process.env.MICRO_SERVICE}/api/srp-add-willingness`,auth,crop.postSrpWillingnessData);
+//    app.post(`${process.env.MICRO_SERVICE}/api/srp-variety-willingness`, auth, crop.getSrpWillingnessDetails);
 };

@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FilterPaginateSearch } from 'src/app/common/data/data-among-components/filter-paginate-search';
 import { PaginationUiComponent } from 'src/app/common/pagination-ui/pagination-ui.component';
 import { SeedServiceService } from 'src/app/services/seed-service.service';
@@ -46,13 +46,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
   inventoryIndentorData: any
   popupIndex: number | null = null;
   lastVarietyCode: string | null = null;
-  cropGroupList = [
-    { id: 1, name: 'Cereals' },
-    { id: 2, name: 'Pulses' },
-    { id: 3, name: 'Oilseeds' },
-    { id: 4, name: 'Vegetables' },
-  ];
-  bspsDataArray: { id: number; production_center: string; season: string; crop: string; variety_name: string; variety_code: string; bspc_developed_by: number; req_no_doc_moa: string; req_no_dept_moa: string; nucleus_seed_available: any; breeder_seed_available: any; total_target: string; }[];
+
   userId: any;
   bspData: any;
   isFinalSubmit: boolean = false;
@@ -72,19 +66,17 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
   openCropIndexes: number[] = [];
 
   constructor(private service: SeedServiceService, private _masterService: MasterService, private breeder: BreederService, private fb: FormBuilder, private route: Router, private cdRef: ChangeDetectorRef, private _productionCenter: ProductioncenterService, private master: MasterService, private srpService: SeedRollingPlanningService) {
+ 
   }
 
   createForm() {
-    this.ngForm = this.fb.group({
+ this.ngForm = this.fb.group({
       id: [''],
       year: [''],
       season: [''],
       crop_code: [''],
-      variety2_code: [''],
-      bspc: this.fb.array([
-]),
-     
-     
+      bspc: this.fb.array([]),
+      newVarieties: this.fb.array([this.createNewVarietyRow()])
     });
 
     this.ngForm.controls['season'].disable();
@@ -112,27 +104,38 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
         this.ngForm.controls['crop_code'].setValue('');
       }
     });
+
   }
-  innerBspc: FormArray = this.fb.array([]);
-createRow() {
-  return this.fb.group({
-    variety1_code: [''],
-    tentative_quantity: [0]
-  });
-}
+
+  // createBspcRow(): FormGroup {
+  //   return this.fb.group({
+  //     variety_code: [''],
+  //     variety_name: [''],
+  //     total_seed_required: [''],
+  //     status_toggle: [true],
+  //     tentative_quantity: [0],
+  //     replaceVariety: this.fb.array([this.createInnerRow()])
+  //   });
+  // }
+
+  addNewVariety(i) {
+    this.newVarieties.push(this.createNewVarietyRow());
+  }
+
+  removeNewVariety(i) {
+    this.newVarieties.removeAt(i);
+  }
+
   get bspc(): FormArray {
+
     return this.ngForm.get('bspc') as FormArray;
   }
- 
-
-addRow() {
-  this.bspc.push(this.createRow());
-}
-
-// ❌ Delete Row
-deleteRow(index: number) {
-  this.bspc.removeAt(index);
-}
+  get newVarieties(): FormArray {
+    return this.ngForm.get('newVarieties') as FormArray;
+  }
+  getInnerBspc(i: number): FormArray {
+    return this.bspc.at(i).get('replaceVariety') as FormArray;
+  }
 
   loadYear() {
     const apiUrl = 'srp-year-willingness'
@@ -207,6 +210,13 @@ deleteRow(index: number) {
     });
   }
 
+  addSong(albumIndex: number) {
+    const albums = this.ngForm.get('bspc') as FormArray;
+    const songs = albums.at(albumIndex).get('replaceVariety') as FormArray;
+    console.log(songs, "songs")
+    songs.push(this.createInnerRow());
+    this.toggleCropSection(albumIndex)
+  }
   getPageData() {
     const year = this.ngForm.controls['year'].value;
     const season = this.ngForm.controls['season'].value;
@@ -222,11 +232,14 @@ deleteRow(index: number) {
       });
       return;
     }
+
+    // Reset form fields
     this.ngForm.get('variety1_code')?.setValue('');
     this.isCrop = true;
 
     const apiUrl = `srp-variety-willingness?year=${year}&season=${season}&crop_code=${crop_code}`;
-    this.getVarietyData(crop_code)
+    this.getVarietyData(crop_code);
+
     this.srpService.postRequestCreator(apiUrl, null, null).subscribe({
       next: (data: any) => {
         if (
@@ -236,28 +249,56 @@ deleteRow(index: number) {
           data.EncryptedResponse.status_code === 200
         ) {
           this.inventoryVarietyData = data.EncryptedResponse.data;
-
           console.log("API DATA:", this.inventoryVarietyData);
 
-          /** 💥 FIRST clear existing FormArray */
-          const bspcArray = this.ngForm.get('bspc') as FormArray;
-          console.log(bspcArray, "bspc.....................................")
-          // bspcArray.clear();
-          console.log(this.varietyData, "vaietyData")
-          /** 💥 NOW push rows after API data arrives */
+          const srpWillingnessArray = this.ngForm.get('bspc') as FormArray;
+          const additionalArray = this.ngForm.get('newVarieties') as FormArray;
+          srpWillingnessArray.clear();
           this.inventoryVarietyData.forEach((variety: any) => {
-            bspcArray.push(
-              this.fb.group({
+
+            if (variety.is_additional === true) {
+              // Additional variety 
+              additionalArray.clear();
+              additionalArray.push(
+                this.fb.group({
+                  variety_code: [variety.variety_code],
+                  variety_name: [variety.variety_name],
+                  new_tentative_quantity: [variety.quantity ?? 0],
+                  additional_note: [variety.remarks ?? '']
+                })
+              );
+            } else {
+              const group = this.fb.group({
                 variety_code: [variety.variety_code],
-                variety_name: [variety.variety_name],  // corrected key
+                variety_name: [variety.variety_name],
                 total_seed_required: [variety.total_breeder_seed ?? 0],
-                status_toggle: [1],
-                tentative_quantity: ['']
-              })
-            );
+                status_toggle: [variety.willingness ?? true],
+                tentative_quantity: [variety.quantity ?? 0],
+                replaceVariety: this.fb.array([])
+
+              });
+              console.log(group,"grouprow.replaceVariety")
+              const replaceArray = group.get('replaceVariety') as FormArray;
+              
+              if (variety.replace_variety && variety.replace_variety.length > 0) {
+
+                variety.replace_variety.forEach((rv: any) => {
+                  replaceArray.push(
+                    this.fb.group({
+                      variety_code: [rv.replace_variety_code],
+                      variety_name: [rv.variety_name],
+                      replace_tentative_qty: [rv.quantity ?? 0]
+                    })
+                  );
+                });
+              }
+
+              srpWillingnessArray.push(group);
+            }
           });
 
-          console.log("FormArray after push:", bspcArray.value);
+
+
         }
       },
       error: (err) => {
@@ -268,6 +309,7 @@ deleteRow(index: number) {
   }
 
   toggleCropSection(index: number) {
+
     const pos = this.openCropIndexes.indexOf(index);
     if (pos === -1) {
       this.openCropIndexes.push(index);
@@ -277,7 +319,7 @@ deleteRow(index: number) {
   }
   getVarietyData(crop_code: string) {
 
-    console.log("hello")
+
     const apiUrl = `get-variety-details?crop_code=${crop_code}`
 
     this.srpService.getRequestCreatorNew(apiUrl).subscribe({
@@ -289,8 +331,6 @@ deleteRow(index: number) {
           data.EncryptedResponse.status_code === 200
         ) {
           this.varietyData = data.EncryptedResponse.data;
-          console.log(this.varietyData, "chbsdcffvswvswv")
-          // ✅ Optional: filter only active seasons
 
 
           console.log('✅ Season list loaded:', this.inventorySeasonData);
@@ -354,35 +394,146 @@ deleteRow(index: number) {
     });
   }
 
- addInnerRow() {
-  this.innerBspc.push(this.createInnerRow());
-}
+  saveAsDraft() {
+    const apiUrl = "srp-add-willingness";
+    const formValues = this.ngForm.value;
+    const existingData = formValues.bspc.map((row: any) => {
 
-deleteInnerRow(index: number) {
-  if (this.innerBspc.length > 1) {
-    this.innerBspc.removeAt(index);
+      const replaceArray = row.replaceVariety   // IMPORTANT FIX
+      console.log(row.replaceVariety, "row.replaceVariety")
+      const replaceData = replaceArray
+        .filter((r: any) => r.variety_code)
+        .map((r: any) => ({
+          replace_variety_code: r.variety_code,
+          quantity: Number(r.replace_tentative_qty)
+        }));
+
+      return {
+        variety_code: row.variety_code,
+        willingness: row.status_toggle,
+        quantity: Number(row.tentative_quantity ?? 0),
+        is_additional: false,
+        remarks: null,
+        replace_varieties: replaceData.length > 0 ? replaceData : null
+      };
+    });
+
+    // new varieties added separately
+    const newVarietyData = (formValues.newVarieties || [])
+      .filter((row: any) => row.variety_code)
+      .map((row: any) => ({
+        variety_code: row.variety_code,
+        willingness: true,
+        quantity: Number(row.new_tentative_quantity ?? 0),
+        is_additional: true,
+        remarks: row.additional_note || null,
+      }));
+
+
+
+
+    const willingnessData = [...existingData, ...newVarietyData];
+
+    const payload = {
+      action: "draft",
+      year: Number(formValues.year),
+      season: formValues.season,
+      crop_code: formValues.crop_code,
+      willingnessData
+    };
+
+    console.log("Payload Sent:", payload);
+
+    this.srpService.postRequestCreator(apiUrl, null, payload).subscribe({
+      next: (data: any) => {
+        console.log("API Response:", data);
+        if (data?.EncryptedResponse?.status_code === 200) {
+          Swal.fire({
+            title: '<p style="font-size:25px;">Data saved as Draft successfully.</p>',
+            icon: 'success',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#B64B1D',
+          }).then(() => {
+            this.getPageData()
+          });
+        } else {
+          Swal.fire({
+            title: '<p style="font-size:25px;">Something went wrong.</p>',
+            icon: 'error',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#B64B1D',
+          });
+        }
+      },
+      error: (err) => {
+        console.error("Error saving draft:", err);
+        Swal.fire({
+          title: '<p style="font-size:25px;">Server Error! Please try again.</p>',
+          icon: 'error',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#B64B1D',
+        });
+      },
+    });
   }
-}
-  bspcCreateForm(): FormGroup {
+
+  // Add inner row (replace variety)
+  addInnerRow(i: number) {
+    this.getInnerBspc(i).push(
+      this.fb.group({
+        variety_code: [''],
+        variety_name: [''],
+        replace_tentative_qty: [0]
+      })
+    );
+  }
+
+  // Remove inner row
+  removeInnerRow(i: number, j: number) {
+    this.getInnerBspc(i).removeAt(j);
+  }
+
+  selectVariety(index: number, variety: any) {
+    const control = this.newVarieties.at(index);
+    control.patchValue({
+      variety_code: variety.variety_code,
+      variety_name: variety.variety_name,
+    });
+  }
+  selectReplaceVariety(i: number, j: number, variety: any) {
+    const control = this.getInnerBspc(i).at(j);
+    console.log(control, "hellooo.....................")
+    control.patchValue({
+      variety_code: variety.variety_code,
+      variety_name: variety.variety_name,
+    });
+  }
+  createInnerRow() {
     return this.fb.group({
-      seed_rate: [''],
-      total_area: [''],
-      srr_value: [''],
-      tentative_quantity: ['']
-
-    })
+      variety_code: [''],
+      variety_name: [''],
+      replace_tentative_qty: [0]
+    });
   }
-createInnerRow() {
-  return this.fb.group({
-    variety_code: [''],
-    tentative_qty: ['']
-  });
+  createNewVarietyRow(): FormGroup {
+    return this.fb.group({
+      variety_code: [''],
+      variety_name: [''],   // REQUIRED
+      new_tentative_quantity: [0],
+      additional_note: ['']
+    });
+  }
+
+ inputValue(i: number, j: number) {
+  const innerArray = this.getInnerBspc(i);
+  console.log(innerArray,"arrry")
+  const value = innerArray.at(j).get('replace_tentative_qty')?.value;
+  console.log(value);  // will now be the exact string you typed
 }
-  // your existing form array
+
   ngOnInit(): void {
     this.createForm();
     this.loadYear();
-this.innerBspc.push(this.createInnerRow());
     const userData = localStorage.getItem('BHTCurrentUser');
     const data = JSON.parse(userData);
     this.userId = data.id;
@@ -399,15 +550,6 @@ this.innerBspc.push(this.createInnerRow());
     this.popupIndex = null;
   }
 
-  initSearchAndPagination() {
-    if (this.paginationUiComponent === undefined) {
-      setTimeout(() => {
-        this.initSearchAndPagination();
-      }, 300);
-      return;
-    }
-    this.paginationUiComponent.Init(this.filterPaginateSearch);
-  }
 
   // Cancel Button
   revertDataCancelation() {

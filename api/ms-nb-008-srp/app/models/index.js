@@ -209,13 +209,13 @@ db.srpWillingnessModel.belongsTo(db.userModel, {
 db.srpWillingnessModel.hasMany(db.srpWillingnessReplaceModel, {
     foreignKey: "srp_willingness_id",
     sourceKey: "id",
-    as: "seed_rolling_plan_willingness"
+    
 });
 
 db.srpWillingnessReplaceModel.belongsTo(db.srpWillingnessModel, {
     foreignKey: "srp_willingness_id",
     targetKey: "id",
-    as: "seed_rolling_plan_willingness"  // 🔥 MUST MATCH EXACTLY
+   // 🔥 MUST MATCH EXACTLY
 });
 db.srpWillingnessModel.belongsTo(db.cropModel, {
     foreignKey: "crop_code",
@@ -230,6 +230,34 @@ db.cropModel.hasMany(db.srpWillingnessModel, {
 db.varietyModel.hasMany(db.srpWillingnessModel, {
     foreignKey: "variety_code",
     sourceKey: "variety_code",
+
+});
+db.srpWillingnessModel.belongsTo(db.varietyModel, {
+    foreignKey: "variety_code",
+    targetKey: "variety_code",
+ 
+
+});
+db.varietyModel.hasMany(db.srpWillingnessReplaceModel, {
+    foreignKey: "replace_variety_code",
+    sourceKey: "variety_code",
+   
+});
+db.srpWillingnessReplaceModel.belongsTo(db.varietyModel, {
+    foreignKey: "replace_variety_code",
+    targetKey: "variety_code",
+ 
+});
+db.srpVarietyModel.hasMany(db.srpWillingnessModel, {
+    foreignKey: "variety_code",
+    sourceKey: "variety_code",
+    as:"seed_rolling_plan_variety_wises"
+});
+
+db.srpWillingnessModel.belongsTo(db.srpVarietyModel, {
+    foreignKey: "variety_code",
+    targetKey: "variety_code",
+    as:"seed_rolling_plan_variety_wises"
 
 });
 

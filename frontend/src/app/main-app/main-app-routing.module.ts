@@ -260,8 +260,9 @@ import { SeedReport1Component } from './seed-report1/seed-report1.component';
 import { SeedReport2Component } from './seed-report2/seed-report2.component';
 import { SeedRollingPlaningCropWiseComponent } from './seed-rolling-planing/indentor-login/seed-rolling-planing-crop-wise/seed-rolling-planing-crop-wise.component';
 import { SeedRollingPlaningVarietyWiseComponent } from './seed-rolling-planing/indentor-login/seed-rolling-planing-variety-wise/seed-rolling-planing-variety-wise.component';
-import { StateLoginReplanningComponent } from './state-login-replanning/state-login-replanning.component';
+
 import { SeedRollingPlaningWillingnessScreenComponent } from './seed-rolling-planing/pdpc-login/seed-rolling-planing-willingness-screen/seed-rolling-planing-willingness-screen.component';
+import { StateLoginReplanningComponent } from './seed-rolling-planing/indentor-login/state-login-replanning/state-login-replanning.component';
 // import { ProfarmaOneQrComponent } from './profarma-one-qr/profarma-one-qr.component';
 const routes: Routes = [
   // {

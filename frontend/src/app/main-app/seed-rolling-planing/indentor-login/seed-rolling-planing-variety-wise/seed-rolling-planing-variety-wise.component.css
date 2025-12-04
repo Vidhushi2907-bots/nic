@@ -653,5 +653,40 @@ input[type="number"]::-webkit-outer-spin-button {
   margin: 0;
 }
  
+.disabled-input {
+  cursor: not-allowed;
+}
+ 
+.row-locked input,
+.row-locked select,
+.row-locked textarea {
+background-color: #e9ecef; /* light grey background */
+  color: #6c757d;           /* grey text */
+  cursor: not-allowed;      /* shows not-allowed cursor */
+  pointer-events: none;
+}
+ 
+.row-locked .switch input {
+  pointer-events: auto;   /* allow toggle */
+ 
+  
+ 
+}
+ 
+.disabled-input {
+  cursor: not-allowed;
+}
+ 
+ 
+ 
+ 
+ 
+.readOnlyInput {
+  background-color: #e9ecef; /* light grey background */
+  color: #6c757d;           /* grey text */
+  cursor: not-allowed;      /* shows not-allowed cursor */
+  pointer-events: none;     /* optional: prevent focus/click */
+}
+ 
  
  

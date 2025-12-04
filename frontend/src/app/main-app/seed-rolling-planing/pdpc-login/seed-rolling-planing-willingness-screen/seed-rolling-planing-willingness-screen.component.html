@@ -227,63 +227,102 @@
                                                 class="form-button d-flex justify-content-center verticle-content-middle"
                                                 style="width: 100px !important; background-color: #B64B1D; color: white; border: none; border-radius: 6px;"
                                                 [disabled]="bspc.controls[i].get('status_toggle')?.value === 1
-                                              " (click)="toggleCropSection(i)">
+                                              " (click)="addSong(i)">
                                                 Add
                                             </button>
                                         </div>
 
 
-                                        <div class="col-12 px-3" *ngIf="openCropIndexes.includes(i)">
-    
-    <div class="row card-inventory form-group inner-row"
-         formArrayName="innerBspc"
-         *ngFor="let group of innerBspc.controls; let j = index"
-         [formGroupName]="j">
+                                        <div class="col-12 px-3" *ngIf="openCropIndexes.includes(i)"
+                                            FormArray="replaceVariety">
 
-        <div class="col-xl-11 col-lg-11 col-md-11 col-12 pt-3">
-            <div class="row">
+                                            <div class="row card-inventory form-group inner-row"
+                                                *ngFor="let group of getInnerBspc(i).controls; let j = index"
+                                                [formGroupName]="j">
 
-                <div class="col-12 col-md-6 mb-3">
-                    <label>Variety Name</label>
-                    <select class="form-control"
-                        formControlName="variety1_code">
-                        <option value="">Please Select Variety</option>
-                        <option *ngFor="let v of varietyData" 
-                            [value]="v.variety_code">
-                            {{ v.variety_name }}
-                        </option>
-                    </select>
-                </div>
+                                                <div class="col-xl-11 col-lg-11 col-md-11 col-12 pt-3">
+                                                    <div class="row">
+                                                        <div class="col-12 col-md-6 mb-3">
+                                                            <label class="label-inventorys mb-1">Variety Name</label>
 
-                <div class="col-12 col-md-6 mb-3">
-                    <label>Tentative Quantity (Qtl.)</label>
-                    <input type="number"
-                        class="form-control"
-                        formControlName="tentative_quantity"
-                        placeholder="Enter Quantity">
-                </div>
+                                                            <div ngbDropdown
+                                                                class="d-inline-block w-100 position-relative">
+                                                                <!-- Dropdown Toggle -->
+                                                                <button
+                                                                    class="btn takeplacholder w-100 crop toggle-button text-start"
+                                                                    [id]="'destination' + i" ngbDropdownToggle>
+                                                                    {{ group.get('variety_name')?.value || 'Select
+                                                                    Variety' }}
+                                                                </button>
 
-            </div>
-        </div>
+                                                                <i
+                                                                    class="fa-solid fa-angle-down downicon position-absolute end-0 top-50 translate-middle-y pe-2">
+                                                                </i>
 
-        <!-- Add/Delete Buttons -->
-        <div class="col-xl-1 col-lg-1 col-md-1 col-12 d-flex align-items-center justify-content-center pt-3">
-            <!-- ADD Always show -->
-    <button class="list-action-buttons-second" (click)="addInnerRow()">
-        <img src="assets/images/Add.png" width="24" height="24">
-    </button>
+                                                                <div ngbDropdownMenu class="w-100">
+                                                                    <button type="button"
+                                                                        class="dropdown-item text-start"
+                                                                        *ngFor="let v of varietyData"
+                                                                        (click)="selectReplaceVariety(i, j, v)">
+                                                                        {{ v.variety_name }}
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
 
-    <!-- DELETE Always show but disable if only 1 row -->
-    <button class="list-action-buttons-second"
-        [disabled]="innerBspc.length === 0"
-        (click)="deleteInnerRow(j)">
-        <img src="assets/images/delete.png" width="24" height="24">
-    </button>
-        </div>
 
-    </div>
+                                                        <!-- 2️⃣ Tentative Breeder Seed Quantity -->
+                                                        <div class="col-12 col-md-6 mb-3">
+                                                            <label class="label-inventorys mb-1">Tentative Breeder Seed
+                                                                Qty
+                                                                (QTL.)</label>
+                                                            <input type="number" class="form-control"
+                                                                formControlName="replace_tentative_qty"
+                                                                placeholder="Enter Quantity"
+                                                                (input)="inputValue(i,j)"
+                                                               />
 
-</div>
+                                                        </div>
+                                                        <!-- <div class="col-12 col-md-6 mb-3">
+                                                            <label>Variety Name</label>
+                                                            <select class="form-control"
+                                                                formControlName="variety1_code">
+                                                                <option value="">Please Select Variety</option>
+                                                                <option *ngFor="let v of varietyData"
+                                                                    [value]="v.variety_code">
+                                                                    {{ v.variety_name }}
+                                                                </option>
+                                                            </select>
+                                                        </div>
+
+                                                        <div class="col-12 col-md-6 mb-3">
+                                                            <label>Tentative Quantity (Qtl.)</label>
+                                                            <input type="number" class="form-control"
+                                                                formControlName="tentative_quantity"
+                                                                placeholder="Enter Quantity">
+                                                        </div> -->
+
+                                                    </div>
+                                                </div>
+
+                                                <!-- Add/Delete Buttons -->
+                                                <div class="col-xl-1 col-lg-1 pl-md-0 pl-xl-3 mt-lg-4 col-md-1 pt-3 col-12"
+                                                    style="display: flex;">
+                                                    <button class="list-action-buttons-second ml-lg-3  mt-md-2 "
+                                                        style="cursor: pointer;" (click)="addInnerRow(i)">
+                                                        <img src="assets/images/Add.png">
+                                                    </button>
+                                                    <button *ngIf="getInnerBspc(i).controls.length != 1"
+                                                        class="list-action-buttons-second ml-lg-3 mt-md-2"
+                                                        style="cursor: pointer;" (click)="removeInnerRow(i,j)">
+                                                        <img src="assets/images/delete.png">
+                                                    </button>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
 
 
                                     </div>
@@ -329,85 +368,103 @@
 
                     </div>
                 </div>
-
-                <!-- fifth ui -->
                 <div class="col-12 px-3" *ngIf="isCrop">
-                    <div class="row card-inventory form-group ">
-                        <ng-container>
+
+                    <div formArrayName="newVarieties">
+
+                        <div class="row card-inventory form-group inner-row"
+                            *ngFor="let ele of newVarieties.controls; let i = index" [formGroupName]="i">
+
                             <div class="col-xl-11 col-lg-11 col-md-11 col-12 pt-3">
-                                <div class="row">
+                                <div class="row g-2 align-items-end">
 
-                                    <!-- Row 1: Variety Name and Tentative Quantity -->
-                                    <div class="col-12 col-md-6 col-lg-6 mb-3">
-                                        <label class="label-inventory required">Variety
-                                            Name</label>
-                                        <select class="form-control input-inventory" formControlName="variety2_code">
-                                            <option value="">Please Select Variety</option>
-                                            <option *ngFor="let v of varietyData" [value]="v.variety_code">
-                                                {{ v.variety_name }}
-                                            </option>
-                                        </select>
+                                    <!-- Variety Name -->
+                                    <div class="col-md-3 col-sm-6 mb-3">
+                                        <label class="label-inventorys mb-1">Variety Name</label>
+
+                                        <div ngbDropdown class="d-inline-block w-100 position-relative">
+                                            <button class="btn takeplacholder w-100 crop text-start"
+                                                [id]="'destination' + i" ngbDropdownToggle>
+                                                {{ ele.get('variety_name')?.value || 'Select Variety' }}
+                                            </button>
+
+                                            <i
+                                                class="fa-solid fa-angle-down downicon position-absolute end-0 top-50 translate-middle-y pe-2"></i>
+
+                                            <div ngbDropdownMenu class="w-100">
+                                                <button type="button" class="dropdown-item text-start"
+                                                    *ngFor="let v of varietyData" (click)="selectVariety(i, v)">
+                                                    {{ v.variety_name }}
+                                                </button>
+                                            </div>
+                                        </div>
+
                                     </div>
 
-                                    <div class="col-12 col-md-6 col-lg-6 mb-3">
-                                        <label class="label-inventory required">Tentative Quantity (Qtl.)</label>
-                                        <input type="number" class="form-control input-inventory"
-                                            formControlName="tentative_quantity" placeholder="Enter Quantity" min="0" />
+                                    <!-- Tentative Quantity -->
+                                    <div class="col-md-3 col-sm-6 mb-3">
+                                        <label class="label-inventorys mb-1">Tentative Breeder Seed Qty (QTL.)</label>
+                                        <input type="number" class="form-control"
+                                            formControlName="new_tentative_quantity" placeholder="Enter Quantity" />
                                     </div>
 
-                                    <!-- Row 2: Additional Note -->
-                                    <div class="col-12 mb-3">
+                                    <!-- Additional Note -->
+                                    <div class="col-12 col-md-6 mb-3">
                                         <label class="label-inventory">Additional Note</label>
-                                        <input type="text" class="form-control input-inventory"
-                                            formControlName="additional_note" placeholder="Enter Note"
-                                            maxlength="200" />
+                                        <input type="text" class="form-control" formControlName="additional_note"
+                                            placeholder="Enter Note" maxlength="200" />
                                     </div>
 
                                 </div>
                             </div>
 
-                            <!-- Add / Remove Buttons -->
-                            <div
-                                class="col-xl-1 col-lg-1 col-md-1 col-12 d-flex align-items-center justify-content-center pt-3">
-                                <button class="list-action-buttons-second">
-                                    <img src="assets/images/Add.png" alt="Add">
+                            <div class="col-xl-1 col-lg-1 col-md-1 pt-3 col-12" style="display: flex;">
+                                <button class="list-action-buttons-second ml-lg-3 mt-md-2" (click)="addNewVariety(i)">
+                                    <img src="assets/images/Add.png">
                                 </button>
-                                <button class="list-action-buttons-second">
-                                    <img src="assets/images/delete.png" alt="Delete">
+                                <button *ngIf="newVarieties.controls.length != 1"
+                                    class="list-action-buttons-second ml-lg-3 mt-md-2" (click)="removeNewVariety(i)">
+                                    <img src="assets/images/delete.png">
                                 </button>
                             </div>
 
-                            <div class="col-12 px-4">
-                                <hr class="separator m-0">
-                            </div>
-                        </ng-container>
+                            <hr class="my-2" />
+
+                        </div>
 
                     </div>
+
+
                 </div>
+
+
+                <!-- fifth ui -->
+
 
 
 
                 <!-- Buttons -->
-                <!-- <div *ngIf="isCrop" class="col-12 pt-2">
-                        <div class="row justify-content-end">
-                            <div class="col-auto">
-                                <button [disabled]="isFinalSubmit" class="clear-form-button btn-inventory mb-3"
-                                    (click)="revertDataCancelation()">
-                                    Cancel
-                                </button>
-                            </div>
-                            <div class="col-auto">
-                                <button [disabled]="isFinalSubmit" class="clear-form-button btn-inventory mb-3">
-                                    Save as Draft
-                                </button>
-                            </div>
-                            <div class="col-auto">
-                                <button [disabled]="isFinalSubmit" class="clear-form-button btn-inventory mb-3">
-                                    Submit
-                                </button>
-                            </div>
+                <div *ngIf="isCrop" class="col-12 pt-2">
+                    <div class="row justify-content-end">
+                        <div class="col-auto">
+                            <button [disabled]="isFinalSubmit" class="clear-form-button btn-inventory mb-3"
+                                (click)="revertDataCancelation()">
+                                Cancel
+                            </button>
                         </div>
-                    </div> -->
+                        <div class="col-auto">
+                            <button [disabled]="isFinalSubmit" class="clear-form-button btn-inventory mb-3"
+                                (click)="saveAsDraft()">
+                                Save as Draft
+                            </button>
+                        </div>
+                        <div class="col-auto">
+                            <button [disabled]="isFinalSubmit" class="clear-form-button btn-inventory mb-3">
+                                Submit
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
             </form>
         </div>

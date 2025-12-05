@@ -227,14 +227,14 @@
                                                 class="form-button d-flex justify-content-center verticle-content-middle"
                                                 style="width: 100px !important; background-color: #B64B1D; color: white; border: none; border-radius: 6px;"
                                                 [disabled]="bspc.controls[i].get('status_toggle')?.value === 1
-                                              " (click)="addSong(i)">
+                                              " (click)="addReplaceVarieties(i)">
                                                 Add
                                             </button>
                                         </div>
 
 
                                         <div class="col-12 px-3" *ngIf="openCropIndexes.includes(i)"
-                                            FormArray="replaceVariety">
+                                            formArrayName="replaceVariety">
 
                                             <div class="row card-inventory form-group inner-row"
                                                 *ngFor="let group of getInnerBspc(i).controls; let j = index"
@@ -278,9 +278,7 @@
                                                                 (QTL.)</label>
                                                             <input type="number" class="form-control"
                                                                 formControlName="replace_tentative_qty"
-                                                                placeholder="Enter Quantity"
-                                                                (input)="inputValue(i,j)"
-                                                               />
+                                                                placeholder="Enter Quantity" />
 
                                                         </div>
                                                         <!-- <div class="col-12 col-md-6 mb-3">
@@ -427,6 +425,31 @@
                                     <img src="assets/images/delete.png">
                                 </button>
                             </div>
+                               <!-- <div class="col-xl-1 col-lg-1 pl-md-0 pl-xl-3 mt-lg-4 col-md-1 pt-3 col-12">
+                                    <button *ngIf="newVarieties.controls.length === i + 1"
+            class="list-action-buttons-second ml-lg-3 mt-md-2"
+            (click)="addNewVariety()">
+        <img src="assets/images/Add.png">
+    </button>
+                                    <button *ngIf="bspc.controls.length!=1 "
+                                        class="list-action-buttons-second ml-lg-3 mt-md-2 " style="cursor: pointer;"
+                                        (click)="removeNewVariety(i)">
+                                        <img src="assets/images/delete.png">
+                                    </button>
+                                </div> -->
+                            <!-- <div class="col-md-3 d-flex align-items-center">
+        <button class="list-action-buttons-second ml-2" (click)="addNewVariety(i)">
+          <img src="assets/images/Add.png">
+        </button>
+
+        <button *ngIf="newVarieties.length > 1"
+          class="list-action-buttons-second ml-2"
+          (click)="removeNewVariety(i)">
+          <img src="assets/images/delete.png">
+        </button>
+      </div> -->
+
+
 
                             <hr class="my-2" />
 

@@ -351,122 +351,124 @@ class SrpWillingnessController {
         try {
             const { year, season, crop_code } = req.query;
 
-        // 1. Fetch all willingness data
-const willingnessData = await db.srpWillingnessModel.findAll({
-  where: { year, season, crop_code },
-  attributes: [
-    "id",
-    "variety_code",
-    "willingness",
-    "quantity",
-    "is_active",
-    "is_additional",
-    "remarks",
-    [db.Sequelize.fn("SUM", db.Sequelize.col("seed_rolling_plan_variety_wises.breeder_seed")), "total_breeder_seed"],
-    [db.Sequelize.col("seed_rolling_plan_variety_wises->m_crop_variety.variety_name"), "variety_name"]
-  ],
-  include: [
-  
-    {
-      model: db.srpVarietyModel,
-      as: "seed_rolling_plan_variety_wises",
-      required: true,
-      attributes: [],
-      include: [{ model: db.varietyModel, as: "m_crop_variety", required: true, attributes: [] }]
-    }
-  ],
-  group: [
-    "seed_rolling_plan_willingnesses.id",
-    "seed_rolling_plan_willingnesses.variety_code",
-    "seed_rolling_plan_variety_wises->m_crop_variety.variety_name",
-    "seed_rolling_plan_willingnesses.willingness",
-    "seed_rolling_plan_willingnesses.quantity",
-    "seed_rolling_plan_willingnesses.is_active",
-    "seed_rolling_plan_willingnesses.is_additional",
-    "seed_rolling_plan_willingnesses.remarks"
-  ],
-  raw: true
-});
+            // 1. Fetch all willingness data
+            const willingnessData = await db.srpWillingnessModel.findAll({
+                where: { year, season, crop_code },
+                attributes: [
+                    "id",
+                    "variety_code",
+                    "willingness",
+                    "quantity",
+                    "is_active",
+                    "is_additional",
+                    "remarks",
+                    [db.Sequelize.fn("SUM", db.Sequelize.col("seed_rolling_plan_variety_wises.breeder_seed")), "total_breeder_seed"],
+                    [db.Sequelize.col("seed_rolling_plan_variety_wises->m_crop_variety.variety_name"), "variety_name"]
+                ],
+                include: [
 
-const newVarietyWillingnessData = await db.srpWillingnessModel.findAll({
-  where: { year, season, crop_code, is_additional: true },
-  attributes: [
-    "id",
-    "variety_code",
-    "willingness",
-    "quantity",
-    "is_active",
-    "is_additional",
-    "remarks"
-   
-  ],
-      include: [
-        {
-          model: db.varietyModel,
-          as: "m_crop_variety",
-          required: true,
-          attributes: ["variety_code","variety_name"]          // we map its column via Sequelize.col
-        }
-      ],
-    
-  raw: true
-});
+                    {
+                        model: db.srpVarietyModel,
+                        as: "seed_rolling_plan_variety_wises",
+                        required: true,
+                        attributes: [],
+                        include: [{ model: db.varietyModel, as: "m_crop_variety", required: true, attributes: [] }]
+                    }
+                ],
+                group: [
+                    "seed_rolling_plan_willingnesses.id",
+                    "seed_rolling_plan_willingnesses.variety_code",
+                    "seed_rolling_plan_variety_wises->m_crop_variety.variety_name",
+                    "seed_rolling_plan_willingnesses.willingness",
+                    "seed_rolling_plan_willingnesses.quantity",
+                    "seed_rolling_plan_willingnesses.is_active",
+                    "seed_rolling_plan_willingnesses.is_additional",
+                    "seed_rolling_plan_willingnesses.remarks"
+                ],
+                raw: true
+            });
 
-const replaceMap = {};
-const replaceVarietyWillingnessData = await db.srpWillingnessReplaceModel.findAll({
-  attributes: ["srp_willingness_id", "replace_variety_code", "quantity"],
-  include:[
-    {
-        model:db.varietyModel,
-          as: "m_crop_variety",
-        required:true,
-        attributes:["variety_code","variety_name"]
-    }
-  ],
-  raw: true
-});
-replaceVarietyWillingnessData.forEach(r => {
-  if (!replaceMap[r.srp_willingness_id]) {
-    replaceMap[r.srp_willingness_id] = [];
-  }
+            const newVarietyWillingnessData = await db.srpWillingnessModel.findAll({
+                where: { year, season, crop_code, is_additional: true,is_active:true},
+                attributes: [
+                    "id",
+                    "variety_code",
+                    "willingness",
+                    "quantity",
+                    "is_active",
+                    "is_additional",
+                    "remarks"
 
-  replaceMap[r.srp_willingness_id].push({
-    replace_variety_code: r.replace_variety_code,
-    quantity: r.quantity,
-    replace_variety_name: r["m_crop_variety.variety_name"], 
-  });
-});
-function finalData(willingnessData, newVarietyWillingnessData, replaceMap) {
-  
-  // 1️⃣ Normal varieties (jisme replace mapping lagegi)
-  const normal = willingnessData.map(item => ({
-    ...item,
-    replace_varieties: replaceMap[item.id] || []
-  }));
+                ],
+                include: [
+                    {
+                        model: db.varietyModel,
+                        as: "m_crop_variety",
+                        required: true,
+                        attributes: ["variety_code", "variety_name"]          // we map its column via Sequelize.col
+                    }
+                ],
 
-  // 2️⃣ Additional varieties (new variety)
-  const additionals = newVarietyWillingnessData.map(item => ({
-    id: item.id,
-    variety_code: item.variety_code,
-    willingness: item.willingness,
-    quantity: item.quantity,
-    is_active: item.is_active,
-    is_additional: item.is_additional,
-    remarks: item.remarks ?? null,
-    total_breeder_seed: 0,                // new varieties me BS nahi hoti
-    variety_name: item["m_crop_variety.variety_name"],
-    replace_varieties: []                 // ⭐ additional me replace nahi chahiye
-  }));
+                raw: true
+            });
 
-  // 3️⃣ Merge both
-  return [...normal, ...additionals];
-}
-if (willingnessData.length > 0 || newVarietyWillingnessData.length > 0) {
-    // Willingness data available hai → return finalData
-    return response(res, "Data Available willingness", 200, finalData(willingnessData, newVarietyWillingnessData, replaceMap));
-}
+            const replaceMap = {};
+            const replaceVarietyWillingnessData = await db.srpWillingnessReplaceModel.findAll({
+                where:{is_active:true},
+                attributes: ["id","srp_willingness_id", "replace_variety_code", "quantity"],
+                include: [
+                    {
+                        model: db.varietyModel,
+                        as: "m_crop_variety",
+                        required: true,
+                        attributes: ["variety_code", "variety_name"]
+                    }
+                ],
+                raw: true
+            });
+            replaceVarietyWillingnessData.forEach(r => {
+                if (!replaceMap[r.srp_willingness_id]) {
+                    replaceMap[r.srp_willingness_id] = [];
+                }
 
- const varietyData = await db.srpVarietyModel.findAll({
+                replaceMap[r.srp_willingness_id].push({
+                    id:r.id,
+                    replace_variety_code: r.replace_variety_code,
+                    quantity: r.quantity,
+                    replace_variety_name: r["m_crop_variety.variety_name"],
+                });
+            });
+            function finalData(willingnessData, newVarietyWillingnessData, replaceMap) {
+
+                // 1️⃣ Normal varieties (jisme replace mapping lagegi)
+                const normal = willingnessData.map(item => ({
+                    ...item,
+                    replace_varieties: replaceMap[item.id] || []
+                }));
+
+                // 2️⃣ Additional varieties (new variety)
+                const additionals = newVarietyWillingnessData.map(item => ({
+                    id: item.id,
+                    variety_code: item.variety_code,
+                    willingness: item.willingness,
+                    quantity: item.quantity,
+                    is_active: item.is_active,
+                    is_additional: item.is_additional,
+                    remarks: item.remarks ?? null,
+                    total_breeder_seed: 0,                // new varieties me BS nahi hoti
+                    variety_name: item["m_crop_variety.variety_name"],
+                    replace_varieties: []                 // ⭐ additional me replace nahi chahiye
+                }));
+
+                // 3️⃣ Merge both
+                return [...normal, ...additionals];
+            }
+            if (willingnessData.length > 0 || newVarietyWillingnessData.length > 0) {
+                // Willingness data available hai → return finalData
+                return response(res, "Data Available willingness", 200, finalData(willingnessData, newVarietyWillingnessData, replaceMap));
+            }
+
+            const varietyData = await db.srpVarietyModel.findAll({
                 where: {
                     is_active: true,
                     is_final_submit: true
@@ -496,10 +498,9 @@ if (willingnessData.length > 0 || newVarietyWillingnessData.length > 0) {
                     "m_crop_variety.variety_name", "m_crop_variety.id"
                 ]
             });
-if(varietyData.length>0)
-         {   return response(res, "Data Available", 200, varietyData);}
+            if (varietyData.length > 0) { return response(res, "Data Available", 200, varietyData); }
             // STEP 2: If no willingness, return fresh variety list
-            
+
 
         } catch (error) {
             console.log(error);
@@ -1117,43 +1118,95 @@ if(varietyData.length>0)
         }
     };
 
-
     static getSrpWillingnessDetails = async (req, res) => {
-       const {year, season, crop_code}=req.query;
+        const { year, season, crop_code } = req.query;
         const varietyData = await db.srpVarietyModel.findAll({
-                where: {
-                    is_active: true,
-                    is_final_submit: true
+            where: {
+                is_active: true,
+                is_final_submit: true
+            },
+            include: [
+                {
+                    model: db.srpCropModel,
+                    as: "seed_rolling_plan_crop_wises",
+                    where: { year, season, crop_code, is_active: true, is_final_submit: true },
+                    required: true,
+                    attributes: []
                 },
-                include: [
-                    {
-                        model: db.srpCropModel,
-                        as: "seed_rolling_plan_crop_wises",
-                        where: { year, season, crop_code, is_active: true, is_final_submit: true },
-                        required: true,
-                        attributes: []
-                    },
-                    {
-                        model: db.varietyModel,
-                        as: "m_crop_variety",
-                        attributes: ["variety_name"],
-                        required: true
-                    }
-                ],
-                attributes: [
-                    "variety_code",
-                    [db.Sequelize.col("m_crop_variety.variety_name"), "variety_name"],
-                    [db.Sequelize.fn("SUM", db.Sequelize.col("breeder_seed")), "total_breeder_seed"]
-                ],
-                group: [
-                    "seed_rolling_plan_variety_wises.variety_code",
-                    "m_crop_variety.variety_name", "m_crop_variety.id"
-                ]
-            });
-if(varietyData.length>0)
-         {   return response(res, "Data Available", 200, varietyData);}
+                {
+                    model: db.varietyModel,
+                    as: "m_crop_variety",
+                    attributes: ["variety_name"],
+                    required: true
+                }
+            ],
+            attributes: [
+                "variety_code",
+                [db.Sequelize.col("m_crop_variety.variety_name"), "variety_name"],
+                [db.Sequelize.fn("SUM", db.Sequelize.col("breeder_seed")), "total_breeder_seed"]
+            ],
+            group: [
+                "seed_rolling_plan_variety_wises.variety_code",
+                "m_crop_variety.variety_name", "m_crop_variety.id"
+            ]
+        });
+        if (varietyData.length > 0) { return response(res, "Data Available", 200, varietyData); }
     }
+    static deleteSrpWillingnessRepalce = async (req, res) => {
+        try {
+            const { id } = req.query;
 
+            // Check if exists
+            const data = await db.srpWillingnessReplaceModel.findOne({
+                where: { id }
+            });
+
+            if (!data) {
+                return response(res, "Not Found", 404, []);
+            }
+
+            // Update is_active
+            const updateData = await db.srpWillingnessReplaceModel.update(
+                { is_active: false },     // values to update
+                { where: { id } }         // condition
+            );
+
+            return response(res, "Data Deleted Successfully!", 200, updateData);
+
+        } catch (error) {
+            console.log(error);
+            return response(res, "Something went wrong", 500, []);
+        }
+    }
+    static deleteSrpWillingness = async (req, res) => {
+        try {
+            const { id } = req.query;
+
+            // Check if exists
+            const data = await db.srpWillingnessModel.findOne({
+                where: { id }
+            });
+
+            if (!data) {
+                return response(res, "Not Found", 404, []);
+            }
+
+            // Update is_active
+            const updateData = await db.srpWillingnessModel.update(
+                { is_active: false },     // values to update
+                { where: { id, is_additional: true } }         // condition
+            );
+            if (updateData[0] === 0) {
+                return response(res, "Already Inactive or is_additional = false", 400, []);
+            }
+
+            return response(res, "Data Deleted Successfully!", 200, updateData);
+
+        } catch (error) {
+            console.log(error);
+            return response(res, "Something went wrong", 500, []);
+        }
+    }
 
 
 

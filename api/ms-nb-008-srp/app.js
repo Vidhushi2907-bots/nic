@@ -65,6 +65,7 @@ require("./app/routes/srp_variety.routes.js")(app);
 require("./app/routes/srp_crop.routes.js")(app)
 require("./app/routes/master.routes.js")(app);
 require("./app/routes/srp_willingness.routes.js")(app);
+require("./app/routes/srp_state_replanning.routes.js")(app)
 
 app.use(errorHandler);
 const PORT = process.env.PORT || 3008;

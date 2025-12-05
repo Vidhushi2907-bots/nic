@@ -66,11 +66,11 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
   openCropIndexes: number[] = [];
 
   constructor(private service: SeedServiceService, private _masterService: MasterService, private breeder: BreederService, private fb: FormBuilder, private route: Router, private cdRef: ChangeDetectorRef, private _productionCenter: ProductioncenterService, private master: MasterService, private srpService: SeedRollingPlanningService) {
- 
+
   }
 
   createForm() {
- this.ngForm = this.fb.group({
+    this.ngForm = this.fb.group({
       id: [''],
       year: [''],
       season: [''],
@@ -123,7 +123,34 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
   }
 
   removeNewVariety(i) {
-    this.newVarieties.removeAt(i);
+    const id = this.newVarieties.at(i.toString()).value.id;
+    console.log(id, "id")
+    // Remove row from FormArray
+    this.newVarieties.removeAt(i.toString());
+
+    const apiUrl = `srp-willingness-variety?id=${id}`
+    console.log(apiUrl, " apiUrl")
+    this.srpService.getRequestCreatorNew(apiUrl).subscribe({
+      next: (data: any) => {
+        if (
+          data &&
+          data.EncryptedResponse &&
+          data.EncryptedResponse.data &&
+          data.EncryptedResponse.status_code === 200
+        ) {
+          this.varietyData = data.EncryptedResponse.data;
+
+
+          console.log('✅ Season list loaded:', this.inventorySeasonData);
+        } else {
+          console.warn('⚠️ No valid data received in EncryptedResponse');
+          this.varietyData = [];
+        }
+      },
+      error: (err) => {
+        console.error('❌ Error fetching seasons:', err);
+      },
+    });;
   }
 
   get bspc(): FormArray {
@@ -134,7 +161,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
     return this.ngForm.get('newVarieties') as FormArray;
   }
   getInnerBspc(i: number): FormArray {
-    return this.bspc.at(i).get('replaceVariety') as FormArray;
+    return this.ngForm.get('bspc')?.get(i.toString())?.get('replaceVariety') as FormArray;
   }
 
   loadYear() {
@@ -210,13 +237,14 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
     });
   }
 
-  addSong(albumIndex: number) {
+  addReplaceVarieties(albumIndex: number) {
     const albums = this.ngForm.get('bspc') as FormArray;
     const songs = albums.at(albumIndex).get('replaceVariety') as FormArray;
     console.log(songs, "songs")
     songs.push(this.createInnerRow());
     this.toggleCropSection(albumIndex)
   }
+  
   getPageData() {
     const year = this.ngForm.controls['year'].value;
     const season = this.ngForm.controls['season'].value;
@@ -254,45 +282,91 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
           const srpWillingnessArray = this.ngForm.get('bspc') as FormArray;
           const additionalArray = this.ngForm.get('newVarieties') as FormArray;
           srpWillingnessArray.clear();
-          this.inventoryVarietyData.forEach((variety: any) => {
+          
+          // this.inventoryVarietyData.forEach((variety: any) => {
 
+          //   if (variety.is_additional === true) {
+          //     // Additional variety 
+          //     additionalArray.clear();
+          //     additionalArray.push(
+          //       this.fb.group({
+          //         variety_code: [variety.variety_code],
+          //         variety_name: [variety.variety_name],
+          //         new_tentative_quantity: [variety.quantity ?? 0],
+          //         additional_note: [variety.remarks ?? '']
+          //       })
+          //     );
+          //   } else {
+          //     const group = this.fb.group({
+          //       variety_code: [variety.variety_code],
+          //       variety_name: [variety.variety_name],
+          //       total_seed_required: [variety.total_breeder_seed ?? 0],
+          //       status_toggle: [variety.willingness ?? true],
+          //       tentative_quantity: [variety.quantity ?? 0],
+          //       replaceVariety: this.fb.array([])
+
+          //     });
+
+          //     const replaceArray = group.get('replaceVariety') as FormArray;
+
+          //     if (variety.replace_variety && variety.replace_variety.length > 0) {
+          //       variety.replace_variety.forEach((rv: any) => {
+          //         replaceArray.push(
+          //           this.fb.group({
+          //             variety_code: [rv.replace_variety_code],
+          //             variety_name: [rv.variety_name],
+          //             replace_tentative_qty: [rv.quantity ?? 0]
+          //           })
+          //         );
+          //       });
+          //     }
+
+          //     srpWillingnessArray.push(group);
+          //   }
+          // });
+          this.inventoryVarietyData.forEach((variety: any, index: number) => {
+            console.log(variety, "variety.................")
+            additionalArray.clear();
             if (variety.is_additional === true) {
-              // Additional variety 
-              additionalArray.clear();
-              additionalArray.push(
+            
+               additionalArray.push(
                 this.fb.group({
+                  id: [variety.id],
                   variety_code: [variety.variety_code],
                   variety_name: [variety.variety_name],
                   new_tentative_quantity: [variety.quantity ?? 0],
                   additional_note: [variety.remarks ?? '']
                 })
               );
+              
             } else {
               const group = this.fb.group({
+                id: [variety.id],
                 variety_code: [variety.variety_code],
                 variety_name: [variety.variety_name],
                 total_seed_required: [variety.total_breeder_seed ?? 0],
                 status_toggle: [variety.willingness ?? true],
                 tentative_quantity: [variety.quantity ?? 0],
-                replaceVariety: this.fb.array([])
-
+                replaceVariety: this.fb.array([])   // INNER ARRAY
               });
-              console.log(group,"grouprow.replaceVariety")
-              const replaceArray = group.get('replaceVariety') as FormArray;
-              
-              if (variety.replace_variety && variety.replace_variety.length > 0) {
 
-                variety.replace_variety.forEach((rv: any) => {
+              const replaceArray = group.get('replaceVariety') as FormArray;
+              replaceArray.clear();
+              if (variety.replace_varieties?.length > 0) {
+                variety.replace_varieties.forEach(rv => {
                   replaceArray.push(
                     this.fb.group({
+                      id:[rv.id],
                       variety_code: [rv.replace_variety_code],
-                      variety_name: [rv.variety_name],
-                      replace_tentative_qty: [rv.quantity ?? 0]
+                      variety_name: [rv.replace_variety_name],
+                      replace_tentative_qty: [rv.quantity]
                     })
                   );
                 });
+                if (!this.openCropIndexes.includes(index)) {
+                  this.openCropIndexes.push(index);
+                }
               }
-
               srpWillingnessArray.push(group);
             }
           });
@@ -481,6 +555,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
   addInnerRow(i: number) {
     this.getInnerBspc(i).push(
       this.fb.group({
+        id:[''],
         variety_code: [''],
         variety_name: [''],
         replace_tentative_qty: [0]
@@ -489,9 +564,50 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
   }
 
   // Remove inner row
+  // removeInnerRow(i: number, j: number) {
+  //   this.getInnerBspc(i).removeAt(j);
+    
+  // }
   removeInnerRow(i: number, j: number) {
-    this.getInnerBspc(i).removeAt(j);
+  const innerArray = this.getInnerBspc(i);
+
+  // Get ID safely
+  const id = innerArray.get(j.toString()).value?.id
+  console.log(id, "id");
+
+  // Remove the inner row
+  innerArray.removeAt(j);
+
+  // If id does not exist, don't make API call
+  if (!id) {
+    console.warn("⚠️ No ID found for this row, skipping API call.");
+    return;
   }
+
+  const apiUrl = `srp-willingness-replace-variety?id=${id}`;
+  console.log(apiUrl, "apiUrl");
+
+  this.srpService.getRequestCreatorNew(apiUrl).subscribe({
+    next: (data: any) => {
+      if (
+        data &&
+        data.EncryptedResponse &&
+        data.EncryptedResponse.data &&
+        data.EncryptedResponse.status_code === 200
+      ) {
+        this.varietyData = data.EncryptedResponse.data;
+        console.log("✅ Data loaded");
+      } else {
+        console.warn("⚠️ No valid data received");
+        this.varietyData = [];
+      }
+    },
+    error: (err) => {
+      console.error("❌ Error fetching data:", err);
+    },
+  });
+}
+
 
   selectVariety(index: number, variety: any) {
     const control = this.newVarieties.at(index);
@@ -508,7 +624,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
       variety_name: variety.variety_name,
     });
   }
-  createInnerRow() {
+  createInnerRow(): FormGroup {
     return this.fb.group({
       variety_code: [''],
       variety_name: [''],
@@ -517,19 +633,13 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
   }
   createNewVarietyRow(): FormGroup {
     return this.fb.group({
+      id: [''],
       variety_code: [''],
       variety_name: [''],   // REQUIRED
       new_tentative_quantity: [0],
       additional_note: ['']
     });
   }
-
- inputValue(i: number, j: number) {
-  const innerArray = this.getInnerBspc(i);
-  console.log(innerArray,"arrry")
-  const value = innerArray.at(j).get('replace_tentative_qty')?.value;
-  console.log(value);  // will now be the exact string you typed
-}
 
   ngOnInit(): void {
     this.createForm();
@@ -549,7 +659,6 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
   closePopup() {
     this.popupIndex = null;
   }
-
 
   // Cancel Button
   revertDataCancelation() {

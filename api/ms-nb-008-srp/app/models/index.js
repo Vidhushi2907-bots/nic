@@ -238,26 +238,29 @@ db.srpWillingnessModel.belongsTo(db.varietyModel, {
  
 
 });
-db.varietyModel.hasMany(db.srpWillingnessReplaceModel, {
-    foreignKey: "replace_variety_code",
-    sourceKey: "variety_code",
-   
-});
 db.srpWillingnessReplaceModel.belongsTo(db.varietyModel, {
     foreignKey: "replace_variety_code",
     targetKey: "variety_code",
- 
+    as: "m_crop_variety", // <- this must match the include
+});
+
+db.varietyModel.hasMany(db.srpWillingnessReplaceModel, {
+    foreignKey: "replace_variety_code",
+    sourceKey: "variety_code",
+    as: "replacements",
 });
 db.srpVarietyModel.hasMany(db.srpWillingnessModel, {
     foreignKey: "variety_code",
     sourceKey: "variety_code",
-    as:"seed_rolling_plan_variety_wises"
+    as:"vw"
+    // as:"seed_rolling_plan_variety_wises"
 });
 
 db.srpWillingnessModel.belongsTo(db.srpVarietyModel, {
     foreignKey: "variety_code",
     targetKey: "variety_code",
-    as:"seed_rolling_plan_variety_wises"
+    // as:"seed_rolling_plan_variety_wises"
+    as:"vw"
 
 });
 

@@ -16,5 +16,5 @@ module.exports = app => {
      app.post(`${process.env.MICRO_SERVICE}/api/srp-state-replanning-season`, auth, srpStateReplanning.getSrpStateReplanningSeasonData);
       app.post(`${process.env.MICRO_SERVICE}/api/srp-state-replanning-crop`, auth, srpStateReplanning.getSrpStateReplanningCropData);
     
-//    app.post(`${process.env.MICRO_SERVICE}/api/srp-variety-willingness`, auth, crop.getSrpWillingnessDetails);
+ app.post(`${process.env.MICRO_SERVICE}/api/srp-state-replanning-variety`, auth, srpStateReplanning.getSrpStateReplanningVareityData);
 };

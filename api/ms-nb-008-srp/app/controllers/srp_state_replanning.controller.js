@@ -488,7 +488,7 @@ async function getFreshData(crop_wise_id, year, season, crop_code) {
             remarks: vwData ? vwData.remarks : null,
             is_additional: vwData ? vwData.is_additional : null,
 
-            seed_rolling_plan_willingness_replaces: vwData
+           replace_varieties: vwData
                 ? vwData.seed_rolling_plan_willingness_replaces?.map(r => {
                     const variety = r.m_crop_variety?.get?.({ plain: true }) || null;
                     console.log(variety.variet, "variety.variety_name ")

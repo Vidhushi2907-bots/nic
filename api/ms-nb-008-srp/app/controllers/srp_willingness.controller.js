@@ -1,4 +1,4 @@
-const { Op, literal, Sequelize } = require("sequelize");
+const { Op, literal, Sequelize, NUMBER } = require("sequelize");
 const db = require("../models");
 const response = require('../_helpers/response')
 const status = require('../_helpers/status.conf')
@@ -347,300 +347,208 @@ class SrpWillingnessController {
         }
     };
 
-static getSrpWillingnessVarietyData = async (req, res) => {
-    try {
-        const { year, season, crop_code } = req.query;
+    static getSrpWillingnessVarietyData = async (req, res) => {
+        try {
+            const { year, season, crop_code } = req.query;
 
-        // 1. Fetch all willingness data
-        const willingnessData = await db.srpWillingnessModel.findAll({
-            where: { year, season, crop_code },
-            attributes: [
-                "id",
-                "variety_code",
-                "willingness",
-                "quantity",
-                "is_active",
-                "is_additional",
-                "remarks",
-                [db.Sequelize.fn("SUM", db.Sequelize.col("vw.breeder_seed")), "total_breeder_seed"],
-                [db.Sequelize.col("vw->m_crop_variety.variety_name"), "variety_name"]
-            ],
-            include: [
-                {
-                    model: db.srpVarietyModel,
-                    as: "vw",             // ✅ FIXED ALIAS
-                    required: true,
-                    attributes: [],
-                    include: [
-                        {
-                            model: db.varietyModel,
-                            as: "m_crop_variety",
-                            required: true,
-                            attributes: []
-                        }
-                    ]
+            // 1. Fetch all willingness data
+            const willingnessData = await db.srpWillingnessModel.findAll({
+                where: { year, season, crop_code },
+                attributes: [
+                    "id",
+                    "variety_code",
+                    "willingness",
+                    "quantity",
+                    "is_active",
+                    "is_additional",
+                    "is_final_submit", "is_draft",
+                    "remarks",
+
+                    [db.Sequelize.col("vw->m_crop_variety.variety_name"), "variety_name"]
+                ],
+                include: [
+                    {
+                        model: db.srpVarietyModel,
+                        as: "vw",             // ✅ FIXED ALIAS
+                        required: true,
+                        attributes: [],
+                        include: [
+                            {
+                                model: db.varietyModel,
+                                as: "m_crop_variety",
+                                required: true,
+                                attributes: []
+                            }
+                        ]
+                    }
+                ],
+                group: [
+                    "seed_rolling_plan_willingnesses.id",
+                    "seed_rolling_plan_willingnesses.variety_code",
+                    "vw->m_crop_variety.variety_name",
+                    "seed_rolling_plan_willingnesses.willingness",
+                    "seed_rolling_plan_willingnesses.quantity",
+                    "seed_rolling_plan_willingnesses.is_active",
+                    "seed_rolling_plan_willingnesses.is_additional",
+                    "seed_rolling_plan_willingnesses.remarks"
+                ],
+                raw: true
+            });
+            const breederSeedSum = await db.srpVarietyModel.findAll({
+
+                include: [
+                    {
+                        model: db.srpCropModel,
+                        as: "seed_rolling_plan_crop_wises",
+                        where: { year, season, crop_code, is_active: true, is_final_submit: true },
+                        required: true,
+                        attributes: []
+                    },],
+                attributes: [
+                    "variety_code",
+                    [db.Sequelize.fn("SUM", db.Sequelize.col("breeder_seed")), "total_breeder_seed"]
+                ],
+                group: ["variety_code"],
+                raw: true
+            });
+            const data = willingnessData.map(item => {
+                const total = breederSeedSum.find(x => x.variety_code === item.variety_code);
+                return { ...item, total_breeder_seed: total ? (total.total_breeder_seed).toFixed(2) : 0 };
+            });
+
+            const newVarietyWillingnessData = await db.srpWillingnessModel.findAll({
+                where: { year, season, crop_code, is_additional: true, is_active: true },
+                attributes: [
+                    "id",
+                    "variety_code",
+                    "willingness",
+                    "quantity",
+                    "is_active",
+                    "is_additional",
+                    "remarks", "is_draft", "is_final_submit"
+                ],
+                include: [
+                    {
+                        model: db.varietyModel,
+                        as: "m_crop_variety",
+                        required: true,
+                        attributes: ["variety_code", "variety_name"]
+                    }
+                ],
+                raw: true
+            });
+
+            const replaceMap = {};
+            const replaceVarietyWillingnessData = await db.srpWillingnessReplaceModel.findAll({
+                where: { is_active: true },
+                attributes: ["id", "srp_willingness_id", "replace_variety_code", "quantity",],
+                include: [
+                    {
+                        model: db.varietyModel,
+                        as: "m_crop_variety",
+                        required: true,
+                        attributes: ["variety_code", "variety_name"]
+                    }
+                ],
+                raw: true
+            });
+
+            replaceVarietyWillingnessData.forEach(r => {
+                if (!replaceMap[r.srp_willingness_id]) {
+                    replaceMap[r.srp_willingness_id] = [];
                 }
-            ],
-            group: [
-                "seed_rolling_plan_willingnesses.id",
-                "seed_rolling_plan_willingnesses.variety_code",
-                "vw->m_crop_variety.variety_name",
-                "seed_rolling_plan_willingnesses.willingness",
-                "seed_rolling_plan_willingnesses.quantity",
-                "seed_rolling_plan_willingnesses.is_active",
-                "seed_rolling_plan_willingnesses.is_additional",
-                "seed_rolling_plan_willingnesses.remarks"
-            ],
-            raw: true
-        });
 
-        const newVarietyWillingnessData = await db.srpWillingnessModel.findAll({
-            where: { year, season, crop_code, is_additional: true, is_active: true },
-            attributes: [
-                "id",
-                "variety_code",
-                "willingness",
-                "quantity",
-                "is_active",
-                "is_additional",
-                "remarks"
-            ],
-            include: [
-                {
-                    model: db.varietyModel,
-                    as: "m_crop_variety",
-                    required: true,
-                    attributes: ["variety_code", "variety_name"]
-                }
-            ],
-            raw: true
-        });
+                replaceMap[r.srp_willingness_id].push({
+                    id: r.id,
+                    replace_variety_code: r.replace_variety_code,
+                    quantity: r.quantity,
+                    replace_variety_name: r["m_crop_variety.variety_name"]
+                });
+            });
 
-        const replaceMap = {};
-        const replaceVarietyWillingnessData = await db.srpWillingnessReplaceModel.findAll({
-            where: { is_active: true },
-            attributes: ["id", "srp_willingness_id", "replace_variety_code", "quantity"],
-            include: [
-                {
-                    model: db.varietyModel,
-                    as: "m_crop_variety",
-                    required: true,
-                    attributes: ["variety_code", "variety_name"]
-                }
-            ],
-            raw: true
-        });
+            function finalData(wData, newData, replaceMap) {
+                const normal = wData.map(item => ({
+                    ...item,
+                    replace_varieties: replaceMap[item.id] || []
+                }));
 
-        replaceVarietyWillingnessData.forEach(r => {
-            if (!replaceMap[r.srp_willingness_id]) {
-                replaceMap[r.srp_willingness_id] = [];
+                const additionals = newData.map(item => ({
+                    id: item.id,
+                    variety_code: item.variety_code,
+                    willingness: item.willingness,
+                    quantity: item.quantity,
+                    is_active: item.is_active,
+                    is_additional: item.is_additional,
+                    is_draft: item.is_draft,
+                    is_final_submit: item.is_final_submit,
+                    remarks: item.remarks ?? null,
+                    total_breeder_seed: 0,
+                    variety_name: item["m_crop_variety.variety_name"],
+                    replace_varieties: []
+                }));
+
+                return [...normal, ...additionals];
             }
 
-            replaceMap[r.srp_willingness_id].push({
-                id: r.id,
-                replace_variety_code: r.replace_variety_code,
-                quantity: r.quantity,
-                replace_variety_name: r["m_crop_variety.variety_name"]
+            if (data.length > 0 || data.length > 0) {
+                return response(
+                    res,
+                    "Data Available willingness",
+                    200,
+                    finalData(data, newVarietyWillingnessData, replaceMap)
+                );
+            }
+
+            const varietyData = await db.srpVarietyModel.findAll({
+                where: { is_active: true, is_final_submit: true },
+                include: [
+                    {
+                        model: db.srpCropModel,
+                        as: "seed_rolling_plan_crop_wises",
+                        where: { year, season, crop_code, is_active: true, is_final_submit: true },
+                        required: true,
+                        attributes: []
+                    },
+                    {
+                        model: db.varietyModel,
+                        as: "m_crop_variety",
+                        attributes: ["variety_name"],
+                        required: true
+                    }
+                ],
+                attributes: [
+                    "variety_code",
+                    [db.Sequelize.col("m_crop_variety.variety_name"), "variety_name"],
+                    [
+                        db.Sequelize.fn(
+                            "ROUND",
+                            db.Sequelize.cast(
+                                db.Sequelize.fn("SUM", db.Sequelize.col("breeder_seed")),
+                                "numeric"
+                            ),
+                            2
+                        ),
+                        "total_breeder_seed"
+                    ]
+                ],
+                group: [
+                    "seed_rolling_plan_variety_wises.variety_code",
+                    "m_crop_variety.variety_name",
+                    "m_crop_variety.id"
+                ]
             });
-        });
 
-        function finalData(wData, newData, replaceMap) {
-            const normal = wData.map(item => ({
-                ...item,
-                replace_varieties: replaceMap[item.id] || []
-            }));
 
-            const additionals = newData.map(item => ({
-                id: item.id,
-                variety_code: item.variety_code,
-                willingness: item.willingness,
-                quantity: item.quantity,
-                is_active: item.is_active,
-                is_additional: item.is_additional,
-                remarks: item.remarks ?? null,
-                total_breeder_seed: 0,
-                variety_name: item["m_crop_variety.variety_name"],
-                replace_varieties: []
-            }));
+            if (varietyData.length > 0) {
+                return response(res, "Data Available", 200, varietyData);
+            }
 
-            return [...normal, ...additionals];
+        } catch (error) {
+            console.log(error);
+            return response(res, "Server Error", 500, error);
         }
+    };
 
-        if (willingnessData.length > 0 || newVarietyWillingnessData.length > 0) {
-            return response(
-                res,
-                "Data Available willingness",
-                200,
-                finalData(willingnessData, newVarietyWillingnessData, replaceMap)
-            );
-        }
-
-        const varietyData = await db.srpVarietyModel.findAll({
-            where: { is_active: true, is_final_submit: true },
-            include: [
-                {
-                    model: db.srpCropModel,
-                    as: "seed_rolling_plan_crop_wises",
-                    where: { year, season, crop_code, is_active: true, is_final_submit: true },
-                    required: true,
-                    attributes: []
-                },
-                {
-                    model: db.varietyModel,
-                    as: "m_crop_variety",
-                    attributes: ["variety_name"],
-                    required: true
-                }
-            ],
-            attributes: [
-                "variety_code",
-                [db.Sequelize.col("m_crop_variety.variety_name"), "variety_name"],
-                [db.Sequelize.fn("SUM", db.Sequelize.col("breeder_seed")), "total_breeder_seed"]
-            ],
-            group: [
-                "seed_rolling_plan_variety_wises.variety_code",
-                "m_crop_variety.variety_name",
-                "m_crop_variety.id"
-            ]
-        });
-
-        if (varietyData.length > 0) {
-            return response(res, "Data Available", 200, varietyData);
-        }
-
-    } catch (error) {
-        console.log(error);
-        return response(res, "Server Error", 500, error);
-    }
-};
-
-
-
-    // static getSrpWillingnessVarietyData = async (req, res) => {
-    //     try {
-    //         const { year, season, crop_code } = req.query;
-
-
-    //         const varieties = await db.srpVarietyModel.findAll({
-    //             where: {
-    //                 is_active: true,
-    //                 is_final_submit: true
-    //             },
-    //             include: [
-    //                 {
-    //                     model: db.srpCropModel,
-    //                     as: "seed_rolling_plan_crop_wises",
-    //                     required: true,
-    //                     where: {
-    //                         year, season, crop_code,
-    //                         is_active: true,
-    //                         is_final_submit: true
-    //                     },
-    //                     attributes: []
-    //                 },
-    //                 {
-    //                     model: db.varietyModel,
-    //                     as: "m_crop_variety",
-    //                     required: true,
-    //                     attributes: []  // attributes blank because we will pick in main select
-    //                 }
-    //             ],
-
-    //             attributes: [
-    //                 "variety_code",
-
-    //                 // JOIN table values
-    //                 [db.Sequelize.col("seed_rolling_plan_crop_wises.year"), "year"],
-    //                 [db.Sequelize.col("seed_rolling_plan_crop_wises.season"), "season"],
-    //                 [db.Sequelize.col("seed_rolling_plan_crop_wises.crop_code"), "crop_code"],
-
-    //                 // 🎯 FIX: include variety_name here
-    //                 [db.Sequelize.col("m_crop_variety.variety_name"), "variety_name"],
-
-    //                 // SUM
-    //                 [db.Sequelize.fn("SUM", db.Sequelize.col("breeder_seed")), "total_breeder_seed"]
-    //             ],
-
-    //             group: [
-    //                 "seed_rolling_plan_crop_wises.year",
-    //                 "seed_rolling_plan_crop_wises.season",
-    //                 "seed_rolling_plan_crop_wises.crop_code",
-    //                 "seed_rolling_plan_variety_wises.variety_code",
-    //                 "m_crop_variety.variety_name"
-    //             ],
-
-    //             raw: true
-    //         });
-
-    //         return response(res, status.DATA_AVAILABLE, 200, varieties);
-
-    //     } catch (error) {
-    //         console.log(error);
-    //         return response(res, "Server Error", 500, error)
-    //     }
-    // };
-    // static getSrpWillingnessVarietyData = async (req, res) => {
-    //     try {
-    //         const { year, season, crop_code } = req.query;
-
-    //         const varieties = await db.srpVarietyModel.findAll({
-    //             where: {
-    //                 is_active: true,
-    //                 is_final_submit: true
-    //             },
-    //             include: [
-    //                 {
-    //                     model: db.srpCropModel,
-    //                     as: "seed_rolling_plan_crop_wises",
-    //                     required: true,
-    //                     where: {
-    //                         year, season, crop_code,
-    //                         is_active: true,
-    //                         is_final_submit: true
-    //                     },
-    //                     attributes: []
-    //                 },
-    //                 {
-    //                     model: db.varietyModel,
-    //                     as: "m_crop_variety",
-    //                     required: true,
-    //                     attributes: []  // attributes blank because we will pick in main select
-    //                 }
-    //             ],
-
-    //             attributes: [
-    //                 "variety_code",
-
-    //                 // JOIN table values
-    //                 [db.Sequelize.col("seed_rolling_plan_crop_wises.year"), "year"],
-    //                 [db.Sequelize.col("seed_rolling_plan_crop_wises.season"), "season"],
-    //                 [db.Sequelize.col("seed_rolling_plan_crop_wises.crop_code"), "crop_code"],
-
-    //                 // 🎯 FIX: include variety_name here
-    //                 [db.Sequelize.col("m_crop_variety.variety_name"), "variety_name"],
-
-    //                 // SUM
-    //                 [db.Sequelize.fn("SUM", db.Sequelize.col("breeder_seed")), "total_breeder_seed"]
-    //             ],
-
-    //             group: [
-    //                 "seed_rolling_plan_crop_wises.year",
-    //                 "seed_rolling_plan_crop_wises.season",
-    //                 "seed_rolling_plan_crop_wises.crop_code",
-    //                 "seed_rolling_plan_variety_wises.variety_code",
-    //                 "m_crop_variety.variety_name"
-    //             ],
-
-    //             raw: true
-    //         });
-
-    //         return response(res, status.DATA_AVAILABLE, 200, varieties);
-
-    //     } catch (error) {
-    //         console.log(error);
-    //         return response(res, "Server Error", 500, error)
-    //     }
-    // };
     static getSrpWillingnessIndentorName = async (req, res) => {
         try {
             const { year, season, crop_code, variety_code } = req.query;
@@ -727,206 +635,6 @@ static getSrpWillingnessVarietyData = async (req, res) => {
             return response(res, "Server Error", 500, error)
         }
     };
-    // static postSrpWillingnessData = async (req, res) => {
-    //     try {
-    //         const { willingnessData,replace_varieties,year,season,crop_code, action } = req.body;
-
-    //         const user_id = req.body?.loginedUserid?.id;
-    //         const userData = await db.userModel.findOne({
-    //             where: { id: user_id }
-    //         });
-
-    //         if (userData.user_type !== "BR") {
-    //             return response(res, 'Not Access Other User', 403);
-    //         }
-
-    //         const isDraft = action === "draft";
-    //         const isFinalSubmit = action === "final";
-    //         const savedRecords = [];
-
-    //         // 🌟 LOOP STARTS
-    //         for (const crop of willingnessData) {
-
-    //             const {
-    //                 variety_code,
-    //                 quantity,
-    //                 is_additional,
-    //                 willingness,
-    //                 replace_variety_code
-    //             } = crop;
-
-    //             const remarks =
-    //                 is_additional === true
-    //                     ? (crop.remarks ?? null)
-    //                     : null;
-
-    //             const existing = await db.srpWillingnessModel.findOne({
-    //                 where: { year, season, crop_code, variety_code }
-    //             });
-
-    //             if (!existing) {
-
-    //                 if (willingness === true) {
-    //                     const newCrop = await db.srpWillingnessModel.create({
-    //                         crop_code,
-    //                         variety_code,
-    //                         year,
-    //                         season,
-    //                         is_active: true,
-    //                         quantity,
-    //                         is_additional,
-    //                         remarks,
-    //                         user_id,
-    //                         willingness,
-    //                         is_draft: isDraft,
-    //                         is_final_submit: isFinalSubmit
-    //                     });
-
-    //                     savedRecords.push(newCrop);
-    //                 }
-    //                 else {
-
-    //                     // const baseEntry = await db.srpWillingnessModel.create({
-    //                     //     crop_code,
-    //                     //     variety_code,
-    //                     //     year,
-    //                     //     season,
-    //                     //     is_active: false,
-    //                     //     quantity: 0.0,
-    //                     //     is_additional,
-    //                     //     remarks,
-    //                     //     user_id,
-    //                     //     willingness,
-    //                     //     is_draft: isDraft,
-    //                     //     is_final_submit: isFinalSubmit
-    //                     // });
-
-    //                     // savedRecords.push(baseEntry);
-
-    //                     // if (replace_variety_code) {
-    //                     //     const replaceEntry = await db.srpWillingnessReplaceModel.create({
-    //                     //         srp_willingness_id: baseEntry.id,
-    //                     //         replace_variety_code,
-    //                     //         is_active: true,
-    //                     //         quantity
-    //                     //     });
-
-    //                     //     savedRecords.push(replaceEntry);
-    //                     // }
-    //                     console.log(replace_varieties,"replace_code.........................");
-    //                     const baseEntry = await db.srpWillingnessModel.create({
-    //                         crop_code,
-    //                         variety_code,
-    //                         year,
-    //                         season,
-    //                         is_active: false,
-    //                         quantity,
-    //                         is_additional,
-    //                         remarks,
-    //                         user_id,
-    //                         willingness,
-    //                         is_draft: isDraft,
-    //                         is_final_submit: isFinalSubmit
-    //                     });
-
-    //                     savedRecords.push(baseEntry);
-
-    //                     // 👇 Multiple replace varieties
-    //                     if (Array.isArray(replace_varieties) && replace_varieties.length > 0) {
-
-    //                         for (const item of replace_varieties) {
-    //                             const replaceEntry = await db.srpWillingnessReplaceModel.create({
-    //                                 srp_willingness_id: baseEntry.id,
-    //                                 replace_variety_code: item.replace_variety_code,
-    //                                 quantity: item.quantity ?? 0,
-    //                                 is_active: item.is_active ?? true
-    //                             });
-
-    //                             savedRecords.push(replaceEntry);
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //             else {
-
-    //                 if (willingness === true) {
-
-    //                     await existing.update({
-    //                         is_active: true,
-    //                         quantity,
-    //                         is_additional,
-    //                         remarks: null,
-    //                         willingness,
-    //                         is_draft: isDraft,
-    //                         is_final_submit: isFinalSubmit
-    //                     });
-
-    //                     savedRecords.push(existing);
-
-    //                     // deactivate old replace entries
-    //                     await db.srpWillingnessReplaceModel.update(
-    //                         { is_active: false },
-    //                         { where: { srp_willingness_id: existing.id, is_active: true } }
-    //                     );
-    //                 }
-    //                 else {
-    //                     await existing.update({
-    //                         is_active: false,
-    //                         quantity: 0.0,
-    //                         is_additional,
-    //                         remarks,
-    //                         willingness,
-    //                         is_draft: isDraft,
-    //                         is_final_submit: isFinalSubmit
-    //                     });
-
-    //                     savedRecords.push(existing);
-
-    //                     if (replace_variety_code) {
-
-    //                         const existingReplace = await db.srpWillingnessReplaceModel.findOne({
-    //                             where: { srp_willingness_id: existing.id }
-    //                         });
-
-    //                         if (existingReplace) {
-    //                             await existingReplace.update({
-    //                                 replace_variety_code,
-    //                                 quantity,
-    //                                 is_active: true
-    //                             });
-
-    //                             savedRecords.push(existingReplace);
-    //                         }
-    //                         else {
-    //                             const newReplace = await db.srpWillingnessReplaceModel.create({
-    //                                 srp_willingness_id: existing.id,
-    //                                 replace_variety_code,
-    //                                 quantity,
-    //                                 is_active: true
-    //                             });
-
-    //                             savedRecords.push(newReplace);
-    //                         }
-    //                     }
-    //                 }
-
-    //                 savedRecords.push(existing);
-    //             }
-    //         }
-    //         const message =
-    //             action === "final"
-    //                 ? "Crop data finalized successfully"
-    //                 : "Crop data saved as draft successfully";
-
-
-    //         return response(res, message, 200, savedRecords);
-
-    //     } catch (error) {
-    //         console.error("Error in postSrpCropWiseData:", error);
-    //         return response(res, status.DATA_NOT_AVAILABLE, 500);
-    //     }
-    // };
-
     static postSrpWillingnessData = async (req, res) => {
         try {
             const { willingnessData, year, season, crop_code, action } = req.body;
@@ -938,8 +646,8 @@ static getSrpWillingnessVarietyData = async (req, res) => {
                 return response(res, 'Not Access Other User', 403);
             }
 
-            const isDraft = action === "draft";
-            const isFinalSubmit = action === "final";
+           const isDraft = action === "draft" ? 1 : 1;
+      const isFinalSubmit = action === "final" ? 1 : 0;
             const savedRecords = [];
 
             for (const crop of willingnessData) {

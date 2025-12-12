@@ -274,7 +274,9 @@ import { SeedRollingPlaningCropWiseComponent } from './seed-rolling-planing/inde
 import { SeedRollingPlaningVarietyWiseComponent } from './seed-rolling-planing/indentor-login/seed-rolling-planing-variety-wise/seed-rolling-planing-variety-wise.component';
 
 import { SeedRollingPlaningWillingnessScreenComponent } from './seed-rolling-planing/pdpc-login/seed-rolling-planing-willingness-screen/seed-rolling-planing-willingness-screen.component';
-import { StateLoginReplanningComponent } from './seed-rolling-planing/indentor-login/state-login-replanning/state-login-replanning.component';
+// import { StateLoginReplanningComponent } from './seed-rolling-planing/indentor-login/state-login-replanning/state-login-replanning.component';
+// import { StateLoginScreenComponent } from './seed-rolling-planing/indentor-login/state-login-screen/state-login-screen.component';
+import { AssignSpaComponent } from './seed-rolling-planing/indentor-login/assign-spa/assign-spa.component';
 
 
 
@@ -493,8 +495,10 @@ import { StateLoginReplanningComponent } from './seed-rolling-planing/indentor-l
     ProfarmaOneQrComponent,
     SeedRollingPlaningCropWiseComponent,
     SeedRollingPlaningVarietyWiseComponent,
-    StateLoginReplanningComponent,
-    SeedRollingPlaningWillingnessScreenComponent
+    // StateLoginReplanningComponent,
+    SeedRollingPlaningWillingnessScreenComponent,
+    // StateLoginScreenComponent,
+    AssignSpaComponent
     // GenerateCardQrComponent
     // UnfreezeIndentComponent
     // IndenterReportComponent,

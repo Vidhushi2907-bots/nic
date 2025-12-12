@@ -93,15 +93,7 @@
     pointer-events: none;
 }
 
-.list-action-buttons:disabled {
-    /* background: gainsboro;
-    pointer-events: none; */
-}
 
-.list-action-buttons-second:disabled {
-    /* background: gainsboro;
-    pointer-events: none; */
-}
 
 .form-control {
     border-color: 2px solid #B64B1D;
@@ -850,12 +842,21 @@ input:checked + .slider:before {
     .list-action-buttons-second,
     .list-action-buttons-second:focus,
     .list-action-buttons-second:active {
-    width: 32px;
+    /* width: 32px;
     /* height: 39px; */
-    height: 35px;
+    /* height: 35px;
     outline: none;
     border: none !important;
     fill: #B64B1D !important;
+    cursor: pointer; */ 
+       width: 32px;
+    /* height: 39px; */
+    height: 35px;
+    outline: none;
+    border-radius: 10px;
+    border: none !important;
+    fill: #B64B1D !important;
+    background: none;
     cursor: pointer;
     }
     
@@ -1038,3 +1039,40 @@ font-size: 14px !important;
     display: flex;
     gap: 8px;
 }
+.variety-block {
+   background: #B64B1D0D;     /* light grey-blue shade */
+    padding: 12px 10px;
+    border-radius: 6px;
+    margin-bottom: 12px; 
+}
+.rounded-modal {
+  border-radius: 15px !important;
+  padding: 0 !important;
+}
+
+.modal-title {
+  background: #0d6efd;
+  padding: 12px !important;
+  border-radius: 10px 10px 0 0;
+  font-size: 18px !important;
+  text-align: left !important;
+}
+/* Disable click on LABEL when input is disabled */
+/* .switch.small-switch input:disabled + .slider,
+.switch.small-switch input:disabled + .slider.round,
+.switch.small-switch input:disabled {
+    pointer-events: none !important;
+}
+
+/* Also disable pointer events on the full label */
+/* .switch.small-switch input:disabled {
+    pointer-events: none !important;
+}
+
+.switch.small-switch input:disabled ~ * {
+    pointer-events: none !important;
+}
+
+.switch.small-switch {
+    pointer-events: none !important;
+}  */

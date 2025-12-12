@@ -66,7 +66,8 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
   isSubmitting = false;
   isFinalSubmitted: boolean = false;
   isFinalSubmitButtonHide: boolean;
-  autoSearchTimeout: any
+  autoSearchTimeout: any;
+  lastValidSRR: any = [];
   // selectedGroup: string = '';
   // originalCropList: any[] = [];
   // filteredCrops:any[]=[]
@@ -141,7 +142,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
       this.getPageData();  // automatically fire your API function
     }, 400); // delay 0.4 sec
   }
-  
+
   //get crop code
   getCropCode(i: number) {
 
@@ -565,72 +566,46 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
     const result = this.service.getPlansInfo(route).then((data: any) => {
       this.response_crop_group = data['EncryptedResponse'].data;
       this.response_crop_group_second = this.response_crop_group
-      console.log(data['EncryptedResponse'].data, 'ddddddddd', this.response_crop_group)
+      // console.log(data['EncryptedResponse'].data, 'ddddddddd', this.response_crop_group)
     })
 
   }
+  srrValidation(event: any, index: number) {
+    const input = event.target as HTMLInputElement;
+    let value = input.value;
 
- srrValidation(event: any, index: number) {
-  const input = event.target as HTMLInputElement;
-  let value = input.value;
+    const regex = /^[0-9]*\.?[0-9]{0,2}$/;
 
-  // 🔵 Allow only numbers + 2 decimals
-  const regex = /^[0-9]*\.?[0-9]{0,2}$/;
+    if (!regex.test(value)) {
+      input.value = this.lastValidSRR[index];
 
-  if (!regex.test(value)) {
-    // remove last wrong character
-    value = value.slice(0, -1);
-    input.value = value;
+      return;
+    }
+
+    const numValue = parseFloat(value);
+
+    // ✔ Agar value ≤ 100 → store per-row last valid value
+    if (!isNaN(numValue) && numValue <= 100) {
+      console.log(value, "heeeeeeeeeeeeeee")
+      this.lastValidSRR[index] = value;
+    }
+
+    // ❌ If value > 100 → revert to this row ka last valid value
+    if (numValue > 100) {
+      Swal.fire({
+        title: '<p style="font-size:25px;">Error: SRR Target must be 100 or less.</p>',
+        icon: 'error',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#E97E15'
+      });
+
+      input.value = this.lastValidSRR[index];
+      return;
+    }
+
+    this.calculateTotalSeed(index);
   }
 
-  // 🔴 Max value 100
-  const numValue = parseFloat(value);
-  if (numValue > 100) {
-    Swal.fire({
-      title: '<p style="font-size:25px;">Error: SRR Target must be 100 or less.</p>',
-      icon: 'error',
-      confirmButtonText: 'OK',
-      confirmButtonColor: '#E97E15'
-    });
-
-    // input.value = "100"; // set back to 100
-    // this.ngForm.controls['srpCropWise']['controls'][index].controls['srr'].setValue(100);
-  }
-
-  // 🔵 Call your calculation function
-  this.calculateTotalSeed(index);
-}
-
-  // getCroupCroupList(year1: number, season: string) {
-  //   if (!year1 || !season) {
-  //     this.response_crop_group = [];
-  //     this.response_crop_group_second = [];
-  //     return;
-  //   }
-
-  //   let apiUrl = `get-srp-crop-group-wise?year=${year1}&season=${season}`;
-
-  //   this.srpService.getPlansInfo(apiUrl)
-  //     .then((data: any) => {
-  //       if (
-  //         data &&
-  //         data.EncryptedResponse &&
-  //         data.EncryptedResponse.status_code === 200
-  //       ) {
-  //         this.response_crop_group = data.EncryptedResponse.data || [];
-  //         console.log(this.response_crop_group, "status")
-  //         this.response_crop_group_second = [...this.response_crop_group];
-  //       } else {
-  //         this.response_crop_group = [];
-  //         this.response_crop_group_second = [];
-  //       }
-  //     })
-  //     .catch((error: any) => {
-  //       console.error("❌ Error:", error);
-  //       this.response_crop_group = [];
-  //       this.response_crop_group_second = [];
-  //     });
-  // }
   calculateTotalSeed(i: number) {
     const srpCropWiseArray = this.ngForm.get('srpCropWise') as FormArray;
 
@@ -679,8 +654,9 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
   ngOnInit(): void {
     // Initialize form first
     const userData = localStorage.getItem('BHTCurrentUser');
-  const data = JSON.parse(userData);
-  this.userId = data.id;
+    const data = JSON.parse(userData);
+    this.userId = data.id;
+
     this.ngForm = this.fb.group({
       year: [''],
       season: [''],
@@ -698,10 +674,13 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
         this.getPageData(); // reload data automatically when dropdown changes
       });
     }
- 
+
     // Load years and seasons for dropdowns
     this.loadYears();
     this.loadSeasons();
+
+
+
   }
 
   openpopup() {

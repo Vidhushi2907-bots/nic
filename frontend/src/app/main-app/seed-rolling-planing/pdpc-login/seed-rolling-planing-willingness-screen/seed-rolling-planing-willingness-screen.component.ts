@@ -64,7 +64,9 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
   openCropIndexs: number | null = null;
   selectCrop: any;
   openCropIndexes: number[] = [];
-
+  isFinalSubmitButtonHide: boolean;
+  isCheckNewVariety:boolean
+  selectedReplaceList: any = [];
   constructor(private service: SeedServiceService, private _masterService: MasterService, private breeder: BreederService, private fb: FormBuilder, private route: Router, private cdRef: ChangeDetectorRef, private _productionCenter: ProductioncenterService, private master: MasterService, private srpService: SeedRollingPlanningService) {
 
   }
@@ -244,7 +246,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
     songs.push(this.createInnerRow());
     this.toggleCropSection(albumIndex)
   }
-  
+
   getPageData() {
     const year = this.ngForm.controls['year'].value;
     const season = this.ngForm.controls['season'].value;
@@ -277,12 +279,13 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
           data.EncryptedResponse.status_code === 200
         ) {
           this.inventoryVarietyData = data.EncryptedResponse.data;
-          console.log("API DATA:", this.inventoryVarietyData);
-
+          const willingnessData = this.inventoryVarietyData || [];
+          this.isFinalSubmitButtonHide = willingnessData.some((item: any) => item?.is_final_submit === true);
+// assuming API returns this at root
           const srpWillingnessArray = this.ngForm.get('bspc') as FormArray;
           const additionalArray = this.ngForm.get('newVarieties') as FormArray;
           srpWillingnessArray.clear();
-          
+          additionalArray.clear();
           // this.inventoryVarietyData.forEach((variety: any) => {
 
           //   if (variety.is_additional === true) {
@@ -325,11 +328,10 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
           //   }
           // });
           this.inventoryVarietyData.forEach((variety: any, index: number) => {
-            console.log(variety, "variety.................")
-            additionalArray.clear();
+
             if (variety.is_additional === true) {
-            
-               additionalArray.push(
+
+              additionalArray.push(
                 this.fb.group({
                   id: [variety.id],
                   variety_code: [variety.variety_code],
@@ -338,7 +340,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
                   additional_note: [variety.remarks ?? '']
                 })
               );
-              
+
             } else {
               const group = this.fb.group({
                 id: [variety.id],
@@ -356,7 +358,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
                 variety.replace_varieties.forEach(rv => {
                   replaceArray.push(
                     this.fb.group({
-                      id:[rv.id],
+                      id: [rv.id],
                       variety_code: [rv.replace_variety_code],
                       variety_name: [rv.replace_variety_name],
                       replace_tentative_qty: [rv.quantity]
@@ -371,7 +373,9 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
             }
           });
 
-
+          if (additionalArray.length === 0) {
+            additionalArray.push(this.createNewVarietyRow());
+          }
 
         }
       },
@@ -434,11 +438,9 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
 
     this.indentorBreederSeedData(varietyCode);
   }
-
   hidePopover() {
     this.popupIndex = null;
   }
-
   indentorBreederSeedData(varietyCode: string) {
 
     const year = this.ngForm.controls['year'].value;
@@ -466,6 +468,24 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
         console.error("❌ API Error:", err);
       }
     });
+  }
+  checkTentativeValue(i: number) {
+    const controlGroup = this.ngForm.controls['bspc']['controls'][i];
+    const totalSeedRequired = controlGroup.controls['total_seed_required'].value;
+    console.log(totalSeedRequired, "totalSeedRequired");
+    const tentativeControl = controlGroup.controls['tentative_quantity'];
+    console.log(tentativeControl.value, "tentativeControl")
+    if (tentativeControl.value > totalSeedRequired) {
+      // Reset tentative to 0
+      Swal.fire({
+        icon: 'warning',
+        title: 'Oops!',
+        text: 'Tentative quantity cannot exceed the target quantity!',
+        confirmButtonText: 'OK'
+      });
+      tentativeControl.setValue(0, { emitEvent: false });
+
+    }
   }
 
   saveAsDraft() {
@@ -522,6 +542,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
       next: (data: any) => {
         console.log("API Response:", data);
         if (data?.EncryptedResponse?.status_code === 200) {
+
           Swal.fire({
             title: '<p style="font-size:25px;">Data saved as Draft successfully.</p>',
             icon: 'success',
@@ -550,65 +571,200 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
       },
     });
   }
+  openReplaceSwal(list: any[]) {
+    console.log(list, "heeloo....................")
+    Swal.fire({
+      title: '<span style="color:Black;">Replacement Varieties</span>',
+      width: 700,
+      background: '#f5f5f5',
+      html: this.generateTableHTML(list),
+      showCloseButton: true,
+      showConfirmButton: false,
+      customClass: {
+        popup: 'rounded-modal',
+        title: 'modal-title'
+      }
+    });
+  }
 
-  // Add inner row (replace variety)
+  generateTableHTML(list: any[]) {
+    if (!list || list.length === 0) {
+      return `<p>No replacement varieties available.</p>`;
+    }
+
+    let rows = list
+      .map(
+        (x) => `
+      <tr>
+      
+        <td>${x.variety_name || '-'}</td>
+        <td>${x.replace_tentative_qty}</td>
+      </tr>`
+      )
+      .join('');
+
+    return `
+    <div style="margin-top:10px;">
+      <table border="1" width="100%" style="border-collapse: collapse; text-align:center;">
+        <thead style="background:#B34B1D;">
+          <tr>
+          
+          <th style="color: black;">Variety Name</th>
+<th style="color: black;">Tentative Qty</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          ${rows}
+        </tbody>
+      </table>
+    </div>
+  `;
+  }
+  finalizeData() {
+    const apiUrl = "srp-add-willingness";
+    const formValues = this.ngForm.value;
+
+    const bspcArray = formValues.bspc || [];               // FIX 1
+    const newVarArr = formValues.newVarieties || [];       // FIX 2
+  
+
+  
+    const existingData = bspcArray.map((row: any) => {
+
+      const replaceArray = row.replaceVariety || [];       // FIX 3
+
+      const replaceData = replaceArray
+        .filter((r: any) => r?.variety_code)
+        .map((r: any) => ({
+          replace_variety_code: r.variety_code,
+          quantity: Number(r.replace_tentative_qty || 0),
+        }));
+
+      return {
+        variety_code: row.variety_code,
+        willingness: row.status_toggle,
+        quantity: Number(row.tentative_quantity || 0),
+        is_additional: false,
+        remarks: null,
+        replace_varieties: replaceData.length > 0 ? replaceData : null
+      };
+    });
+
+    const newVarietyData = newVarArr
+      .filter((row: any) => row?.variety_code)
+      .map((row: any) => ({
+        variety_code: row.variety_code,
+        willingness: true,
+        quantity: Number(row.new_tentative_quantity || 0),
+        is_additional: true,
+        remarks: row.additional_note || null
+      }));
+
+    // FINAL MERGE — always an array
+    const willingnessData = [...existingData, ...newVarietyData];
+
+    // Validation: If willingness true → quantity must be > 0
+    for (let item of willingnessData) {
+      if (item.willingness === true && item.quantity === 0) {
+        Swal.fire({
+          title: '<p style="font-size:25px;">Quantity is required if willingness is true.</p>',
+          icon: 'error',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#B64B1D',
+        });
+        return;
+      }
+    }
+
+    const payload = {
+      action: "final",
+      year: Number(formValues.year),
+      season: formValues.season,
+      crop_code: formValues.crop_code,
+      willingnessData
+    };
+
+    console.log("Final Payload: ", payload);
+
+    this.srpService.postRequestCreator(apiUrl, null, payload).subscribe({
+      next: (data: any) => {
+        if (data?.EncryptedResponse?.status_code === 200) {
+          Swal.fire({
+            title: '<p style="font-size:22px;">Data Submitted Successfully!</p>',
+            icon: 'success',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#E97E15',
+          }).then(() => {
+            this.isFinalSubmitButtonHide = true
+            this.getPageData();
+          });
+        } else {
+          Swal.fire({
+            title: '<p style="font-size:22px;">Something went wrong!</p>',
+            icon: 'error',
+          });
+        }
+      },
+      error: () => {
+        Swal.fire({
+          title: '<p style="font-size:22px;">Server Error! Try again.</p>',
+          icon: 'error',
+        });
+      },
+    });
+  }
+
+
   addInnerRow(i: number) {
     this.getInnerBspc(i).push(
       this.fb.group({
-        id:[''],
+        id: [''],
         variety_code: [''],
         variety_name: [''],
         replace_tentative_qty: [0]
       })
     );
   }
-
-  // Remove inner row
-  // removeInnerRow(i: number, j: number) {
-  //   this.getInnerBspc(i).removeAt(j);
-    
-  // }
   removeInnerRow(i: number, j: number) {
-  const innerArray = this.getInnerBspc(i);
+    const innerArray = this.getInnerBspc(i);
 
-  // Get ID safely
-  const id = innerArray.get(j.toString()).value?.id
-  console.log(id, "id");
+    // Get ID safely
+    const id = innerArray.get(j.toString()).value?.id
+    console.log(id, "id");
 
-  // Remove the inner row
-  innerArray.removeAt(j);
+    // Remove the inner row
+    innerArray.removeAt(j);
 
-  // If id does not exist, don't make API call
-  if (!id) {
-    console.warn("⚠️ No ID found for this row, skipping API call.");
-    return;
+    // If id does not exist, don't make API call
+    if (!id) {
+      console.warn("⚠️ No ID found for this row, skipping API call.");
+      return;
+    }
+
+    const apiUrl = `srp-willingness-replace-variety?id=${id}`;
+    console.log(apiUrl, "apiUrl");
+
+    this.srpService.getRequestCreatorNew(apiUrl).subscribe({
+      next: (data: any) => {
+        if (
+          data &&
+          data.EncryptedResponse &&
+          data.EncryptedResponse.data &&
+          data.EncryptedResponse.status_code === 200
+        ) {
+          this.varietyData = data.EncryptedResponse.data;
+          console.log("✅ Data loaded");
+        } else {
+          console.warn("⚠️ No valid data received");
+          this.varietyData = [];
+        }
+      },
+      error: (err) => {
+        console.error("❌ Error fetching data:", err);
+      },
+    });
   }
-
-  const apiUrl = `srp-willingness-replace-variety?id=${id}`;
-  console.log(apiUrl, "apiUrl");
-
-  this.srpService.getRequestCreatorNew(apiUrl).subscribe({
-    next: (data: any) => {
-      if (
-        data &&
-        data.EncryptedResponse &&
-        data.EncryptedResponse.data &&
-        data.EncryptedResponse.status_code === 200
-      ) {
-        this.varietyData = data.EncryptedResponse.data;
-        console.log("✅ Data loaded");
-      } else {
-        console.warn("⚠️ No valid data received");
-        this.varietyData = [];
-      }
-    },
-    error: (err) => {
-      console.error("❌ Error fetching data:", err);
-    },
-  });
-}
-
-
   selectVariety(index: number, variety: any) {
     const control = this.newVarieties.at(index);
     control.patchValue({
@@ -644,6 +800,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
   ngOnInit(): void {
     this.createForm();
     this.loadYear();
+    this.isFinalSubmitButtonHide = false;
     const userData = localStorage.getItem('BHTCurrentUser');
     const data = JSON.parse(userData);
     this.userId = data.id;

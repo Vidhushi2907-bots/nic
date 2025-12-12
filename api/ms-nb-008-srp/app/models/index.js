@@ -135,6 +135,9 @@ db.seedMultiplicationRatioModel = require('./seed_multiplication_ratio.model.js'
 db.seasonModel = require('./season.model.js')(sequelize, Sequelize);
 db.srpWillingnessModel = require('./srp_willingnesses.model.js')(sequelize, Sequelize);
 db.srpWillingnessReplaceModel = require('./srp_willingness_replaces.js')(sequelize, Sequelize);
+db.srpStateReplanningModel=require('./srp_state_replaning.model.js')(sequelize,Sequelize);
+db.srpStateReplanningReplaceVaritiesModel=require('./srp_state_replanning_replace_varieties.model.js')(sequelize,Sequelize);
+db.srpStateReplanningNewVarietiesModel=require('./srp_replanning_new_varieties.model.js')(sequelize,Sequelize);
 // Here
 // table first
 //table second
@@ -287,7 +290,54 @@ db.srpVarietyModel.belongsTo(db.srpCropModel, {
     as: "seed_rolling_plan_crop_wises"  // 🔥 MUST MATCH EXACTLY
 });
 
+db.srpCropModel.hasMany(db.srpStateReplanningModel,{
+    foreignKey: "srp_crop_wise_id",
+    targetKey: "id",
+   
+})
+db.srpStateReplanningModel.belongsTo(db.srpCropModel, {
+    foreignKey: "srp_crop_wise_id",
+    targetKey: "id",
+    
+});
+db.srpVarietyModel.hasMany(db.srpStateReplanningModel,{
+    foreignKey: "srp_variety_wise_id",
+    targetKey: "id",
+   
+})
+db.srpStateReplanningModel.belongsTo(db.srpVarietyModel, {
+    foreignKey: "srp_variety_wise_id",
+    targetKey: "id",
+    
+});
+db.varietyModel.hasMany(db.srpStateReplanningNewVarietiesModel, {
+    foreignKey: "new_variety_code",
+    sourceKey: "variety_code",
+});
 
+db.srpStateReplanningNewVarietiesModel.belongsTo(db.varietyModel, {
+    foreignKey: "new_variety_code",
+    targetKey: "variety_code",
+});
+
+db.varietyModel.hasMany(db.srpStateReplanningReplaceVaritiesModel, {
+    foreignKey: "replace_variety_code",
+    sourceKey: "variety_code",
+});
+
+db.srpStateReplanningReplaceVaritiesModel.belongsTo(db.varietyModel, {
+    foreignKey: "replace_variety_code",
+    targetKey: "variety_code",
+});
+db.srpStateReplanningModel.hasMany(db.srpStateReplanningReplaceVaritiesModel,{
+      foreignKey: "srp_replanning_id",
+      targetKey: "id",
+})
+db.srpStateReplanningReplaceVaritiesModel.belongsTo(db.srpStateReplanningModel,{
+    foreignKey: "srp_replanning_id",
+    targetKey: "id",
+})
+//.............................Seed rolling planning................................
 db.allocationToSPASeed.belongsTo(db.cropModel, {
     foreignKey: 'crop_code',
     targetKey: 'crop_code'

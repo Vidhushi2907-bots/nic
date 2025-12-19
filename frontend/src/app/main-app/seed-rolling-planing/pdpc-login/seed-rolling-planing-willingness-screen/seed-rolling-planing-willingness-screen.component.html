@@ -45,8 +45,6 @@
                                                 <option *ngFor="let s of inventorySeasonData" [value]="s.season">
                                                     {{ s.season }}
                                                 </option>
-                                                <!-- <option value="Kharif">Kharif</option>
-                                                <option value="Rabi">Rabi</option> -->
                                             </select>
                                         </div>
                                     </div>
@@ -64,9 +62,6 @@
                                                 <option *ngFor="let c of inventoryCropData" [value]="c.crop_code">
                                                     {{ c.crop_name }}
                                                 </option>
-                                                <!-- <option value="Kharif">Kharif</option>
-                                                <option value="Rabi">Rabi</option> -->
-
                                             </select>
                                         </div>
                                     </div>
@@ -154,56 +149,58 @@
                                     </div>
                                 </div>
 
-
-                                <!-- Dynamic Rows -->
-                                <div formArrayName="bspc" *ngIf="bspc && bspc.controls">
-                                    <div class="row data-row" *ngFor="let data of bspc.controls; let i = index"
-                                        [formGroupName]="i">
-                                        <!-- S.No -->
-                                        <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle  justify-content-center"
-                                            [ngClass]="{'disabled-row': !ngForm.controls['bspc']['controls'][i].controls['status_toggle'].value}">
-                                            <label class="d-md-none"><b>S.No:</b>&nbsp;</label>
-                                            <span>{{ i + 1 }}</span>
-                                        </div>
-
-                                        <!-- Variety Name -->
-                                        <div class="col-md-3 d-flex align-items-center justify-content-center border-end justify-content-center"
-                                            [ngClass]="{'disabled-row': !ngForm.controls['bspc']['controls'][i].controls['status_toggle'].value}">
-                                            <label class="d-md-none"><b>Variety Name:</b>&nbsp;</label>
-                                            <span>
-                                                {{ ngForm.controls['bspc']['controls'][i].controls['variety_name'].value
-                                                }}
-                                            </span>
-                                        </div>
-
-                                        <!-- Target Breeder Seed Quantity -->
-                                        <div class="col-md-3 d-flex align-items-center justify-content-center border-end text-center"
-                                            style="position: relative;">
-
-                                            <div class="form-group w-100 px-2">
-                                                <label class="d-md-none">
-                                                    <b>Target Breeder Seed Quantity:</b>
-                                                </label>
-
-                                                <!-- CLICK Event Only -->
-                                                <span (click)="onQuantityClick(i, $event)" class="quantity-link">
-                                                    {{
-                                                    ngForm.controls['bspc']['controls'][i].controls['total_seed_required'].value
-                                                    }}
-                                                </span>
-
-                                                <!-- Popup ONLY when clicked -->
-                                                <div *ngIf="popupIndex === i" class="custom-popup">
-                                                    <div *ngFor="let d of inventoryIndentorData">
-                                                        <b>{{ d.user_name }}</b>: {{ d.breeder_seed }}
-                                                    </div>
-                                                </div>
+                                <div style="max-height: 350px; overflow-x: hidden;
+                            overflow-y: auto; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;">
+                                    <!-- Dynamic Rows -->
+                                    <div formArrayName="bspc" *ngIf="bspc && bspc.controls">
+                                        <div class="row data-row" *ngFor="let data of bspc.controls; let i = index"
+                                            [formGroupName]="i">
+                                            <!-- S.No -->
+                                            <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle  justify-content-center"
+                                                [ngClass]="{'disabled-row':!isFinalSubmitButtonHide &&!ngForm.controls['bspc']['controls'][i].controls['status_toggle'].value}">
+                                                <label class="d-md-none"><b>S.No:</b>&nbsp;</label>
+                                                <span>{{ i + 1 }}</span>
                                             </div>
 
+                                            <!-- Variety Name -->
+                                            <div class="col-md-3 d-flex align-items-center justify-content-center border-end justify-content-center"
+                                                [ngClass]="{'disabled-row': !isFinalSubmitButtonHide &&!ngForm.controls['bspc']['controls'][i].controls['status_toggle'].value}">
+                                                <label class="d-md-none"><b>Variety Name:</b>&nbsp;</label>
+                                                <span>
+                                                    {{
+                                                    ngForm.controls['bspc']['controls'][i].controls['variety_name'].value
+                                                    }}
+                                                </span>
+                                            </div>
 
-                                        </div>
-                                        <!-- Willingness Toggle -->
-                                        <div
+                                            <!-- Target Breeder Seed Quantity -->
+                                            <div class="col-md-3 d-flex align-items-center justify-content-center border-end text-center"
+                                                style="position: relative;">
+
+                                                <div class="form-group w-100 px-2">
+                                                    <label class="d-md-none">
+                                                        <b>Target Breeder Seed Quantity:</b>
+                                                    </label>
+
+                                                    <!-- CLICK Event Only -->
+                                                    <span (click)="onQuantityClick(i, $event)" class="quantity-link">
+                                                        {{
+                                                        ngForm.controls['bspc']['controls'][i].controls['total_seed_required'].value
+                                                        }}
+                                                    </span>
+
+                                                    <!-- Popup ONLY when clicked -->
+                                                    <div *ngIf="popupIndex === i" class="custom-popup">
+                                                        <div *ngFor="let d of inventoryIndentorData">
+                                                            <b>{{ d.user_name }}</b>: {{ d.breeder_seed }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+                                            <!-- Willingness Toggle -->
+                                            <!-- <div
                                             class="col-6 col-md-1 py-3 d-flex verticle-content-middle align-items-center justify-content-center">
                                             <label class="switch small-switch mb-0"
                                                 [ngStyle]="isFinalSubmitButtonHide ? {'pointer-events':'none'} : {}">
@@ -211,145 +208,166 @@
                                                     [disabled]="isFinalSubmitButtonHide">
                                                 <span class="slider round"></span>
                                             </label>
-                                        </div>
+                                        </div> -->
+                                            <div
+                                                class="col-6 col-md-1 py-3 d-flex align-items-center justify-content-center">
 
-                                        <!-- Tentative Breeder Seed Quantity -->
-                                        <div class="col-md-3 d-flex align-items-center justify-content-center border-end justify-content-center "
-                                            [ngClass]="{'disabled-row': !ngForm.controls['bspc']['controls'][i].controls['status_toggle'].value}">
-                                            <div class="form-group w-100 px-2">
-                                                <label class="d-md-none"><b>Tentative Quantity:</b>&nbsp;</label>
-                                                <input type="number" class="form-control target-input-field"
-                                                    (keypress)="checkDecimal($event)"
-                                                    (keypress)="checkLength($event, 10)"
-                                                    formControlName="tentative_quantity"
-                                                    [readonly]="isFinalSubmitButtonHide"
-                                                    (input)="checkTentativeValue(i)" />
+                                                <!-- TOGGLE (before final submit) -->
+                                                <label class="switch small-switch mb-0"
+                                                    *ngIf="!isFinalSubmitButtonHide">
+                                                    <input type="checkbox" formControlName="status_toggle">
+                                                    <span class="slider round"></span>
+                                                </label>
+
+                                                <!-- YES / NO (after final submit) -->
+                                                <span *ngIf="isFinalSubmitButtonHide">
+                                                    {{
+                                                    ngForm.controls['bspc']['controls'][i].controls['status_toggle'].value
+                                                    ? 'Yes' : 'No'
+                                                    }}
+                                                </span>
+
                                             </div>
-                                        </div>
-
-                                        <!-- Button Add Replacement Variety -->
-                                        <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle"
-                                            [ngClass]="{'disabled-row': ngForm.controls['bspc']['controls'][i].controls['status_toggle'].value}"
-                                            *ngIf="!isFinalSubmitButtonHide" style="padding-right: 2rem!important;">
-                                            <button
-                                                class="form-button d-flex justify-content-center verticle-content-middle"
-                                                style="width: 100px !important; background-color: #B64B1D; color: white; border: none; border-radius: 6px;"
-                                                [disabled]="bspc.controls[i].get('status_toggle')?.value === 1"
-                                                (click)="addReplaceVarieties(i)">
-                                                Add
-                                            </button>
 
 
-                                        </div>
-                                        <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle"
-                                            *ngIf="isFinalSubmitButtonHide" style="padding-right: 2rem!important;">
+                                            <!-- Tentative Breeder Seed Quantity -->
+                                            <div class="col-md-3 d-flex align-items-center justify-content-center border-end justify-content-center "
+                                                [ngClass]="{'disabled-row':!isFinalSubmitButtonHide && !ngForm.controls['bspc']['controls'][i].controls['status_toggle'].value}">
+                                                <div class="form-group w-100 px-2">
+                                                    <label class="d-md-none"><b>Tentative Quantity:</b>&nbsp;</label>
+                                                    <span class="d-flex align-items-center justify-content-center"
+                                                        *ngIf="isFinalSubmitButtonHide">
+                                                        {{
+                                                        ngForm.controls['bspc']['controls'][i].controls['tentative_quantity'].value
+                                                        }}
+                                                    </span> <input type="number" class="form-control target-input-field"
+                                                        *ngIf="!isFinalSubmitButtonHide"
+                                                        (keypress)="checkDecimal($event)"
+                                                        (keypress)="checkLength($event, 10)"
+                                                        formControlName="tentative_quantity"
+                                                        [readonly]="isFinalSubmitButtonHide"
+                                                        (input)="checkTentativeValue(i)" />
+
+                                                </div>
+                                            </div>
+
+                                            <!-- Button Add Replacement Variety -->
+                                            <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle"
+                                                [ngClass]="{'disabled-row': ngForm.controls['bspc']['controls'][i].controls['status_toggle'].value}"
+                                                *ngIf="!isFinalSubmitButtonHide" style="padding-right: 2rem!important;">
+                                                <button
+                                                    class="form-button d-flex justify-content-center verticle-content-middle"
+                                                    style="width: 100px !important; background-color: #B64B1D; color: white; border: none; border-radius: 6px;"
+                                                    [disabled]="bspc.controls[i].get('status_toggle')?.value === 1"
+                                                    (click)="addReplaceVarieties(i)">
+                                                    Add
+                                                </button>
 
 
-                                            <!-- FINAL SUBMIT KE BAAD REPLACE COUNT -->
-                                            <a style="cursor:pointer; text-decoration: underline; color:#007bff;"
-                                                (click)="openReplaceSwal(bspc.controls[i].get('replaceVariety')?.value)">
-                                                {{ bspc.controls[i].get('replaceVariety')?.value?.length || 0 }}
-                                            </a>
-                                        </div>
+                                            </div>
+                                            <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle"
+                                                *ngIf="isFinalSubmitButtonHide" style="padding-right: 2rem!important;">
 
-                                        <div class="col-12 px-3"
-                                            *ngIf="openCropIndexes.includes(i) && !isFinalSubmitButtonHide"
-                                            formArrayName="replaceVariety">
 
-                                            <div class="row inner-row variety-block"
-                                                *ngFor="let group of getInnerBspc(i).controls; let j = index"
-                                                [formGroupName]="j" style="margin-bottom:0; padding-top:0;">
+                                                <!-- FINAL SUBMIT KE BAAD REPLACE COUNT -->
+                                                <a style="cursor:pointer; text-decoration: underline; color:#007bff;"
+                                                    (click)="openReplaceSwal(bspc.controls[i].get('replaceVariety')?.value)">
+                                                    {{ bspc.controls[i].get('replaceVariety')?.value?.length || 0 }}
+                                                </a>
+                                            </div>
 
-                                                <!-- Inputs Column -->
-                                                <div class="col-xl-11 col-12" style="padding:0;">
-                                                    <div class="row g-2"> <!-- reduced gutter -->
+                                            <div class="col-12 px-3"
+                                                *ngIf="openCropIndexes.includes(i) && !isFinalSubmitButtonHide"
+                                                formArrayName="replaceVariety">
 
-                                                        <!-- Variety Name -->
-                                                        <div class="col-12 col-md-6">
-                                                            <label class="label-inventorys mb-1">Variety Name</label>
-                                                            <div ngbDropdown
-                                                                class="d-inline-block w-100 position-relative">
-                                                                <button
-                                                                    class="btn takeplacholder w-100 crop toggle-button text-start"
-                                                                    [id]="'destination' + i" ngbDropdownToggle>
-                                                                    {{ group.get('variety_name')?.value || 'Select
-                                                                    Variety' }}
-                                                                </button>
-                                                                <i
-                                                                    class="fa-solid fa-angle-down downicon position-absolute end-0 top-50 translate-middle-y pe-2"></i>
-                                                                <div ngbDropdownMenu class="w-100">
-                                                                    <button type="button"
-                                                                        class="dropdown-item text-start"
-                                                                        *ngFor="let v of varietyData"
-                                                                        (click)="selectReplaceVariety(i, j, v)">
-                                                                        {{ v.variety_name }}
+                                                <div class="row inner-row variety-block"
+                                                    *ngFor="let group of getInnerBspc(i).controls; let j = index"
+                                                    [formGroupName]="j" style="margin-bottom:0; padding-top:0;">
+
+                                                    <!-- Inputs Column -->
+                                                    <div class="col-xl-11 col-12" style="padding:0;">
+                                                        <div class="row g-2"> <!-- reduced gutter -->
+
+                                                            <!-- Variety Name -->
+                                                            <div class="col-12 col-md-6">
+                                                                <label class="label-inventorys mb-1">Variety
+                                                                    Name</label>
+                                                                <div ngbDropdown
+                                                                    class="d-inline-block w-100 position-relative">
+                                                                    <button
+                                                                        class="btn takeplacholder w-100 crop toggle-button text-start"
+                                                                        [id]="'destination' + i" ngbDropdownToggle>
+                                                                        {{ group.get('variety_name')?.value || 'Select
+                                                                        Variety' }}
                                                                     </button>
+                                                                    <i
+                                                                        class="fa-solid fa-angle-down downicon position-absolute end-0 top-50 translate-middle-y pe-2"></i>
+                                                                    <div ngbDropdownMenu class="w-100">
+                                                                        <button type="button"
+                                                                            class="dropdown-item text-start"
+                                                                            *ngFor="let v of varietyData"
+                                                                            (click)="selectReplaceVariety(i, j, v)">
+                                                                            {{ v.variety_name }}
+                                                                        </button>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
 
-                                                        <!-- Tentative Breeder Seed Qty -->
-                                                        <div class="col-12 col-md-6">
-                                                            <label class="label-inventorys mb-1">Tentative Breeder Seed
-                                                                Qty (QTL.)</label>
-                                                            <input type="number" class="form-control"
-                                                                formControlName="replace_tentative_qty"
-                                                                placeholder="Enter Quantity">
-                                                        </div>
+                                                            <!-- Tentative Breeder Seed Qty -->
+                                                            <div class="col-12 col-md-6">
+                                                                <label class="label-inventorys mb-1">Tentative Breeder
+                                                                    Seed
+                                                                    Qty (QTL.)</label>
+                                                                <input type="number" class="form-control"
+                                                                    formControlName="replace_tentative_qty"
+                                                                    placeholder="Enter Quantity">
+                                                            </div>
 
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                                <!-- Buttons Column -->
-                                                <div class="col-xl-1 col-12 d-flex align-items-center"
-                                                    style="display: flex;">
-                                                    <button class="list-action-buttons-second ml-lg-3  mt-md-2 "
-                                                        (click)="addInnerRow(i)">
-                                                        <img src="assets/images/Add.png">
-                                                    </button>
-                                                    <button *ngIf="getInnerBspc(i).controls.length > 1"
-                                                        class="list-action-buttons-second ml-lg-3  mt-md-2 "
-                                                        (click)="removeInnerRow(i,j)">
-                                                        <img src="assets/images/delete.png">
-                                                    </button>
-                                                </div>
+                                                    <!-- Buttons Column -->
+                                                    <div class="col-xl-1 col-12 d-flex align-items-center"
+                                                        style="display: flex;">
+                                                        <button class="list-action-buttons-second ml-lg-3  mt-md-2 "
+                                                            (click)="addInnerRow(i)">
+                                                            <img src="assets/images/Add.png">
+                                                        </button>
+                                                        <button *ngIf="getInnerBspc(i).controls.length > 1"
+                                                            class="list-action-buttons-second ml-lg-3  mt-md-2 "
+                                                            (click)="removeInnerRow(i,j)">
+                                                            <img src="assets/images/delete.png">
+                                                        </button>
+                                                    </div>
 
-                                                <!-- Separator Line -->
-                                                <div class="col-12 px-0" style="padding-top: 10px;">
-                                                    <hr class="separator m-0">
-                                                    <!-- added space -->
-                                                </div>
+                                                    <!-- Separator Line -->
+                                                    <div class="col-12 px-0" style="padding-top: 10px;">
+                                                        <hr class="separator m-0">
+                                                        <!-- added space -->
+                                                    </div>
 
+                                                </div>
                                             </div>
-                                        </div>
 
+
+
+                                        </div>
 
 
                                     </div>
-
-
                                 </div>
-
-
-
 
                             </div>
 
                             <!-- No Data Message -->
-                            <div *ngIf="
-          filterPaginateSearch &&
-          filterPaginateSearch.initialized &&
-          (!filterPaginateSearch.itemList || filterPaginateSearch.itemList.length < 1)
-        " class="px-2 py-3 w-100 text-center" style="height: 50px;">
-                                No Data Found.
-                            </div>
+                         
                         </div>
                     </div>
 
                 </div>
                 <!-- fourth ui -->
-                <div class="col-12 col-md-12 col-lg-12" *ngIf="isCrop" >
-                    <div class="row card-inventory form-group align-items-end" >
+                <div class="col-12 col-md-12 col-lg-12" *ngIf="isCrop ">
+                    <div class="row card-inventory form-group align-items-end">
                         <div class="col-12 col-md-12 col-lg-12 col-sm-12 col-xl-12">
                             <div class="card-inventory-2 form-group mt-2 mb-2">
                                 <div class="col-12 col-md-12 col-lg-12 col-sm-12 col-xl-12">
@@ -368,15 +386,15 @@
 
                     </div>
                 </div>
-                <div class="col-12 px-3" *ngIf="isCrop" formArrayName="newVarieties">
+                <div class="col-12 px-3" *ngIf="isCrop && !isFinalSubmitButtonHide" formArrayName="newVarieties">
 
                     <div class="row inner-row variety-block" *ngFor="let ele of newVarieties.controls; let i = index"
                         [formGroupName]="i" style="margin-bottom:0; padding-top:0;">
 
-                        <div class="row w-100" >
+                        <div class="row w-100">
 
                             <!-- Variety Name -->
-                            <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
+                            <!-- <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
                                 <label class="label-inventorys mb-1">Variety Name</label>
                                 <div ngbDropdown class="d-inline-block w-100 position-relative">
                                     <button class="btn takeplacholder w-100 crop toggle-button text-start"
@@ -387,12 +405,44 @@
                                         class="fa-solid fa-angle-down downicon position-absolute end-0 top-50 translate-middle-y pe-2"></i>
                                     <div ngbDropdownMenu class="w-100">
                                         <button type="button" class="dropdown-item text-start"
-                                            [disabled]="isFinalSubmitButtonHide" *ngFor="let v of varietyData"
+                                            *ngIf="!isFinalSubmitButtonHide" *ngFor="let v of varietyData"
                                             (click)="selectVariety(i, v)">
+                                            {{ v.variety_name }}
+                                        </button>
+                                        <span class="d-flex align-items-center justify-content-center"  *ngIf="!isFinalSubmitButtonHide" >  {{ v.variety_name }}</span>
+                                    </div>
+                                </div>
+                            </div> -->
+
+                            <!-- Variety Name -->
+                            <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
+                                <label class="label-inventorys mb-1">Variety Name</label>
+
+                                <!-- DROPDOWN (Before Final Submit) -->
+                                <div ngbDropdown class="d-inline-block w-100 position-relative"
+                                    *ngIf="!isFinalSubmitButtonHide">
+
+                                    <button class="btn takeplacholder w-100 crop toggle-button text-start"
+                                        [id]="'destination' + i" ngbDropdownToggle>
+                                        {{ ele.get('variety_name')?.value || 'Select Variety' }}
+                                    </button>
+
+                                    <i
+                                        class="fa-solid fa-angle-down downicon position-absolute end-0 top-50 translate-middle-y pe-2"></i>
+
+                                    <div ngbDropdownMenu class="w-100">
+                                        <button type="button" class="dropdown-item text-start"
+                                            *ngFor="let v of varietyData" (click)="selectVariety(i, v)">
                                             {{ v.variety_name }}
                                         </button>
                                     </div>
                                 </div>
+
+                                <!-- TEXT ONLY (After Final Submit) -->
+                                <span class="d-flex align-items-center py-2 fw-semibold"
+                                    *ngIf="isFinalSubmitButtonHide">
+                                    {{ ele.get('variety_name')?.value || '-' }}
+                                </span>
                             </div>
 
                             <!-- Quantity -->
@@ -436,6 +486,94 @@
                 </div>
 
                 <!-- Buttons -->
+                <div class="col-12 col-md-12 col-lg-12 pt-0"
+                    *ngIf="isCrop && isFinalSubmitButtonHide  && hasValidNewVariety()">
+
+                    <div class="row card-inventory form-group">
+                        <div class="col-12">
+
+                            <div class="list-wrapper">
+
+                                <!-- Header Row -->
+                                <div class="row d-none d-md-flex data-row-header">
+
+                                    <div class="col-md-1 py-3 d-flex justify-content-center">
+                                        S/No
+                                    </div>
+
+                                    <div class="col-md-3 d-flex align-items-center justify-content-center border-end">
+                                        New Variety Name
+                                    </div>
+
+                                    <div class="col-md-3 d-flex align-items-center justify-content-center border-end">
+                                        Tentative Breeder Seed Quantity (qtl)
+                                    </div>
+
+                                    <div class="col-md-6 d-flex align-items-center justify-content-center border-end">
+                                        Remarks
+                                    </div>
+
+                                </div>
+
+                                <!-- Dynamic Rows -->
+                                  <div style="max-height: 350px; overflow-x: hidden;
+                            overflow-y: auto; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;">
+                                <div formArrayName="newVarieties">
+                                    <div class="row data-row" *ngFor="let ele of newVarieties.controls; let i = index"
+                                        [formGroupName]="i">
+
+                                        <!-- S.No -->
+                                        <div class="col-md-1 py-3 d-flex justify-content-center">
+
+                                            <label class="d-md-none"><b>S.No:</b>&nbsp;</label>
+                                            <span>{{ i + 1 }}</span>
+                                        </div>
+
+                                        <!-- Variety Name -->
+                                        <div
+                                            class="col-md-3 d-flex align-items-center justify-content-center border-end">
+                                            <label class="d-md-none"><b>Variety Name:</b>&nbsp;</label>
+                                            <span>
+
+                                                {{
+                                                ngForm.controls['newVarieties']['controls'][i].controls['variety_name'].value
+                                                || '-' }}
+                                            </span>
+                                        </div>
+
+                                        <!-- Tentative Quantity -->
+                                        <div
+                                            class="col-md-3 d-flex align-items-center justify-content-center border-end">
+                                            <label class="d-md-none"><b>Tentative Quantity:</b>&nbsp;</label>
+                                            <span>
+
+                                                {{
+                                                ngForm.controls['newVarieties']['controls'][i].controls['new_tentative_quantity'].value
+                                                || 0 }}
+                                            </span>
+                                        </div>
+
+                                        <!-- Remarks -->
+                                        <div
+                                            class="col-md-6 d-flex align-items-center justify-content-center border-end">
+                                            <label class="d-md-none"><b>Remarks:</b>&nbsp;</label>
+                                            <span>
+                                                {{ngForm.controls['newVarieties']['controls'][i].controls['additional_note'].value
+                                                || '-' }}
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                </div>
+</div>
+                            </div>
+
+                          
+
+                        </div>
+                    </div>
+                </div>
+
                 <div *ngIf="isCrop" class="col-12 pt-2">
                     <div class="row justify-content-end">
                         <div class="col-auto">

@@ -263,6 +263,7 @@ import { SeedRollingPlaningVarietyWiseComponent } from './seed-rolling-planing/i
 
 import { SeedRollingPlaningWillingnessScreenComponent } from './seed-rolling-planing/pdpc-login/seed-rolling-planing-willingness-screen/seed-rolling-planing-willingness-screen.component';
 import { AssignSpaComponent } from './seed-rolling-planing/indentor-login/assign-spa/assign-spa.component';
+import { StateLoginReplanningComponent } from './seed-rolling-planing/indentor-login/state-login-replanning/state-login-replanning.component';
 // import { ProfarmaOneQrComponent } from './profarma-one-qr/profarma-one-qr.component';
 const routes: Routes = [
   // {
@@ -1703,10 +1704,10 @@ const routes: Routes = [
         // canActivate: [ProductionCenterGuard]
       },
 
-      // {
-      //   path: 'state-login-replanning',
-      //   component: StateLoginReplanningComponent
-      // },
+      {
+        path: 'state-login-replanning',
+        component: StateLoginReplanningComponent
+      },
       {
         path: 'assign-spa',
         component: AssignSpaComponent

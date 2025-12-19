@@ -107,10 +107,6 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
 
         this.srpCropWise.clear();
         this.isCrop = false;
-
-        // Reset search when year changes
-
-
       }
     });
     this.getCroupCroupList()
@@ -119,6 +115,18 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
 
   searchData() {
     // Reset form fields
+      const year = this.ngForm.get('year')?.value;
+  const season = this.ngForm.get('season')?.value;
+
+  if (
+    year &&
+    season &&
+    localStorage.getItem('year') !== year
+  ) {
+    localStorage.setItem('year', year);
+    localStorage.setItem('season', season);
+    localStorage.setItem('isLocked', 'true');
+  }
     this.ngForm.patchValue({
       global_search: '',
       group_code: '',
@@ -126,8 +134,6 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
 
     // Hide crop card
     this.isCrop = false;
-
-    // Clear cropWise array/list if exists
     if (this.srpCropWise && this.srpCropWise.clear) {
       this.srpCropWise.clear();
     }
@@ -415,8 +421,12 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
     if (this.isSubmitting) return; // prevent multiple clicks
     this.isSubmitting = true;
 
+
+
     const apiUrl = "add-srp-crop-wise";
     const formValues = this.ngForm.value;
+    const year = formValues.year;
+    const season = formValues.season;
     const srpCropWiseArray = Array.isArray(formValues.srpCropWise)
       ? formValues.srpCropWise
       : [];
@@ -649,13 +659,35 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
   cgClick() {
     document.getElementById('group_code').click();
   }
+onCropClick(index: number) {
+  const year = this.ngForm.get('year')?.value;
+  const season = this.ngForm.get('season')?.value;
 
+  if (
+    year &&
+    season &&
+    localStorage.getItem('year') !== year
+  ) {
+    localStorage.setItem('year', year);
+    localStorage.setItem('season', season);
+    localStorage.setItem('isLocked', 'true');
+  }
+}
   // your existing form array
   ngOnInit(): void {
     // Initialize form first
     const userData = localStorage.getItem('BHTCurrentUser');
     const data = JSON.parse(userData);
     this.userId = data.id;
+      // 🔴 CLEAR on refresh
+//   const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+//   const isRefresh = nav?.type === 'reload';
+// console.log(isRefresh,"refresh........")
+//   if (isRefresh) {
+//     localStorage.removeItem('year');
+//     localStorage.removeItem('season');
+//     localStorage.removeItem('isLocked');
+//   }
 
     this.ngForm = this.fb.group({
       year: [''],
@@ -675,13 +707,22 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
       });
     }
 
-    // Load years and seasons for dropdowns
     this.loadYears();
     this.loadSeasons();
 
-
-
+    const year = localStorage.getItem('year');
+    const season = localStorage.getItem('season');
+    const isLocked = localStorage.getItem('isLocked') === 'true';
+    if (year && season) {
+      this.ngForm.patchValue({
+        year: year,
+        season: season
+      });
+      this.getPageData();
+    }
+    
   }
+
 
   openpopup() {
     this.displayStyle = 'block'

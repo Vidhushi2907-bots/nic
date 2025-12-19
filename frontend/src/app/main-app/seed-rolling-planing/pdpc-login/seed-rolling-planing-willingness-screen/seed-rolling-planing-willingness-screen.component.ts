@@ -46,7 +46,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
   inventoryIndentorData: any
   popupIndex: number | null = null;
   lastVarietyCode: string | null = null;
-
+  autoSearchTimeout: any;
   userId: any;
   bspData: any;
   isFinalSubmit: boolean = false;
@@ -65,7 +65,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
   selectCrop: any;
   openCropIndexes: number[] = [];
   isFinalSubmitButtonHide: boolean;
-  isCheckNewVariety:boolean
+  isCheckNewVariety: boolean
   selectedReplaceList: any = [];
   constructor(private service: SeedServiceService, private _masterService: MasterService, private breeder: BreederService, private fb: FormBuilder, private route: Router, private cdRef: ChangeDetectorRef, private _productionCenter: ProductioncenterService, private master: MasterService, private srpService: SeedRollingPlanningService) {
 
@@ -77,6 +77,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
       year: [''],
       season: [''],
       crop_code: [''],
+      global_search: [''],
       bspc: this.fb.array([]),
       newVarieties: this.fb.array([this.createNewVarietyRow()])
     });
@@ -106,19 +107,12 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
         this.ngForm.controls['crop_code'].setValue('');
       }
     });
+    this.ngForm.patchValue({
+      global_search: '',
+
+    })
 
   }
-
-  // createBspcRow(): FormGroup {
-  //   return this.fb.group({
-  //     variety_code: [''],
-  //     variety_name: [''],
-  //     total_seed_required: [''],
-  //     status_toggle: [true],
-  //     tentative_quantity: [0],
-  //     replaceVariety: this.fb.array([this.createInnerRow()])
-  //   });
-  // }
 
   addNewVariety(i) {
     this.newVarieties.push(this.createNewVarietyRow());
@@ -241,6 +235,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
 
   addReplaceVarieties(albumIndex: number) {
     const albums = this.ngForm.get('bspc') as FormArray;
+    console.log( albums.at(albumIndex)," albums.at(albumIndex)")
     const songs = albums.at(albumIndex).get('replaceVariety') as FormArray;
     console.log(songs, "songs")
     songs.push(this.createInnerRow());
@@ -262,9 +257,9 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
       });
       return;
     }
-
+    const searchKeyword = String(this.ngForm.get('global_search')?.value || '').trim().toLowerCase();
     // Reset form fields
-    this.ngForm.get('variety1_code')?.setValue('');
+    this.ngForm.get('variety_code')?.setValue('');
     this.isCrop = true;
 
     const apiUrl = `srp-variety-willingness?year=${year}&season=${season}&crop_code=${crop_code}`;
@@ -279,9 +274,19 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
           data.EncryptedResponse.status_code === 200
         ) {
           this.inventoryVarietyData = data.EncryptedResponse.data;
-          const willingnessData = this.inventoryVarietyData || [];
-          this.isFinalSubmitButtonHide = willingnessData.some((item: any) => item?.is_final_submit === true);
-// assuming API returns this at root
+
+          this.isFinalSubmitButtonHide = this.inventoryVarietyData.some((item: any) => item?.is_final_submit === true);
+          console.log(this.inventoryVarietyData,"varietydata")
+          // assuming API returns this at root
+          if (searchKeyword) {
+            this.inventoryVarietyData = this.inventoryVarietyData.filter(item =>
+              String(item.variety_name || '').toLowerCase().includes(searchKeyword) ||
+              String(item.willingness || '').toLowerCase().includes(searchKeyword) ||
+              String(item.total_breeder_seed || '').toLowerCase().includes(searchKeyword) ||
+              String(item.remarks || '').toLowerCase().includes(searchKeyword) ||
+              String(item.quantity || '').toLowerCase().includes(searchKeyword)
+            );
+          }
           const srpWillingnessArray = this.ngForm.get('bspc') as FormArray;
           const additionalArray = this.ngForm.get('newVarieties') as FormArray;
           srpWillingnessArray.clear();
@@ -627,9 +632,9 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
 
     const bspcArray = formValues.bspc || [];               // FIX 1
     const newVarArr = formValues.newVarieties || [];       // FIX 2
-  
 
-  
+
+
     const existingData = bspcArray.map((row: any) => {
 
       const replaceArray = row.replaceVariety || [];       // FIX 3
@@ -697,6 +702,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
             confirmButtonColor: '#E97E15',
           }).then(() => {
             this.isFinalSubmitButtonHide = true
+
             this.getPageData();
           });
         } else {
@@ -713,6 +719,20 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
         });
       },
     });
+  }
+  hasValidNewVariety(): boolean {
+    if (!this.newVarieties) return false;
+
+    const validRows = this.newVarieties.value.filter((row: any) => {
+      return (
+        (row.new_tentative_quantity && row.new_tentative_quantity > 0) ||
+        (row.variety_name && row.variety_name.trim() !== '') ||
+        (row.additional_note && row.additional_note.trim() !== '')
+      );
+    });
+
+    console.log(validRows.length, 'VALID ROW COUNT');
+    return validRows.length > 0;
   }
 
 
@@ -796,7 +816,13 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
       additional_note: ['']
     });
   }
+  async triggerAutoSearch() {
+    clearTimeout(this.autoSearchTimeout);
 
+    this.autoSearchTimeout = setTimeout(() => {
+      this.getPageData();  // automatically fire your API function
+    }, 400); // delay 0.4 sec
+  }
   ngOnInit(): void {
     this.createForm();
     this.loadYear();
@@ -804,6 +830,9 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
     const userData = localStorage.getItem('BHTCurrentUser');
     const data = JSON.parse(userData);
     this.userId = data.id;
+    this.ngForm.get('global_search')?.valueChanges.subscribe(() => {
+      this.triggerAutoSearch();
+    })
   }
 
   openpopup() {

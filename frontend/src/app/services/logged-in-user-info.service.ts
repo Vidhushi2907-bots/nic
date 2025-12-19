@@ -1808,6 +1808,13 @@ export class LoggedInUserInfoService {
                 href: "/seed-rolling-planing-crop-wise",
                 subMenus: undefined
               },
+              {
+                icon: "crop.svg",
+                name: " state-login-replanning",
+                href: "/state-login-replanning",
+                subMenus: undefined
+              },
+             
 
             ]
 

@@ -13,8 +13,9 @@ module.exports = app => {
 
 
     app.post(`${process.env.MICRO_SERVICE}/api/srp-state-replanning-year`, auth, srpStateReplanning.getSrpStateReplanningYearData);
-     app.post(`${process.env.MICRO_SERVICE}/api/srp-state-replanning-season`, auth, srpStateReplanning.getSrpStateReplanningSeasonData);
-      app.post(`${process.env.MICRO_SERVICE}/api/srp-state-replanning-crop`, auth, srpStateReplanning.getSrpStateReplanningCropData);
-    
- app.post(`${process.env.MICRO_SERVICE}/api/srp-state-replanning-variety`, auth, srpStateReplanning.getSrpStateReplanningVareityData);
+    app.post(`${process.env.MICRO_SERVICE}/api/srp-state-replanning-season`, auth, srpStateReplanning.getSrpStateReplanningSeasonData);
+    app.post(`${process.env.MICRO_SERVICE}/api/srp-state-replanning-crop`, auth, srpStateReplanning.getSrpStateReplanningCropData);
+    app.post(`${process.env.MICRO_SERVICE}/api/srp-add-state-replanning-variety`, auth, srpStateReplanning.postSrpStateReplanningVarietyData)
+    app.post(`${process.env.MICRO_SERVICE}/api/srp-state-replanning-variety`, auth, srpStateReplanning.getSrpStateReplanningVareityData);
+    app.post(`${process.env.MICRO_SERVICE}/api/srp-state-replanning-new-variety`,auth, srpStateReplanning.getSrpStateReplanningNewVarietyData);
 };

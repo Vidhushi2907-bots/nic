@@ -23,7 +23,7 @@ class SrpWillingnessController {
                 return response(res, status.DATA_NOT_AVAILABLE, 404, []);
             }
 
-            const data = await db.seedRollingPlanCropWisesModel.findAll({
+            const data = await db.srpWillingnessModel.findAll({
                 attributes: ["year"],
                 order: [["year", "ASC"]],
                 where: {
@@ -57,7 +57,7 @@ class SrpWillingnessController {
                 return response(res, status.DATA_NOT_AVAILABLE, 404, []);//kgkgkg
             }
             console.log(year)
-            const data = await db.seedRollingPlanCropWisesModel.findAll({
+            const data = await db.srpWillingnessModel.findAll({
                 where: {
                     year: year, is_active: true,
                     is_final_submit: true,
@@ -94,7 +94,7 @@ class SrpWillingnessController {
             if (!user) {
                 return response(res, status.DATA_NOT_AVAILABLE, 404, []);//kgkgkg
             }
-            const data = await db.srpCropModel.findAll({
+            const data = await db.srpWillingnessModel.findAll({
                 where: {
                     year: year, season: season, is_active: true,
                     is_final_submit: true,
@@ -109,13 +109,35 @@ class SrpWillingnessController {
 
             });
 
-            const formattedData = data.map(item => {
-                return {
-                    id: item.id,
-                    crop_code: item.crop_code,
-                    crop_name: item.m_crop.crop_name
+            // const formattedData = data.map(item => {
+            //     return {
+            //         id: item.id,
+            //         crop_code: item.crop_code,
+            //         crop_name: item.m_crop.crop_name
+            //     }
+            // })
+            const allCrop = data.map(item => ({
+                crop_code: item.crop_code,
+                id: item.id,
+                crop_name: item.m_crop?.crop_name
+            }));
+            // Remove duplicates
+
+            const uniqueMap = new Map();
+
+            allCrop.forEach(item => {
+                const key = `${item.crop_code}_${item.crop_name}`;
+
+                if (!uniqueMap.has(key)) {
+                    uniqueMap.set(key, {
+                        id: item.id, // pehla id rakhenge
+                        crop_code: item.crop_code,
+                        crop_name: item.crop_name
+                    });
                 }
-            })
+            });
+
+            const formattedData = Array.from(uniqueMap.values());
             console.log(formattedData, "formattedData")
             return response(res, status.DATA_AVAILABLE, 200, formattedData);
 
@@ -129,8 +151,8 @@ class SrpWillingnessController {
     static postSrpStateReplanningVarietyData = async (req, res) => {
         try {
             const { replanningData, action } = req.body;
-            const isDraft = action === "draft";
-            const isFinalSubmit = action === "final";
+            const isDraft = action === "draft" ? 1 : 1;
+            const isFinalSubmit = action === "final" ? 1 : 0;
 
             if (!Array.isArray(replanningData) || replanningData.length === 0) {
                 return response(res, "Replanning data is required", 400, []);
@@ -301,8 +323,39 @@ class SrpWillingnessController {
             return response(res, "Fresh Data Available", 200, result);
         }
     }
-}
+    static getSrpStateReplanningNewVarietyData = async (req, res) => {
+        try {
+            const { year, season, crop_code } = req.query;
+            const data = await db.srpWillingnessModel.findAll({
+                where: { is_additional: true, year, season, crop_code },
+                include: [{
+                    model: db.varietyModel,
+                    required: true,
+                    attributes: ["variety_name", "variety_code"]
 
+                }],
+                attributes: ["id", "willingness", "quantity", "is_additional", "variety_code", "remarks"]
+            })
+            const formattedData=data.map((item)=>
+                {return{
+                    id:item.id,
+                    new_variety_code:item.variety_code,
+                    new_quantity_available:item.quantity,
+                    new_variety_name:item.m_crop_variety.variety_name,
+                    new_remarks:item.remarks
+
+            
+
+            }})
+         return response(res, "Data found successfully", 200,  formattedData);
+        } catch (error) {
+            console.error(error);
+            return response(res, "Something went wrong!", 500, []);
+    }
+
+
+}
+}
 async function getReplanningData(crop_wise_id) {
 
 
@@ -412,9 +465,10 @@ async function getReplanningData(crop_wise_id) {
 
 }
 async function getFreshData(crop_wise_id, year, season, crop_code) {
+    console.log(year, season, crop_code, "crop_code.................")
     const varietyData = await db.srpVarietyModel.findAll({
         where: { srp_crop_wise_id: crop_wise_id },
-        attributes: ["id", "variety_code", "breeder_seed", "srp_crop_wise_id"],
+
         include: [
             {
                 model: db.varietyModel,
@@ -446,9 +500,10 @@ async function getFreshData(crop_wise_id, year, season, crop_code) {
                 ],
 
             }
-        ]
+        ],
+        attributes: ["id", "variety_code", "breeder_seed", "srp_crop_wise_id"],
     });
-
+    console.log(varietyData, "varietyData")
     const sqlQuery = `
             SELECT 
                 c.year, c.season, c.crop_code,
@@ -467,6 +522,7 @@ async function getFreshData(crop_wise_id, year, season, crop_code) {
         replacements: { year, season, crop_code },
         type: db.Sequelize.QueryTypes.SELECT
     });
+    console.log(varietyData, "efwefbowfwbfwf")
     // Format Data
     const formattedData = varietyData.map(v => {
         const vwData = Array.isArray(v.vw) && v.vw.length > 0 ? v.vw[0] : null; //willingness data
@@ -488,7 +544,7 @@ async function getFreshData(crop_wise_id, year, season, crop_code) {
             remarks: vwData ? vwData.remarks : null,
             is_additional: vwData ? vwData.is_additional : null,
 
-           replace_varieties: vwData
+            replace_varieties: vwData
                 ? vwData.seed_rolling_plan_willingness_replaces?.map(r => {
                     const variety = r.m_crop_variety?.get?.({ plain: true }) || null;
                     console.log(variety.variet, "variety.variety_name ")
@@ -506,6 +562,8 @@ async function getFreshData(crop_wise_id, year, season, crop_code) {
         };
 
     });
+
     return formattedData;
 }
+
 module.exports = SrpWillingnessController

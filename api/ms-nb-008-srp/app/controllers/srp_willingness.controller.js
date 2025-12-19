@@ -10,97 +10,6 @@ const srpVarietyWise = db.srp_varietyModel
 class SrpWillingnessController {
 
 
-    // static postSrpCropWiseData = async (req, res) => {
-    //     try {
-    //         const userId = req.body?.loginedUserid?.id;
-    //         console.log(req.body?.loginedUserid?.id, "......................");
-    //         // 1️⃣ Fetch user + cropCodes from agency_detail JSON
-    //         const user = await userModel.findOne({
-    //             where: { id: userId, user_type: "BR" },
-    //             include: [
-    //                 { model: agencyDetail, as: "agency_detail", attributes: [] }
-    //             ],
-    //             attributes: [
-    //                 "id",
-    //                 "name",
-    //                 [
-    //                     literal(`
-    //                     ARRAY(
-    //                         SELECT cd->>'crop_code'
-    //                         FROM jsonb_array_elements("agency_detail"."crop_data"::jsonb) AS cd
-    //                     )
-    //                 `),
-    //                     "cropCodes"
-    //                 ]
-    //             ],
-    //             raw: true
-    //         });
-
-    //         if (!user) {
-    //             return response(res, status.DATA_NOT_AVAILABLE, 404, []);
-    //         }
-
-    //         const cropCodes = user.cropCodes || [];
-
-    //         // 2️⃣ Fetch only those crops which have SRP filled (INNER JOIN)
-    //         const crops = await cropModel.findAll({
-    //             where: {
-    //                 crop_code: { [Op.in]: cropCodes }
-    //             },
-
-
-
-    //             include: [
-    //                 {
-    //                     model: srpCropWise,
-    //                     as: "seed_rolling_plan_crop_wises",
-    //                     required: true,   // INNER JOIN
-    //                     where: {
-    //                         is_active: true,
-    //                         is_final_submit: true
-    //                     },
-    //                     attributes: [
-    //                         "id",
-    //                         "year",
-    //                         "season",
-    //                         "group_code",
-    //                         "crop_code",
-    //                         "total_required",
-    //                         "user_id"
-
-
-    //                     ]
-    //                 }
-    //             ],
-
-    //             attributes: ["id", "crop_name", "crop_code"]
-    //         });
-    //         const formateData = crops.map((item) => {
-    //             const srp = item.seed_rolling_plan_crop_wises?.[0] || {};
-    //             return {
-    //                 id: item.id,
-    //                 season: srp.season,
-    //                 year: srp.year,
-    //                 crop_code: srp.crop_code,
-    //                 crop_name:item.crop_name,
-    //                 group_code: srp.group_code,
-    //                 user_id: srp.user_id,
-
-    //             }
-    //         })
-
-    //         return response(res, status.DATA_AVAILABLE, 200, formateData);
-
-    //     } catch (error) {
-    //         console.log(error);
-    //         return res.status(500).json({
-    //             status: false,
-    //             message: "Server Error",
-    //             error
-    //         });
-    //     }
-    // };
-
 
     static getSrpWillingnessYearData = async (req, res) => {
         try {
@@ -156,15 +65,14 @@ class SrpWillingnessController {
 
             });
 
-            // 🔹 Extract all years
+     
             const allYears = years.flatMap(item =>
                 item.seed_rolling_plan_crop_wises.map(srp => srp.year)
             );
 
-            // 🔹 Remove duplicate years
+           
             const uniqueYears = [...new Set(allYears)];
 
-            // 🔹 Format to your required response
             const formattedYears = uniqueYears.map(year => ({ year }));
             return response(res, status.DATA_AVAILABLE, 200, formattedYears);
 
@@ -174,6 +82,7 @@ class SrpWillingnessController {
 
         }
     };
+
     static getSrpWillingnessSeasonData = async (req, res) => {
         try {
             const userId = req.body?.loginedUserid?.id;
@@ -351,7 +260,6 @@ class SrpWillingnessController {
         try {
             const { year, season, crop_code } = req.query;
 
-            // 1. Fetch all willingness data
             const willingnessData = await db.srpWillingnessModel.findAll({
                 where: { year, season, crop_code },
                 attributes: [
@@ -394,6 +302,7 @@ class SrpWillingnessController {
                 ],
                 raw: true
             });
+
             const breederSeedSum = await db.srpVarietyModel.findAll({
 
                 include: [
@@ -411,6 +320,7 @@ class SrpWillingnessController {
                 group: ["variety_code"],
                 raw: true
             });
+
             const data = willingnessData.map(item => {
                 const total = breederSeedSum.find(x => x.variety_code === item.variety_code);
                 return { ...item, total_breeder_seed: total ? (total.total_breeder_seed).toFixed(2) : 0 };
@@ -603,6 +513,7 @@ class SrpWillingnessController {
             return response(res, "Server Error", 500, error)
         }
     };
+
     static getVarietyData = async (req, res) => {
         try {
             const { crop_code } = req.query;
@@ -635,6 +546,7 @@ class SrpWillingnessController {
             return response(res, "Server Error", 500, error)
         }
     };
+
     static postSrpWillingnessData = async (req, res) => {
         try {
             const { willingnessData, year, season, crop_code, action } = req.body;
@@ -646,8 +558,8 @@ class SrpWillingnessController {
                 return response(res, 'Not Access Other User', 403);
             }
 
-           const isDraft = action === "draft" ? 1 : 1;
-      const isFinalSubmit = action === "final" ? 1 : 0;
+            const isDraft = action === "draft" ? 1 : 1;
+            const isFinalSubmit = action === "final" ? 1 : 0;
             const savedRecords = [];
 
             for (const crop of willingnessData) {
@@ -868,6 +780,7 @@ class SrpWillingnessController {
         });
         if (varietyData.length > 0) { return response(res, "Data Available", 200, varietyData); }
     }
+
     static deleteSrpWillingnessRepalce = async (req, res) => {
         try {
             const { id } = req.query;
@@ -894,6 +807,7 @@ class SrpWillingnessController {
             return response(res, "Something went wrong", 500, []);
         }
     }
+
     static deleteSrpWillingness = async (req, res) => {
         try {
             const { id } = req.query;
@@ -923,11 +837,6 @@ class SrpWillingnessController {
             return response(res, "Something went wrong", 500, []);
         }
     }
-
-
-
-
-
 
 }
 module.exports = SrpWillingnessController

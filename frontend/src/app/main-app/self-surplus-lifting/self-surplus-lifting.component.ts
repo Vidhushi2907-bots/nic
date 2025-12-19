@@ -747,8 +747,8 @@ export class SelfSurplusLiftingComponent implements OnInit {
 
     this._productionCenter.postRequestCreator(route, param, null).subscribe(res => {
       if (res && res.EncryptedResponse && res.EncryptedResponse.status_code === 200) {
-        this.varietyListSecond = res.EncryptedResponse.data || []; // Update full list here
-        this.varietyData1 = [...this.varietyListSecond]; // Use it as the filtered list
+        this.varietyListSecond = res.EncryptedResponse.data || []; 
+        this.varietyData1 = [...this.varietyListSecond]; 
       } else {
         this.varietyListSecond = [];
         this.varietyData = [];
@@ -768,11 +768,7 @@ export class SelfSurplusLiftingComponent implements OnInit {
         crop_code: this.ngForm.controls['crop_code'].value ? this.ngForm.controls['crop_code'].value : '',
         user_id: UserId ? UserId.toString() : '',
         variety_code: this.ngForm.controls['variety_level_2'].value ? this.ngForm.controls['variety_level_2'].value : '',
-        // crop_group: (this.ngForm.controls["crop_group"].value),
-        // crop_name: this.ngForm.controls["crop_name"].value,
-        // variety_name: this.ngForm.controls["variety_name"].value,
-        // variety_name_filter: this.ngForm.controls['variety_name_filter'].value ? this.ngForm.controls['variety_name_filter'].value : '',
-        // user_id: this.userId.id
+       
       }
     }).subscribe((apiResponse: any) => {
       if (apiResponse !== undefined

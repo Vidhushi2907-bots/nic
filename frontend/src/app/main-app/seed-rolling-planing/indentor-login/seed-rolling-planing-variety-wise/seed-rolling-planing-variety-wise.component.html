@@ -60,8 +60,6 @@
                         </div>
                     </div>
  
- 
- 
                     <ng-template #noData>
                         <p class="text-muted">No crop data available.</p>
                     </ng-template>
@@ -83,29 +81,6 @@
                                             placeholder="Search" formControlName="global_search"
                                             style="max-width: 250px; border: 1px solid #c96a2b; height: 38px;" />
                                     </div>
- 
-                                    <!-- Filter Dropdown -->
-                                    <!-- <div class="d-flex align-items-center mb-2" style="gap: 6px;">
-                                        <label for="cropGroup" class="mb-0"
-                                            style="font-size: 13px; font-weight: 600; color: #000; white-space: nowrap;">
-                                            Filter by Crop Group
-                                        </label>
-                                        <select class="form-control input-inventory rounded-pill px-3 py-2"
-                                            formControlName="crop_group"
-                                            style="width: 100%; border: 1px solid #c96a2b; height: 40px;">
-                                            <option value="">All Crop Groups</option>
-                                            <option *ngFor="let crop of cropGroupList" [value]="crop.id">
-                                                {{ crop.name }}
-                                            </option>
-                                        </select>
-                                    </div> -->
- 
-                                    <!-- Search Input -->
-                                    <!-- <div class="d-flex align-items-end gap-2 flex-wrap">
-                                        <input type="text" class="form-control search-input rounded-pill px-3"
-                                            placeholder="Search Keyword" formControlName="global_search"
-                                            style="max-width: 250px; border: 1px solid #c96a2b; height: 38px;" />
-                                    </div> -->
  
                                 </div>
  
@@ -153,8 +128,14 @@
                                                     <div class="col-md-1 py-2">{{ i + 1 }}</div>
  
                                                     <!-- VARIETY NAME -->
-                                                    <div class="col-md-2 py-2">{{ data.get('variety_name')?.value }}
+                                                    <div class="col-md-2 py-2">
+                                                        <a href="javascript:void(0)"
+                                                            class="text-primary text-decoration-underline"
+                                                            (click)="viewVarietyDetail(data)">
+                                                            {{ data.get('variety_name')?.value }}
+                                                        </a>
                                                     </div>
+ 
  
                                                     <!-- YEAR -->
                                                     <div class="col-md-2 py-2">{{ data.get('notification_year')?.value
@@ -163,43 +144,43 @@
                                                     <!-- REQUIRED QUANTITY -->
                                                     <div class="col-md-2 py-2">
                                                         <div class="bspc-row w-100 text-center"
-                                                         [ngClass]="{ 'row-locked': data.get('is_active')?.value === false }">
-                                                        <input type="number"
-                                                            class="form-control form-control-sm text-center"
-                                                            formControlName="Req_Qty_of_breeder_seed"
-                                                            (blur)="handleSeedInput(i)"
-                                                            placeholder="Enter Qty" />
-                                                            </div>
+                                                            [ngClass]="{ 'row-locked': data.get('is_active')?.value === false }">
+                                                            <input type="number"
+                                                                class="form-control form-control-sm text-center"
+                                                                formControlName="Req_Qty_of_breeder_seed"
+                                                                (blur)="handleSeedInput(i)" placeholder="Enter Qty" />
+                                                        </div>
                                                     </div>
  
                                                     <!-- FOUNDATION SEED -->
                                                     <div class="col-md-2 py-2">
                                                         <div class="bspc-row w-100 text-center"
-                                                         [ngClass]="{ 'row-locked': data.get('is_active')?.value === false }">
-                                                        <input type="number"
-                                                            class="form-control form-control-sm text-center"
-                                                            formControlName="foundation_seed" readonly
-                                                            style="border:none; background:transparent;" />
-                                                            </div>
+                                                            [ngClass]="{ 'row-locked': data.get('is_active')?.value === false }">
+                                                            <input type="number"
+                                                                class="form-control form-control-sm text-center"
+                                                                formControlName="foundation_seed" readonly
+                                                                style="border:none; background:transparent;" />
+                                                        </div>
                                                     </div>
  
                                                     <!-- BREEDER SEED -->
                                                     <div class="col-md-2 py-2">
                                                         <div class="bspc-row w-100 text-center"
-                                                         [ngClass]="{ 'row-locked': data.get('is_active')?.value === false }">
-                                                        <input type="number"
-                                                            class="form-control form-control-sm text-center"
-                                                            formControlName="breeder_seed" readonly
-                                                            style="border:none; background:transparent;" />
+                                                            [ngClass]="{ 'row-locked': data.get('is_active')?.value === false }">
+                                                            <input type="number"
+                                                                class="form-control form-control-sm text-center"
+                                                                formControlName="breeder_seed" readonly
+                                                                style="border:none; background:transparent;" />
                                                         </div>
                                                     </div>
  
  
-                                                    <div
-                                                        class="col-md-1 py-3 d-flex align-items-center justify-content-center" *ngIf="!isFinalSubmitButtonHide">
-                                                        <label class="switch small-switch mb-0" *ngIf="
-                                                          data.get('id')?.value ||
-                                                          data.get('is_draft')?.value === true ">
+                                                    <div class="col-md-1 py-3 d-flex align-items-center justify-content-center"
+                                                        *ngIf="!isFinalSubmitButtonHide">
+ 
+                                                        <!-- Toggle Switch -->
+                                                        <label class="switch small-switch mb-0"
+                                                            *ngIf="data.get('id')?.value || data.get('is_draft')?.value === true">
  
                                                             <input type="checkbox" formControlName="is_active"
                                                                 (change)="onToggleChange(i)"
@@ -208,7 +189,10 @@
                                                             <span class="slider round"></span>
                                                         </label>
  
+ 
+ 
                                                     </div>
+ 
  
  
                                                 </div>
@@ -241,7 +225,7 @@
  
                 <div class="col-12 pt-2">
                     <div class="row justify-content-end">
-                       
+ 
                         <div class="col-auto" *ngIf="!isFinalSubmitButtonHide">
                             <button (click)="saveVariety('draft')"
                                 class="clear-form-button btn-inventory d-inline-flex justify-content-center align-items-center mb-3">
@@ -255,7 +239,6 @@
                                 Submit
                             </button>
                         </div>
- 
  
                     </div>
                 </div>

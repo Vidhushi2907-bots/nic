@@ -37,7 +37,6 @@ module.exports = (sql, Sequelize) => {
             type: Sequelize.DOUBLE,
             allowNull: false,
         },
-
         is_draft: {
             type: Sequelize.BOOLEAN,
         },

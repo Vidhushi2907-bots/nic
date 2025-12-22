@@ -131,7 +131,10 @@
                                         *ngIf="!isFinalSubmitButtonHide">
                                         SPA Assign
                                     </div>
-
+<div class="col-6 col-md-1 py-2 d-flex verticle-content-middle"
+                                        *ngIf="isFinalSubmitButtonHide">
+                                        SPA 
+                                    </div>
                                 </div>
 
 
@@ -164,7 +167,7 @@
                                                 <!-- CLICK Event Only -->
                                               <span class="d-block text-center">
   {{
-    ngForm.controls['bspc']['controls'][i].controls['quantity'].value
+    ngForm.controls['bspc']['controls'][i].controls['breeder_seed'].value
   }}
 </span>
 
@@ -238,17 +241,28 @@
                                         </div> -->
 
                                         <!-- Button Add Replacement Variety -->
-                                        <div class="col-6 col-md-1 py-2 d-flex verticle-content-middle">
+                                        <div class="col-6 col-md-1 py-2 d-flex verticle-content-middle"  *ngIf="!isFinalSubmitButtonHide">
                                             <button
                                                 class="form-button d-flex justify-content-center verticle-content-middle"
                                                 (click)="addReplaceVarieties(i)"
+                                                
                                                 style="width: 100px !important; background-color: #B64B1D; color: white; border: none; border-radius: 6px;">
                                                 Add
                                             </button>
                                         </div>
+                                         <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle"
+                                                *ngIf="isFinalSubmitButtonHide" style="padding-right: 2rem!important;">
+
+
+                                                <!-- FINAL SUBMIT KE BAAD REPLACE COUNT -->
+                                                <a style="cursor:pointer; text-decoration: underline; color:#007bff;"
+                                                    (click)="openReplaceSwal(bspc.controls[i].get('assign_spa')?.value)">
+                                                    {{ bspc.controls[i].get('assign_spa')?.value?.length || 0 }}
+                                                </a>
+                                            </div>
                                         <div class="col-12 px-3"
-                                            *ngIf="openCropIndexes.includes(i)" 
-                                            formArrayName="replaceVariety">
+                                            *ngIf="openCropIndexes.includes(i) && !isFinalSubmitButtonHide"
+                                            formArrayName="assign_spa">
 
                                             <div class="row inner-row variety-block"
                                                 *ngFor="let group of getInnerBspc(i).controls; let j = index"
@@ -289,7 +303,7 @@
                                                                 Seed
                                                                 Qty (QTL.)</label>
                                                             <input type="number" class="form-control"
-                                                                formControlName="replace_tentative_qty"
+                                                                formControlName="certified_seed_quantity"
                                                                  (input)="validateSpaQuantity(i,j)"
                                                                 placeholder="Enter Quantity">
                                                         </div>

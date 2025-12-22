@@ -336,25 +336,26 @@ class SrpWillingnessController {
                 }],
                 attributes: ["id", "willingness", "quantity", "is_additional", "variety_code", "remarks"]
             })
-            const formattedData=data.map((item)=>
-                {return{
-                    id:item.id,
-                    new_variety_code:item.variety_code,
-                    new_quantity_available:item.quantity,
-                    new_variety_name:item.m_crop_variety.variety_name,
-                    new_remarks:item.remarks
+            const formattedData = data.map((item) => {
+                return {
+                    id: item.id,
+                    new_variety_code: item.variety_code,
+                    new_quantity_available: item.quantity,
+                    new_variety_name: item.m_crop_variety.variety_name,
+                    new_remarks: item.remarks
 
-            
 
-            }})
-         return response(res, "Data found successfully", 200,  formattedData);
+
+                }
+            })
+            return response(res, "Data found successfully", 200, formattedData);
         } catch (error) {
             console.error(error);
             return response(res, "Something went wrong!", 500, []);
+        }
+
+
     }
-
-
-}
 }
 async function getReplanningData(crop_wise_id) {
 
@@ -435,7 +436,7 @@ async function getReplanningData(crop_wise_id) {
         };
     });
 
-    // 6️⃣ Fetch new varieties in one go
+   
     const new_variety_data = await db.srpStateReplanningNewVarietiesModel.findAll({
         where: { srp_crop_wise_id: crop_wise_id },
         include: [
@@ -448,7 +449,7 @@ async function getReplanningData(crop_wise_id) {
         attributes: ["id", "quantity_available", "quantity_required", "is_accept", "srp_crop_wise_id"]
     });
 
-    // 7️⃣ Combine both normal and new varieties in a single array
+  
     const combinedData = [
         ...formattedVarieties,
         ...new_variety_data.map(v => ({

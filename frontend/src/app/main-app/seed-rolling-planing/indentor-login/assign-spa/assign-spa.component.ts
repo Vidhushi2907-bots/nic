@@ -95,7 +95,7 @@ export class AssignSpaComponent implements OnInit {
 
 
   getInnerBspc(i: number): FormArray {
-    return this.ngForm.get('bspc')?.get(i.toString())?.get('replaceVariety') as FormArray;
+    return this.ngForm.get('bspc')?.get(i.toString())?.get('assign_spa') as FormArray;
   }
 
   loadYear() {
@@ -207,8 +207,7 @@ export class AssignSpaComponent implements OnInit {
   addReplaceVarieties(albumIndex: number) {
     const albums = this.ngForm.get('bspc') as FormArray;
     console.log(albums.at(albumIndex), "albums")
-    const songs = albums.at(albumIndex).get('replaceVariety') as FormArray;
-
+    const songs = albums.at(albumIndex).get('assign_spa') as FormArray;
     songs.push(this.createInnerRow());
     console.log(songs, "songs")
     this.toggleCropSection(albumIndex)
@@ -219,7 +218,7 @@ export class AssignSpaComponent implements OnInit {
     const year = this.ngForm.get('year')?.value;
     const season = this.ngForm.get('season')?.value;
     const crop_code = this.ngForm.get('crop_code')?.value;
-    console.log(year, season, crop_code, "helllllllllllllllll")
+
     if (!year || !season || !crop_code) {
       Swal.fire({
         icon: "warning",
@@ -232,28 +231,58 @@ export class AssignSpaComponent implements OnInit {
 
     this.isCrop = true;
     // this.ngForm.get('variety1_code')?.setValue('');
-
+const searchKeyword = String(this.ngForm.get('global_search')?.value || '').trim().toLowerCase();
     const apiUrl = `get-variety?year=${year}&season=${season}&crop_code=${crop_code}`;
     this.srpService.postRequestCreator(apiUrl, null, null).subscribe({
       next: (res: any) => {
         if (res?.EncryptedResponse?.status_code === 200) {
 
           this.inventoryVarietyData = res.EncryptedResponse.data || [];
-          const srpWillingnessArray = this.ngForm.get('bspc') as FormArray;
-
-          this.inventoryVarietyData.forEach((variety: any) => {
-            const foundation_seed = Number((variety.quantity *this.smr1).toFixed(2));
-            const certified_seed = Number((foundation_seed * this.smr2).toFixed(2));
-            srpWillingnessArray.push(
-              this.fb.group({
-                variety_code: [variety.variety_code],
-                variety_name: [variety.variety_name],
-                quantity: [variety.quantity],
-                foundation_seed: [foundation_seed],
-                certified_seed: [certified_seed],
-                replaceVariety: this.fb.array([])
-              })
+              if (searchKeyword) {
+            this.inventoryVarietyData = this.inventoryVarietyData.filter(item =>
+              String(item.variety_name || '').toLowerCase().includes(searchKeyword) ||
+              String(item.certified_seed || '').toLowerCase().includes(searchKeyword) ||
+              String(item.breeder_seed || '').toLowerCase().includes(searchKeyword) ||
+              String(item.foundation_seed || '').toLowerCase().includes(searchKeyword) 
+              
             );
+          }
+          const srpWillingnessArray = this.ngForm.get('bspc') as FormArray;
+          srpWillingnessArray.clear();
+          this.isFinalSubmitButtonHide = this.inventoryVarietyData.some((item: any) => item?.is_final_submit === true);
+          this.inventoryVarietyData.forEach((variety: any, index: number) => {
+            const foundation_seed = Number((variety.breeder_seed * this.smr1).toFixed(2));
+            const certified_seed = Number((foundation_seed * this.smr2).toFixed(2));
+
+            const group = this.fb.group({
+              variety_code: [variety.variety_code],
+              variety_name: [variety.variety_name],
+              breeder_seed: [variety.breeder_seed],
+              foundation_seed: [foundation_seed],
+              certified_seed: [certified_seed],
+              assign_spa: this.fb.array([])
+            })
+
+            srpWillingnessArray.push(
+              group
+            );
+            const replaceArray = group.get('assign_spa') as FormArray;
+            replaceArray.clear();
+            if (variety.assign_spa?.length > 0) {
+              variety.assign_spa.forEach(rv => {
+                replaceArray.push(
+                  this.fb.group({
+                    id: [rv.id],
+                    spa_user_id: [rv.spa_user_id],
+                    spa_name: [rv.spa_name],
+                    certified_seed_quantity: [rv.certified_seed_quantity]
+                  })
+                );
+              });
+              if (!this.openCropIndexes.includes(index)) {
+                this.openCropIndexes.push(index);
+              }
+            }
           });
           console.log(this.ngForm.get('bspc')?.value, "willingness");
         }
@@ -274,9 +303,7 @@ export class AssignSpaComponent implements OnInit {
   }
   getVarietyData(crop_code: string) {
 
-
     const apiUrl = `get-variety-details?crop_code=${crop_code}`
-
     this.srpService.getRequestCreatorNew(apiUrl).subscribe({
       next: (data: any) => {
         if (
@@ -370,54 +397,40 @@ export class AssignSpaComponent implements OnInit {
     this.ngForm.get('crop_code')?.disable();
   }
   saveAsDraft() {
-    const apiUrl = "srp-add-willingness";
+    const apiUrl = "add-spa-details";
     const formValues = this.ngForm.value;
-    const existingData = formValues.bspc.map((row: any) => {
 
-      const replaceArray = row.replaceVariety   // IMPORTANT FIX
-      console.log(row.replaceVariety, "row.replaceVariety")
-      const replaceData = replaceArray
-        .filter((r: any) => r.variety_code)
-        .map((r: any) => ({
-          replace_variety_code: r.variety_code,
-          quantity: Number(r.replace_tentative_qty)
-        }));
+    const existingData = formValues.bspc.map((row: any) => {
+      const spaDetails = row.assign_spa
+
+      const assignSpa = spaDetails
+        .filter((r: any) => r.spa_user_id)
+        .map((r: any) => {
+          return {
+            spa_user_id: Number(r.spa_user_id),
+            certified_seed_quantity: Number(r.certified_seed_quantity)
+          };
+        });
 
       return {
         variety_code: row.variety_code,
-        willingness: row.status_toggle,
-        quantity: Number(row.tentative_quantity ?? 0),
-        is_additional: false,
-        remarks: null,
-        replace_varieties: replaceData.length > 0 ? replaceData : null
+        breeder_seed: row.breeder_seed,
+        foundation_seed: row.foundation_seed,
+        certified_seed: row.certified_seed,
+        assign_spa: assignSpa.length > 0 ? assignSpa : null
       };
     });
 
-    // new varieties added separately
-    const newVarietyData = (formValues.newVarieties || [])
-      .filter((row: any) => row.variety_code)
-      .map((row: any) => ({
-        variety_code: row.variety_code,
-        willingness: true,
-        quantity: Number(row.new_tentative_quantity ?? 0),
-        is_additional: true,
-        remarks: row.additional_note || null,
-      }));
-
-
-
-
-    const willingnessData = [...existingData, ...newVarietyData];
+    const spaDetails = [...existingData];
 
     const payload = {
       action: "draft",
-      year: Number(formValues.year),
-      season: formValues.season,
-      crop_code: formValues.crop_code,
-      willingnessData
+      year: 2027,
+      season: 'Rabi',
+      crop_code: 'A0210',
+      spaDetails
     };
 
-    console.log("Payload Sent:", payload);
 
     this.srpService.postRequestCreator(apiUrl, null, payload).subscribe({
       next: (data: any) => {
@@ -455,7 +468,7 @@ export class AssignSpaComponent implements OnInit {
   openReplaceSwal(list: any[]) {
     console.log(list, "heeloo....................")
     Swal.fire({
-      title: '<span style="color:Black;">Replacement Varieties</span>',
+      title: '<span style="color:Black;">Assigned SPA</span>',
       width: 700,
       background: '#f5f5f5',
       html: this.generateTableHTML(list),
@@ -470,7 +483,7 @@ export class AssignSpaComponent implements OnInit {
 
   generateTableHTML(list: any[]) {
     if (!list || list.length === 0) {
-      return `<p>No replacement varieties available.</p>`;
+      return `<p>No SPA Details.</p>`;
     }
 
     let rows = list
@@ -478,8 +491,8 @@ export class AssignSpaComponent implements OnInit {
         (x) => `
        <tr>
        
-         <td>${x.variety_name || '-'}</td>
-         <td>${x.replace_tentative_qty}</td>
+         <td>${x.spa_name || '-'}</td>
+         <td>${x.certified_seed_quantity}</td>
        </tr>`
       )
       .join('');
@@ -490,8 +503,8 @@ export class AssignSpaComponent implements OnInit {
          <thead style="background:#B34B1D;">
            <tr>
            
-           <th style="color: black;">Variety Name</th>
- <th style="color: black;">Tentative Qty</th>
+           <th style="color: black;">SPA Name</th>
+ <th style="color: black;">Certified Seeds</th>
            </tr>
          </thead>
  
@@ -503,67 +516,39 @@ export class AssignSpaComponent implements OnInit {
    `;
   }
   finalizeData() {
-    const apiUrl = "srp-add-willingness";
+    const apiUrl = "add-spa-details";
     const formValues = this.ngForm.value;
-
-    const bspcArray = formValues.bspc || [];               // FIX 1
-    const newVarArr = formValues.newVarieties || [];       // FIX 2
-
-
-
+    const bspcArray = formValues.bspc || [];              
     const existingData = bspcArray.map((row: any) => {
-
-      const replaceArray = row.replaceVariety || [];       // FIX 3
-
-      const replaceData = replaceArray
-        .filter((r: any) => r?.variety_code)
+      const assignSpa = row.assign_spa
+        ?.filter((r: any) => r.spa_user_id)
         .map((r: any) => ({
-          replace_variety_code: r.variety_code,
-          quantity: Number(r.replace_tentative_qty || 0),
-        }));
-
+          spa_user_id: Number(r.spa_user_id),
+          certified_seed_quantity: Number(r.certified_seed_quantity)
+        })) || [];
+ 
       return {
         variety_code: row.variety_code,
-        willingness: row.status_toggle,
-        quantity: Number(row.tentative_quantity || 0),
-        is_additional: false,
-        remarks: null,
-        replace_varieties: replaceData.length > 0 ? replaceData : null
+        breeder_seed: row.breeder_seed,
+        foundation_seed: row.foundation_seed,
+        certified_seed: row.certified_seed,
+        assign_spa: assignSpa.length > 0 ? assignSpa : null
       };
     });
 
-    const newVarietyData = newVarArr
-      .filter((row: any) => row?.variety_code)
-      .map((row: any) => ({
-        variety_code: row.variety_code,
-        willingness: true,
-        quantity: Number(row.new_tentative_quantity || 0),
-        is_additional: true,
-        remarks: row.additional_note || null
-      }));
+    console.log(existingData)
 
     // FINAL MERGE — always an array
-    const willingnessData = [...existingData, ...newVarietyData];
+    const spaDetails = [...existingData];
 
-    // Validation: If willingness true → quantity must be > 0
-    for (let item of willingnessData) {
-      if (item.willingness === true && item.quantity === 0) {
-        Swal.fire({
-          title: '<p style="font-size:25px;">Quantity is required if willingness is true.</p>',
-          icon: 'error',
-          confirmButtonText: 'OK',
-          confirmButtonColor: '#B64B1D',
-        });
-        return;
-      }
-    }
-
+   
     const payload = {
       action: "final",
-      year: Number(formValues.year),
-      season: formValues.season,
-      crop_code: formValues.crop_code,
-      willingnessData
+
+      year: 2027,
+      season: 'Rabi',
+      crop_code: 'A0210',
+      spaDetails
     };
 
     console.log("Final Payload: ", payload);
@@ -599,10 +584,10 @@ export class AssignSpaComponent implements OnInit {
   addInnerRow(i: number) {
     this.getInnerBspc(i).push(
       this.fb.group({
-        id: [''],
-        spa_code: [''],
+        id: [],
+        spa_user_id: [],
         spa_name: [''],
-        replace_tentative_qty: [0]
+        certified_seed_quantity: [0]
       })
     );
   }
@@ -648,17 +633,19 @@ export class AssignSpaComponent implements OnInit {
 
   selectReplaceVariety(i: number, j: number, variety: any) {
     const control = this.getInnerBspc(i).at(j);
+    console.log(variety, "staep 1")
     control.patchValue({
-      spa_code: variety.spa_code,
+      spa_user_id: variety.spa_id,
       spa_name: variety.spa_name,
     });
+
   }
 
   createInnerRow(): FormGroup {
     return this.fb.group({
-      spa_code: [''],
+      spa_user_id: [0],
       spa_name: [''],
-      replace_tentative_qty: [0]
+      certified_seed_quantity: [0]
     });
   }
 
@@ -692,18 +679,18 @@ export class AssignSpaComponent implements OnInit {
     this.popupIndex = null;
   }
   getMainQuantity(i: number): number {
-    console.log(this.ngForm.controls['bspc']['controls'][i].controls['certified_seed'].value)
+
     return Number(
       this.ngForm.controls['bspc']['controls'][i].controls['certified_seed'].value
     ) || 0;
   }
   getSpaTotalQuantity(i: number): number {
     const spaArray =
-      this.ngForm.controls['bspc']['controls'][i].controls['replaceVariety'].controls;
+      this.ngForm.controls['bspc']['controls'][i].controls['assign_spa'].controls;
 
     let total = 0;
     spaArray.forEach((spa: any) => {
-      total += Number(spa.controls['replace_tentative_qty'].value) || 0;
+      total += Number(spa.controls['certified_seed_quantity'].value) || 0;
     });
 
     return Number(total.toFixed(2)); // decimal issue fix
@@ -713,7 +700,7 @@ export class AssignSpaComponent implements OnInit {
     const mainQty = this.getMainQuantity(i);
     const spaTotal = this.getSpaTotalQuantity(i);
     const spaArray =
-      this.ngForm.controls['bspc']['controls'][i].controls['replaceVariety'].controls;
+      this.ngForm.controls['bspc']['controls'][i].controls['assign_spa'].controls;
 
     if (spaTotal > mainQty) {
       Swal.fire({
@@ -722,7 +709,7 @@ export class AssignSpaComponent implements OnInit {
         text: "SPA quantity cannot exceed Tentative Quantity ",
       });
       // 🔥 Value bilkul reset
-      const currentControl = spaArray.at(j).get('replace_tentative_qty');
+      const currentControl = spaArray.at(j).get('certified_seed_quantity');
       currentControl?.setValue(0, { emitEvent: false });
 
       return;

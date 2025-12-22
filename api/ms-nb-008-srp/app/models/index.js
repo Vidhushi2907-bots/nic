@@ -144,8 +144,33 @@ db.srpCropVarietyFinalModel=require('./srop_crop_variety_final.model.js')(sequel
 // table first
 //table second
 //=================forSRP module============
+db.srpAssignSpaModel.belongsTo(db.srpCropVarietyFinalModel, {
+    foreignKey: "srp_final_id",
+    sourceKey: "id"
+})
+db.srpCropVarietyFinalModel.hasMany(db.srpAssignSpaModel, {
+     foreignKey: "srp_final_id",
+    targetKey: "id"
+})
+db.agencyDetailModel.hasMany(db.srpAssignSpaModel,{
+     foreignKey: "spa_user_id",
+    sourceKey: "user_id"
+})
+db.srpAssignSpaModel.belongsTo(db.agencyDetailModel, {
+    foreignKey: "spa_user_id",
+    targetKey: "user_id"
+})
+db.varietyModel.hasMany(db.srpCropVarietyFinalModel, {
+    foreignKey: "variety_code",
+    sourceKey: "variety_code",
 
+});
 
+db.srpCropVarietyFinalModel.belongsTo(db.varietyModel, {
+    foreignKey: "variety_code",
+    targetKey: "variety_code",
+
+});
 
 db.srpCropModel.belongsTo(db.seasonModel, {
     foreignKey: "season",

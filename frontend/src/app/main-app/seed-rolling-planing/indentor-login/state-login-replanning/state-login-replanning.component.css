@@ -656,5 +656,3 @@ input[type="number"]::-webkit-outer-spin-button {
   cursor: not-allowed;      /* shows not-allowed cursor */
   pointer-events: none;     /* optional: prevent focus/click */
 }
- 
- 

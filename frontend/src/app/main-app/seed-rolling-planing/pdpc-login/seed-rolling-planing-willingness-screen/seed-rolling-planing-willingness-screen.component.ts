@@ -235,7 +235,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
 
   addReplaceVarieties(albumIndex: number) {
     const albums = this.ngForm.get('bspc') as FormArray;
-    console.log( albums.at(albumIndex)," albums.at(albumIndex)")
+   
     const songs = albums.at(albumIndex).get('replaceVariety') as FormArray;
     console.log(songs, "songs")
     songs.push(this.createInnerRow());
@@ -276,7 +276,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
           this.inventoryVarietyData = data.EncryptedResponse.data;
 
           this.isFinalSubmitButtonHide = this.inventoryVarietyData.some((item: any) => item?.is_final_submit === true);
-          console.log(this.inventoryVarietyData,"varietydata")
+          console.log(this.inventoryVarietyData, "varietydata")
           // assuming API returns this at root
           if (searchKeyword) {
             this.inventoryVarietyData = this.inventoryVarietyData.filter(item =>
@@ -291,47 +291,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
           const additionalArray = this.ngForm.get('newVarieties') as FormArray;
           srpWillingnessArray.clear();
           additionalArray.clear();
-          // this.inventoryVarietyData.forEach((variety: any) => {
 
-          //   if (variety.is_additional === true) {
-          //     // Additional variety 
-          //     additionalArray.clear();
-          //     additionalArray.push(
-          //       this.fb.group({
-          //         variety_code: [variety.variety_code],
-          //         variety_name: [variety.variety_name],
-          //         new_tentative_quantity: [variety.quantity ?? 0],
-          //         additional_note: [variety.remarks ?? '']
-          //       })
-          //     );
-          //   } else {
-          //     const group = this.fb.group({
-          //       variety_code: [variety.variety_code],
-          //       variety_name: [variety.variety_name],
-          //       total_seed_required: [variety.total_breeder_seed ?? 0],
-          //       status_toggle: [variety.willingness ?? true],
-          //       tentative_quantity: [variety.quantity ?? 0],
-          //       replaceVariety: this.fb.array([])
-
-          //     });
-
-          //     const replaceArray = group.get('replaceVariety') as FormArray;
-
-          //     if (variety.replace_variety && variety.replace_variety.length > 0) {
-          //       variety.replace_variety.forEach((rv: any) => {
-          //         replaceArray.push(
-          //           this.fb.group({
-          //             variety_code: [rv.replace_variety_code],
-          //             variety_name: [rv.variety_name],
-          //             replace_tentative_qty: [rv.quantity ?? 0]
-          //           })
-          //         );
-          //       });
-          //     }
-
-          //     srpWillingnessArray.push(group);
-          //   }
-          // });
           this.inventoryVarietyData.forEach((variety: any, index: number) => {
 
             if (variety.is_additional === true) {
@@ -632,13 +592,8 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
 
     const bspcArray = formValues.bspc || [];               // FIX 1
     const newVarArr = formValues.newVarieties || [];       // FIX 2
-
-
-
     const existingData = bspcArray.map((row: any) => {
-
       const replaceArray = row.replaceVariety || [];       // FIX 3
-
       const replaceData = replaceArray
         .filter((r: any) => r?.variety_code)
         .map((r: any) => ({
@@ -818,7 +773,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
   }
   async triggerAutoSearch() {
     clearTimeout(this.autoSearchTimeout);
-
+console.log("hellllllllllllllllll2")
     this.autoSearchTimeout = setTimeout(() => {
       this.getPageData();  // automatically fire your API function
     }, 400); // delay 0.4 sec

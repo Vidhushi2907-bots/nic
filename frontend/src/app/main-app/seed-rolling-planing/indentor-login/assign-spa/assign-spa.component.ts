@@ -44,7 +44,7 @@ export class AssignSpaComponent implements OnInit {
   inventoryIndentorData: any
   popupIndex: number | null = null;
   lastVarietyCode: string | null = null;
-
+  autoSearchTimeout: any;
   userId: any;
   bspData: any;
   isFinalSubmit: boolean = false;
@@ -79,6 +79,7 @@ export class AssignSpaComponent implements OnInit {
       year: [''],
       season: [''],
       crop_code: [''],
+      global_search: [''],
       bspc: this.fb.array([]),
 
     });
@@ -181,8 +182,6 @@ export class AssignSpaComponent implements OnInit {
           this.spaStateCode = res.EncryptedResponse.data;
           const stateCode = this.spaStateCode.state_code;
 
-          console.log('State Code:', stateCode);
-
           // 🔥 Ab second API call
           const route = 'get-lifting-surplus-breeder-spa-details';
           const param = {
@@ -196,7 +195,6 @@ export class AssignSpaComponent implements OnInit {
             .subscribe((res2: any) => {
               if (res2?.EncryptedResponse?.status_code === 200) {
                 this.dropdownList22 = res2.EncryptedResponse.data || [];
-                console.log(this.dropdownList22, 'dropdownList22');
               }
             });
         }
@@ -206,10 +204,8 @@ export class AssignSpaComponent implements OnInit {
   }
   addReplaceVarieties(albumIndex: number) {
     const albums = this.ngForm.get('bspc') as FormArray;
-    console.log(albums.at(albumIndex), "albums")
     const songs = albums.at(albumIndex).get('assign_spa') as FormArray;
     songs.push(this.createInnerRow());
-    console.log(songs, "songs")
     this.toggleCropSection(albumIndex)
   }
 
@@ -228,23 +224,25 @@ export class AssignSpaComponent implements OnInit {
       });
       return;
     }
-
+    const searchKeyword = String(this.ngForm.get('global_search')?.value || '').trim().toLowerCase();
+    console.log(this.ngForm.get('global_search')?.value, "hhhhhhhhhhhhhhhhhh");
     this.isCrop = true;
-    // this.ngForm.get('variety1_code')?.setValue('');
-const searchKeyword = String(this.ngForm.get('global_search')?.value || '').trim().toLowerCase();
+
     const apiUrl = `get-variety?year=${year}&season=${season}&crop_code=${crop_code}`;
     this.srpService.postRequestCreator(apiUrl, null, null).subscribe({
       next: (res: any) => {
         if (res?.EncryptedResponse?.status_code === 200) {
 
           this.inventoryVarietyData = res.EncryptedResponse.data || [];
-              if (searchKeyword) {
+          console.log(this.inventoryVarietyData, "this.inventoryVarietyData")
+          if (searchKeyword) {
+            console.log(searchKeyword)
             this.inventoryVarietyData = this.inventoryVarietyData.filter(item =>
               String(item.variety_name || '').toLowerCase().includes(searchKeyword) ||
               String(item.certified_seed || '').toLowerCase().includes(searchKeyword) ||
               String(item.breeder_seed || '').toLowerCase().includes(searchKeyword) ||
-              String(item.foundation_seed || '').toLowerCase().includes(searchKeyword) 
-              
+              String(item.foundation_seed || '').toLowerCase().includes(searchKeyword)
+
             );
           }
           const srpWillingnessArray = this.ngForm.get('bspc') as FormArray;
@@ -284,13 +282,19 @@ const searchKeyword = String(this.ngForm.get('global_search')?.value || '').trim
               }
             }
           });
-          console.log(this.ngForm.get('bspc')?.value, "willingness");
+
         }
       },
       error: (err) => console.error("❌ API Error:", err)
     });
   }
-
+  async triggerAutoSearch() {
+    clearTimeout(this.autoSearchTimeout);
+    console.log("hellloooooooooooooooooooooooooooooo")
+    this.autoSearchTimeout = setTimeout(() => {
+      this.getPageData();  // automatically fire your API function
+    }, 400); // delay 0.4 sec
+  }
 
   toggleCropSection(index: number) {
 
@@ -301,6 +305,7 @@ const searchKeyword = String(this.ngForm.get('global_search')?.value || '').trim
       this.openCropIndexes.splice(pos, 1);
     }
   }
+
   getVarietyData(crop_code: string) {
 
     const apiUrl = `get-variety-details?crop_code=${crop_code}`
@@ -313,8 +318,6 @@ const searchKeyword = String(this.ngForm.get('global_search')?.value || '').trim
           data.EncryptedResponse.status_code === 200
         ) {
           this.varietyData = data.EncryptedResponse.data;
-
-
           console.log('✅ Season list loaded:', this.inventorySeasonData);
         } else {
           console.warn('⚠️ No valid data received in EncryptedResponse');
@@ -327,6 +330,7 @@ const searchKeyword = String(this.ngForm.get('global_search')?.value || '').trim
     });
 
   }
+
   onQuantityClick(index: number, event: Event) {
     event.stopPropagation(); // 👈 outside click में count न हो
 
@@ -342,9 +346,11 @@ const searchKeyword = String(this.ngForm.get('global_search')?.value || '').trim
 
     this.indentorBreederSeedData(varietyCode);
   }
+
   hidePopover() {
     this.popupIndex = null;
   }
+
   indentorBreederSeedData(varietyCode: string) {
 
     const year = this.ngForm.controls['year'].value;
@@ -373,6 +379,7 @@ const searchKeyword = String(this.ngForm.get('global_search')?.value || '').trim
       }
     });
   }
+
   checkTentativeValue(i: number) {
     const controlGroup = this.ngForm.controls['bspc']['controls'][i];
     const totalSeedRequired = controlGroup.controls['total_seed_required'].value;
@@ -466,7 +473,7 @@ const searchKeyword = String(this.ngForm.get('global_search')?.value || '').trim
     });
   }
   openReplaceSwal(list: any[]) {
-    console.log(list, "heeloo....................")
+
     Swal.fire({
       title: '<span style="color:Black;">Assigned SPA</span>',
       width: 700,
@@ -518,7 +525,7 @@ const searchKeyword = String(this.ngForm.get('global_search')?.value || '').trim
   finalizeData() {
     const apiUrl = "add-spa-details";
     const formValues = this.ngForm.value;
-    const bspcArray = formValues.bspc || [];              
+    const bspcArray = formValues.bspc || [];
     const existingData = bspcArray.map((row: any) => {
       const assignSpa = row.assign_spa
         ?.filter((r: any) => r.spa_user_id)
@@ -526,7 +533,7 @@ const searchKeyword = String(this.ngForm.get('global_search')?.value || '').trim
           spa_user_id: Number(r.spa_user_id),
           certified_seed_quantity: Number(r.certified_seed_quantity)
         })) || [];
- 
+
       return {
         variety_code: row.variety_code,
         breeder_seed: row.breeder_seed,
@@ -536,12 +543,11 @@ const searchKeyword = String(this.ngForm.get('global_search')?.value || '').trim
       };
     });
 
-    console.log(existingData)
 
     // FINAL MERGE — always an array
     const spaDetails = [...existingData];
 
-   
+
     const payload = {
       action: "final",
 
@@ -657,7 +663,9 @@ const searchKeyword = String(this.ngForm.get('global_search')?.value || '').trim
     const data = JSON.parse(userData!);
     this.userId = data.id;
 
-
+    this.ngForm.get('global_search')?.valueChanges.subscribe(() => {
+      this.triggerAutoSearch();
+    })
     this.ngForm.patchValue({
       year: 2027,
       season: 'Rabi',
@@ -666,6 +674,7 @@ const searchKeyword = String(this.ngForm.get('global_search')?.value || '').trim
 
     this.lockHeaderFields();
     this.getPageData();
+
   }
 
   openpopup() {

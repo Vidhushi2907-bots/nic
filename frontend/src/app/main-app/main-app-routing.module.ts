@@ -1685,7 +1685,7 @@ const routes: Routes = [
         component: DashboardPhaseSecondComponent
       },
       {
-        path: 'seed-rolling-planing-crop-wise',
+        path: 'seed-rolling-planing-crop-wise/:isLocked',
         component: SeedRollingPlaningCropWiseComponent
       },
       //     {

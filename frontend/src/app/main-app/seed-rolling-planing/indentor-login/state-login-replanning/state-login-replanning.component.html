@@ -11,10 +11,10 @@
                     <div class="col-12 pb-2 pt-2 pr-0">
                         <div class="row card-inventory form-group formargin">
  
-                            <div class="col-12 pt-1 pl-4 formargin mb-3">
+                            <div class="col-12 pt-1 pl-1 formargin mb-3">
  
                                 <!-- FLEX ROW: three wide fields + right aligned button -->
-                                <div class="d-flex align-items-end flex-nowrap" >
+                                <div class="d-flex align-items-end flex-nowrap" style="width: 118%;">
  
                                     <!-- Year -->
                                     <div class="me-2 flex-grow-1 col-3">
@@ -88,7 +88,7 @@
                 </div>
  
                 <!--third ui-->
-                <div class="col-12 col-md-12 col-lg-12 pt-0" *ngIf="isBspc">
+                <div class="col-12 col-md-12 col-lg-12 pt-0" *ngIf="isCrop">
                     <div class="row card-inventory form-group">
                         <div class="col-12 col-md-12 col-lg-12 col-sm-12 col-xl-12">
                             <!-- Wrapper -->
@@ -96,87 +96,80 @@
  
                                 <!-- Header Row -->
                                 <div class="row d-none d-md-flex data-row-header text-center fw-bold">
-                                    <!-- Variety Name -->
+ 
                                     <div class="col-md-2 py-3">Variety Name</div>
  
-                                    <!-- Target Breeder Seed Qty -->
-                                    <div class="col-md-2 py-3">Target Breeder Seed Quantity (QTL.)</div>
+                                    <div class="col-md-2 py-3">
+                                        Target Breeder Seed Quantity (QTL.)
+                                    </div>
  
-                                    <!-- Willingness -->
                                     <div class="col-md-1 py-3">Willingness</div>
  
-                                    <!-- Tentative Breeder Seed Qty I -->
-                                    <div class="col-md-2 py-3">Tentative Breeder Seed Quantity (QTL.)</div>
+                                    <div class="col-md-2 py-3">
+                                        Tentative Breeder Seed Quantity (QTL.)
+                                    </div>
  
-                                    <!-- Replacement Variety -->
-                                    <div class="col-md-1.5 py-3">Replacement Variety Name</div>
+                                    <div class="col-md-2 py-3">
+                                        Replacement Variety Name
+                                    </div>
  
-                                    <!-- Tentative Breeder Seed Qty II -->
-                                    <div class="col-md-2 py-3">Tentative Breeder Seed Quantity (QTL.)</div>
+                                    <div class="col-md-1 py-3">
+                                        Tentative Qty (QTL.)
+                                    </div>
  
-                                    <!-- Action -->
-                                    <div class="col-md-1.5 py-3" style="margin-left: 50px;">Action</div>
+                                    <div class="col-md-2 py-3">
+                                        Action
+                                    </div>
+ 
                                 </div>
+ 
  
                                 <!-- Dynamic Rows -->
                                 <div formArrayName="bspc">
                                     <div class="row data-row align-items-center text-center"
-                                        *ngFor="let group of bspc.controls; let i = index" [formGroupName]="i">
+                                        *ngFor="let group of bspc.controls; let i = index; trackBy: trackByBspc"
+                                        [formGroupName]="i">
  
                                         <!-- Variety Name -->
                                         <div class="col-md-2 py-2">
                                             <input type="text"
-                                                class="form-control form-control-sm text-end border-0 bg-transparent ellipsis-input"
-                                                formControlName="variety_name"
-                                                [title]="group.get('variety_name')?.value" data-bs-toggle="tooltip"
-                                                readonly />
+                                                class="form-control form-control-sm border-0 bg-transparent"
+                                                formControlName="variety_name" readonly />
                                         </div>
  
- 
-                                        <!-- Target Breeder Seed Qty -->
+                                        <!-- Target Qty -->
                                         <div class="col-md-2 py-2">
                                             <input type="number"
-                                                class="form-control form-control-sm text-center border-0 bg-transparent"
+                                                class="form-control form-control-sm border-0 bg-transparent text-center"
                                                 formControlName="target_breeder_seed" readonly />
                                         </div>
  
                                         <!-- Willingness -->
                                         <div class="col-md-1 py-2">
                                             <input type="text"
-                                                class="form-control form-control-sm text-center border-0 bg-transparent"
+                                                class="form-control form-control-sm border-0 bg-transparent text-center"
                                                 formControlName="willingness" readonly />
                                         </div>
  
-                                        <!-- Tentative Qty I -->
+                                        <!-- Tentative Qty -->
                                         <div class="col-md-2 py-2">
                                             <input type="number" class="form-control form-control-sm text-center"
                                                 formControlName="tentative_quantity" readonly />
                                         </div>
  
-                                        <!-- Replace List -->
-                                        <div formArrayName="replaces" class="col-md-2 py-2">
- 
-                                            <div class="row" *ngFor="let r of getReplaces(i).controls; let j = index"
+                                        <!-- Replacement Variety -->
+                                        <div class="col-md-2 py-2" formArrayName="replaces">
+                                            <div *ngFor="let r of getReplacesArray(group).controls; let j = index"
                                                 [formGroupName]="j">
- 
-                                                <!-- Replace Variety Name -->
-                                                <div class="col-12">
-                                                    <input type="text"
-                                                        class="form-control form-control-sm text-end border-0 bg-transparent ellipsis-input big-tooltip"
-                                                        formControlName="replace_variety_name"
-                                                        [attr.title]="r.get('replace_variety_name')?.value"
-                                                        data-bs-toggle="tooltip" data-bs-placement="top" readonly />
- 
-                                                </div>
- 
+                                                <input type="text"
+                                                    class="form-control form-control-sm border-0 bg-transparent"
+                                                    formControlName="replace_variety_name" readonly />
                                             </div>
- 
                                         </div>
  
- 
- 
-                                        <div formArrayName="replaces" class="col-md-1.5 py-2">
-                                            <div *ngFor="let r of getReplaces(i).controls; let j = index"
+                                        <!-- Replacement Qty -->
+                                        <div class="col-md-1 py-2" formArrayName="replaces">
+                                            <div *ngFor="let r of getReplacesArray(group).controls; let j = index"
                                                 [formGroupName]="j">
                                                 <input type="number" class="form-control form-control-sm text-center"
                                                     formControlName="replace_quantity" readonly />
@@ -184,92 +177,85 @@
                                         </div>
  
                                         <!-- Action -->
-                                        <div formArrayName="replaces" class="col-md-1.5 py-2">
-                                            <div *ngFor="let r of getReplaces(i).controls; let j = index"
-                                                [formGroupName]="j" class="mb-2">
-                                                <select class="form-control form-control-sm "
-                                                    style="margin-left: 18px;" formControlName="replace_is_accept">
-                                                     <option value="">Select</option>
-                                                    <option *ngFor="let data of statusData" [value]="data.id">{{data.name}}</option>
-                                                  
+                                        <div class="col-md-2 py-2 mb-2" formArrayName="replaces">
+                                            <div *ngFor="let r of getReplacesArray(group).controls; let j = index"
+                                                [formGroupName]="j">
+ 
+                                                <select class="form-control form-control-sm"
+                                                    formControlName="replace_is_accept" style="margin-bottom: 6px;margin-left: 79px;width: 100px;">
+                                                    <option value="">Select</option>
+                                                    <option *ngFor="let data of statusData" [value]="data.id">
+                                                        {{ data.name }}
+                                                    </option>
                                                 </select>
                                             </div>
                                         </div>
  
- 
- 
-                                        <!-- <div class="col-md-1.5 py-2">
-                                            <select class="form-control form-control-sm text-center"
-                                                formControlName="is_status_active">
-                                                <option [ngValue]="0">Select</option>
-                                                <option [ngValue]="1">Accept</option>
-                                                <option [ngValue]="2">Reject</option>
-                                            </select>
-                                        </div> -->
- 
                                     </div>
+ 
+ 
+ 
                                 </div>
+                            </div>
  
- 
+                            <!-- No Data Message -->
+                            <div *ngIf="filterPaginateSearch &&filterPaginateSearch.initialized &&
+                                   (!filterPaginateSearch.itemList || filterPaginateSearch.itemList.length < 1)"
+                                class="px-2 py-3 w-100 text-center" style="height: 50px;">
+                                No Data Found.
                             </div>
                         </div>
- 
-                        <!-- No Data Message -->
-                        <div *ngIf="filterPaginateSearch &&filterPaginateSearch.initialized &&
-                                   (!filterPaginateSearch.itemList || filterPaginateSearch.itemList.length < 1)"
-                            class="px-2 py-3 w-100 text-center" style="height: 50px;">
-                            No Data Found.
-                        </div>
                     </div>
-                </div>
  
-                <!-- New Variety Section -->
-                <div class="col-12 pt-2" *ngIf="isCrop">
-                    <div class="row card-inventory form-group">
-                        <div class="col-12 px-3">
-                            <div class="row card-monitoring form-group mx-1">
-                                <ng-container formArrayName="newVarietyArr"
-                                    *ngFor="let ele of newVarietyArr.controls; let i = index">
-                                    <div [formGroupName]="i" class="col-12 py-2">
-                                        <label class="label">New Variety Details</label>
-                                        <!--  Single Row for Each Variety -->
-                                        <div class="row g-2 align-items-end">
-                                            <!-- 1️⃣ Variety Name -->
-                                            <div class="col-md-3  col-sm-6">
-                                                <label class="label-inventorys mb-1">Variety Name</label>
-                                                <input type="text" class="form-control text-end" formControlName="new_variety_name"
-                                                    readonly />
-                                            </div>
+                    <!-- New Variety Section -->
+                    <div class="col-12 col-md-12 col-lg-12 pt-2" *ngIf="isCrop">
+                        <div class="row card-inventory form-group">
+                            <div class="col-12 px-5">
+                                <div class="row card-monitoring form-group mx-1">
+                                    <ng-container formArrayName="newVarietyArr"
+                                        *ngFor="let ele of newVarietyArr.controls; let i = index">
+                                        <div [formGroupName]="i" class="col-12 py-2">
+                                            <label class="label">New Variety Details</label>
+                                            <!--  Single Row for Each Variety -->
+                                            <div class="row g-2 align-items-end">
+                                                <!-- 1️⃣ Variety Name -->
+                                                <div class="col-md-3  col-sm-6">
+                                                    <label class="label-inventorys mb-1">Variety Name</label>
+                                                    <input type="text" class="form-control text-end"
+                                                        formControlName="new_variety_name" readonly />
+                                                </div>
  
  
-                                            <!-- 2️⃣ Tentative Breeder Seed Quantity -->
-                                            <div class="col-md-3  col-sm-6">
-                                                <label class="label-inventorys mb-1">Tentative Breeder Seed Qty
-                                                    (QTL.)</label>
-                                                <input type="number" class="form-control"
-                                                    formControlName="new_quantity_available" readonly />
-                                            </div>
+                                                <!-- 2️⃣ Tentative Breeder Seed Quantity -->
+                                                <div class="col-md-3  col-sm-6">
+                                                    <label class="label-inventorys mb-1">Tentative Breeder Seed Qty
+                                                        (QTL.)</label>
+                                                    <input type="number" class="form-control"
+                                                        formControlName="new_quantity_available" readonly />
+                                                </div>
  
-                                            <!-- 3️⃣ Action -->
-                                            <div class="col-md-3 col-sm-5">
-                                                <label class="label-inventorys mb-1">Action</label>
-                                                <select class="form-control" formControlName="new_is_accept">
-                                                    <option value="">Select</option>
-                                                    <option *ngFor="let data of statusData2" [ngValue]="data.id">{{data.name}}</option>
-                                                </select>
-                                            </div>
+                                                <!-- 3️⃣ Action -->
+                                                <div class="col-md-3 col-sm-5">
+                                                    <label class="label-inventorys mb-1">Action</label>
+                                                    <select class="form-control" formControlName="new_is_accept">
+                                                        <option value="">Select</option>
+                                                        <option *ngFor="let data of statusData2" [ngValue]="data.id">
+                                                            {{data.name}}</option>
+                                                    </select>
+                                                </div>
  
-                                            <!-- 2️⃣ Tentative Breeder Seed Quantity -->
-                                            <div class="col-md-3  col-sm-6" *ngIf="ele.get('new_is_accept')?.value === 1">
-                                                <label class="label-inventorys mb-1">Tentative Breeder Seed Qty
-                                                    (QTL.)</label>
-                                                <input type="number" class="form-control"
-                                                    formControlName="new_quantity_required" min="0"
-                                                    placeholder="Enter Quantity" />
-                                            </div>
+                                                <!-- 2️⃣ Tentative Breeder Seed Quantity -->
+                                                <div class="col-md-3  col-sm-6"
+                                                    *ngIf="ele.get('new_is_accept')?.value === 1">
+                                                    <label class="label-inventorys mb-1">Tentative Breeder Seed Qty
+                                                        (QTL.)</label>
+                                                    <input type="number" class="form-control"
+                                                        formControlName="new_quantity_required" min="0"
+                                                        placeholder="Enter Quantity" />
+                                                </div>
  
-                                            <!-- 4️⃣ Icons (Add / Delete) -->
-                                            <!-- <div class="col-xl-1 col-lg-1 pl-md-0 pl-xl-3 mt-lg-4 col-md-1 pt-3 col-12"
+                                                <!-- 4️⃣ Icons (Add / Delete) -->
+                                                <!-- <div class="col-xl-1 col-lg-1 pl-md-0 pl-xl-3 mt-lg-4 col-md-1 pt-3 col-12"
                                                 style="display: flex;">
                                                 <button class="list-action-buttons-second ml-lg-3  mt-md-2 "
                                                     style="cursor: pointer;" (click)="addMore(i)">
@@ -283,48 +269,47 @@
  
                                             </div> -->
  
-                                        </div>
+                                            </div>
  
-                                        <hr class="my-2" />
-                                    </div>
-                                </ng-container>
+                                            <hr class="my-2" />
+                                        </div>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+ 
+                    <!-- buttons -->
+                    <div class="col-12 pt-2" *ngIf="isCrop">
+                        <div class="row justify-content-end">
+                            <div class="col-auto">
+ 
+                            </div>
+                            <div class="col-auto" *ngIf="!isFinalSubmitButtonHide">
+                                <button (click)="draftPopup()"
+                                    class="clear-form-button btn-inventory d-inline-flex justify-content-center align-items-center mb-3">
+                                    Save as Draft
+                                </button>
+                            </div>
+                            <div class="col-auto" *ngIf="!isFinalSubmitButtonHide">
+                                <button (click)="saveEditPopup()"
+                                    class="clear-form-button btn-inventory d-inline-flex justify-content-center align-items-center mb-3">
+                                    Submit
+                                </button>
+                            </div>
+ 
+                            <div class="col-auto" *ngIf="isFinalSubmitButtonHide">
+                                <button (click)="onAddSpa()"
+                                    class="clear-form-button btn-inventory d-inline-flex justify-content-center align-items-center mb-3">
+                                    Add SPA
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
- 
-                <!-- buttons -->
-                <div class="col-12 pt-2" *ngIf="isCrop">
-                    <div class="row justify-content-end">
-                        <div class="col-auto">
- 
-                        </div>
-                        <div class="col-auto" *ngIf="!isFinalSubmitButtonHide">
-                            <button (click)="draftPopup()"
-                                class="clear-form-button btn-inventory d-inline-flex justify-content-center align-items-center mb-3">
-                                Save as Draft
-                            </button>
-                        </div>
-                        <div class="col-auto" *ngIf="!isFinalSubmitButtonHide">
-                            <button (click)="saveEditPopup()"
-                                class="clear-form-button btn-inventory d-inline-flex justify-content-center align-items-center mb-3">
-                                Submit
-                            </button>
-                        </div>
- 
-                          <div class="col-auto" *ngIf="isFinalSubmitButtonHide">
-                            <button
-                            (click)="goBack()"
-                                class="clear-form-button btn-inventory d-inline-flex justify-content-center align-items-center mb-3">
-                                Add SPA
-                            </button>
-                        </div>
-                    </div>
-                </div>
- 
             </form>
+ 
         </div>
  
     </div>
 </div>
- 

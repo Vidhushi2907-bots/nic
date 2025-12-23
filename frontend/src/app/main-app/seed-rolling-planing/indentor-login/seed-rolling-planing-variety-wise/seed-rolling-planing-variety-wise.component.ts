@@ -647,9 +647,25 @@ ${variety_wise
     });
   }
 
+  // goBack() {
+  //   this.router.navigate(['/seed-rolling-planing-crop-wise/true']);
+  // }
   goBack() {
-    this.router.navigate(['/seed-rolling-planing-crop-wise']);
+  const year = localStorage.getItem('year');
+  const season = localStorage.getItem('season');
+
+  // Agar dono values exist karte hain tabhi navigate karein
+  if (year && season) {
+    this.router.navigate(
+  ['/seed-rolling-planing-crop-wise'],
+  { queryParams: { isLocked: true } }
+);
+    console.log(this.router.navigate(['/seed-rolling-planing-crop-wise/true']))
+  } else {
+    // Kuch nahi karna agar year ya season missing hai
+    console.warn('Year or Season not found in localStorage');
   }
+}
 
   calculateTotalSeedRequired() {
     const bspcArray = this.ngForm.get('bspc') as FormArray;

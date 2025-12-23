@@ -12,7 +12,7 @@ import { MasterService } from 'src/app/services/master/master.service';
 import { SeedRollingPlanningService } from 'src/app/services/seed-rolling-plan/seed-rolling-planning.service'
 import { environment } from 'src/environments/environment';
 import { checkDecimalValue, checkLength } from 'src/app/_helpers/utility';
-
+import { ActivatedRoute } from '@angular/router';
 @Component({
   selector: 'app-seed-rolling-planing-crop-wise',
   templateUrl: './seed-rolling-planing-crop-wise.component.html',
@@ -35,6 +35,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
   inventoryYearData: any;
   inventorySeasonData: any;
   inventoryCropData: any;
+  lastValidSRRValue: any;
   cropGroupList = [
     { id: 1, name: 'Cereals' },
     { id: 2, name: 'Pulses' },
@@ -71,7 +72,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
   // selectedGroup: string = '';
   // originalCropList: any[] = [];
   // filteredCrops:any[]=[]
-  constructor(private service: SeedServiceService, private _masterService: MasterService, private breeder: BreederService, private fb: FormBuilder, private route: Router, private cdRef: ChangeDetectorRef, private _productionCenter: ProductioncenterService, private master: MasterService, private srpService: SeedRollingPlanningService) {
+  constructor(private service: SeedServiceService, private _masterService: MasterService,  private activeRoute: ActivatedRoute,  private breeder: BreederService, private fb: FormBuilder, private route: Router, private cdRef: ChangeDetectorRef, private _productionCenter: ProductioncenterService, private master: MasterService, private srpService: SeedRollingPlanningService) {
     this.createForm();
     this.srpCropWiseData = this.breeder.redirectData;
     if (this.srpCropWiseData && this.srpCropWiseData !== undefined) {
@@ -115,18 +116,18 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
 
   searchData() {
     // Reset form fields
-      const year = this.ngForm.get('year')?.value;
-  const season = this.ngForm.get('season')?.value;
+    const year = this.ngForm.get('year')?.value;
+    const season = this.ngForm.get('season')?.value;
 
-  if (
-    year &&
-    season &&
-    localStorage.getItem('year') !== year
-  ) {
-    localStorage.setItem('year', year);
-    localStorage.setItem('season', season);
-    localStorage.setItem('isLocked', 'true');
-  }
+    if (
+      year &&
+      season &&
+      localStorage.getItem('year') !== year
+    ) {
+      localStorage.setItem('year', year);
+      localStorage.setItem('season', season);
+      
+    }
     this.ngForm.patchValue({
       global_search: '',
       group_code: '',
@@ -280,7 +281,6 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
 
     const payload = { action: "draft", cropData };
     console.log("Payload Sent:", payload);
-
     this.srpService.postRequestCreator(apiUrl, null, payload).subscribe({
       next: (data: any) => {
         console.log("API Response:", data);
@@ -420,9 +420,6 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
   async finalizeData() {
     if (this.isSubmitting) return; // prevent multiple clicks
     this.isSubmitting = true;
-
-
-
     const apiUrl = "add-srp-crop-wise";
     const formValues = this.ngForm.value;
     const year = formValues.year;
@@ -448,7 +445,17 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
         if (crop.seed_rate) cleanCrop.seed_rate = crop.seed_rate;
         return cleanCrop;
       });
-
+const invalidSrr = cropData.find(crop => crop.srr > 100);
+if (invalidSrr) {
+  Swal.fire({
+    title: '<p style="font-size:20px;">Error: SRR cannot be greater than 100!</p>',
+    icon: 'error',
+    confirmButtonText: 'OK',
+    confirmButtonColor: '#E97E15',
+  });
+  this.isSubmitting = false;
+  return; 
+}
     if (!cropData.length) {
       Swal.fire({
         title: '<p style="font-size:20px;">No valid data to submit.</p>',
@@ -580,42 +587,61 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
     })
 
   }
-  srrValidation(event: any, index: number) {
+  // srrValidation(event: any, index: number) {
+  //   const input = event.target as HTMLInputElement;
+  //   let value = input.value;
+
+  //   const regex = /^[0-9]*\.?[0-9]{0,2}$/;
+
+  //   if (!regex.test(value)) {
+  //     input.value = this.lastValidSRR[index];
+  //     return;
+  //   }
+  //   const numValue = parseFloat(value);
+
+  //   // ✔ Agar value ≤ 100 → store per-row last valid value
+  //   if (!isNaN(numValue) && numValue <= 100) {
+  //     this.lastValidSRR[index] = value;
+  //   }
+  //   if (numValue > 100) {
+  //     Swal.fire({
+  //       title: '<p style="font-size:25px;">Error: SRR Target must be 100 or less.</p>',
+  //       icon: 'error',
+  //       confirmButtonText: 'OK',
+  //       confirmButtonColor: '#E97E15'
+  //     });
+
+  //     input.value = this.lastValidSRR[index];
+  //     return;
+  //   }
+
+  //   this.calculateTotalSeed(index);
+  // }
+  srrValidation(event: any, index: any) {
+    const bspcArray = this.ngForm.get('srpCropWise') as FormArray;
+    const srrControl = bspcArray.at(index).get('srr');
+    console.log(srrControl, "step:1")
     const input = event.target as HTMLInputElement;
-    let value = input.value;
-
-    const regex = /^[0-9]*\.?[0-9]{0,2}$/;
-
-    if (!regex.test(value)) {
-      input.value = this.lastValidSRR[index];
-
-      return;
+    const currentValue = input.value + event.key;
+    console.log(event.target.value, "input");
+    const regex = /^[0-9]+(\.[0-9]{0,2})?$/;
+    if (!regex.test(currentValue) || (event.key === '.' && input.value.includes('.'))) {
+      event.preventDefault();
     }
 
-    const numValue = parseFloat(value);
+    const SRRTargetbySTATE = parseFloat(input.value);
 
-    // ✔ Agar value ≤ 100 → store per-row last valid value
-    if (!isNaN(numValue) && numValue <= 100) {
-      console.log(value, "heeeeeeeeeeeeeee")
-      this.lastValidSRR[index] = value;
-    }
-
-    // ❌ If value > 100 → revert to this row ka last valid value
-    if (numValue > 100) {
+    if (SRRTargetbySTATE > 100) {
       Swal.fire({
         title: '<p style="font-size:25px;">Error: SRR Target must be 100 or less.</p>',
         icon: 'error',
         confirmButtonText: 'OK',
         confirmButtonColor: '#E97E15'
       });
-
-      input.value = this.lastValidSRR[index];
-      return;
+      event.preventDefault();
     }
-
-    this.calculateTotalSeed(index);
+    return;
   }
-
   calculateTotalSeed(i: number) {
     const srpCropWiseArray = this.ngForm.get('srpCropWise') as FormArray;
 
@@ -635,7 +661,6 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
     console.log('Index:', i, 'Total Seed Required:', total);
   }
 
-  //Total Seed Required 
   updateTotalSeedRequired() {
     const srpCropWiseArray = this.ngForm.get('srpCropWise') as FormArray;
     this.totalSeedRequired = srpCropWiseArray.controls.reduce((sum, control) => {
@@ -655,39 +680,40 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
 
     })
   }
-  //cropGroupId
+
   cgClick() {
     document.getElementById('group_code').click();
   }
-onCropClick(index: number) {
-  const year = this.ngForm.get('year')?.value;
-  const season = this.ngForm.get('season')?.value;
+  onCropClick(index: number) {
+    const year = this.ngForm.get('year')?.value;
+    const season = this.ngForm.get('season')?.value;
 
-  if (
-    year &&
-    season &&
-    localStorage.getItem('year') !== year
-  ) {
-    localStorage.setItem('year', year);
-    localStorage.setItem('season', season);
-    localStorage.setItem('isLocked', 'true');
+    if (
+      year &&
+      season &&
+      localStorage.getItem('year') !== year
+    ) {
+      localStorage.setItem('year', year);
+      localStorage.setItem('season', season);
+      localStorage.setItem('isLocked', 'true');
+    }
   }
-}
   // your existing form array
   ngOnInit(): void {
     // Initialize form first
     const userData = localStorage.getItem('BHTCurrentUser');
     const data = JSON.parse(userData);
     this.userId = data.id;
-      // 🔴 CLEAR on refresh
-//   const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-//   const isRefresh = nav?.type === 'reload';
-// console.log(isRefresh,"refresh........")
-//   if (isRefresh) {
-//     localStorage.removeItem('year');
-//     localStorage.removeItem('season');
-//     localStorage.removeItem('isLocked');
-//   }
+
+    // 🔴 CLEAR on refresh
+    //   const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+    //   const isRefresh = nav?.type === 'reload';
+    // console.log(isRefresh,"refresh........")
+    //   if (isRefresh) {
+    //     localStorage.removeItem('year');
+    //     localStorage.removeItem('season');
+    //     localStorage.removeItem('isLocked');
+    //   }
 
     this.ngForm = this.fb.group({
       year: [''],
@@ -712,15 +738,22 @@ onCropClick(index: number) {
 
     const year = localStorage.getItem('year');
     const season = localStorage.getItem('season');
-    const isLocked = localStorage.getItem('isLocked') === 'true';
-    if (year && season) {
+    
+
+  this.activeRoute.paramMap.subscribe(params => {
+    const isLockedParam = params.get('isLocked'); // 'true' | 'false'
+    const isLocked = isLockedParam === 'true';    // boolean
+
+    console.log(isLocked, 'IS LOCKED');
+
+    if (isLocked) {
       this.ngForm.patchValue({
         year: year,
         season: season
       });
       this.getPageData();
     }
-    
+  });
   }
 
 

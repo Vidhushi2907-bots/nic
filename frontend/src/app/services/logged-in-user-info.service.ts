@@ -1805,7 +1805,7 @@ export class LoggedInUserInfoService {
               {
                 icon: "crop.svg",
                 name: "seed-rolling-planing-crop-wise",
-                href: "/seed-rolling-planing-crop-wise",
+              href: "/seed-rolling-planing-crop-wise/false",
                 subMenus: undefined
               },
               {

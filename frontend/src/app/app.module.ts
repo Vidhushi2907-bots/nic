@@ -114,6 +114,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { BspProformaOneReportQrComponent } from './bsp-proforma-one-report-qr/bsp-proforma-one-report-qr.component';
 import { BspProformaOneReportQr1Component } from './bsp-proforma-one-report-qr1/bsp-proforma-one-report-qr1.component';
 
+
 Chart.register(ChartDataLabels);
 
 
@@ -204,6 +205,7 @@ Chart.register(ChartDataLabels);
     VarietyCharactersticReportsViewFormComponent,
     BspProformaOneReportQrComponent,
     BspProformaOneReportQr1Component,
+  
     // GenerateCardQr
     // GenerateCardQrComponent
     // BspcWiseAssi

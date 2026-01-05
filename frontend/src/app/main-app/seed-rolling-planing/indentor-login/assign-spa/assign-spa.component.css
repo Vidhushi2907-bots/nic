@@ -1057,6 +1057,9 @@ font-size: 14px !important;
   font-size: 18px !important;
   text-align: left !important;
 }
+.btn-inventory1 {
+  min-width: 71px; /* keeps both buttons uniform */
+}
 /* Disable click on LABEL when input is disabled */
 /* .switch.small-switch input:disabled + .slider,
 .switch.small-switch input:disabled + .slider.round,

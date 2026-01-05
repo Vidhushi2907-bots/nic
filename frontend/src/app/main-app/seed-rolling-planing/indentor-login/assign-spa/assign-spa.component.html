@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-12 col-md-12 col-lg-12 title-inventory pl-2 pb-3 pt-0">
             <span class="ml-3">
-                PD/PC or BSPC Login Screen
+                Assign SPA
             </span>
             <form [formGroup]="ngForm">
 
@@ -19,15 +19,8 @@
                                             <label for="year" class="label-inventory required">Year</label>
                                         </div>
                                         <div class="col-12">
-                                            <select class="form-control input-inventory" formControlName="year">
-                                                <option value="">Please Select Year</option>
-
-                                                <!-- <option *ngFor="let year of inventoryYearData" [value]="year.year">
-                                                    {{ year.year }}
-                                                </option> -->
-                                                <option value="2028">2029-30</option>
-                                                <option value="2027">2028-29</option>
-                                            </select>
+                                            <input type="text" class="form-control" formControlName="year"
+                                                placeholder="Enter Year">
 
                                         </div>
                                     </div>
@@ -40,14 +33,7 @@
                                             <label for="year" class="label-inventory required">Season</label>
                                         </div>
                                         <div class="col-12">
-                                            <select class="form-control input-inventory" formControlName="season">
-                                                <option value="">Please Select Season</option>
-                                                <!-- <option *ngFor="let s of inventorySeasonData" [value]="s.season">
-                                                    {{ s.season }}
-                                                </option> -->
-                                                <option value="Kharif">Kharif</option>
-                                                <option value="Rabi">Rabi</option>
-                                            </select>
+                                            <input type="text" class="form-control" formControlName="season">
                                         </div>
                                     </div>
                                 </div>
@@ -59,15 +45,7 @@
                                             <label for="year" class="label-inventory required">Crop</label>
                                         </div>
                                         <div class="col-12">
-                                            <select class="form-control input-inventory" formControlName="crop_code">
-                                                <option value="">Please Select Crop</option>
-                                                <!-- <option *ngFor="let c of inventoryCropData" [value]="c.crop_code">
-                                                    {{ c.crop_name }}
-                                                </option> -->
-                                                <option value="A0502">Jute</option>
-                                                <option value="A0210">Sorgum</option>
-
-                                            </select>
+                                            <input type="text" class="form-control" formControlName="crop_name">
                                         </div>
                                     </div>
                                 </div>
@@ -80,26 +58,62 @@
                 </div>
 
                 <!-- second ui  -->
-                <div class="col-12 col-md-12 col-lg-12 pt-3" *ngIf="isCrop">
-                    <div class="row card-inventory form-group">
+                 <div class="col-12 col-md-12 col-lg-12 pt-3" *ngIf="isCrop">
+  <div class="row card-inventory form-group">
+    <div class="col-12">
+
+      <!-- HEADER ROW -->
+     <div class="d-flex align-items-center justify-content-between mb-3 pt-3">
+
+        <!-- Back Button -->
+    <button
+   (click)="goBack()"
+  class="form-button btn-inventory search d-inline-flex align-items-center justify-content-center px-2 py-1"
+ style="min-width:unset 71px ; gap: 6px; font-size: 13px;">
+  <i class="fa fa-arrow-left" style="font-size: 12px;"></i>
+  <span>Back</span>
+</button>
+        <!-- Search Input -->
+        <input
+          type="text"
+          class="form-control search-input rounded-pill px-3"
+          placeholder="Search Keyword"
+          formControlName="global_search"
+          style="max-width: 250px; border: 1px solid #c96a2b; height: 38px;" />
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+                <!-- <div class="col-12 col-md-12 col-lg-12 pt-3" *ngIf="isCrop"> -->
+                    <!-- <div class="row card-inventory form-group">
                         <div class="col-12">
                             <div class="row">
-                                <!-- Search and Filter Container -->
-                                <div
-                                    class="col-12 d-flex align-items-center justify-content-end flex-wrap mb-2 gap-3 pt-3">
+                                       <div class="d-flex justify-content-start mb-2 " style="margin-left: -8px;">
+                        <button 
+                            class="form-button btn-inventory search d-inline-flex align-items-center justify-content-center px-2 py-1"
+                            style="width: auto; min-width: unset; gap: 6px; font-size: 13px;">
+                            <i class="fa fa-arrow-left" style="font-size: 12px;"></i>
+                            Back
+                        </button>
+                    </div> -->
+                                <!-- <div
+                                    class="col-12 d-flex align-items-center justify-content-end flex-wrap mb-2 gap-3 pt-3"> -->
                                     <!-- Search Input -->
-                                    <div class="d-flex align-items-end gap-2 flex-wrap">
-                                         <input type="text" class="form-control search-input rounded-pill px-3"
+                                    <!-- <div class="d-flex align-items-end gap-2 flex-wrap">
+                                        <input type="text" class="form-control search-input rounded-pill px-3"
                                             placeholder="Search Keyword" formControlName="global_search"
                                             style="max-width: 250px; border: 1px solid #c96a2b; height: 38px;" />
                                     </div>
-                                </div>
+                                </div> -->
 
 
-                            </div>
-                        </div>
+                            <!-- </div> -->
+                        <!-- </div>
                     </div>
-                </div>
+                </div> -->
 
                 <!--third ui -->
                 <div class="col-12 col-md-12 col-lg-12 pt-0" *ngIf="isCrop">
@@ -118,8 +132,7 @@
                                         Tentative Quantity (qtl)
                                     </div>
 
-                                    <div
-                                        class="col-md-3 d-flex align-items-center justify-content-center border-end ">
+                                    <div class="col-md-3 d-flex align-items-center justify-content-center border-end ">
                                         Foundation Seed(qtl)
                                     </div>
 
@@ -131,9 +144,9 @@
                                         *ngIf="!isFinalSubmitButtonHide">
                                         SPA Assign
                                     </div>
-<div class="col-6 col-md-1 py-2 d-flex verticle-content-middle"
+                                    <div class="col-6 col-md-1 py-2 d-flex verticle-content-middle"
                                         *ngIf="isFinalSubmitButtonHide">
-                                        SPA 
+                                        SPA
                                     </div>
                                 </div>
 
@@ -165,21 +178,12 @@
                                                 </label>
 
                                                 <!-- CLICK Event Only -->
-                                              <span class="d-block text-center">
-  {{
-    ngForm.controls['bspc']['controls'][i].controls['breeder_seed'].value
-  }}
-</span>
-
-                                                <!-- Popup ONLY when clicked -->
-                                                <!-- <div *ngIf="popupIndex === i" class="custom-popup">
-                                                    <div *ngFor="let d of inventoryIndentorData">
-                                                        <b>{{ d.user_name }}</b>: {{ d.breeder_seed }}
-                                                    </div>
-                                                </div> -->
+                                                <span class="d-block text-center">
+                                                    {{
+                                                    ngForm.controls['bspc']['controls'][i].controls['breeder_seed'].value
+                                                    }}
+                                                </span>
                                             </div>
-
-
                                         </div>
                                         <!-- Willingness Toggle -->
                                         <div class="col-md-3 d-flex align-items-center justify-content-center border-end justify-content-center"
@@ -191,7 +195,7 @@
                                                 </label>
 
                                                 <!-- CLICK Event Only -->
-                                                <span  class="d-block text-center">
+                                                <span class="d-block text-center">
                                                     {{
                                                     ngForm.controls['bspc']['controls'][i].controls['foundation_seed'].value
                                                     }}
@@ -210,42 +214,35 @@
                                                 </label>
 
                                                 <!-- CLICK Event Only -->
-                                                <span  class="d-block text-center">
+                                                <span class="d-block text-center">
                                                     {{
                                                     ngForm.controls['bspc']['controls'][i].controls['certified_seed'].value
                                                     }}
                                                 </span>
-
-                                                <!-- Popup ONLY when clicked -->
-                                                <!-- <div *ngIf="popupIndex === i" class="custom-popup">
-                                                    <div *ngFor="let d of inventoryIndentorData">
-                                                        <b>{{ d.user_name }}</b>: {{ d.breeder_seed }}
-                                                    </div>
-                                                </div> -->
                                             </div>
 
 
                                         </div>
-                                       
-                                        <div class="col-6 col-md-1 py-2 d-flex verticle-content-middle"  *ngIf="!isFinalSubmitButtonHide">
+
+                                        <div class="col-6 col-md-1 py-2 d-flex verticle-content-middle"
+                                            *ngIf="!isFinalSubmitButtonHide">
                                             <button
                                                 class="form-button d-flex justify-content-center verticle-content-middle"
                                                 (click)="addReplaceVarieties(i)"
-                                                
                                                 style="width: 100px !important; background-color: #B64B1D; color: white; border: none; border-radius: 6px;">
                                                 Add
                                             </button>
                                         </div>
-                                         <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle"
-                                                *ngIf="isFinalSubmitButtonHide" style="padding-right: 2rem!important;">
+                                        <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle"
+                                            *ngIf="isFinalSubmitButtonHide" style="padding-right: 2rem!important;">
 
 
-                                                <!-- FINAL SUBMIT KE BAAD REPLACE COUNT -->
-                                                <a style="cursor:pointer; text-decoration: underline; color:#007bff;"
-                                                    (click)="openReplaceSwal(bspc.controls[i].get('assign_spa')?.value)">
-                                                    {{ bspc.controls[i].get('assign_spa')?.value?.length || 0 }}
-                                                </a>
-                                            </div>
+                                            <!-- FINAL SUBMIT KE BAAD REPLACE COUNT -->
+                                            <a style="cursor:pointer; text-decoration: underline; color:#007bff;"
+                                                (click)="openReplaceSwal(bspc.controls[i].get('assign_spa')?.value)">
+                                                {{ bspc.controls[i].get('assign_spa')?.value?.length || 0 }}
+                                            </a>
+                                        </div>
                                         <div class="col-12 px-3"
                                             *ngIf="openCropIndexes.includes(i) && !isFinalSubmitButtonHide"
                                             formArrayName="assign_spa">
@@ -276,7 +273,7 @@
                                                                     <button type="button"
                                                                         class="dropdown-item text-start"
                                                                         *ngFor="let v of dropdownList22"
-                                                                      (click)="selectReplaceVariety(i,j,v)">
+                                                                        (click)="selectReplaceVariety(i,j,v)">
                                                                         {{ v.spa_name }}
                                                                     </button>
                                                                 </div>
@@ -290,7 +287,7 @@
                                                                 Qty (QTL.)</label>
                                                             <input type="number" class="form-control"
                                                                 formControlName="certified_seed_quantity"
-                                                                 (input)="validateSpaQuantity(i,j)"
+                                                                (input)="validateSpaQuantity(i,j)"
                                                                 placeholder="Enter Quantity">
                                                         </div>
 
@@ -301,7 +298,7 @@
                                                 <div class="col-xl-1 col-12 d-flex align-items-center"
                                                     style="display: flex;">
                                                     <button class="list-action-buttons-second ml-lg-3  mt-md-2 "
-                                                      *ngIf="getSpaTotalQuantity(i) < getMainQuantity(i)"
+                                                        *ngIf="getSpaTotalQuantity(i) < getMainQuantity(i)"
                                                         (click)="addInnerRow(i)">
                                                         <img src="assets/images/Add.png">
                                                     </button>
@@ -348,12 +345,6 @@
                 <!-- Buttons -->
                 <div *ngIf="isCrop" class="col-12 pt-2">
                     <div class="row justify-content-end">
-                        <div class="col-auto">
-                            <button *ngIf="!isFinalSubmitButtonHide" class="clear-form-button btn-inventory mb-3"
-                                (click)="revertDataCancelation()">
-                                Cancel
-                            </button>
-                        </div>
                         <div class="col-auto">
                             <button *ngIf="!isFinalSubmitButtonHide" class="clear-form-button btn-inventory mb-3"
                                 (click)="saveAsDraft()">

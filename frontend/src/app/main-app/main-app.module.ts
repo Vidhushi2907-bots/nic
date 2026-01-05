@@ -278,6 +278,12 @@ import { SeedRollingPlaningWillingnessScreenComponent } from './seed-rolling-pla
 // import { StateLoginScreenComponent } from './seed-rolling-planing/indentor-login/state-login-screen/state-login-screen.component';
 import { AssignSpaComponent } from './seed-rolling-planing/indentor-login/assign-spa/assign-spa.component';
 import { StateLoginReplanningComponent } from './seed-rolling-planing/indentor-login/state-login-replanning/state-login-replanning.component';
+import { ZsrmComponent } from './zsrm/indentor-login/zsrm/zsrm.component';
+import { ZsrmReqQsComponent } from './zsrm/indentor-login/zsrm-req-qs/zsrm-req-qs.component';
+import { SrrComponent } from './zsrm/indentor-login/srr/srr.component';
+import { ZsrmCsQsDistributionComponent } from './zsrm/indentor-login/zsrm-cs-qs-distribution/zsrm-cs-qs-distribution.component';
+
+
 
 
 
@@ -500,7 +506,13 @@ import { StateLoginReplanningComponent } from './seed-rolling-planing/indentor-l
     SeedRollingPlaningWillingnessScreenComponent,
     // StateLoginScreenComponent,
     AssignSpaComponent,
-    StateLoginReplanningComponent
+    StateLoginReplanningComponent,
+    ZsrmComponent,
+    ZsrmReqQsComponent,
+    SrrComponent,
+    ZsrmCsQsDistributionComponent,
+
+
     // GenerateCardQrComponent
     // UnfreezeIndentComponent
     // IndenterReportComponent,

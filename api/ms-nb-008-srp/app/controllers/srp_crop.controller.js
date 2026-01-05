@@ -145,7 +145,6 @@ class CropController {
       // info
 
 
-      console.log("step:1")
       const data = await db.cropModel.findAll({
         attributes: ["id", "crop_code", "crop_name", "srr", "seed_rate", "is_active", "group_code"],
         include: [
@@ -348,7 +347,6 @@ return response(res, 'Not Access Other User', 403);
       response(res, status.DATA_NOT_SAVE, 500);
     }
   };
-
   //Delete Srp Crop data
   static deleteSrpCropWiseData = async (req, res) => {
     try {
@@ -369,7 +367,7 @@ return response(res, 'Not Access Other User', 403);
     }
 
   }
-
+  
   //find one
   static findOneSrpCropWise = async (req, res) => {
     try {

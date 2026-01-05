@@ -235,7 +235,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
 
   addReplaceVarieties(albumIndex: number) {
     const albums = this.ngForm.get('bspc') as FormArray;
-   
+
     const songs = albums.at(albumIndex).get('replaceVariety') as FormArray;
     console.log(songs, "songs")
     songs.push(this.createInnerRow());
@@ -773,7 +773,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
   }
   async triggerAutoSearch() {
     clearTimeout(this.autoSearchTimeout);
-console.log("hellllllllllllllllll2")
+    
     this.autoSearchTimeout = setTimeout(() => {
       this.getPageData();  // automatically fire your API function
     }, 400); // delay 0.4 sec
@@ -788,6 +788,7 @@ console.log("hellllllllllllllllll2")
     this.ngForm.get('global_search')?.valueChanges.subscribe(() => {
       this.triggerAutoSearch();
     })
+
   }
 
   openpopup() {

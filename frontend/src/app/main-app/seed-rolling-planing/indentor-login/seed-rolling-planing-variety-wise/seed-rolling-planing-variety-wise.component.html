@@ -128,7 +128,7 @@
                                                     <div class="col-md-1 py-2">{{ i + 1 }}</div>
  
                                                     <!-- VARIETY NAME -->
-                                                    <div class="col-md-2 py-2">
+                                                    <div class="col-md-2 py-2 " style="text-align: start;">
                                                         <a href="javascript:void(0)"
                                                             class="text-primary text-decoration-underline"
                                                             (click)="viewVarietyDetail(data)">
@@ -148,7 +148,8 @@
                                                             <input type="number"
                                                                 class="form-control form-control-sm text-center"
                                                                 formControlName="Req_Qty_of_breeder_seed"
-                                                                (blur)="handleSeedInput(i)" placeholder="Enter Qty" />
+                                                                (blur)="handleSeedInput(i)" placeholder="Enter Qty"
+                                                                [readonly]="isFinalSubmitButtonHide" />
                                                         </div>
                                                     </div>
  
@@ -188,9 +189,6 @@
  
                                                             <span class="slider round"></span>
                                                         </label>
- 
- 
- 
                                                     </div>
  
  

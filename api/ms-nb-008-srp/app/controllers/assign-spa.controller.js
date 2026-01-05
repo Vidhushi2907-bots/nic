@@ -264,6 +264,20 @@ class SrpWillingnessController {
       return response(res, status.DATA_NOT_AVAILABLE, 500);
     }
   };
+  static getCropName = async(req,res)=>
+  {
+    try{
+const {crop_code}=req.query;
+const data =await db.cropModel.findOne({
+  where:{crop_code:crop_code},
+  attributes:["crop_name"]
+})
+
+return response(res, status.DATA_AVAILABLE, 200, data);
+    }catch(error){
+
+    }
+  }
   //   static getSrpSpaData = async (req, res) => {
   //   try {
   //     const { year, season, crop_code } = req.query;
@@ -501,5 +515,6 @@ async function getSrpSpaData(year, season, crop_code) {
 
 
 }
+
 
 module.exports = SrpWillingnessController

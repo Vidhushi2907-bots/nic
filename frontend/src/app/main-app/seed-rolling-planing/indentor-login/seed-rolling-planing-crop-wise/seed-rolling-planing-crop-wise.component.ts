@@ -72,7 +72,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
   // selectedGroup: string = '';
   // originalCropList: any[] = [];
   // filteredCrops:any[]=[]
-  constructor(private service: SeedServiceService, private _masterService: MasterService,  private activeRoute: ActivatedRoute,  private breeder: BreederService, private fb: FormBuilder, private route: Router, private cdRef: ChangeDetectorRef, private _productionCenter: ProductioncenterService, private master: MasterService, private srpService: SeedRollingPlanningService) {
+  constructor(private service: SeedServiceService, private _masterService: MasterService, private activeRoute: ActivatedRoute, private breeder: BreederService, private fb: FormBuilder, private route: Router, private cdRef: ChangeDetectorRef, private _productionCenter: ProductioncenterService, private master: MasterService, private srpService: SeedRollingPlanningService) {
     this.createForm();
     this.srpCropWiseData = this.breeder.redirectData;
     if (this.srpCropWiseData && this.srpCropWiseData !== undefined) {
@@ -80,7 +80,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
         this.ngForm.controls['year'].patchValue(this.srpCropWiseData.year);
         this.ngForm.controls['season'].patchValue(this.srpCropWiseData.season);
         this.searchData()
-        // this.getPageData();
+
       }
     }
   }
@@ -113,21 +113,16 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
     this.getCroupCroupList()
   }
 
-
   searchData() {
-    // Reset form fields
     const year = this.ngForm.get('year')?.value;
     const season = this.ngForm.get('season')?.value;
 
-    if (
-      year &&
-      season &&
-      localStorage.getItem('year') !== year
-    ) {
+    if (year && season) {
       localStorage.setItem('year', year);
       localStorage.setItem('season', season);
-      
     }
+
+    // reset search related fields
     this.ngForm.patchValue({
       global_search: '',
       group_code: '',
@@ -138,7 +133,8 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
     if (this.srpCropWise && this.srpCropWise.clear) {
       this.srpCropWise.clear();
     }
-    // NOW Reload fresh data
+
+    // reload data
     this.getPageData();
   }
 
@@ -445,17 +441,17 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
         if (crop.seed_rate) cleanCrop.seed_rate = crop.seed_rate;
         return cleanCrop;
       });
-const invalidSrr = cropData.find(crop => crop.srr > 100);
-if (invalidSrr) {
-  Swal.fire({
-    title: '<p style="font-size:20px;">Error: SRR cannot be greater than 100!</p>',
-    icon: 'error',
-    confirmButtonText: 'OK',
-    confirmButtonColor: '#E97E15',
-  });
-  this.isSubmitting = false;
-  return; 
-}
+    const invalidSrr = cropData.find(crop => crop.srr > 100);
+    if (invalidSrr) {
+      Swal.fire({
+        title: '<p style="font-size:20px;">Error: SRR cannot be greater than 100!</p>',
+        icon: 'error',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#E97E15',
+      });
+      this.isSubmitting = false;
+      return;
+    }
     if (!cropData.length) {
       Swal.fire({
         title: '<p style="font-size:20px;">No valid data to submit.</p>',
@@ -587,36 +583,7 @@ if (invalidSrr) {
     })
 
   }
-  // srrValidation(event: any, index: number) {
-  //   const input = event.target as HTMLInputElement;
-  //   let value = input.value;
 
-  //   const regex = /^[0-9]*\.?[0-9]{0,2}$/;
-
-  //   if (!regex.test(value)) {
-  //     input.value = this.lastValidSRR[index];
-  //     return;
-  //   }
-  //   const numValue = parseFloat(value);
-
-  //   // ✔ Agar value ≤ 100 → store per-row last valid value
-  //   if (!isNaN(numValue) && numValue <= 100) {
-  //     this.lastValidSRR[index] = value;
-  //   }
-  //   if (numValue > 100) {
-  //     Swal.fire({
-  //       title: '<p style="font-size:25px;">Error: SRR Target must be 100 or less.</p>',
-  //       icon: 'error',
-  //       confirmButtonText: 'OK',
-  //       confirmButtonColor: '#E97E15'
-  //     });
-
-  //     input.value = this.lastValidSRR[index];
-  //     return;
-  //   }
-
-  //   this.calculateTotalSeed(index);
-  // }
   srrValidation(event: any, index: any) {
     const bspcArray = this.ngForm.get('srpCropWise') as FormArray;
     const srrControl = bspcArray.at(index).get('srr');
@@ -738,22 +705,22 @@ if (invalidSrr) {
 
     const year = localStorage.getItem('year');
     const season = localStorage.getItem('season');
-    
 
-  this.activeRoute.paramMap.subscribe(params => {
-    const isLockedParam = params.get('isLocked'); // 'true' | 'false'
-    const isLocked = isLockedParam === 'true';    // boolean
 
-    console.log(isLocked, 'IS LOCKED');
+    this.activeRoute.paramMap.subscribe(params => {
+      const isLockedParam = params.get('isLocked'); // 'true' | 'false'
+      const isLocked = isLockedParam === 'true';    // boolean
 
-    if (isLocked) {
-      this.ngForm.patchValue({
-        year: year,
-        season: season
-      });
-      this.getPageData();
-    }
-  });
+      console.log(isLocked, 'IS LOCKED');
+
+      if (isLocked) {
+        this.ngForm.patchValue({
+          year: year,
+          season: season
+        });
+        this.getPageData();
+      }
+    });
   }
 
 

@@ -8,7 +8,7 @@ import { SeedServiceService } from 'src/app/services/seed-service.service';
 import Swal from 'sweetalert2';
 import { IDropdownSettings, } from 'ng-multiselect-dropdown';
 import { BreederService } from 'src/app/services/breeder/breeder.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ProductioncenterService } from 'src/app/services/productionCenter/productioncenter.service';
 import { MasterService } from 'src/app/services/master/master.service';
 import { environment } from 'src/environments/environment';
@@ -37,6 +37,7 @@ export class AssignSpaComponent implements OnInit {
   inventoryYearData: any;
   inventorySeasonData: any;
   inventoryCropData: any;
+
   varietyData: any;
   inventoryVarietyData: any;
   hoverIndex: number | null = null;
@@ -69,7 +70,7 @@ export class AssignSpaComponent implements OnInit {
   smr2 = 10;
   dropdownList22 = []
   spaStateCode: any
-  constructor(private service: SeedServiceService, private _masterService: MasterService, private breeder: BreederService, private productionService: ProductioncenterService, private fb: FormBuilder, private route: Router, private cdRef: ChangeDetectorRef, private _productionCenter: ProductioncenterService, private master: MasterService, private srpService: SeedRollingPlanningService) {
+  constructor(private service: SeedServiceService, private router: ActivatedRoute, private _masterService: MasterService, private breeder: BreederService, private productionService: ProductioncenterService, private fb: FormBuilder, private route: Router, private cdRef: ChangeDetectorRef, private _productionCenter: ProductioncenterService, private master: MasterService, private srpService: SeedRollingPlanningService) {
 
   }
 
@@ -79,6 +80,7 @@ export class AssignSpaComponent implements OnInit {
       year: [''],
       season: [''],
       crop_code: [''],
+      crop_name: [''],
       global_search: [''],
       bspc: this.fb.array([]),
 
@@ -99,79 +101,7 @@ export class AssignSpaComponent implements OnInit {
     return this.ngForm.get('bspc')?.get(i.toString())?.get('assign_spa') as FormArray;
   }
 
-  loadYear() {
-    const apiUrl = 'srp-year-willingness'
-    this.srpService.postRequestCreator(apiUrl, null, null).subscribe({
-      next: (data: any) => {
 
-        if (
-          data &&
-          data.EncryptedResponse &&
-          data.EncryptedResponse.data &&
-          data.EncryptedResponse.status_code === 200
-        ) {
-          this.inventoryYearData = data.EncryptedResponse.data;
-
-        } else {
-          console.warn('⚠️ No valid data received in EncryptedResponse');
-          this.inventoryYearData = [];
-        }
-      },
-      error: (err) => {
-        console.error('❌ Error fetching years:', err);
-      },
-    });
-  }
-  loadSeason() {
-    let year = Number(this.ngForm.controls['year']?.value)
-    const apiUrl = `srp-season-willingness?year=${year}`
-    this.srpService.postRequestCreator(apiUrl, null, null).subscribe({
-      next: (data: any) => {
-
-        if (
-          data &&
-          data.EncryptedResponse &&
-          data.EncryptedResponse.data &&
-          data.EncryptedResponse.status_code === 200
-        ) {
-          this.inventorySeasonData = data.EncryptedResponse.data;
-
-        } else {
-          console.warn('⚠️ No valid data received in EncryptedResponse');
-          this.inventoryYearData = [];
-        }
-      },
-      error: (err) => {
-        console.error('❌ Error fetching years:', err);
-      },
-    });
-  }
-  loadCrop() {
-    let year = Number(this.ngForm.controls['year']?.value)
-    let season = this.ngForm.controls['season']?.value;
-    const apiUrl = `srp-crop-willingness?year=${year}&season=${season}`
-
-    this.srpService.postRequestCreator(apiUrl, null, null).subscribe({
-      next: (data: any) => {
-
-        if (
-          data &&
-          data.EncryptedResponse &&
-          data.EncryptedResponse.data &&
-          data.EncryptedResponse.status_code === 200
-        ) {
-          this.inventoryCropData = data.EncryptedResponse.data;
-          console.log(this.inventoryCropData, "............crop")
-        } else {
-          console.warn('⚠️ No valid data received in EncryptedResponse');
-          this.inventoryYearData = [];
-        }
-      },
-      error: (err) => {
-        console.error('❌ Error fetching years:', err);
-      },
-    });
-  }
   liftingselfSPAData(): void {
 
     this.srpService.postRequestCreator('get-state', null, null).subscribe({
@@ -207,6 +137,22 @@ export class AssignSpaComponent implements OnInit {
     const songs = albums.at(albumIndex).get('assign_spa') as FormArray;
     songs.push(this.createInnerRow());
     this.toggleCropSection(albumIndex)
+  }
+  getCropName(crop_code: any) {
+    const url = `get-crop?crop_code=${crop_code}`;
+    this.srpService.postRequestCreator(url, null, null).subscribe({
+      next: (res: any) => {
+        if (res?.EncryptedResponse?.status_code === 200) {
+
+          this.inventoryCropData = res.EncryptedResponse.data || [];
+          this.ngForm.patchValue({
+            crop_name: this.inventoryCropData?.crop_name
+          });
+
+        }
+      },
+      error: (err) => console.error("❌ API Error:", err)
+    });
   }
 
   getPageData() {
@@ -288,9 +234,10 @@ export class AssignSpaComponent implements OnInit {
       error: (err) => console.error("❌ API Error:", err)
     });
   }
+
   async triggerAutoSearch() {
     clearTimeout(this.autoSearchTimeout);
-    console.log("hellloooooooooooooooooooooooooooooo")
+
     this.autoSearchTimeout = setTimeout(() => {
       this.getPageData();  // automatically fire your API function
     }, 400); // delay 0.4 sec
@@ -401,7 +348,24 @@ export class AssignSpaComponent implements OnInit {
   lockHeaderFields() {
     this.ngForm.get('year')?.disable();
     this.ngForm.get('season')?.disable();
-    this.ngForm.get('crop_code')?.disable();
+    this.ngForm.get('crop_name')?.disable();
+  }
+  goBack() {
+    const year = localStorage.getItem('year');
+    const season = localStorage.getItem('season');
+    const crop = localStorage.getItem('crop');
+    console.log(year, season, crop, "kitttttttttt")
+    // Agar dono values exist karte hain tabhi navigate karein
+    if (year && season && crop) {
+      this.route.navigate(
+        ['/state-login-replanning'],
+        { queryParams: { isLocked: true } }
+      );
+
+    } else {
+      // Kuch nahi karna agar year ya season missing hai
+      console.warn('Year or Season not found in localStorage');
+    }
   }
   saveAsDraft() {
     const apiUrl = "add-spa-details";
@@ -432,12 +396,11 @@ export class AssignSpaComponent implements OnInit {
 
     const payload = {
       action: "draft",
-      year: 2027,
-      season: 'Rabi',
-      crop_code: 'A0210',
+      year: this.ngForm.get('year')?.value,
+      season: this.ngForm.get('season')?.value,
+      crop_code: this.ngForm.get('crop_code')?.value,
       spaDetails
     };
-
 
     this.srpService.postRequestCreator(apiUrl, null, payload).subscribe({
       next: (data: any) => {
@@ -548,12 +511,27 @@ export class AssignSpaComponent implements OnInit {
     const spaDetails = [...existingData];
 
 
+  let unassignedVarieties = existingData.filter(variety => {
+  // Check in assign_spa if any SPA belongs to this variety
+  return !variety.assign_spa || variety.assign_spa.length === 0;
+});
+
+if (unassignedVarieties.length > 0) {
+  Swal.fire({
+    title: '<p style="font-size:20px;">Each variety must have at least one SPA assigned.</p>',
+    icon: 'error',
+    confirmButtonText: 'OK',
+    confirmButtonColor: '#B64B1D',
+  });
+  return; // Stop form submission
+}
+ 
     const payload = {
       action: "final",
 
-      year: 2027,
-      season: 'Rabi',
-      crop_code: 'A0210',
+      year: this.ngForm.get('year')?.value,
+      season: this.ngForm.get('season')?.value,
+      crop_code: this.ngForm.get('crop_code')?.value,
       spaDetails
     };
 
@@ -657,25 +635,39 @@ export class AssignSpaComponent implements OnInit {
 
   ngOnInit(): void {
     this.createForm();
-    this.liftingselfSPAData()
-
+    this.liftingselfSPAData();
     const userData = localStorage.getItem('BHTCurrentUser');
-    const data = JSON.parse(userData!);
-    this.userId = data.id;
-
+    if (userData) {
+      const data = JSON.parse(userData);
+      this.userId = data.id;
+    }
     this.ngForm.get('global_search')?.valueChanges.subscribe(() => {
       this.triggerAutoSearch();
-    })
-    this.ngForm.patchValue({
-      year: 2027,
-      season: 'Rabi',
-      crop_code: 'A0210'
+    });
+    this.router.queryParams.subscribe(params => {
+      const year = params['year'] || localStorage.getItem('year');
+      const season = params['season'] || localStorage.getItem('season');
+      const crop_code = params['crop_code'] || localStorage.getItem('crop_code');
+      const isLocked = params['isLocked'] === 'true';
+      this.ngForm.patchValue({
+        year: year,
+        season: season,
+        crop_code: crop_code,
+        isLocked: isLocked
+      });
+      this.getCropName(crop_code);
+
     });
 
-    this.lockHeaderFields();
-    this.getPageData();
+
+
+
+
+    this.lockHeaderFields(); // 🔒 fields disable
+    this.getPageData();      // 🔄 API call
 
   }
+
 
   openpopup() {
     this.displayStyle = 'block'

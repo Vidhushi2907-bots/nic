@@ -180,12 +180,13 @@ class SrpWillingnessController {
                 if (!srpCropData) return response(res, "Crop not found", 404, []);
 
                 let replanningEntry;
-
+                console.log(srp_variety_wise_id, "srp_variety_wise_id")
                 if (srp_variety_wise_id) {
                     // 2️⃣ Validate Variety
                     const srpVarietyData = await db.srpVarietyModel.findOne({
                         where: { srp_crop_wise_id, id: srp_variety_wise_id }
                     });
+                    console.log(srpVarietyData);
                     if (!srpVarietyData) return response(res, "Variety not found", 404, []);
 
                     // 3️⃣ Create/Update Master Replanning
@@ -326,29 +327,25 @@ class SrpWillingnessController {
     static getSrpStateReplanningNewVarietyData = async (req, res) => {
         try {
             const { year, season, crop_code } = req.query;
-            const data = await db.srpWillingnessModel.findAll({
-                where: { is_additional: true, year, season, crop_code },
-                include: [{
-                    model: db.varietyModel,
-                    required: true,
-                    attributes: ["variety_name", "variety_code"]
 
-                }],
-                attributes: ["id", "willingness", "quantity", "is_additional", "variety_code", "remarks"]
+            const crop_data = await db.srpCropModel.findOne({
+                where: { year: year, season: season, crop_code: crop_code }
+            });
+            if (!crop_data) {
+                return response(res, "Crop data not found", 404);
+            }
+            const replanningExists = await db.srpStateReplanningModel.findOne({
+                where: { srp_crop_wise_id: crop_data.id }
             })
-            const formattedData = data.map((item) => {
-                return {
-                    id: item.id,
-                    new_variety_code: item.variety_code,
-                    new_quantity_available: item.quantity,
-                    new_variety_name: item.m_crop_variety.variety_name,
-                    new_remarks: item.remarks
+            if (!replanningExists) {
+                const data = await getFreshNewVarietiesData(year, season, crop_code);
+                return response(res, "Fresh new Variety successfully", 200, data);
+            }
+            else {
+                const data = await getNewVarietyData(crop_data.id);
+                return response(res, "New varieties successfully", 200, data);
+            }
 
-
-
-                }
-            })
-            return response(res, "Data found successfully", 200, formattedData);
         } catch (error) {
             console.error(error);
             return response(res, "Something went wrong!", 500, []);
@@ -392,7 +389,7 @@ async function getReplanningData(crop_wise_id) {
                 ]
             }
         ],
-        attributes: ["id", "srp_crop_wise_id", "srp_variety_wise_id", "is_available", "quantity"]
+        attributes: ["id", "srp_crop_wise_id", "srp_variety_wise_id", "is_available", "quantity", "is_draft", "is_final_submit"]
     });
 
     const replanning_ids = srp_variety_data.map(v => v.id);
@@ -404,7 +401,7 @@ async function getReplanningData(crop_wise_id) {
             required: true,
             attributes: ["variety_name", "variety_code"]
         }],
-        attributes: ["srp_replanning_id", "replace_variety_code", "replace_quantity", "is_accept"]
+        attributes: ["srp_replanning_id", "replace_variety_code", "replace_quantity", "is_accept", "is_draft", "is_final_submit"]
     });
 
     const formattedVarieties = srp_variety_data.map(item => {
@@ -412,7 +409,7 @@ async function getReplanningData(crop_wise_id) {
         const v = item.seed_rolling_plan_variety_wise; // included alias
         const children = replace_varieties.filter(r => r.srp_replanning_id === item.id);
         children.forEach(c => {
-            console.log(c.m_crop_variety.variety_name);
+
         });
         return {
             id: item.id,
@@ -423,44 +420,29 @@ async function getReplanningData(crop_wise_id) {
             willingness: item.is_available,
             target_breeder_seed: v.breeder_seed,
             tentative_quantity: item.quantity,
+            is_final_submit: item.is_final_submit,
+            is_draft: item.is_draft,
             replace_varieties: children.map(c => ({
                 srp_replanning_id: item.id,
                 replace_variety_code: c.replace_variety_code,
 
                 // ✅ Correct key
                 replace_variety_name: c.m_crop_variety?.variety_name || null,
-
+                is_final_submit: c.is_final_submit,
+                is_draft: c.is_draft,
                 replace_quantity: c.replace_quantity,
                 replace_is_accept: c.is_accept
             }))
         };
     });
 
-   
-    const new_variety_data = await db.srpStateReplanningNewVarietiesModel.findAll({
-        where: { srp_crop_wise_id: crop_wise_id },
-        include: [
-            {
-                model: db.varietyModel,
-                required: true,
-                attributes: ["variety_name", "variety_code"]
-            }
-        ],
-        attributes: ["id", "quantity_available", "quantity_required", "is_accept", "srp_crop_wise_id"]
-    });
 
-  
+
+
+
     const combinedData = [
         ...formattedVarieties,
-        ...new_variety_data.map(v => ({
-            id: v.id,
-            new_variety_code: v.m_crop_variety?.variety_code,
-            new_variety_name: v.m_crop_variety?.variety_name,
-            new_quantity_available: v.quantity_available,
-            new_quantity_required: v.quantity_required,
-            new_is_accept: v.is_accept,
-            srp_crop_wise_id: v.srp_crop_wise_id
-        }))
+
     ];
     return combinedData;
 
@@ -523,11 +505,9 @@ async function getFreshData(crop_wise_id, year, season, crop_code) {
         replacements: { year, season, crop_code },
         type: db.Sequelize.QueryTypes.SELECT
     });
-    console.log(varietyData, "efwefbowfwbfwf")
-    // Format Data
+
     const formattedData = varietyData.map(v => {
         const vwData = Array.isArray(v.vw) && v.vw.length > 0 ? v.vw[0] : null; //willingness data
-        // Get sum from SQL query
         const sumMatch = sum_of_breeder_seed_data.find(f => f.variety_code === v.variety_code);//variety code match karne ke liya
         const sum_breeder_seed = sumMatch ? parseFloat(sumMatch.sum) : null;
         return {
@@ -565,6 +545,64 @@ async function getFreshData(crop_wise_id, year, season, crop_code) {
     });
 
     return formattedData;
+}
+async function getFreshNewVarietiesData(year, season, crop_code) {
+    const data = await db.srpWillingnessModel.findAll({
+        where: { is_additional: true, year, season, crop_code },
+        include: [{
+            model: db.varietyModel,
+            required: true,
+            attributes: ["variety_name", "variety_code"]
+
+        }],
+        attributes: ["id", "willingness", "quantity", "is_additional", "variety_code", "remarks"]
+    })
+    const formattedData = data.map((item) => {
+        return {
+            id: item.id,
+            new_variety_code: item.variety_code,
+            new_quantity_available: item.quantity,
+            new_variety_name: item.m_crop_variety.variety_name,
+            new_remarks: item.remarks
+
+
+
+        }
+    })
+    return formattedData;
+}
+async function getNewVarietyData(crop_wise_id) {
+    const new_variety_data =
+        await db.srpStateReplanningNewVarietiesModel.findAll({
+            where: { srp_crop_wise_id: crop_wise_id },
+            include: [
+                {
+                    model: db.varietyModel,
+                    required: true,
+                    attributes: ["variety_name", "variety_code"]
+                }
+            ],
+            attributes: [
+                "id",
+                "quantity_available",
+                "quantity_required",
+                "is_accept",
+                "is_final_submit", "is_draft",
+                "srp_crop_wise_id"
+            ]
+        });
+
+    return new_variety_data.map(v => ({
+        id: v.id,
+        new_variety_code: v.m_crop_variety?.variety_code,
+        new_variety_name: v.m_crop_variety?.variety_name,
+        new_quantity_available: v.quantity_available,
+        new_quantity_required: v.quantity_required,
+        new_is_accept: v.is_accept,
+        is_final_submit: v.is_final_submit,
+        is_draft: v.is_draft,
+        srp_crop_wise_id: v.srp_crop_wise_id
+    }));
 }
 
 module.exports = SrpWillingnessController

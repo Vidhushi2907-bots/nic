@@ -264,6 +264,11 @@ import { SeedRollingPlaningVarietyWiseComponent } from './seed-rolling-planing/i
 import { SeedRollingPlaningWillingnessScreenComponent } from './seed-rolling-planing/pdpc-login/seed-rolling-planing-willingness-screen/seed-rolling-planing-willingness-screen.component';
 import { AssignSpaComponent } from './seed-rolling-planing/indentor-login/assign-spa/assign-spa.component';
 import { StateLoginReplanningComponent } from './seed-rolling-planing/indentor-login/state-login-replanning/state-login-replanning.component';
+import { ZsrmComponent } from './zsrm/indentor-login/zsrm/zsrm.component';
+import { ZsrmReqQsComponent } from './zsrm/indentor-login/zsrm-req-qs/zsrm-req-qs.component';
+import { SrrComponent } from './zsrm/indentor-login/srr/srr.component';
+import { ZsrmCsQsDistributionComponent } from './zsrm/indentor-login/zsrm-cs-qs-distribution/zsrm-cs-qs-distribution.component';
+
 // import { ProfarmaOneQrComponent } from './profarma-one-qr/profarma-one-qr.component';
 const routes: Routes = [
   // {
@@ -1629,6 +1634,17 @@ const routes: Routes = [
         component: VarietyCharactersticReportsComponent
       },
       {
+        path: 'requirement-of-Foundation-Seed',
+        component: ZsrmComponent
+      }, {
+        path: 'requirement-of-cs-qs-Seed',
+        component: ZsrmReqQsComponent
+      },
+      {
+        path: 'target-Achievement-of-seed',
+        component: SrrComponent
+      },
+      {
         path: 'generate-invoices/:submissionid',
         component: GInvoiceTestComponent
       },
@@ -1697,7 +1713,7 @@ const routes: Routes = [
         path: 'seed-rolling-planing-variety-wise',
         component: SeedRollingPlaningVarietyWiseComponent,
         // canActivate: [IndenterGuard]
-      },
+      }   ,
       {
         path: 'seed-rolling-planning-willingness',
         component: SeedRollingPlaningWillingnessScreenComponent,
@@ -1711,7 +1727,12 @@ const routes: Routes = [
       {
         path: 'assign-spa',
         component: AssignSpaComponent
-      }
+      }, {
+        path: 'seed-distribution',
+        component: ZsrmCsQsDistributionComponent
+      },
+      
+
     ]
   },
 ];

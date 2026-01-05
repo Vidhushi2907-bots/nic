@@ -31,7 +31,16 @@
     margin-right: 5%;
   }
   
- 
+.title-inventory {
+    /* font-family: Inter; */
+    /* font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+    letter-spacing: 0em;
+    text-align: left;
+    color: #1C1C1C;
+    white-space: nowrap; */
+}
  
 .card-inventory {
     /* width: 1492px;
@@ -84,6 +93,15 @@
     pointer-events: none;
 }
  
+.list-action-buttons:disabled {
+    /* background: gainsboro;
+    pointer-events: none; */
+}
+ 
+.list-action-buttons-second:disabled {
+    /* background: gainsboro;
+    pointer-events: none; */
+}
  
 .form-control {
     border-color: 2px solid #B64B1D;
@@ -635,15 +653,24 @@ input[type="number"]::-webkit-outer-spin-button {
   margin: 0;
 }
  
- 
-.ellipsis-input {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.disabled-input {
+  cursor: not-allowed;
 }
  
-.tooltip-inner {
-  font-size: 18px !important;
+.row-locked input,
+.row-locked select,
+.row-locked textarea {
+background-color: #e9ecef; /* light grey background */
+  color: #6c757d;           /* grey text */
+  cursor: not-allowed;      /* shows not-allowed cursor */
+  pointer-events: none;
+}
+ 
+.row-locked .switch input {
+  pointer-events: auto;   /* allow toggle */
+ 
+  
+ 
 }
  
 .disabled-input {
@@ -656,5 +683,26 @@ input[type="number"]::-webkit-outer-spin-button {
   cursor: not-allowed;      /* shows not-allowed cursor */
   pointer-events: none;     /* optional: prevent focus/click */
 }
+ 
+.variety-details .field .value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #000;
+}
+ 
+ 
+.badge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+}
+ 
+ 
+ 
+ 
+ 
+ 
  
  

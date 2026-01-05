@@ -110,7 +110,7 @@ module.exports = (sql, Sequelize) => {
         // timezone: '+5:30'
       })
 
-     // ZsrmRefFs.sync({ alter: true });
+    // ZsrmRefFs.sync({ alter: true });
     return ZsrmRefFs;
   };
   

@@ -9,5 +9,5 @@ module.exports = app => {
     app.post(`${process.env.MICRO_SERVICE}/api/get-variety`,auth, spaRoutes.getSrpVarietyAssignBySpa);
     app.post(`${process.env.MICRO_SERVICE}/api/get-state`,auth, spaRoutes.getSrpSpaStateId);
     app.post(`${process.env.MICRO_SERVICE}/api/add-spa-details`,auth,spaRoutes.postSrpSpaData);
-    
+    app.post(`${process.env.MICRO_SERVICE}/api/get-crop`,spaRoutes.getCropName)
 };

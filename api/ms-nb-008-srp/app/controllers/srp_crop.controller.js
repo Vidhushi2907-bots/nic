@@ -136,107 +136,107 @@ class CropController {
     try {
       const { cropData, action, } = req.body; // Expecting payload from frontend
       const user_id = req.body?.loginedUserid?.id
-      const userData=await db.userModel.findOne({
-      where: { id: user_id }
+      const userData = await db.userModel.findOne({
+        where: { id: user_id }
       })
-      console.log(userData,"userData........................")
-      if(userData.user_type ==="IN"){
-      // 1️⃣ Fetch all crops with optional SRP
-      // info
+      console.log(userData, "userData........................")
+      if (userData.user_type === "IN") {
+        // 1️⃣ Fetch all crops with optional SRP
+        // info
 
 
-      const data = await db.cropModel.findAll({
-        attributes: ["id", "crop_code", "crop_name", "srr", "seed_rate", "is_active", "group_code"],
-        include: [
-          {
-            model: db.srpCropModel,
-            attributes: ["total_required", "year", "season", "total_area", "is_draft", "is_final_submit"],
-            required: false,
-          },
-        ],
-        raw: true,
-        nest: false,
-      });
+        const data = await db.cropModel.findAll({
+          attributes: ["id", "crop_code", "crop_name", "srr", "seed_rate", "is_active", "group_code"],
+          include: [
+            {
+              model: db.srpCropModel,
+              attributes: ["total_required", "year", "season", "total_area", "is_draft", "is_final_submit"],
+              required: false,
+            },
+          ],
+          raw: true,
+          nest: false,
+        });
 
-      // 2️⃣ Format the fetched data
-      console.log("step:2")
-      const formattedData = data.map((item) => ({
-        id: item.id,
-        crop_code: item.crop_code,
-        crop_name: item.crop_name,
-        srr: item.srr,
-        seed_rate: item.seed_rate,
-        is_active: item.is_active,
-        group_code: item.group_code,
-        total_required: item["srpCropModel.total_required"] ?? null,
-        year: item["srpCropModel.year"] ?? null,
-        season: item["srpCropModel.season"] ?? null,
-        total_area: item["srpCropModel.total_area"] ?? null,
-        is_draft: item["srpCropModel.is_draft"] ?? null,
-        is_final_submit: item["srpCropModel.is_final_submit"] ?? null,
-      }));
+        // 2️⃣ Format the fetched data
+        console.log("step:2")
+        const formattedData = data.map((item) => ({
+          id: item.id,
+          crop_code: item.crop_code,
+          crop_name: item.crop_name,
+          srr: item.srr,
+          seed_rate: item.seed_rate,
+          is_active: item.is_active,
+          group_code: item.group_code,
+          total_required: item["srpCropModel.total_required"] ?? null,
+          year: item["srpCropModel.year"] ?? null,
+          season: item["srpCropModel.season"] ?? null,
+          total_area: item["srpCropModel.total_area"] ?? null,
+          is_draft: item["srpCropModel.is_draft"] ?? null,
+          is_final_submit: item["srpCropModel.is_final_submit"] ?? null,
+        }));
 
-      if (!formattedData.length) {
-        return response(res, status.DATA_NOT_AVAILABLE, 404, []);
-      }
-
-      // 3️⃣ Determine flags
-      const isDraft = action === "draft" ? 1 : 1;
-      const isFinalSubmit = action === "final" ? 1 : 0;
-
-      const savedRecords = [];
-
-      // 4️⃣ Process each crop
-      for (const crop of cropData) {
-        const { id, crop_code, group_code, year, season, is_active, total_required, total_area, srr, seed_rate } = crop;
-
-        // Check if record already exists
-        const existing = await db.srpCropModel.findOne({ where: { crop_code, year, season,user_id } });
-        
-        if (!existing) {
-          // 4a️⃣ Create new crop
-          const newCrop = await db.srpCropModel.create({
-            crop_code,
-            group_code,
-            year,
-            season,
-            is_active: true,
-            total_required,
-            total_area,
-            srr,
-            user_id,
-            seed_rate,
-            is_draft: isDraft,
-            is_final_submit: isFinalSubmit,
-          });
-          savedRecords.push(newCrop);
-        } else {
-
-
-          await existing.update({
-            is_draft: isDraft,
-            is_final_submit: isFinalSubmit,
-            total_required,
-            total_area,
-            srr,
-            seed_rate,
-            is_active: typeof is_active !== 'undefined' ? is_active : existing.is_active,
-          });
-          savedRecords.push(existing);
+        if (!formattedData.length) {
+          return response(res, status.DATA_NOT_AVAILABLE, 404, []);
         }
+
+        // 3️⃣ Determine flags
+        const isDraft = action === "draft" ? 1 : 1;
+        const isFinalSubmit = action === "final" ? 1 : 0;
+
+        const savedRecords = [];
+
+        // 4️⃣ Process each crop
+        for (const crop of cropData) {
+          const { id, crop_code, group_code, year, season, is_active, total_required, total_area, srr, seed_rate } = crop;
+
+          // Check if record already exists
+          const existing = await db.srpCropModel.findOne({ where: { crop_code, year, season, user_id } });
+
+          if (!existing) {
+            // 4a️⃣ Create new crop
+            const newCrop = await db.srpCropModel.create({
+              crop_code,
+              group_code,
+              year,
+              season,
+              is_active: true,
+              total_required,
+              total_area,
+              srr,
+              user_id,
+              seed_rate,
+              is_draft: isDraft,
+              is_final_submit: isFinalSubmit,
+            });
+            savedRecords.push(newCrop);
+          } else {
+
+
+            await existing.update({
+              is_draft: isDraft,
+              is_final_submit: isFinalSubmit,
+              total_required,
+              total_area,
+              srr,
+              seed_rate,
+              is_active: typeof is_active !== 'undefined' ? is_active : existing.is_active,
+            });
+            savedRecords.push(existing);
+          }
+        }
+
+        // 5️⃣ Return response
+        const message =
+          action === "final"
+            ? "Crop data finalized successfully"
+            : "Crop data saved as draft successfully";
+
+        return response(res, message, 200, savedRecords);
       }
-
-      // 5️⃣ Return response
-      const message =
-        action === "final"
-          ? "Crop data finalized successfully"
-          : "Crop data saved as draft successfully";
-
-      return response(res, message, 200, savedRecords);
-    }
-    else{
-return response(res, 'Not Access Other User', 403);
-    }
+      else {
+        return response(res, 'Not Access Other User', 403);
+      }
     } catch (error) {
       console.error("Error in postSrpCropWiseData:", error);
       return response(res, status.DATA_NOT_AVAILABLE, 500);
@@ -249,7 +249,7 @@ return response(res, 'Not Access Other User', 403);
       const { Op } = require("sequelize");
       const userId = req.body?.loginedUserid?.id;
       // Filter srpCropModel for draft data
-      const whereCondition = { is_draft: { [Op.not]: null },user_id:userId };
+      const whereCondition = { is_draft: { [Op.not]: null }, user_id: userId };
       if (year) whereCondition.year = year;
       if (season) whereCondition.season = season;
 
@@ -266,7 +266,7 @@ return response(res, 'Not Access Other User', 403);
             attributes: [
               "id", "year", "season", "seed_rate", "total_area",
               "total_required", "is_active", "is_draft", "srr",
-              "is_final_submit", "createdAt", "updatedAt","user_id"
+              "is_final_submit", "createdAt", "updatedAt", "user_id"
             ],
             required: false,
             where: whereCondition,
@@ -298,7 +298,7 @@ return response(res, 'Not Access Other User', 403);
           is_final_submit: srp.is_final_submit || null,
           createdAt: srp.createdAt || null,
           updatedAt: srp.updatedAt || null,
-          user_id:srp.user_id
+          user_id: srp.user_id
         };
       });
 
@@ -367,7 +367,7 @@ return response(res, 'Not Access Other User', 403);
     }
 
   }
-  
+
   //find one
   static findOneSrpCropWise = async (req, res) => {
     try {
@@ -454,14 +454,14 @@ return response(res, 'Not Access Other User', 403);
       });
 
       if (finalSubmit) {
-
         const filteredGroupData = await db.cropGroupModel.findAll({
+          attributes: ['group_code', 'group_name'], // ✅ only these fields
           include: [
             {
               model: db.srpCropModel,
               as: "seed_rolling_plan_crop_wises",
               required: true,   // INNER JOIN --> only submitted groups
-              attributes: [],   // No columns from srpCropModel
+              attributes: [],
               where: {
                 year,
                 season,
@@ -473,9 +473,11 @@ return response(res, 'Not Access Other User', 403);
 
         return response(res, status.DATA_AVAILABLE, 200, filteredGroupData);
       }
-
       else {
-        const allGroups = await db.cropGroupModel.findAll();
+        const allGroups = await db.cropGroupModel.findAll({
+          attributes: ['group_code', 'group_name'] // ✅ only these fields
+        });
+
         return response(res, status.DATA_AVAILABLE, 200, allGroups);
       }
 
@@ -484,5 +486,6 @@ return response(res, 'Not Access Other User', 403);
       return response(res, status.DATA_NOT_AVAILABLE, 500);
     }
   };
+
 }
 module.exports = CropController

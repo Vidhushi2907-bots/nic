@@ -206,7 +206,7 @@
                                                 <!-- TOGGLE (before final submit) -->
                                                 <label class="switch small-switch mb-0"
                                                     *ngIf="!isFinalSubmitButtonHide">
-                                                    <input type="checkbox" formControlName="status_toggle">
+                                                    <input type="checkbox" formControlName="status_toggle"   (change)="onWillingnessChange($event, i)">
                                                     <span class="slider round"></span>
                                                 </label>
 

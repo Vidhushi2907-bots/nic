@@ -1795,6 +1795,40 @@ export class LoggedInUserInfoService {
             active: false,
             subMenus: this.getReportsSubMenu
           },
+
+
+          {
+
+            icon: "Add_Breeder.svg",
+            name: "Zsrm",
+            href: "javascript:void(0)",
+            active: false,
+            subMenus: [
+              {
+                icon: "seeding.svg",
+                name: "FS Requirement & Availability Seed",
+                href: "/requirement-of-Foundation-Seed",
+
+              }, {
+                icon: "seeding.svg",
+                name: "CS/Quality Seed Requirement & Availability",
+                href: "/requirement-of-cs-qs-Seed",
+              },
+              {
+                icon: "seeding.svg",
+                name: "CS Distribution (Variety-wise)",
+                href: "/seed-distribution",
+
+              },
+              {
+                icon: "seeding.svg",
+                name: "Target & Acheivement Seed Replacement Rate by State",
+                href: "/target-Achievement-of-seed",
+
+              },
+            ]
+
+          },
           {
 
             icon: "Add_Breeder.svg",
@@ -1805,7 +1839,7 @@ export class LoggedInUserInfoService {
               {
                 icon: "crop.svg",
                 name: "seed-rolling-planing-crop-wise",
-              href: "/seed-rolling-planing-crop-wise/false",
+                href: "/seed-rolling-planing-crop-wise/false",
                 subMenus: undefined
               },
               {
@@ -1814,12 +1848,12 @@ export class LoggedInUserInfoService {
                 href: "/state-login-replanning",
                 subMenus: undefined
               },
-             
+
 
             ]
 
           }
-          
+
           // {
           //   "name": "Availability of Breeder Seeds (BSP IV Report)",
           //   "href": '/bsp-four-report-availability',

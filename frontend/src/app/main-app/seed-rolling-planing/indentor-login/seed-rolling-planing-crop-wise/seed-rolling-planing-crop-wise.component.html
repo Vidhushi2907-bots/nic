@@ -14,10 +14,6 @@
               <label for="year" class="label-inventory required">Year of Indent</label>
               <select class="form-control input-inventory" formControlName="year">
                 <option value="">Please Select Year</option>
-                <!-- <option value="">Please Select Year</option>
-                                                <option *ngFor="let year of inventoryYearData" value="{{year.year}}">
-                                                    {{year
-                                                    && year.year}}-{{(year.year-2000)+1}}</option> -->
                 <option *ngFor="let year of inventoryYearData" [value]="year.year">
                   {{ year.year_range }}
                 </option>
@@ -32,8 +28,6 @@
                 <option *ngFor="let season of inventorySeasonData" [value]="season.season">
                   {{season.season}}
                 </option>
-                <!-- <option value="Kharif">Kharif</option>
-                <option value="Rabi">Rabi</option> -->
               </select>
             </div>
 
@@ -55,15 +49,15 @@
                 <div class="col-12 d-flex align-items-center justify-content-between flex-wrap mb-2 gap-3 pt-3">
                   <!-- Filter Dropdown -->
                   <div class="d-flex align-items-center mb-2" style="gap: 6px;">
-                    <label for="cropGroup" class="mb-0"
+                    <label for="group_code" class="mb-0"
                       style="font-size: 13px; font-weight: 600; color: #000; white-space: nowrap;">
                       Filter by Crop Group
                     </label>
                     <select class="form-control input-inventory rounded-pill px-3 py-2" formControlName="group_code"
-                      (change)="getPageData()" style="width: 100%; border: 1px solid #c96a2b; height: 40px;">
+                      style="width: 100%; border: 1px solid #c96a2b; height: 40px;" (change)="getPageData()">
                       <option value="">All Crop Groups</option>
-                      <option *ngFor="let data of response_crop_group" [value]="data.group_code">
-                        {{data && data.group_name }}
+                      <option [value]="data.group_code" *ngFor="let data of response_crop_group">
+                        {{ data.group_name }}
                       </option>
                     </select>
                   </div>
@@ -139,8 +133,7 @@
 
                         <ng-template #link>
                           <a class="underline-link" [routerLink]="['/seed-rolling-planing-variety-wise']"
-                            [queryParams]="{ id: ngForm.controls['srpCropWise']['controls'][i].controls['id'].value }"
-                            >
+                            [queryParams]="{ id: ngForm.controls['srpCropWise']['controls'][i].controls['id'].value }">
 
                             {{ ngForm.controls['srpCropWise']['controls'][i].controls['crop_name'].value }}
                           </a>
@@ -149,27 +142,24 @@
 
 
                       <!-- Total Area -->
-                      <div class="col-6 col-md-2 py-2 d-flex align-items-center">
+                      <div class="col-6 col-md-2 py-2 d-flex align-items-center justify-content-center">
                         <div class="w-fit-content form-group">
                           <label class="d-md-none"><b>Total Area (in Lakh Ha):</b>&nbsp;</label>
-                          <input type="number" formControlName="total_area" (keypress)="checkDecimal($event)"
-                            (input)="calculateTotalSeed(i)"
+                          <span *ngIf="isFinalSubmitButtonHide" class="fw-semibold">
+                            {{ ngForm.controls['srpCropWise']['controls'][i].controls['total_area'].value || '0' }}
+                          </span>
+                          <input type="number" *ngIf="!isFinalSubmitButtonHide" formControlName="total_area"
+                            (keypress)="checkDecimal($event)" (input)="calculateTotalSeed(i)"
                             [disabled]="ngForm.controls['srpCropWise']['controls'][i].controls['is_final_submit'].value"
                             [readonly]="
-    ngForm.controls['srpCropWise']['controls'][i].controls['is_final_submit'].value ||
-    (
-      ngForm.controls['srpCropWise']['controls'][i].controls['id'].value &&
-      !ngForm.controls['srpCropWise']['controls'][i].controls['is_active'].value
-    )
-  " [ngClass]="
-  ngForm.controls['srpCropWise']['controls'][i].controls['is_final_submit'].value ||
-    (
-      ngForm.controls['srpCropWise']['controls'][i].controls['id'].value &&
-      !ngForm.controls['srpCropWise']['controls'][i].controls['is_active'].value
-    )
-      ? 'readOnlyInput form-control target-input-field'
-      : 'form-control target-input-field'
-  " />
+        ngForm.controls['srpCropWise']['controls'][i].controls['id'].value &&
+        !ngForm.controls['srpCropWise']['controls'][i].controls['is_active'].value
+      " [ngClass]="
+        (ngForm.controls['srpCropWise']['controls'][i].controls['id'].value &&
+         !ngForm.controls['srpCropWise']['controls'][i].controls['is_active'].value)
+          ? 'readOnlyInput form-control target-input-field'
+          : 'form-control target-input-field'
+      " />
                         </div>
                       </div>
 
@@ -177,51 +167,52 @@
                       <div class="col-6 col-md-2 py-2 d-flex align-items-center justify-content-center">
                         <div class="w-fit-content form-group">
                           <label class="d-md-none"><b>Seed Rate/Ha (Quintal):</b>&nbsp;</label>
-                          <input type="number" class="form-control target-input-field" (keypress)="checkDecimal($event)"
-                            (keypress)="checkLength($event, 10)" formControlName="seed_rate"
-                            (input)="calculateTotalSeed(i)" [readonly]="
-    ngForm.controls['srpCropWise']['controls'][i].controls['is_final_submit'].value ||
-    (
-      ngForm.controls['srpCropWise']['controls'][i].controls['id'].value &&
-      !ngForm.controls['srpCropWise']['controls'][i].controls['is_active'].value
-    )
-  " [ngClass]="
-  ngForm.controls['srpCropWise']['controls'][i].controls['is_final_submit'].value ||
-    (
-      ngForm.controls['srpCropWise']['controls'][i].controls['id'].value &&
-      !ngForm.controls['srpCropWise']['controls'][i].controls['is_active'].value
-    )
-      ? 'readOnlyInput form-control target-input-field'
-      : 'form-control target-input-field'
-  " />
+                          <span *ngIf="isFinalSubmitButtonHide" class="fw-semibold">
+                            {{ ngForm.controls['srpCropWise']['controls'][i].controls['seed_rate'].value || '0' }}
+                          </span>
+                          <input *ngIf="!isFinalSubmitButtonHide" type="number" class="form-control target-input-field"
+                            (keypress)="checkDecimal($event)" (keypress)="checkLength($event, 10)"
+                            formControlName="seed_rate" (input)="calculateTotalSeed(i)" [readonly]="
+        ngForm.controls['srpCropWise']['controls'][i].controls['id'].value &&
+        !ngForm.controls['srpCropWise']['controls'][i].controls['is_active'].value
+      " [ngClass]="
+        (ngForm.controls['srpCropWise']['controls'][i].controls['id'].value &&
+         !ngForm.controls['srpCropWise']['controls'][i].controls['is_active'].value)
+          ? 'readOnlyInput form-control target-input-field'
+          : 'form-control target-input-field'
+      " />
                         </div>
                       </div>
 
                       <!-- SRR Value -->
                       <div class="col-6 col-md-2 py-2 d-flex align-items-center justify-content-center">
                         <div class="w-fit-content form-group">
+
                           <label class="d-md-none">
                             <b>SRR Minimum/already achieved:</b>&nbsp;
                           </label>
 
-                          <input type="number" class="form-control target-input-field" (keypress)="checkDecimal($event)"
-                            (keypress)="checkLength($event, 10)" formControlName="srr" (input)="srrValidation($event,i)"
-                            [readonly]="ngForm.controls['srpCropWise']['controls'][i].controls['is_final_submit'].value || (
-      ngForm.controls['srpCropWise']['controls'][i].controls['id'].value &&
-      !ngForm.controls['srpCropWise']['controls'][i].controls['is_active'].value
-    )
-  " [ngClass]="
-  ngForm.controls['srpCropWise']['controls'][i].controls['is_final_submit'].value ||
-    (
-      ngForm.controls['srpCropWise']['controls'][i].controls['id'].value &&
-      !ngForm.controls['srpCropWise']['controls'][i].controls['is_active'].value
-    )
-      ? 'readOnlyInput form-control target-input-field'
-      : 'form-control target-input-field'
-  " />
+                          <!-- ✅ TEXT MODE -->
+                          <span *ngIf="isFinalSubmitButtonHide" class="fw-semibold">
+                            {{ ngForm.controls['srpCropWise']['controls'][i].controls['srr'].value || '0' }}
+                          </span>
+
+                          <!-- ✅ INPUT MODE -->
+                          <input *ngIf="!isFinalSubmitButtonHide" type="number" class="form-control target-input-field"
+                            (keypress)="checkDecimal($event)" (keypress)="checkLength($event, 10)" formControlName="srr"
+                            (input)="srrValidation($event,i)" [readonly]="
+        ngForm.controls['srpCropWise']['controls'][i].controls['id'].value &&
+        !ngForm.controls['srpCropWise']['controls'][i].controls['is_active'].value
+      " [ngClass]="
+        (ngForm.controls['srpCropWise']['controls'][i].controls['id'].value &&
+         !ngForm.controls['srpCropWise']['controls'][i].controls['is_active'].value)
+          ? 'readOnlyInput form-control target-input-field'
+          : 'form-control target-input-field'
+      " />
 
                         </div>
                       </div>
+
 
 
                       <!-- Qty of Seed Required -->

@@ -67,6 +67,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
   isFinalSubmitButtonHide: boolean;
   isCheckNewVariety: boolean
   selectedReplaceList: any = [];
+  popupShownIndexes = [];
   constructor(private service: SeedServiceService, private _masterService: MasterService, private breeder: BreederService, private fb: FormBuilder, private route: Router, private cdRef: ChangeDetectorRef, private _productionCenter: ProductioncenterService, private master: MasterService, private srpService: SeedRollingPlanningService) {
 
   }
@@ -773,7 +774,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
   }
   async triggerAutoSearch() {
     clearTimeout(this.autoSearchTimeout);
-    
+
     this.autoSearchTimeout = setTimeout(() => {
       this.getPageData();  // automatically fire your API function
     }, 400); // delay 0.4 sec
@@ -789,6 +790,35 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
       this.triggerAutoSearch();
     })
 
+  }
+
+  onWillingnessChange(event: any, index: number) {
+    const isYes = event.target.checked;
+    console.log(isYes, "step:1");
+    if (!isYes) return;
+
+    const bspcArray = this.ngForm.get('bspc') as FormArray;
+    const rowGroup = bspcArray.at(index) as FormGroup;
+    const replaceArray = rowGroup.get('replaceVariety') as FormArray;
+
+    console.log(bspcArray, rowGroup, replaceArray, "step:2");
+    if (!replaceArray || replaceArray.length === 0) return;
+
+    // 🔍 check actual filled data
+    const hasFilledReplacement = replaceArray.controls.some(ctrl =>
+      ctrl.get('variety_name')?.value &&
+      ctrl.get('replace_tentative_qty')?.value
+    );
+
+    if (hasFilledReplacement) {
+       rowGroup.get('status_toggle')?.setValue(false);
+      Swal.fire({
+        title: 'Replacement Already Added',
+        text: 'Replacement variety will be deleted',
+        icon: 'info',
+        confirmButtonText: 'OK'
+      });
+    }
   }
 
   openpopup() {

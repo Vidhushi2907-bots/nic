@@ -45,7 +45,7 @@ export class SeedRollingPlanningService {
    getPlansInfo(FromPath: string, token: any = '', DataRow: any={}){
       const currentUser = JSON.parse(localStorage.getItem('BHTCurrentUser'));
        token = currentUser? currentUser.token:'';
-       console.log("Tokensssssssssssssssssssss22222222222",token);
+       
        const header = new HttpHeaders();
        const otherHeader = header.append('Authorization', 'Bearer ' + token);
        return new Promise((resolve, reject) => {

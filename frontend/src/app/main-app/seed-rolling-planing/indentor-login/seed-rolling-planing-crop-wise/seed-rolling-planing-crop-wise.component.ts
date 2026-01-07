@@ -73,26 +73,54 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
   // originalCropList: any[] = [];
   // filteredCrops:any[]=[]
   constructor(private service: SeedServiceService, private _masterService: MasterService, private activeRoute: ActivatedRoute, private breeder: BreederService, private fb: FormBuilder, private route: Router, private cdRef: ChangeDetectorRef, private _productionCenter: ProductioncenterService, private master: MasterService, private srpService: SeedRollingPlanningService) {
-    this.createForm();
-    this.srpCropWiseData = this.breeder.redirectData;
-    if (this.srpCropWiseData && this.srpCropWiseData !== undefined) {
-      if (this.srpCropWiseData.year && this.srpCropWiseData.season) {
-        this.ngForm.controls['year'].patchValue(this.srpCropWiseData.year);
-        this.ngForm.controls['season'].patchValue(this.srpCropWiseData.season);
-        this.searchData()
 
-      }
-    }
+
   }
 
+  //   createForm() {
+  //     this.ngForm = this.fb.group({
+  //       id: [''],
+  //       year: [''],
+  //       season: [''],
+  //     });   
+  //      this.ngForm.controls['season'].disable();
+  //     this.ngForm.controls['year'].enable();
+
+  //  console.log(this.ngForm.controls['year'],"heyffee")
+  //     this.ngForm.controls['year'].valueChanges.subscribe(newvalue => {
+  //       console.log(newvalue)
+  //       if (newvalue) {
+  //         console.log("YEAR SELECTED:", newvalue);
+
+  //         this.ngForm.controls['season'].enable();
+  //         this.loadSeasons();        // <--- season API call here
+  //       } else {
+  //         this.ngForm.controls['season'].disable();
+  //         this.ngForm.controls['season'].setValue('');
+  //       }
+  //     });
+
+  //     this.srpCropWiseData = this.breeder.redirectData;
+  //     if (this.srpCropWiseData && this.srpCropWiseData !== undefined) {
+  //       if (this.srpCropWiseData.year && this.srpCropWiseData.season) {
+  //         this.ngForm.controls['year'].patchValue(this.srpCropWiseData.year);
+  //         this.ngForm.controls['season'].patchValue(this.srpCropWiseData.season);
+  //         this.searchData()
+
+  //       }
+  //     }
+  //   }
   createForm() {
     this.ngForm = this.fb.group({
-      id: [''],
       year: [''],
       season: [''],
+      group_code: [''], // add this so dropdown works
+      global_search: [''],
+      srpCropWise: this.fb.array([]),
     });
+    this.ngForm.controls['season'].disable();
 
-    this.ngForm.controls['season'].enable();
+    // ✅ Sirf year select hone par season enable hoga
     this.ngForm.controls['year'].valueChanges.subscribe(newvalue => {
       if (newvalue) {
 
@@ -103,14 +131,66 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
       }
     });
 
-    this.ngForm.controls['season'].valueChanges.subscribe(newvalue => {
-      if (newvalue) {
+    this.srpCropWiseData = this.breeder.redirectData;
 
-        this.srpCropWise.clear();
-        this.isCrop = false;
+    if (this.srpCropWiseData?.year && this.srpCropWiseData?.season) {
+
+      this.ngForm.controls['year'].patchValue(this.srpCropWiseData.year);
+      this.searchData();
+    }
+  }
+
+  ngOnInit(): void {
+    const userData = localStorage.getItem('BHTCurrentUser');
+    const data = JSON.parse(userData);
+    this.userId = data.id;
+
+    this.loadYears();
+    this.loadSeasons();
+
+    this.createForm();
+    this.ngForm.get('global_search')?.valueChanges.subscribe(() => {
+      this.triggerAutoSearch();
+    })
+    // Subscribe to group_code changes
+    const groupControl = this.ngForm.get('group_code');
+    if (groupControl) {
+      groupControl.valueChanges.subscribe(() => {
+        this.getPageData();
+      });
+    }
+    this.ngForm.get('year')?.valueChanges.subscribe(year => {
+      const season = this.ngForm.get('season')?.value;
+
+      if (year && season) {
+        this.getCroupCroupList(year, season);
       }
     });
-    this.getCroupCroupList()
+    this.ngForm.get('season')?.valueChanges.subscribe(season => {
+      const year = this.ngForm.get('year')?.value;
+      if (year && season) {
+        this.isCrop = false
+
+        this.getCroupCroupList(year, season);
+      }
+    });
+    const year = localStorage.getItem('year');
+    const season = localStorage.getItem('season');
+    this.activeRoute.paramMap.subscribe(params => {
+      const isLockedParam = params.get('isLocked'); // 'true' | 'false'
+      const isLocked = isLockedParam === 'true';    // boolean
+
+      console.log(isLocked, 'IS LOCKED');
+
+      if (isLocked) {
+        this.ngForm.patchValue({
+          year: year,
+          season: season
+        });
+        this.getPageData();
+      }
+    });
+
   }
 
   searchData() {
@@ -148,7 +228,6 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
 
   //get crop code
   getCropCode(i: number) {
-
     return (this.ngForm.get('srpCropWise') as FormArray).at(i).get('crop_code').value;
   }
 
@@ -194,8 +273,8 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
   }
   //season list
   loadSeasons() {
-    const apiUrl = 'get-season-list'; // 👈 your actual API endpoint
 
+    const apiUrl = 'get-season-list'; // 👈 your actual API endpoint
     this.srpService.getRequestCreatorNew(apiUrl).subscribe({
       next: (data: any) => {
         if (
@@ -205,11 +284,6 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
           data.EncryptedResponse.status_code === 200
         ) {
           this.inventorySeasonData = data.EncryptedResponse.data;
-          console.log(this.inventorySeasonData, "chbsdcffvswvswv")
-          // ✅ Optional: filter only active seasons
-
-
-          console.log('✅ Season list loaded:', this.inventorySeasonData);
         } else {
           console.warn('⚠️ No valid data received in EncryptedResponse');
           this.inventorySeasonData = [];
@@ -263,7 +337,17 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
         return cleanCrop;
       });
 
-    console.log("Filtered cropData:", cropData);
+    const invalidSrr = cropData.find(crop => crop.srr > 100);
+    if (invalidSrr) {
+      Swal.fire({
+        title: '<p style="font-size:20px;">Error: SRR cannot be greater than 100!</p>',
+        icon: 'error',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#E97E15',
+      });
+      this.isSubmitting = false;
+      return;
+    }
 
     if (!cropData.length) {
       Swal.fire({
@@ -540,6 +624,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
 
                     this.isFinalSubmitButtonHide = true
                     this.getPageData();
+                    this.getCroupCroupList(year, season);
 
                   });
 
@@ -574,12 +659,12 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
     });
   }
 
-  async getCroupCroupList() {
-    const route = "crop-group";
-    const result = this.service.getPlansInfo(route).then((data: any) => {
-      this.response_crop_group = data['EncryptedResponse'].data;
-      this.response_crop_group_second = this.response_crop_group
-      // console.log(data['EncryptedResponse'].data, 'ddddddddd', this.response_crop_group)
+  async getCroupCroupList(year: any, season: any) {
+    console.log(year, season);
+    const route1 = `get-srp-crop-group-wise?year=${year}&season=${season}`;
+    this.srpService.getPlansInfo(route1).then((data: any) => {
+      this.response_crop_group = data['EncryptedResponse'].data
+
     })
 
   }
@@ -648,9 +733,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
     })
   }
 
-  cgClick() {
-    document.getElementById('group_code').click();
-  }
+
   onCropClick(index: number) {
     const year = this.ngForm.get('year')?.value;
     const season = this.ngForm.get('season')?.value;
@@ -665,64 +748,6 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
       localStorage.setItem('isLocked', 'true');
     }
   }
-  // your existing form array
-  ngOnInit(): void {
-    // Initialize form first
-    const userData = localStorage.getItem('BHTCurrentUser');
-    const data = JSON.parse(userData);
-    this.userId = data.id;
-
-    // 🔴 CLEAR on refresh
-    //   const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-    //   const isRefresh = nav?.type === 'reload';
-    // console.log(isRefresh,"refresh........")
-    //   if (isRefresh) {
-    //     localStorage.removeItem('year');
-    //     localStorage.removeItem('season');
-    //     localStorage.removeItem('isLocked');
-    //   }
-
-    this.ngForm = this.fb.group({
-      year: [''],
-      season: [''],
-      group_code: [''], // add this so dropdown works
-      global_search: [''],
-      srpCropWise: this.fb.array([]),
-    });
-    this.ngForm.get('global_search')?.valueChanges.subscribe(() => {
-      this.triggerAutoSearch();
-    })
-    // Subscribe to group_code changes
-    const groupControl = this.ngForm.get('group_code');
-    if (groupControl) {
-      groupControl.valueChanges.subscribe(() => {
-        this.getPageData(); // reload data automatically when dropdown changes
-      });
-    }
-
-    this.loadYears();
-    this.loadSeasons();
-
-    const year = localStorage.getItem('year');
-    const season = localStorage.getItem('season');
-
-
-    this.activeRoute.paramMap.subscribe(params => {
-      const isLockedParam = params.get('isLocked'); // 'true' | 'false'
-      const isLocked = isLockedParam === 'true';    // boolean
-
-      console.log(isLocked, 'IS LOCKED');
-
-      if (isLocked) {
-        this.ngForm.patchValue({
-          year: year,
-          season: season
-        });
-        this.getPageData();
-      }
-    });
-  }
-
 
   openpopup() {
     this.displayStyle = 'block'
@@ -753,9 +778,9 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
 
   }
 
-  myFunction() {
-    document.getElementById("myDropdown").classList.toggle("show");
-  }
+  // myFunction() {
+  //   document.getElementById("myDropdown").classList.toggle("show");
+  // }
 
   finalSubmit() {
     console.log("final submit");

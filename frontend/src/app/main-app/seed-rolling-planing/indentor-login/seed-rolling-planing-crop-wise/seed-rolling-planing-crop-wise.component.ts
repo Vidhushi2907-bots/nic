@@ -36,6 +36,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
   inventorySeasonData: any;
   inventoryCropData: any;
   lastValidSRRValue: any;
+  filteredBspc: any[] = [];
   cropGroupList = [
     { id: 1, name: 'Cereals' },
     { id: 2, name: 'Pulses' },
@@ -77,39 +78,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
 
   }
 
-  //   createForm() {
-  //     this.ngForm = this.fb.group({
-  //       id: [''],
-  //       year: [''],
-  //       season: [''],
-  //     });   
-  //      this.ngForm.controls['season'].disable();
-  //     this.ngForm.controls['year'].enable();
 
-  //  console.log(this.ngForm.controls['year'],"heyffee")
-  //     this.ngForm.controls['year'].valueChanges.subscribe(newvalue => {
-  //       console.log(newvalue)
-  //       if (newvalue) {
-  //         console.log("YEAR SELECTED:", newvalue);
-
-  //         this.ngForm.controls['season'].enable();
-  //         this.loadSeasons();        // <--- season API call here
-  //       } else {
-  //         this.ngForm.controls['season'].disable();
-  //         this.ngForm.controls['season'].setValue('');
-  //       }
-  //     });
-
-  //     this.srpCropWiseData = this.breeder.redirectData;
-  //     if (this.srpCropWiseData && this.srpCropWiseData !== undefined) {
-  //       if (this.srpCropWiseData.year && this.srpCropWiseData.season) {
-  //         this.ngForm.controls['year'].patchValue(this.srpCropWiseData.year);
-  //         this.ngForm.controls['season'].patchValue(this.srpCropWiseData.season);
-  //         this.searchData()
-
-  //       }
-  //     }
-  //   }
   createForm() {
     this.ngForm = this.fb.group({
       year: [''],
@@ -149,9 +118,9 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
     this.loadSeasons();
 
     this.createForm();
-    this.ngForm.get('global_search')?.valueChanges.subscribe(() => {
-      this.triggerAutoSearch();
-    })
+    this.ngForm.get('global_search')?.valueChanges.subscribe(searchText => {
+      this.applyFilter(searchText);
+    });
     // Subscribe to group_code changes
     const groupControl = this.ngForm.get('group_code');
     if (groupControl) {
@@ -187,8 +156,56 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
           year: year,
           season: season
         });
-        this.getPageData();
+        this.searchData();
       }
+    });
+
+  }
+
+  applyFilter(searchText: string) {
+    const bspcArray = this.ngForm.get('srpCropWise') as FormArray;
+
+    if (!bspcArray) return;
+
+    const allRows = bspcArray.controls;
+
+    // If empty search → show all rows
+    if (!searchText || !searchText.toString().trim()) {
+      this.filteredBspc = allRows;
+      return;
+    }
+
+    const lower = searchText.toString().trim().toLowerCase();
+
+    this.filteredBspc = allRows.filter(ctrl => {
+      const variety = (ctrl.get('crop_name')?.value || '')
+        .toString()
+        .toLowerCase();
+
+      const notificationYear = (ctrl.get('srr')?.value || '')
+        .toString()
+        .toLowerCase();
+
+      const reqQty = (ctrl.get('seed_rate')?.value || '')
+        .toString()
+        .toLowerCase();
+
+      const foundationSeed = (ctrl.get('total_required')?.value || '')
+        .toString()
+        .toLowerCase();
+
+      const breederSeed = (ctrl.get('total_area')?.value || '')
+        .toString()
+        .toLowerCase();
+
+
+      return (
+        variety.includes(lower) ||
+        notificationYear.includes(lower) ||
+        reqQty.includes(lower) ||
+        foundationSeed.includes(lower) ||
+        breederSeed.includes(lower)
+      );
     });
 
   }
@@ -218,27 +235,24 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
     this.getPageData();
   }
 
-  async triggerAutoSearch() {
-    clearTimeout(this.autoSearchTimeout);
+  // async triggerAutoSearch() {
+  //   clearTimeout(this.autoSearchTimeout);
 
-    this.autoSearchTimeout = setTimeout(() => {
-      this.getPageData();  // automatically fire your API function
-    }, 400); // delay 0.4 sec
-  }
+  //   this.autoSearchTimeout = setTimeout(() => {
+  //     this.getPageData();  // automatically fire your API function
+  //   }, 400); // delay 0.4 sec
+  // }
 
-  //get crop code
   getCropCode(i: number) {
     return (this.ngForm.get('srpCropWise') as FormArray).at(i).get('crop_code').value;
   }
 
-  //crop id
   getCropId(i: number) {
     return (this.ngForm.get('srpCropWise') as FormArray)
       .at(i)
       .get('id')?.value;
   }
 
-  //year list
   loadYears() {
     const apiUrl = 'get-year-list'
     this.srpService.getRequestCreatorNew(apiUrl).subscribe({
@@ -271,7 +285,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
       },
     });
   }
-  //season list
+
   loadSeasons() {
 
     const apiUrl = 'get-season-list'; // 👈 your actual API endpoint
@@ -360,7 +374,6 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
     }
 
     const payload = { action: "draft", cropData };
-    console.log("Payload Sent:", payload);
     this.srpService.postRequestCreator(apiUrl, null, payload).subscribe({
       next: (data: any) => {
         console.log("API Response:", data);
@@ -370,7 +383,12 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
             icon: 'success',
             confirmButtonText: 'OK',
             confirmButtonColor: '#B64B1D',
-          }).then(() => this.getPageData());
+          }).then((result) => {
+            if (result.isConfirmed) {
+              this.getPageData();
+              this.ngForm.get('global_search')?.reset();
+            }
+          });
         } else {
           Swal.fire({
             title: '<p style="font-size:25px;">Something went wrong.</p>',
@@ -422,7 +440,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
 
       this.isCrop = true;
 
-      const searchKeyword = String(this.ngForm.get('global_search')?.value || '').trim().toLowerCase();
+   
       let apiUrl = `get-srp-crop-wise?year=${year}&season=${season}`;
       if (group_code) {
         apiUrl += `&group_code=${group_code}`;
@@ -438,16 +456,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
               ? fetchedData.filter(item => item.is_final_submit === true)
               : fetchedData;
 
-            if (searchKeyword) {
-              this.srpCropWiseList = this.srpCropWiseList.filter(item =>
-                String(item.crop_name || '').toLowerCase().includes(searchKeyword) ||
-                String(item.srr || '').toLowerCase().includes(searchKeyword) ||
-                String(item.total_area || '').toLowerCase().includes(searchKeyword) ||
-                String(item.total_required || '').toLowerCase().includes(searchKeyword) ||
-                String(item.seed_rate || '').toLowerCase().includes(searchKeyword)
-              );
-            }
-
+    
             this.disableField = isFinalSubmit;
             this.isFinalSubmitButtonHide = isFinalSubmit;
             const srpCropWiseArray = this.ngForm.get('srpCropWise') as FormArray;
@@ -507,6 +516,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
     const srpCropWiseArray = Array.isArray(formValues.srpCropWise)
       ? formValues.srpCropWise
       : [];
+    console.log(srpCropWiseArray, "srpCropAddy")
     const activeCropsToSubmit = srpCropWiseArray.filter(item => item.is_active);
     const cropData = activeCropsToSubmit
       .filter((crop: any) => crop.crop_code && crop.total_area && crop.srr && crop.seed_rate)
@@ -525,6 +535,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
         if (crop.seed_rate) cleanCrop.seed_rate = crop.seed_rate;
         return cleanCrop;
       });
+    console.log(cropData, "cropData")
     const invalidSrr = cropData.find(crop => crop.srr > 100);
     if (invalidSrr) {
       Swal.fire({
@@ -620,12 +631,13 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
                     icon: 'success',
                     confirmButtonText: 'OK',
                     confirmButtonColor: '#E97E15',
-                  }).then(() => {
-
-                    this.isFinalSubmitButtonHide = true
-                    this.getPageData();
-                    this.getCroupCroupList(year, season);
-
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      this.isFinalSubmitButtonHide = true
+                      this.getPageData();
+                      this.getCroupCroupList(year, season);
+                      this.ngForm.get('global_search')?.reset();
+                    }
                   });
 
 
@@ -672,10 +684,9 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
   srrValidation(event: any, index: any) {
     const bspcArray = this.ngForm.get('srpCropWise') as FormArray;
     const srrControl = bspcArray.at(index).get('srr');
-    console.log(srrControl, "step:1")
     const input = event.target as HTMLInputElement;
     const currentValue = input.value + event.key;
-    console.log(event.target.value, "input");
+
     const regex = /^[0-9]+(\.[0-9]{0,2})?$/;
     if (!regex.test(currentValue) || (event.key === '.' && input.value.includes('.'))) {
       event.preventDefault();
@@ -694,24 +705,38 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
     }
     return;
   }
-  calculateTotalSeed(i: number) {
-    const srpCropWiseArray = this.ngForm.get('srpCropWise') as FormArray;
+  calculateTotalSeed(rowGroup: FormGroup) {
+    if (!rowGroup) return;
 
-    if (!srpCropWiseArray || !srpCropWiseArray.at(i)) return;
-
-    const rowGroup = srpCropWiseArray.at(i) as FormGroup;
     const seed_rate = rowGroup.get('seed_rate')?.value || 0;
-
     const total_area = rowGroup.get('total_area')?.value || 0;
     const srr_value = rowGroup.get('srr')?.value || 0;
 
     const total = seed_rate * total_area * (srr_value / 100);
 
-    // set calculated value back in the same row
     rowGroup.get('total_required')?.setValue(total.toFixed(2), { emitEvent: false });
+
     this.updateTotalSeedRequired();
-    console.log('Index:', i, 'Total Seed Required:', total);
   }
+
+  // calculateTotalSeed(i: number) {
+  //   const srpCropWiseArray = this.ngForm.get('srpCropWise') as FormArray;
+
+  //   if (!srpCropWiseArray || !srpCropWiseArray.at(i)) return;
+
+  //   const rowGroup = srpCropWiseArray.at(i) as FormGroup;
+  //   const seed_rate = rowGroup.get('seed_rate')?.value || 0;
+
+  //   const total_area = rowGroup.get('total_area')?.value || 0;
+  //   const srr_value = rowGroup.get('srr')?.value || 0;
+
+  //   const total = seed_rate * total_area * (srr_value / 100);
+
+  //   // set calculated value back in the same row
+  //   rowGroup.get('total_required')?.setValue(total.toFixed(2), { emitEvent: false });
+  //   this.updateTotalSeedRequired();
+  //   console.log('Index:', i, 'Total Seed Required:', total);
+  // }
 
   updateTotalSeedRequired() {
     const srpCropWiseArray = this.ngForm.get('srpCropWise') as FormArray;
@@ -757,15 +782,6 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
     this.displayStyle = 'none'
   }
 
-  initSearchAndPagination() {
-    if (this.paginationUiComponent === undefined) {
-      setTimeout(() => {
-        this.initSearchAndPagination();
-      }, 300);
-      return;
-    }
-    this.paginationUiComponent.Init(this.filterPaginateSearch);
-  }
 
   // Cancel Button
   revertDataCancelation() {
@@ -777,10 +793,6 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
     this.ngForm.controls['srpCropWise'].enable();
 
   }
-
-  // myFunction() {
-  //   document.getElementById("myDropdown").classList.toggle("show");
-  // }
 
   finalSubmit() {
     console.log("final submit");

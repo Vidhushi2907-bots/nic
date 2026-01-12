@@ -375,12 +375,20 @@ class VarietyController {
  
       const data = await db.srpCropModel.findOne(condition);
       if (data) {
+    const yearData = await db.srpYearModel.findOne({
+      where: { year: data.year},
+      attributes: ['year_range']
+    });
+    data.year = yearData ? yearData.year_range : null;
+
         response(res, status.DATA_AVAILABLE, 200, data);
-      } else {
+      
+     } else {
         response(res, status.DATA_NOT_AVAILABLE, 404, []);
       }
  
-    } catch (error) {
+    } 
+  catch (error) {
       console.error('Error in cropVariety:', error);
       response(res, status.DATA_NOT_AVAILABLE, 500);
     }

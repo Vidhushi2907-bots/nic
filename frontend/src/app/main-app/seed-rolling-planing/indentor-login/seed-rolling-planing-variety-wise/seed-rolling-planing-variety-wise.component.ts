@@ -181,9 +181,6 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
     });
   }
 
-
-
-
   //new code acc. to vidushi api
   getCropDetailsById(id: number) {
     this.isLoading = true;
@@ -212,6 +209,8 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
 
         // 🟢 Assign object (NOT array)
         this.crop_wise_json = {
+          year: item.year,
+          season: item.season,
           crop_name: item['m_crop.crop_name'] || item.crop_name || '',
           total_area: Number(item.total_area) || 0,
           total_required: totalRequired,
@@ -236,14 +235,14 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
       }
     });
   }
-formatDate(dateStr: string): string {
-  if (!dateStr) return '--';
-  const date = new Date(dateStr);
-  const day = ('0' + date.getDate()).slice(-2);
-  const month = ('0' + (date.getMonth() + 1)).slice(-2);
-  const year = date.getFullYear();
-  return `${day}-${month}-${year}`;
-}
+  formatDate(dateStr: string): string {
+    if (!dateStr) return '--';
+    const date = new Date(dateStr);
+    const day = ('0' + date.getDate()).slice(-2);
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
   getVarietyDetails(id, type) {
     let apiRoute = 'get-srp-variety-details';
     id = Number(id);
@@ -405,11 +404,16 @@ formatDate(dateStr: string): string {
       }).then((result) => {
         if (!result.isConfirmed) return;
 
+
+
         this.srpService.postRequestCreator(apiUrl, null, payload).subscribe({
           next: () => {
             Swal.fire('Saved as Draft!', '', 'success').then(() => {
               this.isFinalSubmit = false;
               this.getVarietyDetails(this.srp_crop_wise_id, 'draft');
+
+          this.ngForm.get('global_search')?.reset();
+    
             });
           },
           error: () => Swal.fire('Server Error', '', 'error')
@@ -437,6 +441,7 @@ formatDate(dateStr: string): string {
 </thead>
 <tbody>
 ${variety_wise
+        .filter(v => v.is_active === true)
         .map(
           (v, i) => `
 <tr>
@@ -497,6 +502,7 @@ ${variety_wise
                 confirmButtonColor: '#E97E15',
               }).then(() => {
                 this.isFinalSubmitButtonHide = true;
+                this.ngForm.get('global_search')?.reset();
                 this.getVarietyDetails(this.srp_crop_wise_id, 'submit');
               });
             } else {
@@ -522,40 +528,6 @@ ${variety_wise
     });
   }
 
-
-  // handleSeedInput(index: number) {
-  // this.calculateTotalSeedRequired();
-
-  // // If no crop data yet, stop
-  // if (!this.crop_wise_json) return;
-
-  // const remaining = this.crop_wise_json.rem_req_seeds;
-
-  // // If grid total seeds equals to crop_wise_json total required — warning
-  // if (this.crop_wise_json.total_required ===) {
-  // Swal.fire({
-  // icon: 'warning',
-  // title: 'Limit Reached',
-  // text: `you cannot enter more! Required Qty can't greater than Total Seeds `,
-  // confirmButtonText: 'OK'
-  // });
-
-  // // 🔥 Prevent additional value entry
-  // const bspcArray = this.ngForm.get('bspc') as FormArray;
-  // const control = bspcArray.at(index);
-
-  // // Reset field to prevent exceeding
-  // const enteredValue = Number(control.get('Req_Qty_of_breeder_seed')?.value || 0);
-  // const adjustedValue = enteredValue > 0 ? enteredValue : 0;
-
-  // control.get('Req_Qty_of_breeder_seed')?.setValue(adjustedValue);
-
-  // // Recalculate again after adjustment
-  // setTimeout(() => {
-  // this.calculateTotalSeedRequired();
-  // }, 50);
-  // }
-  // }
   handleSeedInput(index: number) {
     const bspcArray = this.ngForm.get('bspc') as FormArray;
     const control = bspcArray.at(index);
@@ -647,25 +619,22 @@ ${variety_wise
     });
   }
 
-  // goBack() {
-  //   this.router.navigate(['/seed-rolling-planing-crop-wise/true']);
-  // }
   goBack() {
-  const year = localStorage.getItem('year');
-  const season = localStorage.getItem('season');
+    const year = localStorage.getItem('year');
+    const season = localStorage.getItem('season');
 
-  // Agar dono values exist karte hain tabhi navigate karein
-  if (year && season) {
-    this.router.navigate(
-  ['/seed-rolling-planing-crop-wise'],
-  { queryParams: { isLocked: true } }
-);
-    console.log(this.router.navigate(['/seed-rolling-planing-crop-wise/true']))
-  } else {
-    // Kuch nahi karna agar year ya season missing hai
-    console.warn('Year or Season not found in localStorage');
+    // Agar dono values exist karte hain tabhi navigate karein
+    if (year && season) {
+      this.router.navigate(
+        ['/seed-rolling-planing-crop-wise'],
+        { queryParams: { isLocked: true } }
+      );
+      console.log(this.router.navigate(['/seed-rolling-planing-crop-wise/true']))
+    } else {
+      // Kuch nahi karna agar year ya season missing hai
+      console.warn('Year or Season not found in localStorage');
+    }
   }
-}
 
   calculateTotalSeedRequired() {
     const bspcArray = this.ngForm.get('bspc') as FormArray;
@@ -725,18 +694,6 @@ ${variety_wise
     this.calculateTotalSeedRequired();
   }
 
-  // onToggleChange(index: number) {
-  // const row = this.ngForm.get('bspc')?.get(`${index}`) as FormGroup;
-  // const isActive = row.get('is_active')?.value;
-
-  // if (!isActive) {
-  // row.get('Req_Qty_of_breeder_seed')?.disable({ emitEvent: false });
-  // row.addControl('isRowLocked', this.fb.control(true));
-  // } else {
-  // row.get('Req_Qty_of_breeder_seed')?.enable({ emitEvent: false });
-  // row.addControl('isRowLocked', this.fb.control(false));
-  // }
-  // }
   applyFilter(searchText: string) {
     const bspcArray = this.ngForm.get('bspc') as FormArray;
     if (!bspcArray) return;
@@ -748,7 +705,7 @@ ${variety_wise
       this.filteredBspc = allRows;
       return;
     }
-
+    console.log(this.filteredBspc, "this.filtered")
     const lower = searchText.toString().trim().toLowerCase();
 
     this.filteredBspc = allRows.filter(ctrl => {
@@ -782,37 +739,6 @@ ${variety_wise
       );
     });
   }
-
-  // applyFilter(searchText: string) {
-  // const bspcArray = this.ngForm.get('bspc') as FormArray;
-  // if (!bspcArray) return;
-
-  // const allRows = bspcArray.controls;
-
-  // // If empty search → show all rows
-  // if (!searchText || !searchText.toString().trim()) {
-  // this.filteredBspc = allRows;
-  // return;
-  // }
-
-  // const lower = searchText.toString().trim().toLowerCase();
-
-  // this.filteredBspc = allRows.filter(ctrl => {
-  // const variety = (ctrl.get('variety_name')?.value || '')
-  // .toString()
-  // .toLowerCase();
-
-  // const notificationYear = (ctrl.get('notification_year')?.value || '')
-  // .toString()
-  // .toLowerCase();
-
-  // // 🟢 Match EITHER field
-  // return (
-  // variety.includes(lower) ||
-  // notificationYear.includes(lower)
-  // );
-  // });
-  // }
 
   viewVarietyDetail(data: FormGroup) {
     const varietyCode =
@@ -925,137 +851,6 @@ ${(this.ngForm?.value?.filed_data ?? [])
 
       });
   }
-
-
-  // viewVarietyDetail(rowData: any) {
-
-  // if (this.ngForm.value.filed_data && this.ngForm.value.filed_data.length > 0) {
-  // Swal.fire({
-  // title: 'View Variety Characteristics',
-  // html: `
-  // <div class="variety-details">
-
-  // <!-- Column 1 -->
-  // <div class="col">
-  // <div class="field"><label>Crop Group/Crop Category</label><div class="value">--</div></div>
-  // <div class="field"><label>Botanical/Scientific Name</label><div class="value">--</div></div>
-  // <div class="field"><label>Variety Name</label><div class="value">--</div></div>
-  // <div class="field"><label>Notified / Non-Notified</label><div class="value">--</div></div>
-  // <div class="field"><label>Notification Number</label><div class="value">--</div></div>
-  // <div class="field"><label>Year of Release</label><div class="value">--</div></div>
-  // <div class="field"><label>Category</label><div class="value">--</div></div>
-  // </div>
-
-  // <!-- Column 2 -->
-  // <div class="col">
-  // <div class="field"><label>Crop Name</label><div class="value">--</div></div>
-  // <div class="field"><label>Crop Name (Hindi)</label><div class="value">--</div></div>
-  // // <div class="field"><label>Variety Code</label><div class="value">--</div></div>
-  // <div class="field"><label>Notification Date</label><div class="value">--</div></div>
-  // <div class="field"><label>Meeting Number</label><div class="value">--</div></div>
-  // <div class="field"><label>Select Type</label><div class="value"><span class="badge" style="background:#b3e6ff;padding:4px 10px;border-radius:10px;">NA<span></div></div>
-  // <div class="field"><label>category</label><div class="value"><span class="badge" style="background:#e0b3f1;padding:4px 10px;border-radius:10px;">NA<span></div></div>
-  // </div>
-
-  // <!-- Column 3 -->
-  // <div class="col">
-  // <div class="field"><label>Developed By</label><div class="value">--</div></div>
-  // <div class="field"><label>Recommended State(s) for Cultivation</label><div class="value">--</div></div>
-  // <div class="field"><label>Agro-Ecological Regions</label><div class="value">--</div></div>
-  // <div class="field"><label>Type of Maturity</label><div class="value">--</div></div>
-  // <div class="field"><label>Enter Maturity (in Days)</label><div class="value">--</div></div>
-  // <div class="field"><label>Average Yield (Qt/Ha)</label><div class="value">--</div></div>
-  // <div class="field"><label>Climate Resilience</label><div class="value">><span class="badge" style="background:#f0f0f0;padding:4px 10px;border-radius:10px;">NA<span></div></div>
-  // </div>
-
-  // <!-- Column 4 -->
-  // <div class="col">
-  // ${this.ngForm.value.filed_data.map((field: any) => `
-  // <div class="field">
-  // <label>${field.item_text}</label>
-  // <div class="value">${rowData[field.field_key] || 'NA'}</div>
-  // </div>
-  // `).join('')}
-  // </div>
-
-  // </div>
-  // `,
-  // confirmButtonText: 'Close',
-  // width: 1200,
-  // customClass: { confirmButton: 'custom-close-btn', title: 'swal-title-left' },
-  // didOpen: this.applyPopupStyle
-  // });
-
-  // } else {
-  // console.log(rowData.variety_code,"rowData.variety_code")
-  // const payload = { search: { variety_code: rowData.variety_code } };
-
-  // this.service.postRequestCreator('get-all-variety-details', null, payload)
-  // .subscribe((res: any) => {
-  // const data = res?.EncryptedResponse?.data;
-  // console.log("rowData clicked:", rowData);
-  // if (res?.EncryptedResponse?.status_code === 200) {
-
-  // Swal.fire({
-  // title: 'View Variety Characteristics',
-  // html: `
-  // <div class="variety-details">
-
-  // <!-- Column 1 -->
-  // <div class="col">
-  // <div class="field"><label>Crop Group/Crop Category</label><div class="value">${data?.group_name || '--'}</div></div>
-  // <div class="field"><label>Botanical/Scientific Name</label><div class="value">${data?.botanic_name || '--'}</div></div>
-  // <div class="field"><label>Variety Name</label><div class="value">${data?.variety_name || '--'}</div></div>
-  // <div class="field"><label>Notified / Non-Notified</label><div class="value">${data?.is_notified == 1 ? 'Notified' : 'Non-Notified'}</div></div>
-  // <div class="field"><label>Notification Number</label><div class="value">${data?.notification_number || '--'}</div></div>
-  // <div class="field"><label>Year of Release</label><div class="value">${data?.year_of_release || '--'}</div></div>
-  // <div class="field"><label>Category</label><div class="value">${data?.category_name ? `<span class="badge yellow">${data.category_name}</span>` : '--'}</div></div>
-  // </div>
-
-  // <!-- Column 2 -->
-  // <div class="col">
-  // <div class="field"><label>Crop Name</label><div class="value">${data?.crop_name || '--'}</div></div>
-  // <div class="field"><label>Crop Name (Hindi)</label><div class="value">${data?.crop_name_hindi || '--'}</div></div>
-  // <div class="field"><label>Variety Code</label><div class="value">${data?.variety_code || '--'}</div></div>
-  // <div class="field"><label>Notification Date</label><div class="value">${this['formatDate'](data?.notification_date) || '--'}</div></div>
-  // <div class="field"><label>Meeting Number</label><div class="value">${data?.meeting_number || '--'}</div></div>
-  // <div class="field"><label>Select Type</label><div class="value">${data?.select_type ? `<span class="badge green">${data.select_type}</span>` : '--'}</div></div>
-  // <div class="field"><label>Released By</label><div class="value">${data?.released_by ? `<span class="badge purple">${data.released_by}</span>` : '--'}</div></div>
-  // </div>
-
-  // <!-- Column 3 -->
-  // <div class="col">
-  // <div class="field"><label>Developed By</label><div class="value">${data?.developed_by ? `<span class="badge red">${data.developed_by}</span>` : '--'}</div></div>
-  // <div class="field"><label>Recommended State(s) for Cultivation</label><div class="value">${data?.states_for_cultivation || '--'}</div></div>
-  // <div class="field"><label>Agro-Ecological Regions</label><div class="value">${data?.agro_ecological_regions || '--'}</div></div>
-  // <div class="field"><label>Type of Maturity</label><div class="value">${data?.type_of_maturity || '--'}</div></div>
-  // <div class="field"><label>Enter Maturity (in Days)</label><div class="value">${data?.maturity_days || '--'}</div></div>
-  // <div class="field"><label>Average Yield (Qt/Ha)</label><div class="value">${data?.average_yeild_from && data?.average_yeild_to ? `${data.average_yeild_from} to ${data.average_yeild_to}` : '--'}</div></div>
-  // <div class="field"><label>Climate Resilience</label><div class="value">${data?.climate_resilience || '--'}</div></div>
-  // </div>
-
-  // <!-- Column 4 -->
-  // <div class="col">
-  // <div class="field"><label>IP Protected</label><div class="value">${data?.ip_protected == 1 ? '<span class="badge blue">Yes</span>' : '<span class="badge gray">No</span>'}</div></div>
-  // <div class="field"><label>GI Tagged</label><div class="value"><span class="badge" style="background:#eee1a9;padding:4px 10px;border-radius:10px;">${data?.ig_tagged == 1 ? '<span class="badge yellow">Yes</span>' : '<span class="badge">No</span>'}</span></div></div>
-  // <div class="field"><label>Reaction/Tolerance to Major Insect Pests</label><div class="value"><span class="badge gray">${data?.reaction_insect_pests || '--'}</div></div>
-  // <div class="field"><label>Reaction/Resistance to Major Diseases</label><div class="value">${data?.reaction_major_diseases || '--'}</div></div>
-  // <div class="field"><label>Crop Code</label><div class="value">${data?.crop_code || '--'}</div></div>
-  // </div>
-
-  // </div>
-  // `,
-  // confirmButtonText: 'Close',
-  // width: 850,
-  // customClass: { confirmButton: 'custom-close-btn',
-  // title: 'swal-title-left'
-  // },
-  // didOpen: this.applyPopupStyle
-  // });
-  // }
-  // });
-  // }
-  // }
 
   applyPopupStyle = () => {
     const style = document.createElement('style');

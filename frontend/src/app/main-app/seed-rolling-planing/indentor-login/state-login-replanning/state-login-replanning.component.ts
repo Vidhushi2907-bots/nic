@@ -205,7 +205,7 @@ export class StateLoginReplanningComponent implements OnInit, AfterViewInit {
       localStorage.setItem('season', season);
       localStorage.setItem('crop_code', crop_code);
     }
-const year1 = localStorage.getItem('year');
+    const year1 = localStorage.getItem('year');
     const season1 = localStorage.getItem('season');
     const crop = localStorage.getItem('crop_code');
     console.log(year1,season1,crop)

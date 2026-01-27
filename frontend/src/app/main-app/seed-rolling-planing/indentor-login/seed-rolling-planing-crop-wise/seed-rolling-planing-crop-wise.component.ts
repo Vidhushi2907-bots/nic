@@ -150,6 +150,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
 
       }
     });
+    
 
     this.srpCropWiseData = this.breeder.redirectData;
 
@@ -158,6 +159,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
       this.ngForm.controls['season'].patchValue(this.srpCropWiseData.season);
       this.searchData();
     }
+    
   }
   searchData() {
     const year = this.ngForm.get('year')?.value;

@@ -579,13 +579,14 @@ table {
   border-radius: 50%;
 }
 
-input:checked + .slider {
-  background-color: green; /* your red color */
-}
+/* -------- hide toggle ------- */
+/* input:checked + .slider {
+  background-color: green;
+} */
 
-input:checked + .slider:before {
+/* input:checked + .slider:before {
   transform: translateX(24px);
-}
+} */
 
 /* Smaller variant */
 .small-switch {
@@ -600,9 +601,9 @@ input:checked + .slider:before {
   bottom: 2px;
 }
 
-.small-switch input:checked + .slider:before {
+/* .small-switch input:checked + .slider:before {
   transform: translateX(18px);
-}
+} */
 .disabled-row {
   opacity: 0.6;
   pointer-events: none;
@@ -679,4 +680,21 @@ input:checked + .slider:before {
 .readOnlyInput {
   background-color: #f0f0f0;
   cursor: not-allowed;
+}
+.crop-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.crop-item input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  cursor: pointer;
+}
+
+.crop-item label {
+  cursor: pointer;
+  font-size: 14px;
 }

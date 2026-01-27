@@ -15,7 +15,7 @@
                             class="form-button btn-inventory search d-inline-flex align-items-center justify-content-center px-2 py-1"
                             style="width: auto; min-width: unset; gap: 6px; font-size: 13px;">
                             <i class="fa fa-arrow-left" style="font-size: 12px;"></i>
-                            Back
+                            Go Back to Crop Selection Page
                         </button>
                     </div>
 
@@ -249,7 +249,8 @@
                         <div class="col-auto" *ngIf="!isFinalSubmitButtonHide">
                             <button (click)="saveVariety('final')" [disabled]="crop_wise_json?.rem_req_seeds !== 0"
                                 class="clear-form-button btn-inventory d-inline-flex justify-content-center align-items-center mb-3">
-                                Submit
+                                Forward to PD / PC
+                                <!-- Submit -->
                             </button>
                         </div>
 

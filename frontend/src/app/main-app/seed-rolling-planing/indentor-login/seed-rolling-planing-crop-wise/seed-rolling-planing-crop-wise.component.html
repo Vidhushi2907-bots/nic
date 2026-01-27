@@ -206,8 +206,7 @@
                           <label class="d-md-none">
                             <b>Qty. of Seed Required (in Qtls) Available ({{ unitValue ? unitValue : '' }}):</b>
                           </label>
-                          <span>{{ fg.get('total_required')?.value
-                            }}</span>
+                          <span>{{ fg.get('total_required')?.value || 0 }}</span>
                         </div>
                       </div>
 

@@ -66,9 +66,9 @@ export class ZsrmComponent implements OnInit {
   isChangeMessage: string;
   freezeData: boolean;
   dummyData = [];
-  isCheck: boolean=false;
+  isCheck: boolean = false;
   finalData: any[];
-  totalData: any;  
+  totalData: any;
   constructor(
     private fb: FormBuilder,
     private zsrmServiceService: ZsrmServiceService
@@ -102,7 +102,7 @@ export class ZsrmComponent implements OnInit {
               text: "Your data has been deleted.",
               icon: "success"
             });
-            this.getPageData(); 
+            this.getPageData();
           }
         });
       }
@@ -128,7 +128,7 @@ export class ZsrmComponent implements OnInit {
       position: "center",
       cancelButtonColor: "#DD6B55",
     }).then(x => {
-    
+
       if (x.isConfirmed) {
 
         this.zsrmServiceService.putRequestCreator(apiUrl).subscribe(apiResponse => {
@@ -164,7 +164,7 @@ export class ZsrmComponent implements OnInit {
 
   SaveAsData() {
     this.isAddSelected = true;
-    this.isChangeMessage = "Enter the Source Availability"
+    this.isChangeMessage = "Agency-wise Availability"
     this.resetCancelation()
 
   }
@@ -204,7 +204,7 @@ export class ZsrmComponent implements OnInit {
     this.ngForm.valueChanges.subscribe((formValues) => {
       const { year, crop, season, variety } = formValues;
 
-      if (year && season||crop || variety) {
+      if (year && season || crop || variety) {
         this.getPageData();
         this.isShowTable = true
 
@@ -218,10 +218,11 @@ export class ZsrmComponent implements OnInit {
         (values.pvt || 0) +
         (values.nsc || 0) +
         (values.others || 0);
-      const shtorsub = total - (values.req || 0);
-
+      const totalvalue = Number(Number(total).toFixed(2));
+      const shtorsub = totalvalue - (values.req || 0);
+      const value = Number(Number(shtorsub).toFixed(2));
       this.ngForm.patchValue(
-        { total: total, shtorsub: shtorsub },
+        { total: totalvalue, shtorsub: value },
         { emitEvent: false }
       );
     });
@@ -256,7 +257,7 @@ export class ZsrmComponent implements OnInit {
 
   patchDataForUpdate(data: any) {
     this.isAddSelected = true
-    this.isChangeMessage = "Update the Source Availability"
+    this.isChangeMessage = "Update Agency-wise Availability"
     this.isEditMode = true
     this.is_update = true;
     this.dataId = data.id;
@@ -285,7 +286,7 @@ export class ZsrmComponent implements OnInit {
       this.ngForm.controls['others'].patchValue(Number(data.others));
 
       this.ngForm.patchValue(
-        { total: data.total, shtorsub: data.shtorsur },
+        { total: Number(parseInt(data.total).toFixed(2)), shtorsub: Number(parseInt(data.shtorsur).toFixed(2)) },
         { emitEvent: false }
       );
 
@@ -382,7 +383,7 @@ export class ZsrmComponent implements OnInit {
       return;
     }
     this.submitted = true;
-    this.isShowTable = true;
+    this.isShowTable = false;
     const route = "add-req-fs";
     const req = this.ngForm.controls['req'].value || 0;
     const ssc = this.ngForm.controls['ssc'].value || 0;
@@ -392,7 +393,9 @@ export class ZsrmComponent implements OnInit {
     const nsc = this.ngForm.controls['nsc'].value || 0;
     const others = this.ngForm.controls['others'].value || 0;
     const total = (ssc + doa + sau + pvt + nsc + others);
+    const totalvalue = Number(Number(total).toFixed(2));
     const shtorsur = (total - req);
+    const value = Number(Number(shtorsur).toFixed(2));
     const baseParam = {
       "user_id": this.authUserId,
       "year": this.ngForm.controls['year'].value,
@@ -407,10 +410,10 @@ export class ZsrmComponent implements OnInit {
       "nsc": nsc,
       "others": others,
       "remarks": this.ngForm.controls['remarks'].value,
-      "total": total,
-      "shtorsur": shtorsur
+      "total": totalvalue,
+      "shtorsur": value
     };
-
+    console.log(baseParam, "param");
     this.zsrmServiceService.postRequestCreator(route, null, baseParam).subscribe(data => {
       if (data.Response.status_code === 200) {
         Swal.fire({
@@ -452,7 +455,7 @@ export class ZsrmComponent implements OnInit {
   };
 
   createAndSave() {
-    this.isShowTable = true
+    this.isShowTable = false
     this.submitted = true;
     this.saveForm();
   }
@@ -480,12 +483,12 @@ export class ZsrmComponent implements OnInit {
   getPageData() {
     this.filterPaginateSearch.itemList = [];
     this.finalData = [];
-     this.totalData = [];
+    this.totalData = [];
     const year = this.ngForm.controls['year'].value;
     const season = this.ngForm.controls['season'].value;
     const crop = this.ngForm.controls['crop'].value;
     const variety = this.ngForm.controls['variety'].value;
- 
+
 
     const queryParams = [];
     if (year) queryParams.push(`year=${encodeURIComponent(year)}`);
@@ -493,164 +496,165 @@ export class ZsrmComponent implements OnInit {
     if (crop) queryParams.push(`crop_code=${encodeURIComponent(crop)}`);
     if (variety) queryParams.push(`variety_code=${encodeURIComponent(variety)}`);
     const apiUrl = `view-req-fs-all-updated?${queryParams.join('&')}`;
-   
+
     this.zsrmServiceService
-    .getRequestCreator(apiUrl)
-    .subscribe(
-      (apiResponse: any) => {
-        if (apiResponse?.Response.status_code === 200) {
-          this.allData = apiResponse.Response.data || [];
-          this.dummyData = this.allData;
-          if (this.dummyData && this.dummyData[0]?.is_finalised) {
-            this.freezeData = true;
-          } 
-          
-          else {
-            this.freezeData = false;
+      .getRequestCreator(apiUrl)
+      .subscribe(
+        (apiResponse: any) => {
+          if (apiResponse?.Response.status_code === 200) {
+            this.allData = apiResponse.Response.data || [];
+            this.dummyData = this.allData;
+            if (this.dummyData && this.dummyData[0]?.is_finalised) {
+              this.freezeData = true;
+            }
+
+            else {
+              this.freezeData = false;
+            }
+            let totals = {
+              req: 0.00,
+              doa: 0.00,
+              sau: 0.00,
+              ssc: 0.00,
+              nsc: 0.00,
+              pvt: 0.00,
+              others: 0.00,
+              total: 0.00,
+              shtorsur: 0.00
+            };
+            this.dummyData.forEach(item => {
+              totals.req += parseFloat(item.req) || 0.00;
+              totals.doa += parseFloat(item.doa) || 0.00;
+              totals.sau += parseFloat(item.sau) || 0.00;
+              totals.ssc += parseFloat(item.ssc) || 0.00;
+              totals.nsc += parseFloat(item.nsc) || 0.00;
+              totals.pvt += parseFloat(item.pvt) || 0.00;
+              totals.others += parseFloat(item.others) || 0.00;
+              totals.total += parseFloat(item.total) || 0.00;
+              totals.shtorsur += parseFloat(item.shtorsur) || 0.00;
+            });
+
+            let filteredData = [];
+            this.dummyData.forEach((el) => {
+              const cropIndex = filteredData.findIndex(
+                (item) => item.crop_code === el.crop_code
+              );
+              if (cropIndex === -1) {
+                filteredData.push({
+                  crop_name: el.crop_name,
+                  crop_code: el.crop_code,
+                  variety_count: 1,
+                  crop_seed_req: parseFloat(el.req).toFixed(2),
+                  crop_doa: parseFloat(el.doa).toFixed(2),
+                  crop_ssc: parseFloat(el.ssc).toFixed(2),
+                  crop_nsc: parseFloat(el.nsc).toFixed(2),
+                  crop_sau: parseFloat(el.sau).toFixed(2),
+                  crop_pvt: parseFloat(el.pvt).toFixed(2),
+                  crop_others: parseFloat(el.others).toFixed(2),
+                  crop_total: parseFloat(el.total).toFixed(2),
+                  crop_shtorsur: parseFloat(el.shtorsur).toFixed(2),
+                  variety: [
+                    {
+                      variety_code: el.variety_code,
+                      variety_name: el.variety_name,
+
+
+
+                      req: parseFloat(el.req).toFixed(2),
+                      doa: parseFloat(el.doa).toFixed(2),
+                      sau: parseFloat(el.sau).toFixed(2),
+                      ssc: parseFloat(el.ssc).toFixed(2),
+                      nsc: parseFloat(el.nsc).toFixed(2),
+                      pvt: parseFloat(el.pvt).toFixed(2),
+                      others: parseFloat(el.others).toFixed(2),
+                      total: parseFloat(el.total).toFixed(2),
+                      shtorsur: parseFloat(el.shtorsur).toFixed(2)
+                    },
+                  ],
+                });
+              } else {
+                filteredData[cropIndex].variety_count += 1;
+                filteredData[cropIndex].crop_seed_req = (
+                  parseFloat(filteredData[cropIndex].crop_seed_req) +
+                  parseFloat(el.req)
+                ).toFixed(2);
+                filteredData[cropIndex].crop_doa = (
+                  parseFloat(filteredData[cropIndex].crop_doa) +
+                  parseFloat(el.doa)
+                ).toFixed(2);
+                filteredData[cropIndex].crop_ssc = (
+                  parseFloat(filteredData[cropIndex].crop_ssc) +
+                  parseFloat(el.ssc)
+                ).toFixed(2);
+                filteredData[cropIndex].crop_nsc = (
+                  parseFloat(filteredData[cropIndex].crop_nsc) +
+                  parseFloat(el.nsc)
+                ).toFixed(2);
+                filteredData[cropIndex].crop_sau = (
+                  parseFloat(filteredData[cropIndex].crop_sau) +
+                  parseFloat(el.sau)
+                ).toFixed(2);
+                filteredData[cropIndex].crop_pvt = (
+                  parseFloat(filteredData[cropIndex].crop_pvt) +
+                  parseFloat(el.pvt)
+                ).toFixed(2);
+                filteredData[cropIndex].crop_others = (
+                  parseFloat(filteredData[cropIndex].crop_others) +
+                  parseFloat(el.others)
+                ).toFixed(2);
+                filteredData[cropIndex].crop_total = (
+                  parseFloat(filteredData[cropIndex].crop_total) +
+                  parseFloat(el.total)
+                ).toFixed(2);
+                filteredData[cropIndex].crop_shtorsur = (
+                  parseFloat(filteredData[cropIndex].crop_shtorsur) +
+                  parseFloat(el.shtorsur)
+                ).toFixed(2);
+                filteredData[cropIndex].variety.push({
+                  variety_code: el.variety_code,
+                  variety_name: el.variety_name,
+                  req: parseFloat(el.req).toFixed(2),
+                  doa: parseFloat(el.doa).toFixed(2),
+                  sau: parseFloat(el.sau).toFixed(2),
+                  ssc: parseFloat(el.ssc).toFixed(2),
+                  nsc: parseFloat(el.nsc).toFixed(2),
+                  pvt: parseFloat(el.pvt).toFixed(2),
+                  others: parseFloat(el.others).toFixed(2),
+                  total: parseFloat(el.total).toFixed(2),
+                  shtorsur: parseFloat(el.shtorsur).toFixed(2)
+                });
+              }
+
+
+            })
+            this.finalData = filteredData;
+            this.totalData = totals;
+            this.enableTable = true;
+
+          } else {
+            console.warn('API returned an unexpected status:', apiResponse?.Response.status_code);
           }
-          let totals = {
-            req:0.00,
-            doa: 0.00,
-            sau:0.00,
-            ssc: 0.00,
-            nsc: 0.00,
-            pvt: 0.00,
-            others: 0.00,
-            total: 0.00,
-            shtorsur: 0.00
-          };
-          this.dummyData.forEach(item => {
-            totals.req += parseFloat(item.req) || 0.00;
-            totals.doa += parseFloat(item.doa) || 0.00;
-            totals.sau += parseFloat(item.sau) || 0.00;
-            totals.ssc += parseFloat(item.ssc) || 0.00;
-            totals.nsc += parseFloat(item.nsc) || 0.00;
-            totals.pvt += parseFloat(item.pvt) || 0.00;
-            totals.others += parseFloat(item.others) || 0.00;
-            totals.total += parseFloat(item.total) || 0.00;
-            totals.shtorsur += parseFloat(item.shtorsur) || 0.00;
-          }); 
-
-          let filteredData = [];
-          this.dummyData.forEach((el) => {
-            const cropIndex = filteredData.findIndex(
-              (item) => item.crop_code === el.crop_code
-            );
-            if (cropIndex === -1) {
-              filteredData.push({
-                crop_name: el.crop_name,
-                crop_code: el.crop_code,
-                variety_count: 1,
-                crop_seed_req: parseFloat(el.req).toFixed(2),
-                crop_doa: parseFloat(el.doa).toFixed(2),          
-                crop_ssc: parseFloat(el.ssc).toFixed(2),
-                crop_nsc: parseFloat(el.nsc).toFixed(2),
-                crop_sau: parseFloat(el.sau).toFixed(2),
-                crop_pvt: parseFloat(el.pvt).toFixed(2),
-                crop_others: parseFloat(el.others).toFixed(2),
-                crop_total: parseFloat(el.total).toFixed(2),
-                crop_shtorsur: parseFloat(el.shtorsur).toFixed(2),
-                variety: [
-                  {
-                    variety_code: el.variety_code,
-                    variety_name: el.variety_name,
-        
-        
-        
-                    req: parseFloat(el.req).toFixed(2),
-                    doa: parseFloat(el.doa).toFixed(2),
-                    sau: parseFloat(el.sau).toFixed(2),
-                    ssc: parseFloat(el.ssc).toFixed(2),
-                    nsc: parseFloat(el.nsc).toFixed(2),
-                    pvt: parseFloat(el.pvt).toFixed(2),
-                    others: parseFloat(el.others).toFixed(2),
-                    total: parseFloat(el.total).toFixed(2),
-                    shtorsur: parseFloat(el.shtorsur).toFixed(2)
-                  },
-                ],
-              });
-            } else {
-              filteredData[cropIndex].variety_count += 1;
-              filteredData[cropIndex].crop_seed_req = (
-                parseFloat(filteredData[cropIndex].crop_seed_req) +
-                parseFloat(el.req)
-              ).toFixed(2);
-              filteredData[cropIndex].crop_doa = (
-                parseFloat(filteredData[cropIndex].crop_doa) +
-                parseFloat(el.doa)
-              ).toFixed(2);
-              filteredData[cropIndex].crop_ssc = (
-                parseFloat(filteredData[cropIndex].crop_ssc) +
-                parseFloat(el.ssc)
-              ).toFixed(2);
-              filteredData[cropIndex].crop_nsc = (
-                parseFloat(filteredData[cropIndex].crop_nsc) +
-                parseFloat(el.nsc)
-              ).toFixed(2);
-              filteredData[cropIndex].crop_sau = (
-                parseFloat(filteredData[cropIndex].crop_sau) +
-                parseFloat(el.sau)
-              ).toFixed(2);
-              filteredData[cropIndex].crop_pvt = (
-                parseFloat(filteredData[cropIndex].crop_pvt) +
-                parseFloat(el.pvt)
-              ).toFixed(2);
-              filteredData[cropIndex].crop_others = (
-                parseFloat(filteredData[cropIndex].crop_others) +
-                parseFloat(el.others)
-              ).toFixed(2);
-              filteredData[cropIndex].crop_total = (
-                parseFloat(filteredData[cropIndex].crop_total) +
-                parseFloat(el.total)
-              ).toFixed(2);
-              filteredData[cropIndex].crop_shtorsur = (
-                parseFloat(filteredData[cropIndex].crop_shtorsur) +
-                parseFloat(el.shtorsur)
-              ).toFixed(2);
-              filteredData[cropIndex].variety.push({
-                variety_code: el.variety_code,
-                variety_name: el.variety_name,
-                req: parseFloat(el.req).toFixed(2),
-                doa: parseFloat(el.doa).toFixed(2),
-                sau: parseFloat(el.sau).toFixed(2),
-                ssc: parseFloat(el.ssc).toFixed(2),
-                nsc: parseFloat(el.nsc).toFixed(2),
-                pvt: parseFloat(el.pvt).toFixed(2),
-                others: parseFloat(el.others).toFixed(2),
-                total: parseFloat(el.total).toFixed(2),
-                shtorsur: parseFloat(el.shtorsur).toFixed(2)
-          }); }
-
-
-      })
-          this.finalData = filteredData;
-          this.totalData = totals;
-          this.enableTable = true;
-         
-        } else {
-          console.warn('API returned an unexpected status:', apiResponse?.Response.status_code);
-        }
-      },
-      (error) => {
-        if (error.status === 404) {
-          this.dummyData=[];
-            this.freezeData = false;   
+        },
+        (error) => {
+          if (error.status === 404) {
+            this.dummyData = [];
+            this.freezeData = false;
             this.enableTable = false;
-        } else if (error.status === 500) {
-          Swal.fire({
-                   title: 'Oops',
-                   text: '<p style="font-size:25px;">Something Went Wrong.</p>',
-                   icon: 'error',
-                   confirmButtonText:
-                     'OK',
-                   confirmButtonColor: '#E97E15'
-                 })
-        } else {
-          console.error('Error fetching data:', error);
+          } else if (error.status === 500) {
+            Swal.fire({
+              title: 'Oops',
+              text: '<p style="font-size:25px;">Something Went Wrong.</p>',
+              icon: 'error',
+              confirmButtonText:
+                'OK',
+              confirmButtonColor: '#E97E15'
+            })
+          } else {
+            console.error('Error fetching data:', error);
+          }
         }
-      }
-    );
-}
+      );
+  }
 
   exportexcel(): void {
     let element = document.getElementById('excel-tables');
@@ -665,15 +669,15 @@ export class ZsrmComponent implements OnInit {
 
 
 
-isAddMore(){
-  this.isCheck=true;
-  if (this.dummyData && this.dummyData[0]?.is_finalised) {
-    this.freezeData = true;
-  
-  } else {
-    this.freezeData = false;
+  isAddMore() {
+    this.isCheck = true;
+    if (this.dummyData && this.dummyData[0]?.is_finalised) {
+      this.freezeData = true;
+
+    } else {
+      this.freezeData = false;
+    }
   }
-}
   updateForm() {
     if (this.ngForm.invalid) {
       return;
@@ -715,7 +719,7 @@ isAddMore(){
 
     this.zsrmServiceService.putRequestCreator(route, null, baseParam,).subscribe(data => {
       if (data.Response.status_code === 200) {
-        this.is_update = false;
+       
         this.isShowTable = true;
         Swal.fire({
           title: '<p style="font-size:25px;">Data Has Been Successfully Updated.</p>',
@@ -725,6 +729,7 @@ isAddMore(){
         }).then(() => {
           this.ngForm.controls['variety'].reset('');
           this.selectVariety = '';
+           this.is_update = false;
           this.getPageData();
           this.ngForm.controls['req'].reset('');
           this.ngForm.controls['doa'].reset('');
@@ -749,7 +754,7 @@ isAddMore(){
     });
   }
   resetForm() {
-  
+
     this.ngForm.controls['crop'].reset('');
     this.ngForm.controls['variety'].reset('');
     this.selectCrop = '';
@@ -757,24 +762,24 @@ isAddMore(){
     this.isShowTable = true;
     this.isAddSelected = false;
   }
-   download() {
-      const name = 'Fs-req-report';
-      const element = document.getElementById('excel-table');
-      const options = {
-        margin: 5,
-        filename: `${name}.pdf`,
-        image: { type: 'jpeg', quality: 1 },
-        html2canvas: {
-          dpi: 100,
-          scale: 1,
-          letterRendering: true,
-          useCORS: true
-        },
-        // jsPDF: { unit: 'mm', format: pageSize, orientation: 'portrait' }
-        jsPDF: { unit: 'mm', format: 'A3', orientation: 'landscape' }
-      };
-      html2PDF().set(options).from(element).toPdf().save();
-    }
+  download() {
+    const name = 'Fs-req-report';
+    const element = document.getElementById('excel-table');
+    const options = {
+      margin: 5,
+      filename: `${name}.pdf`,
+      image: { type: 'jpeg', quality: 1 },
+      html2canvas: {
+        dpi: 100,
+        scale: 1,
+        letterRendering: true,
+        useCORS: true
+      },
+      // jsPDF: { unit: 'mm', format: pageSize, orientation: 'portrait' }
+      jsPDF: { unit: 'mm', format: 'A3', orientation: 'landscape' }
+    };
+    html2PDF().set(options).from(element).toPdf().save();
+  }
 
 
 }

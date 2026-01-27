@@ -135,11 +135,11 @@ db.seedMultiplicationRatioModel = require('./seed_multiplication_ratio.model.js'
 db.seasonModel = require('./season.model.js')(sequelize, Sequelize);
 db.srpWillingnessModel = require('./srp_willingnesses.model.js')(sequelize, Sequelize);
 db.srpWillingnessReplaceModel = require('./srp_willingness_replaces.js')(sequelize, Sequelize);
-db.srpStateReplanningModel=require('./srp_state_replaning.model.js')(sequelize,Sequelize);
-db.srpStateReplanningReplaceVaritiesModel=require('./srp_state_replanning_replace_varieties.model.js')(sequelize,Sequelize);
-db.srpStateReplanningNewVarietiesModel=require('./srp_replanning_new_varieties.model.js')(sequelize,Sequelize);
-db.srpAssignSpaModel=require('./srp_assign_spa.model.js')(sequelize,Sequelize);
-db.srpCropVarietyFinalModel=require('./srop_crop_variety_final.model.js')(sequelize,Sequelize);
+db.srpStateReplanningModel = require('./srp_state_replaning.model.js')(sequelize, Sequelize);
+db.srpStateReplanningReplaceVaritiesModel = require('./srp_state_replanning_replace_varieties.model.js')(sequelize, Sequelize);
+db.srpStateReplanningNewVarietiesModel = require('./srp_replanning_new_varieties.model.js')(sequelize, Sequelize);
+db.srpAssignSpaModel = require('./srp_assign_spa.model.js')(sequelize, Sequelize);
+db.srpCropVarietyFinalModel = require('./srop_crop_variety_final.model.js')(sequelize, Sequelize);
 // Here
 // table first
 //table second
@@ -149,11 +149,11 @@ db.srpAssignSpaModel.belongsTo(db.srpCropVarietyFinalModel, {
     sourceKey: "id"
 })
 db.srpCropVarietyFinalModel.hasMany(db.srpAssignSpaModel, {
-     foreignKey: "srp_final_id",
+    foreignKey: "srp_final_id",
     targetKey: "id"
 })
-db.agencyDetailModel.hasMany(db.srpAssignSpaModel,{
-     foreignKey: "spa_user_id",
+db.agencyDetailModel.hasMany(db.srpAssignSpaModel, {
+    foreignKey: "spa_user_id",
     sourceKey: "user_id"
 })
 db.srpAssignSpaModel.belongsTo(db.agencyDetailModel, {
@@ -181,16 +181,20 @@ db.seasonModel.hasMany(db.srpCropModel, {
     sourceKey: "season"
 })
 db.srpCropModel.belongsTo(db.srpYearModel, {
-    foreignKey: "year",
-    targetKey: "year"
-})
+  foreignKey: "year",
+  targetKey: "year",
+  as: "year_master"
+});
+
 db.srpYearModel.hasMany(db.srpCropModel, {
-    foreignKey: "year",
-    sourceKey: "year"
-})
+  foreignKey: "year",
+  sourceKey: "year",
+  as: "year_master_list"   // ⚠️ different alias rakho
+});
 db.srpCropModel.belongsTo(db.cropModel, {
     foreignKey: "crop_code",
     targetKey: "crop_code",
+    
 
 });
 db.cropModel.hasMany(db.srpCropModel, {
@@ -239,13 +243,13 @@ db.srpWillingnessModel.belongsTo(db.userModel, {
 db.srpWillingnessModel.hasMany(db.srpWillingnessReplaceModel, {
     foreignKey: "srp_willingness_id",
     sourceKey: "id",
-    
+
 });
 
 db.srpWillingnessReplaceModel.belongsTo(db.srpWillingnessModel, {
     foreignKey: "srp_willingness_id",
     targetKey: "id",
-   // 🔥 MUST MATCH EXACTLY
+    // 🔥 MUST MATCH EXACTLY
 });
 db.srpWillingnessModel.belongsTo(db.cropModel, {
     foreignKey: "crop_code",
@@ -265,7 +269,7 @@ db.varietyModel.hasMany(db.srpWillingnessModel, {
 db.srpWillingnessModel.belongsTo(db.varietyModel, {
     foreignKey: "variety_code",
     targetKey: "variety_code",
- 
+
 
 });
 db.srpWillingnessReplaceModel.belongsTo(db.varietyModel, {
@@ -282,7 +286,7 @@ db.varietyModel.hasMany(db.srpWillingnessReplaceModel, {
 db.srpVarietyModel.hasMany(db.srpWillingnessModel, {
     foreignKey: "variety_code",
     sourceKey: "variety_code",
-    as:"vw"
+    as: "vw"
     // as:"seed_rolling_plan_variety_wises"
 });
 
@@ -290,7 +294,7 @@ db.srpWillingnessModel.belongsTo(db.srpVarietyModel, {
     foreignKey: "variety_code",
     targetKey: "variety_code",
     // as:"seed_rolling_plan_variety_wises"
-    as:"vw"
+    as: "vw"
 
 });
 
@@ -317,25 +321,25 @@ db.srpVarietyModel.belongsTo(db.srpCropModel, {
     as: "seed_rolling_plan_crop_wises"  // 🔥 MUST MATCH EXACTLY
 });
 
-db.srpCropModel.hasMany(db.srpStateReplanningModel,{
+db.srpCropModel.hasMany(db.srpStateReplanningModel, {
     foreignKey: "srp_crop_wise_id",
     targetKey: "id",
-   
+
 })
 db.srpStateReplanningModel.belongsTo(db.srpCropModel, {
     foreignKey: "srp_crop_wise_id",
     targetKey: "id",
-    
+
 });
-db.srpVarietyModel.hasMany(db.srpStateReplanningModel,{
+db.srpVarietyModel.hasMany(db.srpStateReplanningModel, {
     foreignKey: "srp_variety_wise_id",
     targetKey: "id",
-   
+
 })
 db.srpStateReplanningModel.belongsTo(db.srpVarietyModel, {
     foreignKey: "srp_variety_wise_id",
     targetKey: "id",
-    
+
 });
 db.varietyModel.hasMany(db.srpStateReplanningNewVarietiesModel, {
     foreignKey: "new_variety_code",
@@ -356,11 +360,11 @@ db.srpStateReplanningReplaceVaritiesModel.belongsTo(db.varietyModel, {
     foreignKey: "replace_variety_code",
     targetKey: "variety_code",
 });
-db.srpStateReplanningModel.hasMany(db.srpStateReplanningReplaceVaritiesModel,{
-      foreignKey: "srp_replanning_id",
-      targetKey: "id",
+db.srpStateReplanningModel.hasMany(db.srpStateReplanningReplaceVaritiesModel, {
+    foreignKey: "srp_replanning_id",
+    targetKey: "id",
 })
-db.srpStateReplanningReplaceVaritiesModel.belongsTo(db.srpStateReplanningModel,{
+db.srpStateReplanningReplaceVaritiesModel.belongsTo(db.srpStateReplanningModel, {
     foreignKey: "srp_replanning_id",
     targetKey: "id",
 })

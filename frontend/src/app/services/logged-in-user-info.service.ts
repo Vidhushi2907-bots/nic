@@ -528,6 +528,10 @@ export class LoggedInUserInfoService {
           "href": "/submit-indent-of-spa-wise",
           "icon": "seeding.svg"
         },
+        {
+          "name":"Area Register For Certification",
+          "href":"/area-register-for-certification"
+        }
 
         // {
         //   "name": "Allocated Quantity of Breeder Seed to SPAs for Lifting",

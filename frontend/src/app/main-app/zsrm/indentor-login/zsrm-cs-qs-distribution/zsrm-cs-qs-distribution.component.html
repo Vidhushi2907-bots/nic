@@ -74,7 +74,7 @@
                     </div>
                 </div>
                 <div div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12"
-                    [ngClass]="{ 'd-block': isCheck, 'd-none': !isCheck }"  *ngIf="!freezeData">
+                    [ngClass]="{ 'd-block': isCheck, 'd-none': !isCheck }" *ngIf="!freezeData">
                     <div class="row card-inventory form-group pb-3">
                         <div class="col-12 col-md-12 col-lg-12 col-sm-12 col-xl-12 pt-1">
                             <div class="row for-width">
@@ -186,7 +186,7 @@
                         <div class="modal-content">
                             <div class="modal-header" style="margin-bottom: -25px;">
                                 <h5 class="modal-title" id="exampleModalLongTitle">
-                                      {{ modalType === 'Cs' ? 'Certified Seed Details' : 'Quality Seed Details' }}</h5>
+                                    {{ modalType === 'Cs' ? 'Certified Seed Details' : 'Quality Seed Details' }}</h5>
                                 <button type="button" class="close" data-dismiss="modal" (click)="close(modalType)">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
@@ -209,8 +209,12 @@
                                             <td>{{ modalType==='Cs'?dummyCsAndQsData.doaCs:dummyCsAndQsData.doaQs}}</td>
                                             <td>{{modalType==='Cs'?dummyCsAndQsData.sauCs:dummyCsAndQsData.sauQs}}</td>
                                             <td>{{ modalType==='Cs'?dummyCsAndQsData.nscCs:dummyCsAndQsData.nscQs}}</td>
-                                            <td>{{ modalType==='Cs'?dummyCsAndQsData.seedhubsCs:dummyCsAndQsData.seedhubsQs}}</td>
-                                            <td>{{ modalType==='Cs'?dummyCsAndQsData.othersCs:dummyCsAndQsData.othersQs}}</td>
+                                            <td>{{
+                                                modalType==='Cs'?dummyCsAndQsData.seedhubsCs:dummyCsAndQsData.seedhubsQs}}
+                                            </td>
+                                            <td>{{
+                                                modalType==='Cs'?dummyCsAndQsData.othersCs:dummyCsAndQsData.othersQs}}
+                                            </td>
                                             <td>{{modalType==='Cs'?dummyCsAndQsData.pvtCs:dummyCsAndQsData.pvtQs}}</td>
                                             <td>{{ modalType==='Cs'?dummyCsAndQsData.sscCs:dummyCsAndQsData.sscQs}}</td>
                                         </tr>
@@ -220,7 +224,7 @@
                         </div>
                     </div>
                 </div>
-             
+
                 <div class="row card-inventory form-group">
 
                     <div class="col-12 col-md-12 col-lg-12 col-xl-12 mt-2" *ngIf="isAddSelected">
@@ -245,27 +249,27 @@
 
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="req" class="left-heading required">
-                                                DOA-availability
+                                                DOA (Availability)
                                             </label>
                                         </div>
 
                                         <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
-                                            {{availabilityData.length===0?'Na':availabilityData[0].doaCs}}
+                                            {{availabilityData.length===0?'NA':availabilityData[0].doaCs}}
                                         </div>
 
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="doa" class="left-heading required">
-                                                DOA-availability
+                                                DOA (Availability)
                                             </label>
                                         </div>
 
                                         <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
-                                            {{availabilityData.length===0?'Na':availabilityData[0].doaQs}}
+                                            {{availabilityData.length===0?'NA':availabilityData[0].doaQs}}
                                         </div>
 
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="req" class="left-heading required">
-                                                DOA-distribution
+                                                DOA (Distribution)
                                             </label>
                                         </div>
 
@@ -286,7 +290,7 @@
 
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="doaQs" class="left-heading required">
-                                                DOA-distribution
+                                                DOA (Distribution)
                                             </label>
                                         </div>
                                         <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
@@ -310,28 +314,28 @@
                                     <div class="row">
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="req" class="left-heading required">
-                                                SSC-availability
+                                                SSC (Availability)
                                             </label>
                                         </div>
 
                                         <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
-                                            {{availabilityData.length===0?'Na':availabilityData[0].sscCs}}
+                                            {{availabilityData.length===0?'NA':availabilityData[0].sscCs}}
                                         </div>
 
 
 
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="doa" class="left-heading required">
-                                                SSC-availability
+                                                SSC (Availability)
                                             </label>
                                         </div>
 
                                         <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
-                                            {{availabilityData.length===0?'Na':availabilityData[0].sscQs}}
+                                            {{availabilityData.length===0?'NA':availabilityData[0].sscQs}}
                                         </div>
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="req" class="left-heading required">
-                                                SSC-distribution
+                                                SSC (Distribution)
                                             </label>
                                         </div>
 
@@ -352,7 +356,7 @@
 
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="doa" class="left-heading required">
-                                                SSC-distribution
+                                                SSC (Distribution)
                                             </label>
                                         </div>
                                         <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
@@ -375,26 +379,26 @@
                                     <div class="row">
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="req" class="left-heading required">
-                                                NSC-availability
+                                                NSC (Availability)
                                             </label>
                                         </div>
 
                                         <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
-                                            {{availabilityData.length===0?'Na':availabilityData[0].nscCs}}
+                                            {{availabilityData.length===0?'NA':availabilityData[0].nscCs}}
                                         </div>
 
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="doa" class="left-heading required">
-                                                NSC-availability
+                                                NSC (Availability)
                                             </label>
                                         </div>
 
                                         <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
-                                            {{availabilityData.length===0?'Na':availabilityData[0].nscQs}}
+                                            {{availabilityData.length===0?'NA':availabilityData[0].nscQs}}
                                         </div>
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="req" class="left-heading required">
-                                                NSC-distribution
+                                                NSC (Distribution)
                                             </label>
                                         </div>
 
@@ -415,7 +419,7 @@
 
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="nscQs" class="left-heading required">
-                                                NSC-distribution
+                                                NSC (Distribution)
                                             </label>
                                         </div>
                                         <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
@@ -438,32 +442,32 @@
                                     <div class="row">
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="req" class="left-heading required">
-                                                SAU-availability
+                                                SAU (Availability)
                                             </label>
                                         </div>
 
                                         <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
-                                            {{availabilityData.length===0?'Na':availabilityData[0].sauCs}}
+                                            {{availabilityData.length===0?'NA':availabilityData[0].sauCs}}
                                         </div>
 
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="doa" class="left-heading required">
-                                                SAU-availability
+                                                SAU (Availability)
                                             </label>
                                         </div>
 
                                         <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
-                                            {{availabilityData.length===0?'Na':availabilityData[0].sauQs}}
+                                            {{availabilityData.length===0?'NA':availabilityData[0].sauQs}}
                                         </div>
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="req" class="left-heading required">
-                                                SAU-distribution
+                                                SAU (Distribution)
                                             </label>
                                         </div>
 
                                         <div class="col-sm-12 col-md-12 col-lg-4 pr-4">
                                             <input type="number" class=" form-control input-inventory"
-                                                formControlName="sauCs" placeholder="Enter SAU-distribution"
+                                                formControlNAme="sauCs" placeholder="Enter SAU-distribution"
                                                 (keypress)="validateDecimal($event)">
                                             <div class="username errorMessage"
                                                 *ngIf="submitted ||ngForm.controls['sauCs'].invalid && ngForm.controls['sauCs'].dirty || ngForm.controls['sauCs'].touched">
@@ -478,7 +482,7 @@
 
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="doa" class="left-heading required">
-                                                SAU-distribution
+                                                SAU (Distribution)
                                             </label>
                                         </div>
                                         <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
@@ -500,26 +504,26 @@
                                     <div class="row">
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="req" class="left-heading required">
-                                                SeedHubs-availability
+                                                SeedHubs (Availability)
                                             </label>
                                         </div>
 
                                         <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
-                                            {{availabilityData.length===0?'Na':availabilityData[0].seedhubsCs}}
+                                            {{availabilityData.length===0?'NA':availabilityData[0].seedhubsCs}}
                                         </div>
 
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="doa" class="left-heading required">
-                                                SeedHubs-availability
+                                                SeedHubs (Availability)
                                             </label>
                                         </div>
 
                                         <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
-                                            {{availabilityData.length===0?'Na':availabilityData[0].seedhubsQs}}
+                                            {{availabilityData.length===0?'NA':availabilityData[0].seedhubsQs}}
                                         </div>
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="req" class="left-heading required">
-                                                SeedHubs-distribution
+                                                SeedHubs (Distribution)
                                             </label>
                                         </div>
 
@@ -540,7 +544,7 @@
 
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="doa" class="left-heading required">
-                                                SeedHubs-distribution
+                                                SeedHubs (Distribution)
                                             </label>
                                         </div>
                                         <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
@@ -563,26 +567,26 @@
                                     <div class="row">
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="req" class="left-heading required">
-                                                Private-availability
+                                                Private (Availability)
                                             </label>
                                         </div>
 
                                         <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
-                                            {{availabilityData.length===0?'Na':availabilityData[0].pvtCs}}
+                                            {{availabilityData.length===0?'NA':availabilityData[0].pvtCs}}
                                         </div>
 
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="doa" class="left-heading required">
-                                                Private-availability
+                                                Private (Availability)
                                             </label>
                                         </div>
 
                                         <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
-                                            {{availabilityData.length===0?'Na':availabilityData[0].pvtQs}}
+                                            {{availabilityData.length===0?'NA':availabilityData[0].pvtQs}}
                                         </div>
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="req" class="left-heading required">
-                                                Private-distribution
+                                                Private (Distribution)
                                             </label>
                                         </div>
 
@@ -603,7 +607,7 @@
 
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="doa" class="left-heading required">
-                                                Private-distribution
+                                                Private (Distribution)
                                             </label>
                                         </div>
                                         <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
@@ -625,26 +629,26 @@
                                     <div class="row">
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="req" class="left-heading required">
-                                                Others-availability
+                                                Others (Availability)
                                             </label>
                                         </div>
 
                                         <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
-                                            {{availabilityData.length===0?'Na':availabilityData[0].othersCs}}
+                                            {{availabilityData.length===0?'NA':availabilityData[0].othersCs}}
                                         </div>
 
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="doa" class="left-heading required">
-                                                Others-availability
+                                                Others (Distribution)
                                             </label>
                                         </div>
 
                                         <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
-                                            {{availabilityData.length===0?'Na':availabilityData[0].othersQs}}
+                                            {{availabilityData.length===0?'NA':availabilityData[0].othersQs}}
                                         </div>
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="req" class="left-heading required">
-                                                Others-distribution
+                                                Others (Distribution)
                                             </label>
                                         </div>
 
@@ -665,7 +669,7 @@
 
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                             <label for="doa" class="left-heading required">
-                                                Others-Quality Seed
+                                                Others (Availability)
                                             </label>
                                         </div>
                                         <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
@@ -683,31 +687,31 @@
 
                                     </div>
                                 </div>
-                              
+
                                 <div class="col-12 pt-4 px-4">
                                     <div class="row">
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
-                                            <label for="req" class="left-heading required">
-                                                Total-availability
+                                            <label for="req" class="left-heading ">
+                                                Total (Availability)
                                             </label>
                                         </div>
 
                                         <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
-                                            {{availabilityData.length===0?'Na':availabilityData[0].csavl}}
+                                            {{availabilityData.length===0?'NA':availabilityData[0].csavl}}
                                         </div>
 
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
-                                            <label for="doa" class="left-heading required">
-                                                Total-availability
+                                            <label for="doa" class="left-heading ">
+                                                Total (Availability)
                                             </label>
                                         </div>
 
                                         <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
-                                            {{availabilityData.length===0?'Na':availabilityData[0].qsavl}}
+                                            {{availabilityData.length===0?'NA':availabilityData[0].qsavl}}
                                         </div>
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
-                                            <label for="req" class="left-heading required">
-                                                Total-distribution
+                                            <label for="req" class="left-heading ">
+                                                Total (Distribution)
                                             </label>
                                         </div>
 
@@ -718,8 +722,8 @@
 
 
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
-                                            <label for="doa" class="left-heading required">
-                                                Total-Quality Seed
+                                            <label for="doa" class="left-heading">
+                                                Total (Distribution)
                                             </label>
                                         </div>
 
@@ -734,21 +738,21 @@
                                 <div class="col-12 pt-4 px-4">
                                     <div class="row">
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
-                                            <label for="req" class="left-heading required">
-                                                Total-availability
+                                            <label for="req" class="left-heading ">
+                                                Grand Total (Availability)
                                             </label>
                                         </div>
 
                                         <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
                                             <span>
-                                                {{availabilityData.length===0?'Na':availabilityData[0].totalavl}}</span>
+                                                {{availabilityData.length===0?'NA':availabilityData[0].totalavl}}</span>
 
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
-                                            <label for="req" class="left-heading required">
-                                                Total-distribution
+                                            <label for="req" class="left-heading ">
+                                                Grand Total (Distribution)
                                             </label>
                                         </div>
 
@@ -772,27 +776,20 @@
                                 <button
                                     class="btn-inventory-cancel search d-inline-flex justify-content-center verticle-content-middle mb-3"
                                     (click)="revertDataCancelation()" style="border: 2px solid #B64B1D;">Cancel</button>
-                                         <button
-                                        class="search form-button btn-inventory ml-2 d-inline-flex justify-content-center verticle-content-middle mb-3"
-                                        (click)="is_update ? updateForm() : createAndSave()"
-                                        style="border: 2px solid #B64B1D;">
-                                        {{ is_update ? 'Update' : 'Add' }}
-                                    </button>
-                                 
-                                <!-- <button
-                                    class="search form-button btn-inventory ml-2 d-inline-flex justify-content-center verticle-content-middle mb-3"
-                                    (click)="createAndSave()" *ngIf="!is_update"
-                                    style="border: 2px solid #B64B1D;">Add</button>
-
                                 <button
                                     class="search form-button btn-inventory ml-2 d-inline-flex justify-content-center verticle-content-middle mb-3"
-                                    (click)="updateForm()" *ngIf="is_update">Update</button> -->
+                                    (click)="is_update ? updateForm() : createAndSave()"
+                                    style="border: 2px solid #B64B1D;">
+                                    {{ is_update ? 'Update' : 'Add' }}
+                                </button>
+
+
                             </div>
                         </div>
                     </div>
                 </div>
                 <!-- second card ui  -->
-                <div class="col-12 col-md-12 col-lg-12 col-xl-12" *ngIf="isShowTable">
+                <div class="col-12 col-md-12 col-lg-12 col-xl-12" *ngIf="isShowTable && !isAddSelected ">
                     <div class="row card-inventory form-group">
 
                         <div class="col-12 col-md-12 col-lg-12 col-sm-12 col-xl-12">
@@ -918,8 +915,8 @@
                                                             <label class="d-md-none"
                                                                 class="d-md-none"><b>View:</b>&nbsp;</label>
                                                             <span>
-                                                                <a
-                                                                    style="color:blue;text-decoration: underline; cursor: pointer;" (click)="getSeedData(data.id,'Qs')">View</a>
+                                                                <a style="color:blue;text-decoration: underline; cursor: pointer;"
+                                                                    (click)="getSeedData(data.id,'Qs')">View</a>
                                                             </span>
                                                         </div>
                                                     </div>
@@ -959,7 +956,7 @@
                                                                 <img src="assets/images/Vector.svg"
                                                                     [ngStyle]="{'opacity': freezeData ? '0.5' : '1', 'cursor': freezeData ? 'not-allowed' : 'pointer'}">
                                                             </button>
-                                                            
+
 
                                                         </div>
                                                     </div>
@@ -974,18 +971,19 @@
                                         </div>
 
                                     </div>
- <div class="col-12 col-md-10 col-lg-10 pt-4 pb-2 buttons-phone col-xl-10 ">
+                                    <div class="col-12 col-md-10 col-lg-10 pt-4 pb-2 buttons-phone col-xl-10 ">
 
-                            <button
-                                class="search form-button btn-inventory ml-2 d-inline-flex justify-content-center verticle-content-middle mb-3"
-                                (click)="finalizeData()" [disabled]="freezeData"
-                                [ngClass]="{'activeBtn': !freezeData, 'disableBtn': freezeData}"
-                                [ngStyle]="{'border': freezeData ? '2px solid #DCDCDC' : '2px solid #B64B1D'}">
-                                Submit
-                            </button>
+                                        <button
+                                            class="search form-button btn-inventory ml-2 d-inline-flex justify-content-center verticle-content-middle mb-3"
+                                            (click)="finalizeData()" [disabled]="freezeData"
+                                            *ngIf="(dummyData&&dummyData.length>=1)"
+                                            [ngClass]="{'activeBtn': !freezeData, 'disableBtn': freezeData}"
+                                            [ngStyle]="{'border': freezeData ? '2px solid #DCDCDC' : '2px solid #B64B1D'}">
+                                            Submit
+                                        </button>
 
 
-                        </div>
+                                    </div>
                                     <div class="col-12 col-md-12 col-lg-12 px-4 px-md-3 py-1 pb-4 pl-4">
                                         <app-pagination-ui></app-pagination-ui>
                                     </div>

@@ -316,3 +316,8 @@ input[type='radio'] {
   .myClass {
       max-width: 50% !important;
   }
+  .custom-fs {
+  font-size: 26px !important;
+  padding-top: 10px;
+  padding-bottom: 18px;
+}

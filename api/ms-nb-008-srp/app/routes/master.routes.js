@@ -15,6 +15,7 @@ module.exports = app => {
     app.post(`${process.env.MICRO_SERVICE}/api/add-year`,auth, master.createYear);
     app.patch(`${process.env.MICRO_SERVICE}/api/edit-year/:id`, auth,master.editYear);
     app.delete(`${process.env.MICRO_SERVICE}/api/delete-year/:id`,auth, master.deleteYear);
-    app.get(`${process.env.MICRO_SERVICE}/api/get-one-year/:id`,auth, master.findOneYear);
+    app.post(`${process.env.MICRO_SERVICE}/api/get-one-year/:id`,auth, master.findOneYear);
+    app.post(`${process.env.MICRO_SERVICE}/api/get-one-year-range/`,auth, master.findOneYearRange)
     app.get(`${process.env.MICRO_SERVICE}/api/get-season-list`,auth, master.viewSeason)
 };

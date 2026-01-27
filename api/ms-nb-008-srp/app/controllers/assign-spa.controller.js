@@ -220,7 +220,7 @@ class SrpWillingnessController {
         const assignSpaArray = Array.isArray(assign_spa)
           ? assign_spa
           : [];
-        
+
         for (const spa of assignSpaArray) {
           const {
             spa_user_id,
@@ -264,66 +264,49 @@ class SrpWillingnessController {
       return response(res, status.DATA_NOT_AVAILABLE, 500);
     }
   };
-  static getCropName = async(req,res)=>
-  {
-    try{
-const {crop_code}=req.query;
-const data =await db.cropModel.findOne({
-  where:{crop_code:crop_code},
-  attributes:["crop_name"]
-})
+  static getCropName = async (req, res) => {
+    try {
+      const { crop_code } = req.query;
+      const data = await db.cropModel.findOne({
+        where: { crop_code: crop_code },
+        attributes: ["crop_name"]
+      })
 
-return response(res, status.DATA_AVAILABLE, 200, data);
-    }catch(error){
+      return response(res, status.DATA_AVAILABLE, 200, data);
+    } catch (error) {
 
     }
   }
-  //   static getSrpSpaData = async (req, res) => {
-  //   try {
-  //     const { year, season, crop_code } = req.query;
+  static deleteSrpSpa = async (req, res) => {
+    try {
+      const { id } = req.query;
 
-  //     // 1️⃣ Get SRP final records (variety wise)
-  //     const srpFinalData = await db.srpFinalModel.findAll({
-  //       where: { year, season, crop_code },
-  //       raw: true
-  //     });
+      // Check if exists
+      const data = await db.srpAssignSpaModel.findOne({
+        where: { id }
+      });
 
-  //     const srpFinalIds = srpFinalData.map(d => d.id);
 
-  //     // 2️⃣ Get assigned SPA data
-  //     const spaAssignData = await db.srpAssignSpaModel.findAll({
-  //       where: {
-  //         srp_final_id: srpFinalIds
-  //       },
-  //       raw: true
-  //     });
+      if (!data) {
+        return response(res, "Not Found", 404, []);
+      }
 
-  //     // 3️⃣ Map data into required format
-  //     const result = srpFinalData.map(final => {
-  //       return {
-  //         variety_code: final.variety_code,
-  //         breeder_seed: final.breeder_seed,
-  //         foundation_seed: final.foundation_seed,
-  //         certified_seed: final.certified_seed,
-  //         assign_spa: spaAssignData
-  //           .filter(spa => spa.srp_final_id === final.id)
-  //           .map(spa => ({
-  //             spa_user_id: spa.spa_user_id,
-  //             certified_seed_quantity: spa.certified_seed_quantity
-  //           }))
-  //       };
-  //     });
+      // Update is_active
+      const updateData = await db.srpAssignSpaModel.update(
+        { is_active: false },     // values to update
+        { where: { id } }         // condition
+      );
+      if (updateData[0] === 0) {
+        return response(res, "Already Inactive or is_additional = false", 400, []);
+      }
 
-  //     return res.status(200).json({
-  //       status: 200,
-  //       data: result
-  //     });
+      return response(res, "Data Deleted Successfully!", 200, updateData);
 
-  //   } catch (error) {
-  //     console.error(error);
-  //     res.status(500).json({ error: error.message });
-  //   }
-  // };
+    } catch (error) {
+      console.log(error);
+      return response(res, "Something went wrong", 500, []);
+    }
+  }
 
   static getSrpVarietyAssignBySpa = async (req, res) => {
     const { year, season, crop_code } = req.query;
@@ -470,42 +453,45 @@ async function getSrpSpaData(year, season, crop_code) {
       model: db.varietyModel,
       attributes: ["id", "variety_code", "variety_name"]
     }],
-    attributes:["id","crop_code","variety_code","breeder_seed","foundation_seed","certified_seed","is_draft","is_final_submit"],
+    attributes: ["id", "crop_code", "variety_code", "breeder_seed", "foundation_seed", "certified_seed", "is_draft", "is_final_submit"],
     raw: true
   });
 
   const srpFinalIds = srpFinalData.map(d => d.id);
   const spaAssignData = await db.srpAssignSpaModel.findAll({
     where: {
-      srp_final_id: srpFinalIds
+      srp_final_id: srpFinalIds,
+      is_active: true
     },
-    include:[{
-      model:db.agencyDetailModel,
-      attributes:["user_id","agency_name"],
-      required:true
+    include: [{
+      model: db.agencyDetailModel,
+      attributes: ["user_id", "agency_name"],
+      required: true
     }],
-    
+
+
     raw: true
   });
-  
+
   const result = srpFinalData.map(final => {
-    console.log(final,"result")
+    console.log(final, "result")
     return {
-    
-  id: final.id,
-  crop_code: final.crop_code,
-  variety_code: final.variety_code,
-  variety_name: final['m_crop_variety.variety_name'] || null,
-  breeder_seed: final.breeder_seed,
-  foundation_seed: final.foundation_seed,
-  certified_seed: final.certified_seed,
-  is_draft: final.is_draft,
-  is_final_submit: final.is_final_submit,
+
+      id: final.id,
+      crop_code: final.crop_code,
+      variety_code: final.variety_code,
+      variety_name: final['m_crop_variety.variety_name'] || null,
+      breeder_seed: final.breeder_seed,
+      foundation_seed: final.foundation_seed,
+      certified_seed: final.certified_seed,
+      is_draft: final.is_draft,
+      is_final_submit: final.is_final_submit,
       assign_spa: spaAssignData
         .filter(spa => spa.srp_final_id === final.id)
         .map(spa => ({
+          id: spa.id,
           spa_user_id: spa.spa_user_id,
-          spa_name:spa['agency_detail.agency_name'],
+          spa_name: spa['agency_detail.agency_name'],
           certified_seed_quantity: spa.certified_seed_quantity
         }))
     };

@@ -19,7 +19,7 @@
                                             <label for="year" class="label-inventory required">Year</label>
                                         </div>
                                         <div class="col-12">
-                                            <input type="text" class="form-control" formControlName="year"
+                                            <input type="text" class="form-control" formControlName="year_range"
                                                 placeholder="Enter Year">
 
                                         </div>
@@ -58,62 +58,30 @@
                 </div>
 
                 <!-- second ui  -->
-                 <div class="col-12 col-md-12 col-lg-12 pt-3" *ngIf="isCrop">
-  <div class="row card-inventory form-group">
-    <div class="col-12">
-
-      <!-- HEADER ROW -->
-     <div class="d-flex align-items-center justify-content-between mb-3 pt-3">
-
-        <!-- Back Button -->
-    <button
-   (click)="goBack()"
-  class="form-button btn-inventory search d-inline-flex align-items-center justify-content-center px-2 py-1"
- style="min-width:unset 71px ; gap: 6px; font-size: 13px;">
-  <i class="fa fa-arrow-left" style="font-size: 12px;"></i>
-  <span>Back</span>
-</button>
-        <!-- Search Input -->
-        <input
-          type="text"
-          class="form-control search-input rounded-pill px-3"
-          placeholder="Search Keyword"
-          formControlName="global_search"
-          style="max-width: 250px; border: 1px solid #c96a2b; height: 38px;" />
-
-      </div>
-
-    </div>
-  </div>
-</div>
-
-                <!-- <div class="col-12 col-md-12 col-lg-12 pt-3" *ngIf="isCrop"> -->
-                    <!-- <div class="row card-inventory form-group">
+                <div class="col-12 col-md-12 col-lg-12 pt-3" *ngIf="isCrop">
+                    <div class="row card-inventory form-group">
                         <div class="col-12">
-                            <div class="row">
-                                       <div class="d-flex justify-content-start mb-2 " style="margin-left: -8px;">
-                        <button 
-                            class="form-button btn-inventory search d-inline-flex align-items-center justify-content-center px-2 py-1"
-                            style="width: auto; min-width: unset; gap: 6px; font-size: 13px;">
-                            <i class="fa fa-arrow-left" style="font-size: 12px;"></i>
-                            Back
-                        </button>
-                    </div> -->
-                                <!-- <div
-                                    class="col-12 d-flex align-items-center justify-content-end flex-wrap mb-2 gap-3 pt-3"> -->
-                                    <!-- Search Input -->
-                                    <!-- <div class="d-flex align-items-end gap-2 flex-wrap">
-                                        <input type="text" class="form-control search-input rounded-pill px-3"
-                                            placeholder="Search Keyword" formControlName="global_search"
-                                            style="max-width: 250px; border: 1px solid #c96a2b; height: 38px;" />
-                                    </div>
-                                </div> -->
 
+                            <!-- HEADER ROW -->
+                            <div class="d-flex align-items-center justify-content-between mb-3 pt-3">
 
-                            <!-- </div> -->
-                        <!-- </div>
+                                <!-- Back Button -->
+                                <button (click)="goBack()"
+                                    class="form-button btn-inventory search d-inline-flex align-items-center justify-content-center px-2 py-1"
+                                    style="min-width:unset 71px ; gap: 6px; font-size: 13px;">
+                                    <i class="fa fa-arrow-left" style="font-size: 12px;"></i>
+                                    <span>Back</span>
+                                </button>
+                                <!-- Search Input -->
+                                <input type="text" class="form-control search-input rounded-pill px-3"
+                                    placeholder="Search Keyword" formControlName="global_search"
+                                    style="max-width: 250px; border: 1px solid #c96a2b; height: 38px;" />
+
+                            </div>
+
+                        </div>
                     </div>
-                </div> -->
+                </div>
 
                 <!--third ui -->
                 <div class="col-12 col-md-12 col-lg-12 pt-0" *ngIf="isCrop">

@@ -108,6 +108,22 @@ class MasterController {
             return res.status(500).json({ message: 'Internal Server Error', error: error.message });
         }
     };
+    static findOneYearRange = async (req, res) => {
+        try {
+            const { year } = req.query; // you can find by ID from URL param
+
+            const yearData = await srpYearWise.findOne({ where: { year:year } });
+
+            if (!yearData) {
+                return response(res, status.DATA_NOT_FOUND, 404, null);
+            }
+
+            response(res, status.DATA_AVAILABLE, 200, yearData);
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ message: 'Internal Server Error', error: error.message });
+        }
+    };
 
     //Delete Year by ID
     static deleteYear = async (req, res) => {

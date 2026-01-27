@@ -11,38 +11,60 @@ const agencyDetail = db.agencyDetailModel
 
 class SrpWillingnessController {
 
-    static getSrpStateReplanningYearData = async (req, res) => {
-        try {
-            const userId = req.body?.loginedUserid?.id;
+   static getSrpStateReplanningYearData = async (req, res) => {
+  try {
+    const userId = req.body?.loginedUserid?.id;
 
-            const user = await userModel.findOne({
-                where: { id: userId, user_type: "IN" },
-            });
+    const user = await userModel.findOne({
+      where: { id: userId, user_type: "IN" },
+    });
 
-            if (!user) {
-                return response(res, status.DATA_NOT_AVAILABLE, 404, []);
-            }
+    if (!user) {
+      return response(res, status.DATA_NOT_AVAILABLE, 404, []);
+    }
 
-            const data = await db.srpWillingnessModel.findAll({
-                attributes: ["year"],
-                order: [["year", "ASC"]],
-                where: {
-                    is_active: true,
-                    is_final_submit: true,
-                }
-            });
+    // 1️⃣ willingness se saare years nikalo
+    const data = await db.srpWillingnessModel.findAll({
+      attributes: ["year"],
+      order: [["year", "ASC"]],
+      where: {
+        is_active: true,
+        is_final_submit: true,
+      },
+      raw: true
+    });
 
-            const allYears = data.map(item => item.year);
-            const uniqueYears = [...new Set(allYears)];
-            const formattedYears = uniqueYears.map(year => ({ year }));
+    // 👉 array of year ids
+    const yearIds = [...new Set(data.map(item => item.year))];
 
-            return response(res, status.DATA_AVAILABLE, 200, formattedYears);
+    if (yearIds.length === 0) {
+      return response(res, status.DATA_NOT_AVAILABLE, 200, []);
+    }
 
-        } catch (error) {
-            console.log(error);
-            return response(res, "Server Error", 500, error);
-        }
-    };
+ 
+    const years = await db.srpYearModel.findAll({
+      where: {
+        year: { [Op.in]: yearIds }
+      },
+      attributes: ["year", "year_range"],
+      order: [["year", "ASC"]],
+      raw: true
+    });
+
+    // 3️⃣ final format
+    const formattedYears = years.map(y => ({
+      year: y.year,
+      year_range: y.year_range
+    }));
+
+    return response(res, status.DATA_AVAILABLE, 200, formattedYears);
+
+  } catch (error) {
+    console.log(error);
+    return response(res, "Server Error", 500, error);
+  }
+};
+
 
     static getSrpStateReplanningSeasonData = async (req, res) => {
         try {

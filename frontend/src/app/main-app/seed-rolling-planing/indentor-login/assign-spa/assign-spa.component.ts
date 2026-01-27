@@ -37,7 +37,7 @@ export class AssignSpaComponent implements OnInit {
   inventoryYearData: any;
   inventorySeasonData: any;
   inventoryCropData: any;
-
+  inventoryYearRangeData: any
   varietyData: any;
   inventoryVarietyData: any;
   hoverIndex: number | null = null;
@@ -78,6 +78,7 @@ export class AssignSpaComponent implements OnInit {
     this.ngForm = this.fb.group({
       id: [''],
       year: [''],
+      year_range:[''],
       season: [''],
       crop_code: [''],
       crop_name: [''],
@@ -86,10 +87,7 @@ export class AssignSpaComponent implements OnInit {
 
     });
 
-
-
   }
-
 
   get bspc(): FormArray {
 
@@ -154,13 +152,32 @@ export class AssignSpaComponent implements OnInit {
       error: (err) => console.error("❌ API Error:", err)
     });
   }
+  getYearRange(year: any) {
+    const url = `get-one-year-range?year=${year}`;
+    this.srpService.postRequestCreator(url, null, null).subscribe({
+      next: (res: any) => {
+        if (res?.EncryptedResponse?.status_code === 200) {
 
+          this.inventoryYearRangeData = res.EncryptedResponse.data || [];
+          console.log(this.inventoryYearRangeData, "inventoryData.......................");
+          this.ngForm.patchValue({
+            year_range: this.inventoryYearRangeData?.year_range || ''
+          });
+        }
+
+
+
+      },
+      error: (err) => console.error("❌ API Error:", err)
+    });
+  }
+ 
   getPageData() {
 
     const year = this.ngForm.get('year')?.value;
     const season = this.ngForm.get('season')?.value;
     const crop_code = this.ngForm.get('crop_code')?.value;
-
+    console.log(year,season,crop_code)
     if (!year || !season || !crop_code) {
       Swal.fire({
         icon: "warning",
@@ -175,6 +192,7 @@ export class AssignSpaComponent implements OnInit {
     this.isCrop = true;
 
     const apiUrl = `get-variety?year=${year}&season=${season}&crop_code=${crop_code}`;
+    console.log(apiUrl,"apiUrl")
     this.srpService.postRequestCreator(apiUrl, null, null).subscribe({
       next: (res: any) => {
         if (res?.EncryptedResponse?.status_code === 200) {
@@ -213,6 +231,7 @@ export class AssignSpaComponent implements OnInit {
             const replaceArray = group.get('assign_spa') as FormArray;
             replaceArray.clear();
             if (variety.assign_spa?.length > 0) {
+              console.log(variety.assign_spa,"variety.assign_spa")
               variety.assign_spa.forEach(rv => {
                 replaceArray.push(
                   this.fb.group({
@@ -222,6 +241,7 @@ export class AssignSpaComponent implements OnInit {
                     certified_seed_quantity: [rv.certified_seed_quantity]
                   })
                 );
+                console.log(replaceArray,"delete-spa")
               });
               if (!this.openCropIndexes.includes(index)) {
                 this.openCropIndexes.push(index);
@@ -346,14 +366,14 @@ export class AssignSpaComponent implements OnInit {
     }
   }
   lockHeaderFields() {
-    this.ngForm.get('year')?.disable();
+    this.ngForm.get('year_range')?.disable();
     this.ngForm.get('season')?.disable();
     this.ngForm.get('crop_name')?.disable();
   }
   goBack() {
     const year = localStorage.getItem('year');
     const season = localStorage.getItem('season');
-    const crop = localStorage.getItem('crop');
+    const crop = localStorage.getItem('crop_code');
     console.log(year, season, crop, "kitttttttttt")
     // Agar dono values exist karte hain tabhi navigate karein
     if (year && season && crop) {
@@ -485,6 +505,7 @@ export class AssignSpaComponent implements OnInit {
      </div>
    `;
   }
+
   finalizeData() {
     const apiUrl = "add-spa-details";
     const formValues = this.ngForm.value;
@@ -511,21 +532,21 @@ export class AssignSpaComponent implements OnInit {
     const spaDetails = [...existingData];
 
 
-  let unassignedVarieties = existingData.filter(variety => {
-  // Check in assign_spa if any SPA belongs to this variety
-  return !variety.assign_spa || variety.assign_spa.length === 0;
-});
+    let unassignedVarieties = existingData.filter(variety => {
+      // Check in assign_spa if any SPA belongs to this variety
+      return !variety.assign_spa || variety.assign_spa.length === 0;
+    });
 
-if (unassignedVarieties.length > 0) {
-  Swal.fire({
-    title: '<p style="font-size:20px;">Each variety must have at least one SPA assigned.</p>',
-    icon: 'error',
-    confirmButtonText: 'OK',
-    confirmButtonColor: '#B64B1D',
-  });
-  return; // Stop form submission
-}
- 
+    if (unassignedVarieties.length > 0) {
+      Swal.fire({
+        title: '<p style="font-size:20px;">Each variety must have at least one SPA assigned.</p>',
+        icon: 'error',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#B64B1D',
+      });
+      return; // Stop form submission
+    }
+
     const payload = {
       action: "final",
 
@@ -591,7 +612,7 @@ if (unassignedVarieties.length > 0) {
       return;
     }
 
-    const apiUrl = `srp-willingness-replace-variety?id=${id}`;
+    const apiUrl = `delete-spa?id=${id}`;
     console.log(apiUrl, "apiUrl");
 
     this.srpService.getRequestCreatorNew(apiUrl).subscribe({
@@ -656,7 +677,7 @@ if (unassignedVarieties.length > 0) {
         isLocked: isLocked
       });
       this.getCropName(crop_code);
-
+      this.getYearRange(year);
     });
 
 

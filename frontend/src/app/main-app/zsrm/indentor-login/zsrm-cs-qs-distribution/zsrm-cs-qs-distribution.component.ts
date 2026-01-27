@@ -110,40 +110,12 @@ export class ZsrmCsQsDistributionComponent implements OnInit {
     // this.getPageData();
   }
 
-
-  // deleteDirectIndent(id: number) {
-  //   Swal.fire({
-  //     title: "Are you sure?",
-  //     text: "You won't be able to revert this!",
-  //     icon: "warning",
-  //     showCancelButton: true,
-  //     confirmButtonColor: "#3085d6",
-  //     cancelButtonColor: "#d33",
-  //     confirmButtonText: "Yes, delete it!"
-  //   }).then((result) => {
-  //     if (result.isConfirmed) {
-  //       const route = `delete-zsrm-cs-qs-dist/${id}`;
-  //       this.zsrmServiceService.deleteRequestCreator(route, null,).subscribe(data => {
-  //         if (data.Response.status_code === 200) {
-  //           Swal.fire({
-  //             title: "Deleted!",
-  //             text: "Your data has been deleted.",
-  //             icon: "success"
-  //           });
-  //           this.filterPaginateSearch.itemList = this.filterPaginateSearch.itemList.filter(item => item.id !== id);
-  //         }
-  //       });
-  //     }
-  //   });
-  // }
-
   SaveAsData() {
     this.isAddSelected = true;
     this.isChangeMessage = "Enter Distribution of Certified/Quality Seed"
     this.resetCancelation()
 
   }
-
 
   createForm() {
     this.ngForm = this.fb.group({

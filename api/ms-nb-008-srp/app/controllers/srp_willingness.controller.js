@@ -6,11 +6,8 @@ const userModel = db.userModel;
 const srpCropWise = db.seedRollingPlanCropWisesModel;
 const cropModel = db.cropModel
 const agencyDetail = db.agencyDetailModel
-const srpVarietyWise = db.srp_varietyModel
+const srpVarietyWise = db.srpVarietyModel
 class SrpWillingnessController {
-
-
-
     static getSrpWillingnessYearData = async (req, res) => {
         try {
             const userId = req.body?.loginedUserid?.id;
@@ -41,47 +38,63 @@ class SrpWillingnessController {
             }
 
             const cropCodes = user.cropCodes || [];
-
             const years = await cropModel.findAll({
                 where: {
                     crop_code: { [Op.in]: cropCodes }
                 },
                 include: [
                     {
-                        model: srpCropWise,
+                        model: db.srpCropModel,   // 👈 IMPORTANT
                         as: "seed_rolling_plan_crop_wises",
-                        required: true,   // INNER JOIN
+                        required: true,
                         where: {
                             is_active: true,
                             is_final_submit: true,
-
                         },
-                        attributes:
-                            ["year"]
-                        ,
-                        order: [["year", "ASC"]],
+                        attributes: ["year"],
+                        include: [
+                            {
+                                model: srpVarietyWise,
+                                as: "seed_rolling_plan_crop_wises",
+                                where: {
+                                    is_active: true,
+                                    is_final_submit: true,
+                                }
+                            },
+                            {
+                                model: db.srpYearModel,
+                                as: "year_master",
+                                required: false,
+                                attributes: ["year", "year_range"]
+                            }
+                        ]
                     }
-                ],
-
+                ]
             });
 
-     
+
+
+            // 👉 year_id + year_range dono nikalo
             const allYears = years.flatMap(item =>
-                item.seed_rolling_plan_crop_wises.map(srp => srp.year)
+                item.seed_rolling_plan_crop_wises.map(srp => ({
+                    year: srp.year,
+                    year_range: srp.year_master?.year_range || null
+                }))
             );
 
-           
-            const uniqueYears = [...new Set(allYears)];
+            // 👉 unique by year_id
+            const uniqueYears = [
+                ...new Map(allYears.map(item => [item.year_id, item])).values()
+            ];
 
-            const formattedYears = uniqueYears.map(year => ({ year }));
-            return response(res, status.DATA_AVAILABLE, 200, formattedYears);
+            return response(res, status.DATA_AVAILABLE, 200, uniqueYears);
 
         } catch (error) {
             console.log(error);
-            return response(res, "Server Error", 500, error)
-
+            return response(res, "Server Error", 500, error);
         }
     };
+
 
     static getSrpWillingnessSeasonData = async (req, res) => {
         try {
@@ -448,7 +461,7 @@ class SrpWillingnessController {
                 ]
             });
 
-
+            console.log("hello", varietyData)
             if (varietyData.length > 0) {
                 return response(res, "Data Available", 200, varietyData);
             }
@@ -835,6 +848,28 @@ class SrpWillingnessController {
         } catch (error) {
             console.log(error);
             return response(res, "Something went wrong", 500, []);
+        }
+    }
+    static getVarietyName = async (req, res) => {
+        try {
+            const { variety_code } = req.query;
+
+            const data = await db.varietyModel.findOne({
+                where: {
+                    variety_code: variety_code
+                }
+            })
+            if (!data) {
+                response(res, "Data Not Found", 404);
+            }
+            else {
+                return response(res, "Data Available", 200, data)
+            }
+
+
+        }
+        catch (error) {
+            return response(res, "Server Error", 500, error)
         }
     }
 

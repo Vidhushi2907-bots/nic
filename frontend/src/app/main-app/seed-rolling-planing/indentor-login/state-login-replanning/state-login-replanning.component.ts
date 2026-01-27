@@ -87,7 +87,7 @@ export class StateLoginReplanningComponent implements OnInit, AfterViewInit {
     private breeder: BreederService,
     private fb: FormBuilder,
     private router: Router,
-    private route:ActivatedRoute,
+    private route: ActivatedRoute,
     private _productionCenter: ProductioncenterService,
     private master: MasterService,
     private srpService: SeedRollingPlanningService,
@@ -110,8 +110,7 @@ export class StateLoginReplanningComponent implements OnInit, AfterViewInit {
     })
   }
 
-  // your existing form array
-
+  
   ngOnInit(): void {
     this.ngForm = this.fb.group({
 
@@ -158,7 +157,6 @@ export class StateLoginReplanningComponent implements OnInit, AfterViewInit {
       }
     });
 
-    // wire search filter
     this.ngForm.get('global_search')?.valueChanges.subscribe((searchText: string) => {
       this.applySearch(searchText);
     });
@@ -166,25 +164,22 @@ export class StateLoginReplanningComponent implements OnInit, AfterViewInit {
     const bspcArray = this.ngForm.get('bspc') as FormArray;
     this.filteredBspc = bspcArray.controls; // initialize filtered array
 
- const year = localStorage.getItem('year');
+    const year = localStorage.getItem('year');
     const season = localStorage.getItem('season');
-const crop=localStorage.getItem('crop');
+    const crop = localStorage.getItem('crop_code');
 
-   this.route.queryParams.subscribe(params => {
-    const isLocked = params['isLocked'] === 'true';
+    this.route.queryParams.subscribe(params => {
+      const isLocked = params['isLocked'] === 'true';
+      if (isLocked && year && season && crop) {
+        this.ngForm.patchValue({
+          year: year,
+          season: season,
+          crop: crop,
+        });
 
-    console.log(isLocked, 'IS LOCKED');
-
-    if (isLocked && year && season && crop) {
-      this.ngForm.patchValue({
-        year: year,
-        season: season,
-        crop:crop,
-      });
-
-      this.getPageData(); // 🔥 auto search
-    }
-  });
+        this.getPageData(); // 🔥 auto search
+      }
+    });
   }
   private tooltipsInitialized = false;
 
@@ -200,7 +195,34 @@ const crop=localStorage.getItem('crop');
     });
   }
 
+  searchData() {
+    const year = this.ngForm.get('year')?.value;
+    const season = this.ngForm.get('season')?.value;
+    const crop_code = this.ngForm.get('crop')?.value
+    console.log(year, season, crop_code)
+    if (year && season && crop_code) {
+      localStorage.setItem('year', year);
+      localStorage.setItem('season', season);
+      localStorage.setItem('crop_code', crop_code);
+    }
+const year1 = localStorage.getItem('year');
+    const season1 = localStorage.getItem('season');
+    const crop = localStorage.getItem('crop_code');
+    console.log(year1,season1,crop)
+    this.ngForm.patchValue({
+      global_search: '',
 
+    });
+
+    // Hide crop card
+    this.isCrop = false;
+    if (this.bspc && this.bspc.clear) {
+      this.bspc.clear();
+    }
+
+    // reload data
+    this.getPageData();
+  }
 
   loadYear() {
     this.srpService.postRequestCreator('srp-state-replanning-year', null, null)
@@ -218,11 +240,9 @@ const crop=localStorage.getItem('crop');
       });
   }
 
-
   trackByYear(index: number, item: any) {
     return item.year;
   }
-
 
   loadSeason() {
     let year = Number(this.ngForm.controls['year']?.value)
@@ -248,6 +268,7 @@ const crop=localStorage.getItem('crop');
       },
     });
   }
+
   loadCrop() {
     let year = Number(this.ngForm.controls['year']?.value)
     let season = this.ngForm.controls['season']?.value;
@@ -274,8 +295,6 @@ const crop=localStorage.getItem('crop');
       },
     });
   }
-
-
 
   getPageData() {
     const year = this.ngForm.controls['year'].value;
@@ -314,7 +333,7 @@ const crop=localStorage.getItem('crop');
     const year1 = this.ngForm.get('year')?.value;
     const season1 = this.ngForm.get('season')?.value;
     const crop1 = this.ngForm.get('crop')?.value;
-    console.log(year1, season1, crop1, "heloooooooooooooooo")
+    
     if (year1 && season1 && crop1) {
       localStorage.setItem('year', year1);
       localStorage.setItem('season', season1);
@@ -322,10 +341,10 @@ const crop=localStorage.getItem('crop');
     }
   }
 
-
   get bspc(): FormArray {
     return this.ngForm.get('bspc') as FormArray;
   }
+
   createVarietyGroup(item: any): FormGroup {
 
     const replacesArray = this.fb.array(
@@ -334,7 +353,7 @@ const crop=localStorage.getItem('crop');
           replace_id: [r.replace_id],
           replace_variety_code: [r.replace_variety_code],
           replace_variety_name: [r.replace_variety_name],
-          replace_quantity: [r.replace_quantity],
+          replace_quantity: [r.replace_tentative_quantity??r.replace_quantity],
           replace_is_accept: [
             r.replace_is_accept === true ? 1 :
               r.replace_is_accept === false ? 0 : null
@@ -364,7 +383,7 @@ const crop=localStorage.getItem('crop');
 
     const value = replacesArr.at(index).get('replace_is_accept')?.value;
 
-    if (value === '1') {
+    if (value === 1) {
 
       return "Accept"
     }
@@ -387,7 +406,6 @@ const crop=localStorage.getItem('crop');
     });
   }
 
-  // Get replaces for a specific row
   getReplaces(i: number) {
     return (this.bspc.at(i).get("replaces") as FormArray);
   }
@@ -444,7 +462,6 @@ const crop=localStorage.getItem('crop');
     this.fetchNewVarieties(year, season, crop);
   }
 
-
   fetchNewVarieties(year: number | string, season: string, crop: string) {
 
     const apiUrl = `srp-state-replanning-new-variety?year=${year}&season=${season}&crop_code=${crop}`;
@@ -481,6 +498,7 @@ const crop=localStorage.getItem('crop');
         is_available: ctrl.get('willingness')?.value === 'No' ? false : true,
         quantity: ctrl.get('tentative_quantity')?.value,
         replace_varieties: replacesArr?.controls.map((r: FormGroup) => {
+          
           return {
             replace_variety_code: r.get('replace_variety_code')?.value,
             replace_quantity: r.get('replace_quantity')?.value,
@@ -534,10 +552,19 @@ const crop=localStorage.getItem('crop');
       'srp-add-state-replanning-variety',
       '',
       draftPayload
-    ).subscribe(() => {
-      Swal.fire('Saved as Draft!', '', 'success');
-    });
-    this.getPageData();
+    ).subscribe({
+  next: (res: any) => {
+    console.log('Draft save response =>', res);
+    Swal.fire('Saved as Draft!', '', 'success');
+    this.getPageData();   // refresh data after save
+  },
+  error: (err: any) => {
+    console.error('Draft save error =>', err);
+    Swal.fire('Error!', 'Something went wrong while saving draft.', 'error');
+  }
+});
+   
+   
   }
 
   saveEditPopup() {
@@ -631,8 +658,6 @@ const crop=localStorage.getItem('crop');
           }];
       })
       .flat();
-
-
 
     const newVarietyArr = newVarietyFormArr.controls.map((ctrl: FormGroup) => ({
       new_variety_name: ctrl.get('new_variety_name')?.value || '-',
@@ -759,7 +784,6 @@ const crop=localStorage.getItem('crop');
             this.ngForm.get('season')?.disable();
             this.ngForm.get('crop')?.disable();
 
-
           });
         });
     });
@@ -789,7 +813,6 @@ const crop=localStorage.getItem('crop');
       event.preventDefault();
     }
   }
-
 
   applySearch(searchText: string) {
     const bspcArray = this.ngForm.get('bspc') as FormArray;
@@ -836,8 +859,6 @@ const crop=localStorage.getItem('crop');
     }
   }
 
-
-
   getFilteredRows() {
     const bspcArray = this.ngForm?.get('bspc') as FormArray;
     if (!bspcArray) return [];
@@ -848,10 +869,6 @@ const crop=localStorage.getItem('crop');
 
     return bspcArray.controls;
   }
-
-
-
-
 
   selectVariety(i: number, item: any): void {
     const bspcArray = this.ngForm.get('bspc') as FormArray;
@@ -864,8 +881,6 @@ const crop=localStorage.getItem('crop');
     }
   }
 
-
-
   onSelectVariety(index: number, variety: any) {
     const row = this.newVarietyArr.at(index);
     row.patchValue({
@@ -877,7 +892,6 @@ const crop=localStorage.getItem('crop');
     // Apply accept/reject logic immediately
     this.onStatusChange2(index);
   }
-
 
   // ✅ Accept/Reject logic
   onStatusChange2(index: number) {

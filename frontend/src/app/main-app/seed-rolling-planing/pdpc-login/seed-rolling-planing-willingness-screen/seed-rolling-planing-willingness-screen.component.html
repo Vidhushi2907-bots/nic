@@ -23,7 +23,7 @@
                                                 <option value="">Please Select Year</option>
 
                                                 <option *ngFor="let year of inventoryYearData" [value]="year.year">
-                                                    {{ year.year }}
+                                                    {{ year.year_range }}
                                                 </option>
                                                 <!-- <option value="2029-30">2029-30</option>
                                                 <option value="2028-29">2028-29</option> -->
@@ -183,30 +183,26 @@
                                                     </label>
 
                                                     <!-- CLICK Event Only -->
-                                                    <span (click)="onQuantityClick(i, $event)" class="quantity-link">
+                                                    <span  (click)="onQuantityClick(i, $event)" class="quantity-link">
                                                         {{
                                                         ngForm.controls['bspc']['controls'][i].controls['total_seed_required'].value
                                                         }}
                                                     </span>
 
-                                                    <!-- Popup ONLY when clicked -->
-                                                    <div *ngIf="popupIndex === i" class="custom-popup">
-                                                        <div *ngFor="let d of inventoryIndentorData">
-                                                            <b>{{ d.user_name }}</b>: {{ d.breeder_seed }}
-                                                        </div>
-                                                    </div>
+                                                
                                                 </div>
 
 
                                             </div>
-                                           
+
                                             <div
                                                 class="col-6 col-md-1 py-3 d-flex align-items-center justify-content-center">
 
                                                 <!-- TOGGLE (before final submit) -->
                                                 <label class="switch small-switch mb-0"
                                                     *ngIf="!isFinalSubmitButtonHide">
-                                                    <input type="checkbox" formControlName="status_toggle"   (change)="onWillingnessChange($event, i)">
+                                                    <input type="checkbox" formControlName="status_toggle"
+                                                        (change)="onWillingnessChange($event, i)">
                                                     <span class="slider round"></span>
                                                 </label>
 
@@ -259,11 +255,17 @@
                                             <div class="col-6 col-md-1 py-3 d-flex verticle-content-middle"
                                                 *ngIf="isFinalSubmitButtonHide" style="padding-right: 2rem!important;">
 
-
+                                                <!-- (click)="openReplaceSwal(bspc.controls[i].get('replaceVariety')?.value)"  -->
                                                 <!-- FINAL SUBMIT KE BAAD REPLACE COUNT -->
                                                 <a style="cursor:pointer; text-decoration: underline; color:#007bff;"
-                                                    (click)="openReplaceSwal(bspc.controls[i].get('replaceVariety')?.value)">
-                                                    {{ bspc.controls[i].get('replaceVariety')?.value?.length || 0 }}
+                                                    (click)="openReplaceSwal(
+  bspc.controls[i].get('replaceVariety')?.value,i,true,
+  [
+    { header: 'Variety Name', key: 'variety_name' },
+    { header: 'Tentative Qty', key: 'replace_tentative_qty' }
+  ]
+)">
+                                                    {{ bspc.controls[i].get('replaceVariety')?.value?.length}}
                                                 </a>
                                             </div>
 
@@ -351,7 +353,7 @@
                             </div>
 
                             <!-- No Data Message -->
-                         
+
                         </div>
                     </div>
 
@@ -507,59 +509,60 @@
                                 </div>
 
                                 <!-- Dynamic Rows -->
-                                  <div style="max-height: 350px; overflow-x: hidden;
+                                <div style="max-height: 350px; overflow-x: hidden;
                             overflow-y: auto; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;">
-                                <div formArrayName="newVarieties">
-                                    <div class="row data-row" *ngFor="let ele of newVarieties.controls; let i = index"
-                                        [formGroupName]="i">
+                                    <div formArrayName="newVarieties">
+                                        <div class="row data-row"
+                                            *ngFor="let ele of newVarieties.controls; let i = index"
+                                            [formGroupName]="i">
 
-                                        <!-- S.No -->
-                                        <div class="col-md-1 py-3 d-flex justify-content-center">
+                                            <!-- S.No -->
+                                            <div class="col-md-1 py-3 d-flex justify-content-center">
 
-                                            <label class="d-md-none"><b>S.No:</b>&nbsp;</label>
-                                            <span>{{ i + 1 }}</span>
+                                                <label class="d-md-none"><b>S.No:</b>&nbsp;</label>
+                                                <span>{{ i + 1 }}</span>
+                                            </div>
+
+                                            <!-- Variety Name -->
+                                            <div
+                                                class="col-md-3 d-flex align-items-center justify-content-center border-end">
+                                                <label class="d-md-none"><b>Variety Name:</b>&nbsp;</label>
+                                                <span>
+
+                                                    {{
+                                                    ngForm.controls['newVarieties']['controls'][i].controls['variety_name'].value
+                                                    || '-' }}
+                                                </span>
+                                            </div>
+
+                                            <!-- Tentative Quantity -->
+                                            <div
+                                                class="col-md-3 d-flex align-items-center justify-content-center border-end">
+                                                <label class="d-md-none"><b>Tentative Quantity:</b>&nbsp;</label>
+                                                <span>
+
+                                                    {{
+                                                    ngForm.controls['newVarieties']['controls'][i].controls['new_tentative_quantity'].value
+                                                    || 0 }}
+                                                </span>
+                                            </div>
+
+                                            <!-- Remarks -->
+                                            <div
+                                                class="col-md-6 d-flex align-items-center justify-content-center border-end">
+                                                <label class="d-md-none"><b>Remarks:</b>&nbsp;</label>
+                                                <span>
+                                                    {{ngForm.controls['newVarieties']['controls'][i].controls['additional_note'].value
+                                                    || '-' }}
+                                                </span>
+                                            </div>
+
                                         </div>
-
-                                        <!-- Variety Name -->
-                                        <div
-                                            class="col-md-3 d-flex align-items-center justify-content-center border-end">
-                                            <label class="d-md-none"><b>Variety Name:</b>&nbsp;</label>
-                                            <span>
-
-                                                {{
-                                                ngForm.controls['newVarieties']['controls'][i].controls['variety_name'].value
-                                                || '-' }}
-                                            </span>
-                                        </div>
-
-                                        <!-- Tentative Quantity -->
-                                        <div
-                                            class="col-md-3 d-flex align-items-center justify-content-center border-end">
-                                            <label class="d-md-none"><b>Tentative Quantity:</b>&nbsp;</label>
-                                            <span>
-
-                                                {{
-                                                ngForm.controls['newVarieties']['controls'][i].controls['new_tentative_quantity'].value
-                                                || 0 }}
-                                            </span>
-                                        </div>
-
-                                        <!-- Remarks -->
-                                        <div
-                                            class="col-md-6 d-flex align-items-center justify-content-center border-end">
-                                            <label class="d-md-none"><b>Remarks:</b>&nbsp;</label>
-                                            <span>
-                                                {{ngForm.controls['newVarieties']['controls'][i].controls['additional_note'].value
-                                                || '-' }}
-                                            </span>
-                                        </div>
-
                                     </div>
                                 </div>
-</div>
                             </div>
 
-                          
+
 
                         </div>
                     </div>

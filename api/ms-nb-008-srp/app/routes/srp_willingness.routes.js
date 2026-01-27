@@ -21,5 +21,5 @@ module.exports = app => {
     app.post(`${process.env.MICRO_SERVICE}/api/srp-add-willingness`, auth, crop.postSrpWillingnessData);
     app.get(`${process.env.MICRO_SERVICE}/api/srp-willingness-replace-variety`, auth, crop.deleteSrpWillingnessRepalce)
     app.get(`${process.env.MICRO_SERVICE}/api/srp-willingness-variety`, auth, crop.deleteSrpWillingness)
-    //    app.post(`${process.env.MICRO_SERVICE}/api/srp-variety-willingness`, auth, crop.getSrpWillingnessDetails);
+    app.post(`${process.env.MICRO_SERVICE}/api/get-variety-name`, auth, crop.getVarietyName);
 };

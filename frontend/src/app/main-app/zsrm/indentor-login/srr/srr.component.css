@@ -344,3 +344,16 @@ input[type='radio'] {
   text-align: center;
   font-weight: 600;
 }
+.form-control {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  height: auto !important;
+  min-height: 40px;
+}
+
+   .text-certified{
+      font-weight: bold;
+    font-size: 1.2rem;
+    color: blue;
+}

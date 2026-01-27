@@ -351,7 +351,6 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
       });
   }
 
-
   saveVariety(type: 'draft' | 'final') {
     const apiUrl = 'add-srp-variety';
     const bspcArray = this.ngForm.get('bspc') as FormArray;
@@ -412,8 +411,8 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
               this.isFinalSubmit = false;
               this.getVarietyDetails(this.srp_crop_wise_id, 'draft');
 
-          this.ngForm.get('global_search')?.reset();
-    
+              this.ngForm.get('global_search')?.reset();
+
             });
           },
           error: () => Swal.fire('Server Error', '', 'error')
@@ -555,7 +554,7 @@ ${variety_wise
       control.get('Req_Qty_of_breeder_seed')?.setValue(0, { emitEvent: false });
       control.get('foundation_seed')?.setValue(0, { emitEvent: false });
       control.get('breeder_seed')?.setValue(0, { emitEvent: false });
-
+    
       // Recalculate after correction
       this.calculateTotalSeedRequired();
 

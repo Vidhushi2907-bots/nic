@@ -180,16 +180,17 @@
                     <div class="row card-inventory form-group">
 
                         <div class="col-12 col-md-12 col-lg-12 col-xl-12 mt-2" *ngIf="isAddSelected">
-                            <div
-                                class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 title-inventory pl-3 pb-2 d-flex justify-content-center align-items-center ">
-                                {{this.isChangeMessage}}
-                            </div>
+
                             <div class="row form-group pl-2">
                                 <div class="col-12 col-md-12 col-lg-12 col-xl-12">
 
                                     <div class="row">
 
                                         <div class="col-12 pt-4 px-4">
+                                              <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12"
+                                    style="text-align: right; font-weight: bold;">
+                                    (Agriculture Crops - in Qts., Horticulture Crops - in Kgs.)
+                                </div>
                                             <div class="row">
                                                 <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                                     <label for="req" class="left-heading required">
@@ -209,8 +210,10 @@
                                                     </div>
                                                 </div>
 
-
-
+<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 title-inventory 
+            d-flex justify-content-center align-items-center custom-fs">
+  {{ this.isChangeMessage }}
+</div>
                                                 <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                                     <label for="doa" class="left-heading required">
                                                         DOA
@@ -228,13 +231,7 @@
 
                                                     </div>
                                                 </div>
-
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 pt-4 px-4">
-                                            <div class="row">
-                                                <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
+<div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                                     <label for="sau" class="left-heading required">
                                                         SAU
                                                     </label>
@@ -251,10 +248,14 @@
 
                                                     </div>
                                                 </div>
+                                            </div>
+                                        </div>
 
+                                        <div class="col-12 pt-4 px-4">
+                                            <div class="row">
                                                 <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                                     <label for="nsc" class="left-heading required">
-                                                        NSC
+                                                         NSC
                                                     </label>
                                                 </div>
                                                 <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
@@ -269,16 +270,13 @@
 
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-12 pt-4 px-4">
-                                            <div class="row">
+
                                                 <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                                                     <label for="ssc" class="left-heading required">
-                                                        SSC
+                                                    SSC
                                                     </label>
                                                 </div>
-                                                <div class="col-sm-12 col-md-12 col-lg-4 pr-4">
+                                               <div class="col-sm-12 col-md-12 col-lg-4 pr-4">
                                                     <input type="number" class=" form-control input-inventory"
                                                         formControlName="ssc" placeholder="Enter SSC"
                                                         (keypress)="validateDecimal($event)">
@@ -290,13 +288,16 @@
 
                                                     </div>
                                                 </div>
-
+                                            </div>
+                                        </div>
+                                        <div class="col-12 pt-4 px-4">
+                                            <div class="row">
                                                 <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
-                                                    <label for="pvt" class="left-heading required">
-                                                        PVT
+                                                    <label for="ssc" class="left-heading required">
+                                                      PVT
                                                     </label>
                                                 </div>
-                                                <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
+                                                 <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
                                                     <input type="number" class=" form-control input-inventory"
                                                         formControlName="pvt" placeholder="Enter Pvt"
                                                         (keypress)="validateDecimal($event)">
@@ -308,28 +309,13 @@
 
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 pt-4 px-4">
-                                            <div class="row">
-                                                <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
-                                                    <label for="remarks" class="left-heading">
-                                                        Remarks
-                                                    </label>
-                                                </div>
-                                                <div class="col-sm-12 col-md-12 col-lg-4 pr-4">
-                                                    <input type="text" class=" form-control input-inventory"
-                                                        formControlName="remarks" placeholder="Enter Remarks">
-
-                                                </div>
 
                                                 <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
-                                                    <label for="others" class="left-heading required">
-                                                        Others
+                                                    <label for="pvt" class="left-heading required">
+                                                         Others
                                                     </label>
                                                 </div>
-                                                <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
+                                             <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
                                                     <input type="number" class=" form-control input-inventory"
                                                         formControlName="others" placeholder="Enter Others"
                                                         (keypress)="validateDecimal($event)">
@@ -343,20 +329,21 @@
                                                 </div>
                                             </div>
                                         </div>
+
                                         <div class="col-12 pt-4 px-4">
                                             <div class="row">
+
                                                 <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
-                                                    <label for="total" class="left-heading required">
-                                                        Total
+                                                    <label for="others" class="left-heading">
+                                                       Total
                                                     </label>
                                                 </div>
                                                 <div class="col-sm-12 col-md-12 col-lg-4 pr-4">
                                                     <input type="number" class=" form-control input-inventory"
                                                         formControlName="total" readonly>
                                                 </div>
-
-                                                <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
-                                                    <label for="shtorsur" class="left-heading required">
+                                                 <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
+                                                    <label for="shtorsur" class="left-heading ">
                                                         Surplus/Shortfall
                                                     </label>
                                                 </div>
@@ -364,6 +351,22 @@
                                                     <input type="number" class=" form-control input-inventory"
                                                         formControlName="shtorsub" readonly>
                                                 </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 pt-4 px-4">
+                                            <div class="row">
+                                                  <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
+                                                    <label for="remarks" class="left-heading">
+                                                        Remarks
+                                                    </label>
+                                                </div>
+                                                <div class="col-sm-12 col-md-12 col-lg-4 pr-4">
+                                                    <input type="text" class=" form-control input-inventory"
+                                                        formControlName="remarks" placeholder="Enter Remarks">
+
+                                                </div>
+
+                                         
                                             </div>
                                         </div>
                                     </div>
@@ -391,7 +394,7 @@
                     </div>
                 </div>
 
-                <div class="col-12 col-md-12 col-lg-12 col-xl-12" *ngIf="isShowTable">
+                <div class="col-12 col-md-12 col-lg-12 col-xl-12" *ngIf="isShowTable &&!isAddSelected">
 
                     <div class="row card-inventory form-group">
                         <div class="col-12 col-md-12 col-lg-12 col-sm-12 col-xl-12">
@@ -430,18 +433,14 @@
                                     <div
                                         class="col-12 col-sm-2 col-md-2 col-lg-2 col-xl-2 py-2 d-flex align-items-center justify-content-center text-center">
                                         Availability</div>
-
-
                                     <div
                                         class="col-6 col-md-1 py-1 d-flex verticle-content-middle align-items-center justify-content-center text-center">
                                         Total
                                     </div>
-
                                     <div
                                         class="col-6 col-md-1 py-1 d-flex verticle-content-middle align-items-center justify-content-center text-center">
                                         Surplus/Shortfall
                                     </div>
-
                                     <div
                                         class="col-6 col-md-1 py-1 d-flex verticle-content-middle align-items-center justify-content-center text-center">
                                         Actions</div>
@@ -570,6 +569,7 @@
                                 class="search form-button btn-inventory ml-2 d-inline-flex justify-content-center verticle-content-middle mb-3"
                                 (click)="finalizeData()" [disabled]="freezeData"
                                 [ngClass]="{'activeBtn': !freezeData, 'disableBtn': freezeData}"
+                                *ngIf="(dummyData&&dummyData.length>=1)"
                                 [ngStyle]="{'border': freezeData ? '2px solid #DCDCDC' : '2px solid #B64B1D'}">
                                 Submit
                             </button>

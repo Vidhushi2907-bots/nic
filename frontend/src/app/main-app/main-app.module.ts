@@ -282,6 +282,7 @@ import { ZsrmComponent } from './zsrm/indentor-login/zsrm/zsrm.component';
 import { ZsrmReqQsComponent } from './zsrm/indentor-login/zsrm-req-qs/zsrm-req-qs.component';
 import { SrrComponent } from './zsrm/indentor-login/srr/srr.component';
 import { ZsrmCsQsDistributionComponent } from './zsrm/indentor-login/zsrm-cs-qs-distribution/zsrm-cs-qs-distribution.component';
+import { AreaRegisterForCertificationReportComponent } from './zsrm/indentor-login/Reports/area-register-for-certification-report/area-register-for-certification-report.component';
 
 
 
@@ -511,6 +512,7 @@ import { ZsrmCsQsDistributionComponent } from './zsrm/indentor-login/zsrm-cs-qs-
     ZsrmReqQsComponent,
     SrrComponent,
     ZsrmCsQsDistributionComponent,
+    AreaRegisterForCertificationReportComponent,
 
 
     // GenerateCardQrComponent

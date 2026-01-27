@@ -22,7 +22,7 @@
                                         <select class="form-control input-inventory" formControlName="year">
                                             <option value="">Select Year</option>
                                             <option *ngFor="let yr of inventoryYearData" [value]="yr.year">
-                                                {{ yr.year }}
+                                                {{ yr.year_range }}
                                             </option>
 
                                         </select>
@@ -55,7 +55,7 @@
                                     <div style="width:140px" class="text-end ml-2">
                                         <button id="isSubmitBtn"
                                             class="form-button btn-inventory search w-100 text-center"
-                                            (click)="getPageData()">
+                                            (click)="searchData()">
                                             Search
                                         </button>
                                     </div>

@@ -40,10 +40,11 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
   inventorySeasonData: any;
   inventoryCropData: any;
   varietyData: any;
+  varietyName: any
   inventoryVarietyData: any;
   hoverIndex: number | null = null;
   popupPosition: Record<string, string> = {};
-  inventoryIndentorData: any
+  inventoryIndentorData: any[]
   popupIndex: number | null = null;
   lastVarietyCode: string | null = null;
   autoSearchTimeout: any;
@@ -238,7 +239,6 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
     const albums = this.ngForm.get('bspc') as FormArray;
 
     const songs = albums.at(albumIndex).get('replaceVariety') as FormArray;
-    console.log(songs, "songs")
     songs.push(this.createInnerRow());
     this.toggleCropSection(albumIndex)
   }
@@ -247,7 +247,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
     const year = this.ngForm.controls['year'].value;
     const season = this.ngForm.controls['season'].value;
     const crop_code = this.ngForm.controls['crop_code'].value;
-
+    console.log(year, season, crop_code);
     if (!year || !season || !crop_code) {
       Swal.fire({
         toast: false,
@@ -262,10 +262,9 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
     // Reset form fields
     this.ngForm.get('variety_code')?.setValue('');
     this.isCrop = true;
-
-    const apiUrl = `srp-variety-willingness?year=${year}&season=${season}&crop_code=${crop_code}`;
     this.getVarietyData(crop_code);
-
+    const apiUrl = `srp-variety-willingness?year=${year}&season=${season}&crop_code=${crop_code}`;
+    console.log(apiUrl);
     this.srpService.postRequestCreator(apiUrl, null, null).subscribe({
       next: (data: any) => {
         if (
@@ -277,8 +276,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
           this.inventoryVarietyData = data.EncryptedResponse.data;
 
           this.isFinalSubmitButtonHide = this.inventoryVarietyData.some((item: any) => item?.is_final_submit === true);
-          console.log(this.inventoryVarietyData, "varietydata")
-          // assuming API returns this at root
+
           if (searchKeyword) {
             this.inventoryVarietyData = this.inventoryVarietyData.filter(item =>
               String(item.variety_name || '').toLowerCase().includes(searchKeyword) ||
@@ -351,7 +349,6 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
     });
 
   }
-
   toggleCropSection(index: number) {
 
     const pos = this.openCropIndexes.indexOf(index);
@@ -362,10 +359,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
     }
   }
   getVarietyData(crop_code: string) {
-
-
     const apiUrl = `get-variety-details?crop_code=${crop_code}`
-
     this.srpService.getRequestCreatorNew(apiUrl).subscribe({
       next: (data: any) => {
         if (
@@ -377,7 +371,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
           this.varietyData = data.EncryptedResponse.data;
 
 
-          console.log('✅ Season list loaded:', this.inventorySeasonData);
+
         } else {
           console.warn('⚠️ No valid data received in EncryptedResponse');
           this.varietyData = [];
@@ -402,13 +396,13 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
     const varietyCode =
       this.ngForm.controls['bspc']['controls'][index].controls['variety_code'].value;
 
-    this.indentorBreederSeedData(varietyCode);
+    this.indentorBreederSeedData(varietyCode, index);
   }
   hidePopover() {
     this.popupIndex = null;
   }
-  indentorBreederSeedData(varietyCode: string) {
 
+  indentorBreederSeedData(varietyCode: any, index: number) {
     const year = this.ngForm.controls['year'].value;
     const season = this.ngForm.controls['season'].value;
     const crop_code = this.ngForm.controls['crop_code'].value;
@@ -425,8 +419,16 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
           data.EncryptedResponse.status_code === 200
         ) {
           this.inventoryIndentorData = data.EncryptedResponse.data;
-          console.log(this.inventoryIndentorData, " this.inventoryIndentorData")
 
+          this.openReplaceSwal(
+            this.inventoryIndentorData,
+            index,
+            false,
+            [
+              { header: 'Indentor', key: 'user_name' },
+              { header: 'Tentative Qty', key: 'breeder_seed' }
+            ]
+          );
 
         }
       },
@@ -434,7 +436,12 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
         console.error("❌ API Error:", err);
       }
     });
+
+
+
   }
+
+
   checkTentativeValue(i: number) {
     const controlGroup = this.ngForm.controls['bspc']['controls'][i];
     const totalSeedRequired = controlGroup.controls['total_seed_required'].value;
@@ -489,9 +496,6 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
         remarks: row.additional_note || null,
       }));
 
-
-
-
     const willingnessData = [...existingData, ...newVarietyData];
 
     const payload = {
@@ -503,7 +507,6 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
     };
 
     console.log("Payload Sent:", payload);
-
     this.srpService.postRequestCreator(apiUrl, null, payload).subscribe({
       next: (data: any) => {
         console.log("API Response:", data);
@@ -537,49 +540,83 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
       },
     });
   }
-  openReplaceSwal(list: any[]) {
-    console.log(list, "heeloo....................")
-    Swal.fire({
-      title: '<span style="color:Black;">Replacement Varieties</span>',
-      width: 700,
-      background: '#f5f5f5',
-      html: this.generateTableHTML(list),
-      showCloseButton: true,
-      showConfirmButton: false,
-      customClass: {
-        popup: 'rounded-modal',
-        title: 'modal-title'
-      }
-    });
-  }
 
-  generateTableHTML(list: any[]) {
+  // openReplaceSwal(list: any[]) {
+
+  //   Swal.fire({
+  //     title: '<span style="color:Black;">Replacement Varieties</span>',
+  //     width: 700,
+  //     background: '#f5f5f5',
+  //     html: this.generateTableHTML(list),
+  //     showCloseButton: true,
+  //     showConfirmButton: false,
+  //     customClass: {
+  //       popup: 'rounded-modal',
+  //       title: 'modal-title'
+  //     }
+  //   });
+  // }
+
+  //   generateTableHTML(list: any[]) {
+  //     if (!list || list.length === 0) {
+  //       return `<p>No replacement varieties available.</p>`;
+  //     }
+
+  //     let rows = list
+  //       .map(
+  //         (x) => `
+  //       <tr>
+
+  //         <td>${x.variety_name || '-'}</td>
+  //         <td>${x.replace_tentative_qty}</td>
+  //       </tr>`
+  //       )
+  //       .join('');
+
+  //     return `
+  //     <div style="margin-top:10px;">
+  //       <table border="1" width="100%" style="border-collapse: collapse; text-align:center;">
+  //         <thead style="background:#B34B1D;">
+  //           <tr>
+
+  //           <th style="color: black;">Variety Name</th>
+  // <th style="color: black;">Tentative Qty</th>
+  //           </tr>
+  //         </thead>
+
+  //         <tbody>
+  //           ${rows}
+  //         </tbody>
+  //       </table>
+  //     </div>
+  //   `;
+  //   }
+
+  generateTableHTML(list: any[], columns: { header: string; key: string }[]) {
     if (!list || list.length === 0) {
-      return `<p>No replacement varieties available.</p>`;
+      return `<p>No data available.</p>`;
     }
 
-    let rows = list
-      .map(
-        (x) => `
-      <tr>
-      
-        <td>${x.variety_name || '-'}</td>
-        <td>${x.replace_tentative_qty}</td>
-      </tr>`
-      )
+    // Table Head
+    let thead = columns
+      .map(col => `<th style="color:black;">${col.header}</th>`)
       .join('');
+
+    // Table Rows
+    let rows = list.map(item => {
+      let tds = columns.map(col => {
+        return `<td>${item[col.key] ?? '-'}</td>`;
+      }).join('');
+
+      return `<tr>${tds}</tr>`;
+    }).join('');
 
     return `
     <div style="margin-top:10px;">
       <table border="1" width="100%" style="border-collapse: collapse; text-align:center;">
         <thead style="background:#B34B1D;">
-          <tr>
-          
-          <th style="color: black;">Variety Name</th>
-<th style="color: black;">Tentative Qty</th>
-          </tr>
+          <tr>${thead}</tr>
         </thead>
-
         <tbody>
           ${rows}
         </tbody>
@@ -587,6 +624,70 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
     </div>
   `;
   }
+
+  getVarietyName(variety_code: any, callback: () => void) {
+    const apiUrl = `get-variety-name?variety_code=${variety_code}`;
+
+    this.srpService.postRequestCreator(apiUrl, null, null).subscribe({
+      next: (data: any) => {
+        console.log("API Response:", data);
+
+        if (
+          data &&
+          data.EncryptedResponse &&
+          data.EncryptedResponse.data &&
+          data.EncryptedResponse.status_code === 200
+        ) {
+          this.varietyName = data.EncryptedResponse.data.variety_name;
+        } else {
+          this.varietyName = '';
+        }
+
+        // ✅ API ke baad callback call
+        callback();
+      },
+      error: () => {
+        this.varietyName = '';
+        callback();
+      }
+    });
+  }
+
+  openReplaceSwal(list: any[], index: number, isCheck: boolean, columns: { header: string; key: string }[]) {
+    console.log("inside of openReplaceSwal")
+    if (!list || !list.length) {
+      Swal.fire('No Data', 'No data available', 'info');
+      return;
+    }
+
+    const varietyCode =
+      this.ngForm.controls['bspc']['controls'][index].controls['variety_code'].value;
+
+    // pehle API, phir Swal
+    this.getVarietyName(varietyCode, () => {
+
+      Swal.fire({
+        title: '',
+        width: 700,
+        background: '#f5f5f5',
+        html: `
+        <div style="text-align:center; margin-bottom:6px; font-size:14px; font-weight:600;">
+          ${isCheck === true ? 'Replacement Varieties' : `Variety Name - ${this.varietyName}`}
+        </div>
+
+        ${this.generateTableHTML(list, columns)}
+      `,
+        showCloseButton: true,
+        showConfirmButton: false,
+        customClass: {
+          popup: 'rounded-modal'
+        }
+      });
+
+    });
+  }
+
+
   finalizeData() {
     const apiUrl = "srp-add-willingness";
     const formValues = this.ngForm.value;
@@ -687,10 +788,9 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
       );
     });
 
-    console.log(validRows.length, 'VALID ROW COUNT');
+
     return validRows.length > 0;
   }
-
 
   addInnerRow(i: number) {
     this.getInnerBspc(i).push(
@@ -811,7 +911,7 @@ export class SeedRollingPlaningWillingnessScreenComponent implements OnInit {
     );
 
     if (hasFilledReplacement) {
-       rowGroup.get('status_toggle')?.setValue(false);
+      rowGroup.get('status_toggle')?.setValue(false);
       Swal.fire({
         title: 'Replacement Already Added',
         text: 'Replacement variety will be deleted',

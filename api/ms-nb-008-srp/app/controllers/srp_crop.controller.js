@@ -213,7 +213,6 @@ class CropController {
       const existCropCodes = existCropData.map(item => item.crop_code);
       if (group_code) cropWhereCondition.group_code = group_code;
       if (existCropCodes && existCropCodes.length) cropWhereCondition.crop_code = { [Op.notIn]: existCropCodes };
-      console.log('existCropCodes', existCropCodes);
       const data = await db.cropModel.findAll({
         where: cropWhereCondition,
         // if group_code is undefined, this does nothing → returns all
@@ -233,7 +232,7 @@ class CropController {
         attributes: ["crop_code", "crop_name", "group_code", "srr", "is_active"],
         order: [
           // [{ model: db.srpCropModel, as: "seed_rolling_plan_crop_wises" }, "is_draft", "ASC"],
-          ["crop_code", "ASC"],
+          ["crop_name", "ASC"],
         ],
       });
 
@@ -448,7 +447,7 @@ class CropController {
   static addToListData = async (req, res) => {
     try {
       const user_id = req.body?.loginedUserid?.id
-      const { year, season } = req.body.search;
+      const { year, season,group_code } = req.body.search;
       const addToListData = await db.srpCropModel.findAll({
         include: [
           {
@@ -456,11 +455,15 @@ class CropController {
             attributes: []
           }
         ],
-        where: { year, season: { [Op.iLike]: `${season}%` }, is_draft: true, user_id },
+        where: { year, season: { [Op.iLike]: `${season}%` }, is_draft: true, user_id,group_code:group_code },
         attributes: [
           "*", [sequelize.col('m_crop.crop_name'), 'crop_name']
         ],
-        raw: true
+        raw: true,
+        order: [
+          ['is_final_submit', 'ASC'], // false first
+          [sequelize.col('m_crop.crop_name'), 'ASC'] // name ascending
+        ],
       });
       if (addToListData && addToListData.length) {
         return response(res, status.DATA_AVAILABLE, 200, addToListData);

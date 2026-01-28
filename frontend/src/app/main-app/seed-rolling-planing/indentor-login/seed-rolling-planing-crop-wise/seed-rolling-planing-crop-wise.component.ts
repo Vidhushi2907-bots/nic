@@ -91,7 +91,6 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
     this.ngForm.get('global_search')?.valueChanges.subscribe(() => {
       this.triggerAutoSearch();
     })
-    this.addToListData();
     // Subscribe to group_code changes
     const groupControl = this.ngForm.get('group_code');
     if (groupControl) {
@@ -106,6 +105,8 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
         this.getCroupCroupList(year, season);
       }
     });
+
+
     this.ngForm.get('season')?.valueChanges.subscribe(season => {
       const year = this.ngForm.get('year')?.value;
       if (year && season) {
@@ -146,14 +147,18 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
     // ✅ Sirf year select hone par season enable hoga
     this.ngForm.controls['year'].valueChanges.subscribe(newvalue => {
       if (newvalue) {
-
         this.ngForm.controls['season'].enable();
         this.isCrop = false;
         this.srpCropWise.clear();
 
       }
     });
-
+    
+    this.ngForm.controls['group_code'].valueChanges.subscribe(newvalue => {
+      if (newvalue) {
+        this.addToListData();
+      }
+    });
 
     this.srpCropWiseData = this.breeder.redirectData;
 
@@ -204,6 +209,9 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
       this.srpCropWise.clear();
     }
 
+    // add to list seprate grid 
+    // this.addToListData();
+    this.addToListData();
     // reload data
     this.getPageData();
   }
@@ -767,19 +775,22 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
 
     console.log(seed_rate, total_area, srr_value, "seed_rate * total_area * (srr_value / 100)");
 
-    const total = seed_rate * total_area * (srr_value / 100);
+    let total = seed_rate * total_area * (srr_value / 100);
     console.log(total, "total")
     rowGroup.get('total_required')
       ?.setValue(total.toFixed(2), { emitEvent: false });
-    rowGroup.get('total_area')?.valueChanges.subscribe(value => {
-      const isActiveCtrl = rowGroup.get('is_active');
+    // rowGroup.get('total_required')?.valueChanges.subscribe(value => {
+    //   const isActiveCtrl = rowGroup.get('is_active');
 
-      if (value && Number(value) > 0) {
-        isActiveCtrl?.setValue(true, { emitEvent: false });
-      } else {
-        isActiveCtrl?.setValue(false, { emitEvent: false });
-      }
-    });
+    //   if (value && Number(value) > 0) {
+    //     isActiveCtrl?.setValue(true, { emitEvent: false });
+    //   } else {
+    //     isActiveCtrl?.setValue(false, { emitEvent: false });
+    //   }
+    // });
+    // checkbox auto check/uncheck based on total
+    rowGroup.get('is_active')
+      ?.setValue(total > 0, { emitEvent: false });
     this.updateTotalSeedRequired();
   }
 
@@ -874,10 +885,12 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
       let route = "add-to-list-data";
       let param = {
         "search": {
-          "year": "2027",
-          "season": "R"
+          "year": this.ngForm.controls['year']?.value,
+          "season": this.ngForm.controls['season']?.value,
+          "group_code": this.ngForm.controls['group_code']?.value
         }
       }
+
       this.srpService.postRequestCreator(route, null, param).subscribe(res => {
         let addToListData = [];
         if (res.EncryptedResponse.status_code === 200) {
@@ -932,7 +945,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
         this.srpService.getRequestCreatorNew(route + '?' + 'id' + '=' + id).subscribe(res => {
         })
         this.srpCropWiseFinal.clear();
-        this.addToListData();
+
         this.getPageData()
       }
     });

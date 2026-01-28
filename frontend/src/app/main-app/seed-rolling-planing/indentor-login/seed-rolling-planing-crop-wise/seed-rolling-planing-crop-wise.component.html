@@ -83,7 +83,7 @@
         </div>
 
         <!--third ui -->
-        <div class="col-12 col-md-12 col-lg-12 pt-0">
+        <div class="col-12 col-md-12 col-lg-12 pt-0" *ngIf=" this.srpCropWiseFinal.length > 0 ">
           <div class="row card-inventory form-group">
             <div class="col-12">
               <!-- Header Row -->
@@ -116,8 +116,8 @@
                 </div>
 
                 <!-- 🔹 Scrollable Container -->
-                <div style="max-height: 350px; overflow-x: hidden;
-                            overflow-y: auto; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;">
+                <div style="max-height: 350px; overflow-x: hidden; 
+                            overflow-y: auto; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;"  >
 
                   <!-- Dynamic Rows -->
                   <div formArrayName="srpCropWiseFinal">

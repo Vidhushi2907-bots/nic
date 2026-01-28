@@ -643,14 +643,18 @@ table {
     height: 41px!important;
     color: #000000;
     font-size: 16px;
-}.btn-inventorys {
+}
+.btn-inventorys {
     /* width: 158px !important; */
     background: #B64B1D;
     height: 41px !important;
     /* margin-left: -2em!important; */
     border-radius: 5px;
     font-size: 16px;
+    color: #FFFFFF;
+    border-color: #b64b1d;
 }
+
 .submitted-link {
   text-decoration: underline;
   color: blue;
@@ -697,4 +701,12 @@ table {
 .crop-item label {
   cursor: pointer;
   font-size: 14px;
+}
+.disabled-btn {
+  opacity: 0.4;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+.clear-form-button{
+
 }

@@ -4,72 +4,17 @@ const status = require('../_helpers/status.conf')
 const db = require("../models");
 const paginateResponse = require("../_utility/generate-otp");
 let Validator = require('validatorjs');
-const stateModel = db.stateModel;
-const districtModel = db.districtModel;
-const userModel = db.userModel;
-const allocationToIndentorForLiftingBreederseedsModel = db.allocationToIndentorForLiftingBreederseedsModel;
-const indentOfBreederseedModel = db.indentOfBreederseedModel;
-const directIndent = db.directIndent;
-// const cropModel = db.cropModel;
-const varietyModel = db.varietyModel
-const agencyDetailModel = db.agencyDetailModel
-const designationModel = db.designationModel
-const categoryModel = db.categoryModel
-const bsp1Model = db.bsp1Model;
-const bsp2Model = db.bsp2Model;
-const bsp3Model = db.bsp3Model;
-const bsp4Model = db.bsp4Model;
-const bsp5aModel = db.bsp5aModel;
-const bsp5bModel = db.bsp5bModel;
-const bsp6Model = db.bsp6Model;
-const cropVerietyModel = db.cropVerietyModel;
-const nucleusSeedAvailabityModel = db.nucleusSeedAvailabityModel;
-const freezeTimelineModel = db.freezeTimeline;
-const bsp1ProductionCenter = db.bsp1ProductionCenter;
-const plantDetailsModel = db.plantDetails;
-const indentOfSpaModel = db.indentOfSpa;
-const seasonModel = db.seasonModel;
-const activitiesModel = db.activitiesModel;
-const blockModel = db.blockModel;
-const centralModel = db.centralModel
-const alloallocationToIndentorProductionCenterSeed = db.allocationToIndentorProductionCenterSeed
-const { allocationToSPASeed, allocationToSPAProductionCenterSeed, indenterSPAModel, indentOfBrseedDirectLineModel, sectorModel, deleteIndenteOfSpaModel, deleteIndenteOfBreederSeedModel, bspPerformaBspTwo, bspPerformaBspThree, bspPerformaBspOne, bspProformaOneBspc, monitoringTeamOfBspcMember, monitoringTeamOfBspc, seedInventory, seedClassModel, stageModel, seedInventoryTag, seedInventoryTagDetail, bspPerformaBspTwoSeed, varietyLineModel, mVarietyLinesModel } = require('../models');
-const seedLabTestModel = db.seedLabTestModel;
-const bpctoPlant = db.bspctoplantModel;
-const generatBillsModel = db.generateBills;
-const assignCropNewFlow = db.assignCropNewFlow;
-const assignBspcCropNewFlow = db.assignBspcCropNewFlow;
-const allocationToIndentorProductionCenterSeed = db.allocationToIndentorProductionCenterSeed
-const allocationToIndentorSeed = db.allocationtoIndentorliftingseeds;
-const seedProcessingRegisterModel = db.seedProcessingRegister;
-const liftingSeedDetailsModel = db.liftingSeedDetailsModel;
-
 const SeedUserManagement = require('../_helpers/create-user')
-const labelNumberForBreederseed = db.labelNumberForBreederseed
-const generatedLabelNumberModel = db.generatedLabelNumberModel
 const cropGroupModel = db.cropGroupModel
 const masterHelper = require('../_helpers/masterhelper')
 const JWT = require('jsonwebtoken')
 require('dotenv').config()
 const Token = db.tokens;
-
 const jwt = require('jsonwebtoken');
 const axios = require('axios').default;
-
 const sequelize = require('sequelize');
-const sequelizer = require("../models/db");
-const ConditionCreator = require('../_helpers/condition-creator');
-const { where, QueryTypes } = require('sequelize');
-const { condition } = require('sequelize');
-const e = require('express');
-const AES = require('../_helpers/AES');
-const sendSms = require('../_helpers/sms')
-const paginateResponseRaw = require("../_utility/generate-otp");
-const moment = require("moment");
-const crypto = require("crypto");
-const https = require("https");
 const Sequelize = require('sequelize');
-const srpCropWise = db.seedRollingPlanCropWisesModel;
+const { Op, literal, Model, NOW } = require("sequelize");
 
 class CropController {
   //get-crop
@@ -248,33 +193,46 @@ class CropController {
       const { year, season, group_code } = req.query; // optional group_code
       const { Op } = require("sequelize");
       const userId = req.body?.loginedUserid?.id;
+
+
       // Filter srpCropModel for draft data
-      const whereCondition = { is_draft: { [Op.not]: null }, user_id: userId };
+      const whereCondition = { user_id: userId };
       if (year) whereCondition.year = year;
       if (season) whereCondition.season = season;
 
       // Optional cropModel filter
       const cropWhereCondition = {};
+      // check srp crop wise exit data
+      let existCropData = await db.srpCropModel.findAll(
+        {
+          attributes: ['crop_code'],
+          where: whereCondition,
+          raw: true
+        }
+      )
+      const existCropCodes = existCropData.map(item => item.crop_code);
       if (group_code) cropWhereCondition.group_code = group_code;
-
+      if (existCropCodes && existCropCodes.length) cropWhereCondition.crop_code = { [Op.notIn]: existCropCodes };
+      console.log('existCropCodes', existCropCodes);
       const data = await db.cropModel.findAll({
-        where: cropWhereCondition, // if group_code is undefined, this does nothing → returns all
+        where: cropWhereCondition,
+        // if group_code is undefined, this does nothing → returns all
         include: [
-          {
-            model: db.srpCropModel,
-            as: "seed_rolling_plan_crop_wises",
-            attributes: [
-              "id", "year", "season", "seed_rate", "total_area",
-              "total_required", "is_active", "is_draft", "srr",
-              "is_final_submit", "createdAt", "updatedAt", "user_id"
-            ],
-            required: false,
-            where: whereCondition,
-          },
+          // {
+          //   model: db.srpCropModel,
+          //   as: "seed_rolling_plan_crop_wises",
+          //   attributes: [
+          //     "id", "year", "season", "seed_rate", "total_area",
+          //     "total_required", "is_active", "is_draft", "srr",
+          //     "is_final_submit", "createdAt", "updatedAt", "user_id"
+          //   ],
+          //   required: false,
+          //   where: whereCondition,
+          // },
         ],
         attributes: ["crop_code", "crop_name", "group_code", "srr", "is_active"],
         order: [
-          [{ model: db.srpCropModel, as: "seed_rolling_plan_crop_wises" }, "is_draft", "ASC"],
+          // [{ model: db.srpCropModel, as: "seed_rolling_plan_crop_wises" }, "is_draft", "ASC"],
           ["crop_code", "ASC"],
         ],
       });
@@ -487,5 +445,90 @@ class CropController {
     }
   };
 
+  static addToListData = async (req, res) => {
+    try {
+      const user_id = req.body?.loginedUserid?.id
+      const { year, season } = req.body.search;
+      const addToListData = await db.srpCropModel.findAll({
+        include: [
+          {
+            model: db.cropModel,
+            attributes: []
+          }
+        ],
+        where: { year, season: { [Op.iLike]: `${season}%` }, is_draft: true, user_id },
+        attributes: [
+          "*", [sequelize.col('m_crop.crop_name'), 'crop_name']
+        ],
+        raw: true
+      });
+      if (addToListData && addToListData.length) {
+        return response(res, status.DATA_AVAILABLE, 200, addToListData);
+      } else {
+        return response(res, status.DATA_NOT_AVAILABLE, 201, []);
+      }
+    } catch (error) {
+      console.log('error', error);
+      return response(res, status.UNEXPECTED_ERROR, 501, []);
+    }
+  }
+
+  static addToListDataRemove = async (req, res) => {
+    try {
+      const id = Number(req.query.id);
+      const deleted = await db.srpCropModel.destroy({
+        where: { id: id }
+      });
+
+      if (!deleted) {
+        return res.status(404).json({
+          success: false,
+          message: 'Record not found'
+        });
+      }
+      res.json({
+        status_code: 200,
+        success: true,
+        message: 'Record deleted successfully'
+      });
+    } catch (error) {
+      console.log('error', error);
+      return response(res, status.UNEXPECTED_ERROR, 501, []);
+    }
+  }
+  static submitForFillingVarietyData = async (req, res) => {
+    try {
+      const { ids } = req.body; // [1,2,3,4]
+
+      if (!Array.isArray(ids) || !ids.length) {
+        return res.status(400).json({
+          success: false,
+          message: 'Valid ids array required'
+        });
+      }
+
+      const updated = await db.srpCropModel.update(
+        {
+          is_final_submit: true,
+          is_draft: true
+        },
+        {
+          where: {
+            id: ids // Sequelize auto IN clause
+          }
+        }
+      );
+      res.json({
+        success: true,
+        message: 'Final submit done',
+        updatedCount: updated[0]
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
 }
 module.exports = CropController

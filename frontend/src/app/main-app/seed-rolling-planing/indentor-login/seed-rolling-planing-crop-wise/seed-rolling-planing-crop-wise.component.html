@@ -60,7 +60,8 @@
                       Filter by Crop Group
                     </label>
                     <select class="form-control input-inventory rounded-pill px-3 py-2" formControlName="group_code"
-                      style="width: 100%; border: 1px solid #c96a2b; height: 40px;" (change)="getPageData()">
+                      style="width: 100%; border: 1px solid #c96a2b; height: 40px;"
+                      (change)="getPageData();addToListData();">
                       <option value="">All Crop Groups</option>
                       <option [value]="data.group_code" *ngFor="let data of response_crop_group">
                         {{ data.group_name }}
@@ -83,7 +84,7 @@
         </div>
 
         <!--third ui -->
-        <div class="col-12 col-md-12 col-lg-12 pt-0" *ngIf=" this.srpCropWiseFinal.length > 0 ">
+        <div class="col-12 col-md-12 col-lg-12 pt-0 d-none" *ngIf=" this.srpCropWiseFinal.length > 0 ">
           <div class="row card-inventory form-group">
             <div class="col-12">
               <!-- Header Row -->
@@ -117,11 +118,11 @@
 
                 <!-- 🔹 Scrollable Container -->
                 <div style="max-height: 350px; overflow-x: hidden; 
-                            overflow-y: auto; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;"  >
+                            overflow-y: auto; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;">
 
                   <!-- Dynamic Rows -->
                   <div formArrayName="srpCropWiseFinal">
-                    <div  *ngFor="let fg of srpCropWiseFinal.controls; let i= index">
+                    <div *ngFor="let fg of srpCropWiseFinal.controls; let i= index">
                       <div [formGroupName]="i" class="row data-row">
                         <!-- your existing row content -->
                         <!-- S/N -->
@@ -149,7 +150,8 @@
                         <div class="col-6 col-md-2 py-2 d-flex align-items-center justify-content-center">
                           <div class="w-fit-content form-group">
                             <label class="d-md-none"><b>Total Area (in Lakh Ha):</b>&nbsp;</label>
-                            <input type="number" formControlName="total_area" [readonly]="true" class="form-control target-input-field">
+                            <input type="number" formControlName="total_area" [readonly]="true"
+                              class="form-control target-input-field">
                           </div>
                         </div>
 
@@ -180,13 +182,15 @@
                               <b>Qty. of Seed Required (in Qtls) Available ({{ unitValue ? unitValue : '' }}):</b>
                             </label>
                             <!-- <span> {{ngForm.controls['srpCropWiseFinal']['controls'][i].controls['total_required}}</span> -->
-                              <input type="number" class="form-control target-input-field" formControlName="total_required"
-                              [readonly]="true">
+                            <input type="number" class="form-control target-input-field"
+                              formControlName="total_required" [readonly]="true">
                           </div>
                         </div>
 
                         <div class="col-6 col-md-1 py-3 d-flex align-items-center justify-content-center crop-item">
-                          <button class="list-action-buttons" [class.disabled-btn]="fg.get('is_final_submit')?.value" [disabled]="fg.get('is_final_submit')?.value" (click)="removeData(fg.get('id')?.value)"><img src="assets/images/delete.svg"></button>
+                          <button class="list-action-buttons" [class.disabled-btn]="fg.get('is_final_submit')?.value"
+                            [disabled]="fg.get('is_final_submit')?.value" (click)="removeData(fg.get('id')?.value)"><img
+                              src="assets/images/delete.svg"></button>
                         </div>
                       </div>
                     </div>
@@ -224,8 +228,8 @@
                   class="clear-form-button btn-inventory d-inline-flex justify-content-center align-items-center mb-3">
                   Submit for Filling Variety Data
                 </button> -->
-                 <!-- [class.disabled-btn]="!isFinalSubmitButtonHide" -->
-                 <button (click)="finalizeDataSubmit()" *ngIf="!isFinalSubmitButtonHide"
+                <!-- [class.disabled-btn]="!isFinalSubmitButtonHide" -->
+                <button (click)="finalizeDataSubmit()" *ngIf="!isFinalSubmitButtonHide"
                   class="btn-inventorys d-inline-flex justify-content-center align-items-center mb-3">
                   Submit for Filling Variety Data
                 </button>
@@ -233,6 +237,7 @@
             </div>
           </div>
         </div>
+
         <!--foure ui -->
         <div class="col-12 col-md-12 col-lg-12 pt-0" *ngIf="isCrop">
           <div class="row card-inventory form-group">
@@ -410,20 +415,154 @@
                   <!-- Save -->
                   Add to the List
                   <!-- Save as Draft -->
+                  <!-- write code here -->
                 </button>
               </div>
-              <!-- <div class="col-auto">
-                <button (click)="finalizeData()" *ngIf="!isFinalSubmitButtonHide"
-                  class="clear-form-button btn-inventory d-inline-flex justify-content-center align-items-center mb-3">
+            </div>
+          </div>
+        </div>
+
+        <!-- five ui tabular formate -->
+        <div class="add-to-list-header" *ngIf="this.srpCropWiseFinal.length > 0">
+          <span class="ml-0">
+            Final Data For Submission
+          </span>
+        </div>
+
+        <div class="col-12 col-md-12 col-lg-12 pt-0" *ngIf=" this.srpCropWiseFinal.length > 0 ">
+          <div class="row card-inventory-white form-group">
+            <div class="col-12">
+              <!-- Header Row -->
+              <div class="list-wrapper">
+                <div class="row d-none d-md-flex data-row-header-2">
+                  <div class="col-6 col-md-1 d-flex align-items-center justify-content-center">S/N</div>
+                  <div
+                    class="col-6 col-md-2 py-2 d-flex flex-column align-items-center justify-content-center text-center">
+                    Crop Name</div>
+                  <div class="col-6 col-md-2 py-2 d-flex align-items-center justify-content-center">
+                    Total Area (in Ha)
+                  </div>
+                  <div class="col-6 col-md-2 py-2 d-flex align-items-center justify-content-center">
+                    Seed Rate (Qt./Ha)
+                  </div>
+                  <div class="col-6 col-md-2 py-2 d-flex align-items-center justify-content-center text-center">
+                    SRR
+                  </div>
+                  <div
+                    class=" col-6 col-md-2 py-2 d-flex flex-column align-items-center justify-content-center text-center">
+                    Seed Required (in Qt.)<br />
+
+                  </div>
+                  <div class="col-6 col-md-1 py-2 d-flex align-items-center justify-content-center"
+                    *ngIf="!isFinalSubmitButtonHide">
+                    Action
+                    <!-- //Action -->
+                  </div>
+                </div>
+
+                <!-- 🔹 Scrollable Container -->
+                <div style="max-height: 350px; overflow-x: hidden; 
+                            overflow-y: auto; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;">
+
+                  <!-- Dynamic Rows -->
+                  <div formArrayName="srpCropWiseFinal">
+                    <div *ngFor="let fg of srpCropWiseFinal.controls; let i= index">
+                      <div [formGroupName]="i" class="row data-row-1  py-1">
+                        <!-- your existing row content -->
+                        <!-- S/N -->
+                        <div class="col-6 col-md-1 py-1 d-flex align-items-center justify-content-center pb-0">
+                          <span>{{ i + 1 }}</span>
+                        </div>
+
+                        <!-- Crop Name -->
+                        <div
+                          class=" col-6 col-md-2 py-1 d-flex flex-column align-items-center justify-content-center text-center">
+                          <span *ngIf="!fg.get('is_final_submit')?.value; else link">
+                            {{ngForm.controls['srpCropWiseFinal']['controls'][i].controls['crop_name'].value}}
+                          </span>
+
+                          <ng-template #link>
+                            <a class="underline-link py-1" [routerLink]="['/seed-rolling-planing-variety-wise']"
+                              [queryParams]="{ id: fg.get('id')?.value }">
+                              {{ngForm.controls['srpCropWiseFinal']['controls'][i].controls['crop_name'].value}}
+                            </a>
+                          </ng-template>
+                        </div>
+
+
+                        <!-- Total Area -->
+                        <div class="col-6 col-md-2 py-1 d-flex align-items-center justify-content-center">
+                          <div class="w-fit-content form-group">
+                            <label class="d-md-none"><b>Total Area (in Lakh Ha):</b>&nbsp;</label>
+                            <span>
+                              {{ngForm.controls['srpCropWiseFinal']['controls'][i].controls['total_area'].value}}</span>
+                          </div>
+                        </div>
+
+                        <div class="col-6 col-md-2 py-1 d-flex align-items-center justify-content-center">
+                          <div class="w-fit-content form-group">
+                            <label class="d-md-none"><b>Seed Rate/Ha (Quintal):</b>&nbsp;</label>
+                            <span>
+                              {{ngForm.controls['srpCropWiseFinal']['controls'][i].controls['seed_rate'].value}}</span>
+                          </div>
+                        </div>
+
+                        <!-- SRR Value -->
+                        <div class="col-6 col-md-2 py-1 d-flex align-items-center justify-content-center">
+                          <div class="w-fit-content form-group">
+                            <label class="d-md-none">
+                              <b>SRR </b>&nbsp;
+                            </label>
+                            <span> {{ngForm.controls['srpCropWiseFinal']['controls'][i].controls['srr'].value}}</span>
+                          </div>
+                        </div>
+
+                        <!-- Qty of Seed Required -->
+                        <div class="col-6 col-md-2 py-1 d-flex align-items-center justify-content-center">
+                          <div class="w-fit-content  form-group">
+                            <label class="d-md-none">
+                              <b>Qty. of Seed Required (in Qtls) Available ({{ unitValue ? unitValue : '' }}):</b>
+                            </label>
+                            <span>
+                              {{ngForm.controls['srpCropWiseFinal']['controls'][i].controls['total_required'].value}}</span>
+                          </div>
+                        </div>
+
+                        <div class="col-6 col-md-1 py-1 d-flex align-items-center justify-content-center crop-item">
+                          <button class="list-action-buttons" [class.disabled-btn]="fg.get('is_final_submit')?.value"
+                            [disabled]="fg.get('is_final_submit')?.value" (click)="removeData(fg.get('id')?.value)"><img
+                              src="assets/images/delete.svg"></button>
+                        </div>
+                      </div>
+                      <hr>
+                    </div>
+                    <!-- Total area Calculated -->
+                  </div>
+                </div>
+
+                <!-- No Data Message -->
+                <div *ngIf=" this.srpCropWiseFinal.length < 1 " class="px-2 py-3 w-100 text-center"
+                  style="height: 50px;">
+                  No Data Found.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="isCrop" class="col-12 pt-2">
+            <div class="row justify-content-end">
+              <div class="col-auto">
+              </div>
+              <div class="col-auto">
+                <button (click)="finalizeDataSubmit()" *ngIf="!isFinalSubmitButtonHide"
+                  class="final-submit-form-button btn-inventorys d-inline-flex justify-content-center align-items-center mb-3">
                   Submit for Filling Variety Data
-                  
                 </button>
-              </div> -->
+              </div>
             </div>
           </div>
         </div>
       </form>
     </div>
-
   </div>
 </div>

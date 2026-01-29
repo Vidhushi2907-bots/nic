@@ -51,7 +51,15 @@
     background: #B64B1D0D;
 
 }
+.card-inventory-white {
+    /* width: 1492px;
+    height: 382px;
+    top: 206px;
+    left: 360px; */
+    border-radius: 10px;
+    background: #FFFFFF;
 
+}
 
 
 .label-inventory-v2 {
@@ -155,6 +163,22 @@ input[type='radio'] {
     color: #FFFFFF;
 }
 
+.data-row-header-2 {
+    background: #B64B1D0D 0% 0% no-repeat padding-box;
+    border-top-right-radius: 15px;
+    border-top-left-radius: 15px;
+    /* margin: 0.2%; */
+    /* padding: 2%; */
+}
+
+.data-row-header-2 * {
+    font: normal Poppins 600 15px/19px;
+    font-weight: 500;
+    letter-spacing: 0px;
+    color: #000000;
+    font-size: 18px;
+}
+
 .bsp-one-table {
     border-top-right-radius: 15px;
     border-top-left-radius: 15px;
@@ -189,6 +213,65 @@ input[type='radio'] {
     letter-spacing: 0px;
     color: #000000; */
 }
+.data-row-1 * {
+    font-weight: 600 !important;
+     font-size: 15px!important;
+    /* font-family: Inter;
+    
+    font-weight: 500;
+    font-size: 16px;
+    text-align: left;
+    letter-spacing: 0px;
+    color: #000000; */
+}
+/* start new css for slim grid */
+.data-row-1 + hr {
+  margin: 0 !important;
+}
+.data-row-1 + hr {
+  margin-top: 2px !important;
+  margin-bottom: 2px !important;
+}
+.data-row-1 .form-group {
+  margin-bottom: 0 !important;
+}
+.data-row-1 {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+.data-row-1 > div {
+  padding-top: 2px!important;
+  padding-bottom: 2px !important;
+}
+.data-row-1 {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.data-row-1 > div {
+  padding-top: 2px!important;
+  padding-bottom:2px !important;
+}
+
+.data-row-1 .form-group {
+  margin-bottom: 0 !important;
+}
+
+.data-row-1 + hr {
+  margin-top: 2px !important;
+  margin-bottom: 2px !important;
+}
+
+/* .disabled-btn {
+  opacity: 0.4;
+  pointer-events: none;
+} */
+
+/* end new css for slim grid */
 
 .body-border {
     border: none !important;
@@ -709,4 +792,22 @@ table {
 }
 .clear-form-button{
 
+}
+.final-submit-form-button{
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    width: 230px;
+    height: 46px;
+    /* background: #E97E15 0% 0% no-repeat padding-box; */
+    border-radius: 5px;
+    font: normal Poppins 16px/25px;
+    letter-spacing: 0px;
+    color: #ffffff;
+    cursor: pointer;
+}
+.card-header{
+    /* font-size: 15px; */
+    font-weight: 600;
+    background-color: #FFFFFF !important;
 }

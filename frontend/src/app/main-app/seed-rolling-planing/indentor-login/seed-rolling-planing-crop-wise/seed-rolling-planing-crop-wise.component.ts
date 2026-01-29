@@ -153,13 +153,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
 
       }
     });
-    
-    this.ngForm.controls['group_code'].valueChanges.subscribe(newvalue => {
-      if (newvalue) {
-        this.addToListData();
-      }
-    });
-
+  
     this.srpCropWiseData = this.breeder.redirectData;
 
     if (this.srpCropWiseData?.year && this.srpCropWiseData?.season) {
@@ -232,8 +226,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
 
     if (!searchText) {
       this.originalCropList = this.srpCropWise.controls;
-      this.originalCropListFinal = this.srpCropWise.controls;
-      console.log(this.originalCropList,)
+      this.addToListData()
       return;
     }
 
@@ -253,27 +246,25 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
         String(v || '').toLowerCase().includes(searchText)
       );
     });
-
-    this.originalCropListFinal = this.srpCropWise.controls.filter(ctrl => {
-      if (ctrl.get('is_draft')?.value == true) {
-        const values = [
-          ctrl.get('crop_name')?.value,
-          ctrl.get('srr')?.value,
-          ctrl.get('total_area')?.value,
-          ctrl.get('total_required')?.value,
-          ctrl.get('seed_rate')?.value,
-          ctrl.get('is_active')?.value ? 1 : 0
-        ];
-        console.log(values.some(v =>
-          String(v || '').toLowerCase().includes(searchText)
-        ), "value.................................")
-        return values.some(v =>
-          String(v || '').toLowerCase().includes(searchText)
-        );
-      }
+    
+     this.srpCropWiseFinal.controls = this.srpCropWiseFinal.controls.filter(ctrl => {
+      const values = [
+        ctrl.get('crop_name')?.value,
+        ctrl.get('srr')?.value,
+        ctrl.get('total_area')?.value,
+        ctrl.get('total_required')?.value,
+        ctrl.get('seed_rate')?.value,
+        ctrl.get('is_active')?.value ? 1 : 0
+      ];
+      console.log(values.some(v =>
+        String(v || '').toLowerCase().includes(searchText)
+      ), "value.................................")
+      return values.some(v =>
+        String(v || '').toLowerCase().includes(searchText)
+      );
     });
   }
-
+ 
   //get crop code
   getCropCode(i: number) {
     return (this.ngForm.get('srpCropWise') as FormArray).at(i).get('crop_code').value;
@@ -729,10 +720,10 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
   }
 
   async getCroupCroupList(year: any, season: any) {
+    // const route1 = `get-srp-crop-group-wise?year=${year}&season=${season}`;
     const route1 = `get-srp-crop-group-wise?year=${year}&season=${season}`;
     this.srpService.getPlansInfo(route1).then((data: any) => {
       this.response_crop_group = data['EncryptedResponse'].data
-
     })
   }
 
@@ -893,6 +884,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
 
       this.srpService.postRequestCreator(route, null, param).subscribe(res => {
         let addToListData = [];
+        this.srpCropWiseFinal.clear(); // important
         if (res.EncryptedResponse.status_code === 200) {
           addToListData = res.EncryptedResponse.data
           this.srpCropWiseFinal.clear(); // important
@@ -945,7 +937,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
         this.srpService.getRequestCreatorNew(route + '?' + 'id' + '=' + id).subscribe(res => {
         })
         this.srpCropWiseFinal.clear();
-
+        this.addToListData();
         this.getPageData()
       }
     });

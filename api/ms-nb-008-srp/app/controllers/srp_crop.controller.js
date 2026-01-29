@@ -410,7 +410,7 @@ class CropController {
         where: { year, season, is_final_submit: true }
       });
 
-      if (finalSubmit) {
+      if (false) {
         const filteredGroupData = await db.cropGroupModel.findAll({
           attributes: ['group_code', 'group_name'], // ✅ only these fields
           include: [
@@ -448,6 +448,8 @@ class CropController {
     try {
       const user_id = req.body?.loginedUserid?.id
       const { year, season,group_code } = req.body.search;
+      let groupCode;
+      if(group_code) groupCode = {group_code:group_code}
       const addToListData = await db.srpCropModel.findAll({
         include: [
           {
@@ -455,7 +457,7 @@ class CropController {
             attributes: []
           }
         ],
-        where: { year, season: { [Op.iLike]: `${season}%` }, is_draft: true, user_id,group_code:group_code },
+        where: { year, season: { [Op.iLike]: `${season}%` }, is_draft: true, user_id,...groupCode },
         attributes: [
           "*", [sequelize.col('m_crop.crop_name'), 'crop_name']
         ],

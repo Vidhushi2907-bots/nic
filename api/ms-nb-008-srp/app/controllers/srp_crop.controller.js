@@ -486,16 +486,9 @@ class CropController {
       });
 
       if (!deleted) {
-        return res.status(404).json({
-          success: false,
-          message: 'Record not found'
-        });
+        return response(res, status.DATA_NOT_FOUND, 201, []);
       }
-      res.json({
-        status_code: 200,
-        success: true,
-        message: 'Record deleted successfully'
-      });
+      return response(res, status.DATA_DELETED, 200, []);
     } catch (error) {
       console.log('error', error);
       return response(res, status.UNEXPECTED_ERROR, 501, []);

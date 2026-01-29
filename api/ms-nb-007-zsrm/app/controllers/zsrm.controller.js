@@ -1149,7 +1149,7 @@ exports.addZsrmReqQsDistWise = async (req, res) => {
     });
     if (recordExist) {
 
-      if (await zsrmreqqsdistModel.findOne({ where: { zsrmreqqs_id: recordExist.id, district_id: body.district_id, is_active: true } })) {
+      if (await zsrmreqqsdistModel.findOne({ where: { zsrmreqqs_id: recordExist.id, is_active: true } })) {
         return response(res, "Record already exist for this district", 409, {});
       }
 
@@ -1245,8 +1245,31 @@ exports.addZsrmReqQsDistWise = async (req, res) => {
 
 exports.addZsrmReqQsFinal = async (req, res) => {
   try {
-    const body = req.body;
+        const body = req.body;
     console.log(body.loginedUserid.id);
+    let crop_type = "";
+    let unit = "";
+    let cropExist = await cropDataModel.findOne({
+      where: {
+        crop_code: body.crop_code,
+      },
+    });
+    console.log(
+      body.crop_code)
+    console.log("crop:", cropExist);
+    if (!cropExist) {
+      return response(res, "Crop Not Found", 404, {});
+    }
+
+    let varietyExist = await varietyModel.findOne({
+      where: {
+        variety_code: body.variety_code,
+      },
+    });
+    console.log("varity:", varietyExist);
+    if (!varietyExist) {
+      return response(res, "Variety Not Found", 404, {});
+    }
     let recordExist = await zsrmreqqsModel.findOne({
       where: {
         year: body.year,
@@ -1258,13 +1281,39 @@ exports.addZsrmReqQsFinal = async (req, res) => {
         is_active: true
       },
     });
-    if (recordExist && recordExist.isFinalSubmitted == true) {
+    if (recordExist == true) {
       return response(res, "Record already exist", 409, {});
     }
-    else if (recordExist && recordExist.isFinalSubmitted == false) {
+    else {
+      if ((cropExist.crop_code).slice(0, 1) == 'A') {
+      crop_type = 'agriculture';
+      unit = 'qt';
+    }
+    else if ((cropExist.crop_code).slice(0, 1) == 'H') {
+      crop_type = 'horticulture'
+      unit = 'kg';
+    }
+    console.log("crop_type:", crop_type);
+    console.log("unit:", unit);
 
-      let isUpdate = await recordExist.update({
-        req: body.req,
+    let state = await agencyDetailModel.findOne({
+      where: {
+        user_id: body.loginedUserid.id,
+      },
+      attributes: ['state_id']
+    }
+    )
+    console.log("state_id:", state);
+
+ let data = await zsrmreqqsModel.create({
+      year: body.year,
+      season: body.season,
+      crop_type: crop_type,
+      crop_code: body.crop_code,
+      variety_code: body.variety_code,
+      user_id: body.loginedUserid.id,
+      unit: unit,
+       req: body.req,
         sscCs: body.sscCs,
         doaCs: body.doaCs,
         sauCs: body.sauCs,
@@ -1283,50 +1332,14 @@ exports.addZsrmReqQsFinal = async (req, res) => {
         qsavl: body.qsavl,
         totalavl: body.totalavl,
         shtorsur: body.shtorsur,
-        isFinalSubmitted: true
-      })
-
-      if (isUpdate) {
-
-        let isAddedDist = await zsrmcsqsdistModel.create({
-          zsrmreqqs_id: recordExist.id,
-          year: recordExist.year,
-          season: recordExist.season,
-          crop_code: recordExist.crop_code,
-          variety_code: recordExist.variety_code,
-          unit: recordExist.unit,
-          state_id: recordExist.state_id,
-          user_id: recordExist.user_id,
-          crop_type: recordExist.crop_type,
-          sscCs: 0,
-          doaCs: 0,
-          sauCs: 0,
-          nscCs: 0,
-          seedhubsCs: 0,
-          pvtCs: 0,
-          othersCs: 0,
-          sscQs: 0,
-          doaQs: 0,
-          sauQs: 0,
-          nscQs: 0,
-          seedhubsQs: 0,
-          pvtQs: 0,
-          othersQs: 0,
-          totalCs: 0,
-          totalQs: 0,
-          total: 0
-        })
-        if (isAddedDist) {
-          return response(res, status.DATA_SAVE, 200, isAddedDist);
-        }
-        else {
-          return response(res, status.DATA_NOT_SAVE, 500);
-        }
-      }
-      else {
-        return response(res, status.DATA_NOT_SAVE, 500);
-      }
-
+      state_id: state.state_id,
+    });
+    if (data) {
+      response(res, status.DATA_SAVE, 200, data);
+    }
+    else {
+      return response(res, status.DATA_NOT_SAVE, 404)
+    }
     }
   } catch (error) {
     console.log(error);
@@ -1369,8 +1382,7 @@ exports.updateZsrmReqQs = async (req, res) => {
       csavl: body.csavl,
       qsavl: body.qsavl,
       totalavl: body.totalavl,
-      shtorsur: body.shtorsur,
-      isFinalSubmitted: true
+      shtorsur: body.shtorsur
     }).then(() => response(res, status.DATA_UPDATED, 200, {}))
       .catch(() => response(res, status.DATA_NOT_UPDATED, 500));
   } catch (error) {
@@ -1446,14 +1458,6 @@ exports.deleteZsrmReqQs = async (req, res) => {
       return response(res, status.DATA_NOT_AVAILABLE, 404);
     }
 
-    const dataDeleted = await zsrmreqqsdistModel.update({ is_active: false, deletedAt: Date.now() },
-      {
-        where: {
-          zsrmreqqs_id: req.params.id,
-        },
-      },);
-
-    if (dataDeleted) {
       await zsrmreqqsModel.update({ is_active: false, deletedAt: Date.now() },
         {
           where: {
@@ -1461,10 +1465,7 @@ exports.deleteZsrmReqQs = async (req, res) => {
           },
         },).then(() => response(res, status.DATA_DELETED, 200, {}))
         .catch(() => response(res, status.DATA_NOT_DELETED, 500));
-    }
-    else {
-      return response(res, status.DATA_NOT_DELETED, 500);
-    }
+
   }
   catch (error) {
     console.log(error, 'error')
@@ -1558,7 +1559,6 @@ exports.viewZsrmReqQs = async (req, res) => {
         qsavl: parseFloat(item.qsavl),
         totalavl: parseFloat(item.totalavl),
         shtorsur: parseFloat(item.shtorsur),
-        isFinalSubmitted: item.isFinalSubmitted,
         is_finalised: item.is_finalised
       }
     });
@@ -1573,70 +1573,70 @@ exports.viewZsrmReqQs = async (req, res) => {
 
 }
 
-exports.viewZsrmReqQsDistWise = async (req, res) => {
-  try {
-    // const { search } = req.body;
-    const userid = req.body.loginedUserid.id;
+// exports.viewZsrmReqQsDistWise = async (req, res) => {
+//   try {
+//     // const { search } = req.body;
+//     const userid = req.body.loginedUserid.id;
 
-    const { zsrmreqqs_id } = req.query;  // Extract pagination params from query string
+//     const { zsrmreqqs_id } = req.query;  // Extract pagination params from query string
 
-    let condition = {
-      include: [
-        {
-          model: districtModel,
-          attributes: ['district_name']
-        },
-      ],
-      where: { user_id: userid, zsrmreqqs_id: zsrmreqqs_id, is_active: true },
-      order: [[districtModel, 'district_name', 'ASC'],  // Ordering by crop_name in ascending order
-      ],
-      attributes:
-      {
-        exclude: ['createdAt', 'updatedAt', 'deletedAt', 'is_active']
-      }
-    };
-    let data = await db.zsrmReqQsDistWise.findAll(condition);
+//     let condition = {
+//       include: [
+//         {
+//           model: districtModel,
+//           attributes: ['district_name']
+//         },
+//       ],
+//       where: { user_id: userid, zsrmreqqs_id: zsrmreqqs_id, is_active: true },
+//       order: [[districtModel, 'district_name', 'ASC'],  // Ordering by crop_name in ascending order
+//       ],
+//       attributes:
+//       {
+//         exclude: ['createdAt', 'updatedAt', 'deletedAt', 'is_active']
+//       }
+//     };
+//     let data = await db.zsrmReqQsDistWise.findAll(condition);
 
-    let dataSum = await db.zsrmReqQsDistWise.findAll({
-      where: {
-        user_id: userid, zsrmreqqs_id: zsrmreqqs_id, is_active: true
-      },
-      attributes: [
-        // Grouping by crop_name and user_name  
-        [sequelize.fn('SUM', sequelize.col('csavl')), 'csavl'], // Count of records in 'zsrmReqFs'
-        [sequelize.fn('SUM', sequelize.col('qsavl')), 'qsavl'], // Count of records in 'zsrmReqFs'
-        [sequelize.fn('SUM', sequelize.col('totalavl')), 'totalavl'], // Sum of 'total' from 'zsrmReqFs'
-      ],
-      group: [[sequelize.col('zsrmreqqs_id'), 'zsrmreqqs_id'],], // Grouping by user_id and crop_id (or crop_name depending on your logic)
-    });
+//     let dataSum = await db.zsrmReqQsDistWise.findAll({
+//       where: {
+//         user_id: userid, zsrmreqqs_id: zsrmreqqs_id, is_active: true
+//       },
+//       attributes: [
+//         // Grouping by crop_name and user_name  
+//         [sequelize.fn('SUM', sequelize.col('csavl')), 'csavl'], // Count of records in 'zsrmReqFs'
+//         [sequelize.fn('SUM', sequelize.col('qsavl')), 'qsavl'], // Count of records in 'zsrmReqFs'
+//         [sequelize.fn('SUM', sequelize.col('totalavl')), 'totalavl'], // Sum of 'total' from 'zsrmReqFs'
+//       ],
+//       group: [[sequelize.col('zsrmreqqs_id'), 'zsrmreqqs_id'],], // Grouping by user_id and crop_id (or crop_name depending on your logic)
+//     });
 
-    // if (data.length == 0)
-    // //res.status(404).json({message: "No data found"})
-    // return response(res, status.DATA_NOT_AVAILABLE, 404)
+//     // if (data.length == 0)
+//     // //res.status(404).json({message: "No data found"})
+//     // return response(res, status.DATA_NOT_AVAILABLE, 404)
 
-    const result = data.map((item) => {
-      return {
-        id: item.id,
-        csavl: parseFloat(item.csavl),
-        qsavl: parseFloat(item.qsavl),
-        totalavl: parseFloat(item.totalavl),
-        district_id: item.district_id,
-        district_name: item.m_district.district_name
-      }
-    });
-    console.log(result, 'totalavl')
-    response(res, status.DATA_AVAILABLE, 200, {
-      result: result,
-      total_req: dataSum.length ? dataSum[0].req : 0,
-      total_avl: dataSum.length ? dataSum[0].avl : 0,
-      total_shtorsur: dataSum.length ? dataSum[0].shtorsur : 0,
-    });
-  } catch (error) {
-    console.log(error);
-    return response(res, status.UNEXPECTED_ERROR, 501)
-  }
+//     const result = data.map((item) => {
+//       return {
+//         id: item.id,
+//         csavl: parseFloat(item.csavl),
+//         qsavl: parseFloat(item.qsavl),
+//         totalavl: parseFloat(item.totalavl),
+//         district_id: item.district_id,
+//         district_name: item.m_district.district_name
+//       }
+//     });
+//     console.log(result, 'totalavl')
+//     response(res, status.DATA_AVAILABLE, 200, {
+//       result: result,
+//       total_req: dataSum.length ? dataSum[0].req : 0,
+//       total_avl: dataSum.length ? dataSum[0].avl : 0,
+//       total_shtorsur: dataSum.length ? dataSum[0].shtorsur : 0,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     return response(res, status.UNEXPECTED_ERROR, 501)
+//   }
 
-}
+// }
 exports.finaliseZsrmReqQs = async (req, res) => {
   try {
     const recordsExist = await zsrmreqqsModel.findAll({ where: { year: req.query.year, season: req.query.season, is_active: true, user_id: req.body.loginedUserid.id, } });
@@ -3428,8 +3428,9 @@ exports.viewSrrAll = async (req, res) => {
         NextYearSeedQuanDis: parseFloat(item.nextYearData.plannedSeedQuanDis),
         NextYearSrr: parseFloat(item.nextYearData.plannedSrr),
       }
+   
     });
-
+   console.log(result),"   console.log(result)"
     // Get total records for pagination
     let totalRecords = await srrModel.count(condition);
     const totalPages = Math.ceil(totalRecords / limit);  // Calculate total pages

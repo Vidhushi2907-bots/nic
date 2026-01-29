@@ -35,7 +35,6 @@ export class SrrComponent implements OnInit {
     const adjustment = inputElement.value.length - t.length;
     inputElement.setSelectionRange(cursorPosition + adjustment, cursorPosition + adjustment);
   }
-
   searchClicked: any;
   selectedTable: any;
   selectstate: any;
@@ -44,7 +43,6 @@ export class SrrComponent implements OnInit {
   isDisableNormal: boolean;
   isDisableDelay: boolean;
   isDisableNormalReallocate: boolean;
-
   @ViewChild(PaginationUiComponent) paginationUiComponent!: PaginationUiComponent;
   ngForm!: FormGroup;
   filterPaginateSearch: FilterPaginateSearch = new FilterPaginateSearch();
@@ -65,6 +63,7 @@ export class SrrComponent implements OnInit {
     { year: '2018-19', value: '2018-19' },
   ];
   inventorySeasonData = ['Kharif', 'Rabi'];
+  disableUpperSection: boolean;
   cropData: any[] = [];
   districtData: { district_name: string; district_code: string }[] = [];
   allDirectIndentsData: any[] = [];
@@ -93,12 +92,13 @@ export class SrrComponent implements OnInit {
     private fb: FormBuilder,
     private zsrmServiceService: ZsrmServiceService
   ) {
-    this.createForm();
+
   }
 
   ngOnInit(): void {
     this.getCropData();
     this.loadAuthUser();
+    this.createForm();
 
   }
   formatNumber(value: number) {
@@ -107,10 +107,8 @@ export class SrrComponent implements OnInit {
 
   getNextYearRange(yearRange: string): string {
     const [start, end] = yearRange.split('-');
-
     const nextStart = Number(start) + 1;
     const nextEnd = Number(end) + 1;
-
     return `${nextStart}-${nextEnd < 10 ? '0' : ''}${nextEnd}`;
   }
 
@@ -121,34 +119,23 @@ export class SrrComponent implements OnInit {
     const seed_type = this.ngForm.controls['seed_type'].value;
     const crop = this.ngForm.controls['crop'].value;
     this.getViewSrr(year, seed_type, crop);
-    // const queryParams = [];
-    // if (year) queryParams.push(`year=${encodeURIComponent(year)}`);
-    // if (seed_type) queryParams.push(`seed_type=${encodeURIComponent(seed_type)}`);
-    // if (crop) queryParams.push(`crop_code=${encodeURIComponent(crop)}`);
-    // const apiUrl = `view-srr?${queryParams.join('&')}`;
-    // this.zsrmServiceService.getRequestCreator(apiUrl, null, null).subscribe(
-    //   (apiResponse: any) => {
-
-
-    //     if (apiResponse.Response.status_code === 200) {
-    //       this.allViewSrr = apiResponse.Response.data
-    //       this.ngForm.controls['acheiveSrr'].setValue(apiResponse.Response.data.srr);
-    //       this.ngForm.controls['acheivePlannedAreaUnderCropInHa'].setValue(apiResponse.Response.data.plannedAreaUnderCropInHa)
-    //       this.ngForm.controls['acheiveSeedRateInQtPerHt'].setValue(apiResponse.Response.data.seedRateInQtPerHt)
-    //       this.ngForm.controls['acheivePlannedSeedQuanDis'].setValue(apiResponse.Response.data.plannedSeedQuanDis)
-    //       this.ngForm.controls['acheivePlannedSrr'].setValue(apiResponse.Response.data.plannedSrr)
-
-    //     }
-
-
-    //   },
-    //   (error) => {
-
-    //     console.error('Error fetching data:', error);
-    //   }
-    // );
-
+    this.resetCancelation()
   }
+
+  resetCancelation() {
+    this.ngForm.controls['acheivedSrr'].patchValue(0);
+    this.ngForm.controls['seedQuanDis'].patchValue(0);
+    this.ngForm.controls['seedRateAcheived'].patchValue(0);
+    this.ngForm.controls['areaSownUnderCropInHa'].patchValue(0)
+    this.ngForm.controls['NextYearSrr'].patchValue(0);
+    this.ngForm.controls['NextYearAreaUnderCropInHa'].patchValue(0);
+    this.ngForm.controls['NextYearseedRateInQtPerHt'].patchValue(0);
+    this.ngForm.controls['NextYearSeedQuanDis'].patchValue(0);
+    this.is_update = false;
+    this.showOtherInputBox = false;
+    this.disableUpperSection = false;
+  }
+
   getViewSrr(year: string, seed_type: string, crop_code: string): void {
     try {
       const queryParams: string[] = [];
@@ -166,13 +153,10 @@ export class SrrComponent implements OnInit {
 
       this.zsrmServiceService.getRequestCreator(apiUrl, null, null).subscribe({
         next: (apiResponse: any) => {
-          console.log('API Response:', apiResponse);
-
           if (apiResponse?.Response?.status_code === 200) {
             this.allViewSrr = apiResponse.Response.data;
-
             if (this.ngForm && this.ngForm.controls) {
-              this.ngForm.controls['acheiveSrr'].setValue(apiResponse.Response.data.srr ?? '');
+              this.ngForm.controls['srr'].setValue(apiResponse.Response.data.srr ?? '');
               this.ngForm.controls['acheivePlannedAreaUnderCropInHa'].setValue(apiResponse.Response.data.plannedAreaUnderCropInHa ?? '');
               this.ngForm.controls['acheiveSeedRateInQtPerHt'].setValue(apiResponse.Response.data.seedRateInQtPerHt ?? '');
               this.ngForm.controls['acheivePlannedSeedQuanDis'].setValue(apiResponse.Response.data.plannedSeedQuanDis ?? '');
@@ -197,47 +181,44 @@ export class SrrComponent implements OnInit {
     }
   }
 
-
   createForm() {
     this.ngForm = this.fb.group({
       year: ['', [Validators.required]],
       crop: ['', [Validators.required]],
       seed_type: ['', [Validators.required]],
-      acheiveSrr: [''],
-      acheivePlannedAreaUnderCropInHa: [0],
-      acheiveSeedRateInQtPerHt: [0],
-      acheivePlannedSeedQuanDis: [0],
-      acheivePlannedSrr: [0],
-      plannedAreaUnderCropInHa: [0, [Validators.required]],
-      seedRateInQtPerHt: [0, [Validators.required]],
-      plannedSeedQuanDis: [0, [Validators.required]],
-      plannedSrr: [{ value: 0, disabled: true }],
+      srr: [''],
+         acheivePlannedAreaUnderCropInHa: [''],
+      acheiveSeedRateInQtPerHt: [''],
+      acheivePlannedSeedQuanDis: [''],
+      acheivePlannedSrr: [''],
+      NextYearAreaUnderCropInHa: [0, [Validators.required]],
+      NextYearseedRateInQtPerHt: [0, [Validators.required]],
+      NextYearSeedQuanDis: [0, [Validators.required]],
+      NextYearSrr: [{ value: 0, disabled: true }],
       areaSownUnderCropInHa: [0, [Validators.required]],
       seedRateAcheived: [0, [Validators.required]],
       seedQuanDis: [0, [Validators.required]],
       acheivedSrr: [{ value: 0, disabled: true }],
       crop_text: [''],
-
-
     });
     this.ngForm.valueChanges.subscribe(values => {
-      ((((values.seedQuanDis || 0) / (values.seedRateAcheived || 0)) / values.areaSownUnderCropInHa) * 100)
-      const psq = Number(values.plannedSeedQuanDis) || 0;        // Planned Quantity
-      const rate = Number(values.seedRateInQtPerHt) || 0;        // Seed Rate
-      const area = Number(values.plannedAreaUnderCropInHa) || 0;// Area
+
+      const psq = Number(values.NextYearSeedQuanDis) || 0;        // Planned Quantity
+      const rate = Number(values.NextYearseedRateInQtPerHt) || 0;        // Seed Rate
+      const area = Number(values.NextYearAreaUnderCropInHa) || 0;// Area
       const achieve_sq = Number(values.seedQuanDis) || 0
       const achieve_rate = Number(values.seedRateAcheived) || 0;
       const achieve_area = Number(values.areaSownUnderCropInHa) || 0
-      let plannSrr = 0;
+      let NextYearSrr = 0;
       let acheivedSrr = 0;
 
       if (rate > 0 && area > 0 && psq > 0) {
         const value = ((psq / rate) / area) * 100;
 
-        plannSrr = isFinite(value) ? Number(value.toFixed(2)) : 0;
-        console.log(typeof (plannSrr), "plannSrr")
+        NextYearSrr = isFinite(value) ? Number(value.toFixed(2)) : 0;
+
       } else {
-        plannSrr = 0;
+        NextYearSrr = 0;
       }
       if (achieve_sq > 0 && achieve_rate > 0 && achieve_area > 0) {
         const value = ((achieve_sq / achieve_rate) / achieve_area) * 100;
@@ -249,7 +230,7 @@ export class SrrComponent implements OnInit {
       }
 
       this.ngForm.patchValue(
-        { acheivedSrr: acheivedSrr, plannedSrr: plannSrr },
+        { acheivedSrr: acheivedSrr, NextYearSrr: NextYearSrr },
         { emitEvent: false }
       );
     });
@@ -283,44 +264,49 @@ export class SrrComponent implements OnInit {
     this.ngForm.controls['seed_type'].valueChanges.subscribe(() => this.resetSelections());
 
   }
+
   createAndSave() {
-    this.isShowTable = true
+    this.isShowTable = false
     this.submitted = true;
     this.saveForm();
   }
+
   patchDataForUpdate(data: any) {
+    if (!data || !this.ngForm) return;
     this.isAddSelected = true;
-    this.isChangeMessage = "Update the Source Availability";
-    this.isEditMode = true;
+    this.isChangeMessage = "Update Agency-wise Availability";
     this.is_update = true;
     this.dataId = data.id;
-    this.isShowTable = false;
-    const cropName = this.cropData.find(crop => crop.crop_code === data.crop_code)?.crop_name;
-    this.ngForm.controls['year'].patchValue(data.year);
-    this.ngForm.controls['seed_type'].patchValue(data.seed_type);
-    this.ngForm.controls['crop'].patchValue(data.crop_code);
-    if (data) {
-    
-      this.selectCrop = cropName;
-      this.ngForm.controls['acheiveSrr'].patchValue(data.srr);
-      this.ngForm.controls['acheivePlannedAreaUnderCropInHa'].patchValue(data.targetAreaUnderCropInHa);
-      this.ngForm.controls['acheiveSeedRateInQtPerHt'].patchValue(data.targetSeedRateInQtPerHt);
-      this.ngForm.controls['acheivePlannedSeedQuanDis'].patchValue(data.targetSeedQuanDis);
-      this.ngForm.controls['acheivePlannedSrr'].patchValue(data.targetSrr);
-      this.ngForm.controls['plannedAreaUnderCropInHa'].patchValue(Number(data.areaSownUnderCropInHa));
-      this.ngForm.controls['seedRateInQtPerHt'].patchValue(Number(data.seedRateAcheived));
-      this.ngForm.controls['plannedSeedQuanDis'].patchValue(Number(data.seedQuanDis));
-      this.ngForm.controls['areaSownUnderCropInHa'].patchValue(data.NextYearAreaUnderCropInHa); // Remarks might be a string, no conversion needed
-      this.ngForm.controls['seedRateAcheived'].patchValue(Number(data.NextYearseedRateInQtPerHt));
-      this.ngForm.controls['seedQuanDis'].patchValue(Number(data.NextYearSeedQuanDis));
-      this.ngForm.patchValue(
-        { acheivedSrr: data.acheivedSrr, plannedSrr: data.NextYearSrr },
-        { emitEvent: false }
-      );
+    this.disableUpperSection = true;
+    const cropName = this.cropData?.find(
+      crop => crop.crop_code === data.crop_code
+    )?.crop_name;
+    console.log(data, "data......................................")
+    this.selectCrop = cropName;
+    console.log(this.ngForm, "this...............................")
 
+    this.ngForm.patchValue({
+      year: data.year,
+      seed_type: data.seed_type,
+      crop: data.crop_code,
+      srr: data.srr,
+      acheivePlannedAreaUnderCropInHa: data.targetAreaUnderCropInHa,
+      acheiveSeedRateInQtPerHt: data.targetSeedRateInQtPerHt,
+      acheivePlannedSeedQuanDis: data.targetSeedQuanDis,
+      acheivePlannedSrr: data.targetSrr,
+      NextYearSrr: data.NextYearSrr,
+      acheivedSrr: data.acheivedSrr,
+      NextYearAreaUnderCropInHa: Number(data.NextYearAreaUnderCropInHa || 0),
+      NextYearseedRateInQtPerHt: Number(data.NextYearseedRateInQtPerHt || 0),
+      NextYearSeedQuanDis: Number(data.NextYearSeedQuanDis || 0),
+      areaSownUnderCropInHa: Number(data.areaSownUnderCropInHa || 0),
+      seedRateAcheived: Number(data.seedRateAcheived || 0),
+      seedQuanDis: Number(data.seedQuanDis || 0),
+    }, { emitEvent: false });
+    // ✅ Edit mode → lock fields
 
-    }
   }
+
 
 
   resetSelections() {
@@ -362,34 +348,36 @@ export class SrrComponent implements OnInit {
     this.is_update = false;
     this.isAddSelected = false;
     this.showOtherInputBox = false;
-
+    this.disableUpperSection = false;
   }
+
   saveForm() {
     this.submitted = true;
     this.isShowTable = true;
     const route = "add-srr";
-    const req = this.ngForm.controls['plannedAreaUnderCropInHa'].value || 0;
-    const ssc = this.ngForm.controls['seedRateInQtPerHt'].value || 0;
-    const doa = this.ngForm.controls['plannedSeedQuanDis'].value || 0;
-    const sau = this.ngForm.controls['plannedSrr'].value || 0;
-    const sfci = this.ngForm.controls['areaSownUnderCropInHa'].value || 0;
-    const pvt = this.ngForm.controls['seedRateAcheived'].value || 0;
-    const nsc = this.ngForm.controls['seedQuanDis'].value || 0;
-    const others = this.ngForm.controls['acheivedSrr'].value || 0;
+    const NextYearAreaUnderCropInHa = this.ngForm.controls['NextYearAreaUnderCropInHa'].value || 0;
+    const NextYearseedRateInQtPerHt = this.ngForm.controls['NextYearseedRateInQtPerHt'].value || 0;
+    const NextYearSeedQuanDis = this.ngForm.controls['NextYearSeedQuanDis'].value || 0;
+    const NextYearSrr = this.ngForm.controls['NextYearSrr'].value || 0;
+    const areaSownUnderCropInHa = this.ngForm.controls['areaSownUnderCropInHa'].value || 0;
+    const seedRateAcheived = this.ngForm.controls['seedRateAcheived'].value || 0;
+    const seedQuanDis = this.ngForm.controls['seedQuanDis'].value || 0;
+    const acheivedSrr = this.ngForm.controls['acheivedSrr'].value || 0;
     const baseParam = {
       "user_id": this.authUserId,
       "year": this.ngForm.controls['year'].value,
       "seed_type": this.ngForm.controls['seed_type'].value,
       "crop_code": this.ngForm.controls['crop'].value,
-      "plannedAreaUnderCropInHa": req,
-      "seedRateInQtPerHt": ssc,
-      "plannedSeedQuanDis": doa,
-      "plannedSrr": sau,
-      "areaSownUnderCropInHa": sfci,
-      "seedRateAcheived": pvt,
-      "seedQuanDis": nsc,
-      "acheivedSrr": others,
+      "plannedAreaUnderCropInHa": NextYearAreaUnderCropInHa,
+      "seedRateInQtPerHt": NextYearseedRateInQtPerHt,
+      "plannedSeedQuanDis": NextYearSeedQuanDis,
+      "plannedSrr": NextYearSrr,
+      "areaSownUnderCropInHa": areaSownUnderCropInHa,
+      "seedRateAcheived": seedRateAcheived,
+      "seedQuanDis": seedQuanDis,
+      "acheivedSrr": acheivedSrr,
     };
+    console.log(baseParam, "baseParma.....................")
     this.zsrmServiceService.postRequestCreator(route, null, baseParam).subscribe(data => {
       if (data.Response.status_code === 200) {
         Swal.fire({
@@ -399,15 +387,11 @@ export class SrrComponent implements OnInit {
           confirmButtonColor: '#E97E15'
         }).then(x => {
           this.getPageData();
-          // this.ngForm.controls['plannedAreaUnderCropInHa'].reset('');
-          // this.ngForm.controls['seedRateInQtPerHt'].reset('');
-          // this.ngForm.controls['plannedSeedQuanDis'].reset('');
-          // this.ngForm.controls['plannedSrr'].patchValue('');
-          // this.ngForm.controls['areaSownUnderCropInHa'].reset('');
-          // this.ngForm.controls['seedRateAcheived'].reset('');
-          // this.ngForm.controls['seedQuanDis'].reset('');
-          // this.ngForm.controls['acheivedSrr'].reset('');
+          this.resetCancelation();
           this.submitted = false;
+          this.isAddSelected = false;
+          this.isShowTable = true;
+          this.disableUpperSection = false;
         });
       } else if (data.Response.status_code === 409) { // Assuming 409 indicates "Conflict" or "Already Exists"
         Swal.fire({
@@ -426,6 +410,7 @@ export class SrrComponent implements OnInit {
       }
     })
   };
+
   developedBy(item: any) {
     if (!item) {
       this.developedBy_error = 'Please Select Seed type';
@@ -453,6 +438,7 @@ export class SrrComponent implements OnInit {
       (apiResponse: any) => {
         if (apiResponse?.Response.status_code === 200) {
           this.allData = apiResponse.Response.data || [];
+          console.log(this.allData);
           this.filterPaginateSearch.Init(
             this.allData.data,
             this,
@@ -461,7 +447,7 @@ export class SrrComponent implements OnInit {
             apiResponse.Response.data.pagination.totalRecords,
             true
           );
-          this.initSearchAndPagination();
+          // this.initSearchAndPagination();
         } else {
           console.warn('API returned an unexpected status:', apiResponse?.Response.status_code);
         }
@@ -471,11 +457,6 @@ export class SrrComponent implements OnInit {
       }
     );
   }
-
-  initSearchAndPagination() {
-    // Implement your search and pagination initialization logic
-  }
-
 
   productionTypeValue(value) {
     if (value) {
@@ -492,80 +473,83 @@ export class SrrComponent implements OnInit {
 
   updateForm() {
     this.submitted = true;
-    this.isShowTable = true
     if (this.ngForm.invalid) {
       return;
     }
-    const plannedAreaUnderCropInHa = this.ngForm.controls['plannedAreaUnderCropInHa'].value || 0;
-    const seedRateInQtPerHt = this.ngForm.controls['seedRateInQtPerHt'].value || 0;
-    const plannedSeedQuanDis = this.ngForm.controls['plannedSeedQuanDis'].value || 0;
+
+    const NextYearAreaUnderCropInHa = this.ngForm.controls['NextYearAreaUnderCropInHa'].value || 0;
+    const NextYearseedRateInQtPerHt = this.ngForm.controls['NextYearseedRateInQtPerHt'].value || 0;
+    const NextYearSeedQuanDis = this.ngForm.controls['NextYearSeedQuanDis'].value || 0;
+    const NextYearSrr = this.ngForm.controls['NextYearSrr'].value || 0;
     const areaSownUnderCropInHa = this.ngForm.controls['areaSownUnderCropInHa'].value || 0;
     const seedRateAcheived = this.ngForm.controls['seedRateAcheived'].value || 0;
     const seedQuanDis = this.ngForm.controls['seedQuanDis'].value || 0;
+    const acheivedSrr = this.ngForm.controls['acheivedSrr'].value || 0;
+    // ✅ Safe achieved SRR NextYearseedRateInQtPerHt
+    let acheSrr = 0;
+    if (seedRateAcheived > 0 && seedQuanDis > 0 && areaSownUnderCropInHa > 0) {
+      const value = ((seedQuanDis / seedRateAcheived) / areaSownUnderCropInHa) * 100;
+      acheSrr = isFinite(value) ? Number(value.toFixed(2)) : 0;
+    }
 
-    const acheivedSrr = ((((plannedAreaUnderCropInHa || 0) / (seedRateAcheived || 0)) / seedQuanDis) * 100)
-    const psq = Number(plannedSeedQuanDis) || 0;        // Planned Quantity
-    const rate = Number(seedRateInQtPerHt) || 0;        // Seed Rate
-    const area = Number(plannedAreaUnderCropInHa) || 0;// Area
-
+    // ✅ Safe planned SRR
     let plannSrr = 0;
-
-    if (rate > 0 && area > 0 && psq > 0) {
-      const value = ((psq / rate) / area) * 100;
+    if (NextYearAreaUnderCropInHa > 0 && NextYearseedRateInQtPerHt > 0 && NextYearSeedQuanDis > 0) {
+      const value = ((NextYearSeedQuanDis / NextYearseedRateInQtPerHt) / NextYearAreaUnderCropInHa) * 100;
       plannSrr = isFinite(value) ? Number(value.toFixed(2)) : 0;
-    } else {
-      plannSrr = 0; // yahan aap '' bhi rakh sakti ho
     }
 
     const baseParam = {
       "user_id": this.authUserId,
-      "plannedAreaUnderCropInHa": plannedAreaUnderCropInHa,
-      "seedRateInQtPerHt": seedRateInQtPerHt,
-      "plannedSeedQuanDis": plannedSeedQuanDis,
+      "plannedAreaUnderCropInHa": NextYearAreaUnderCropInHa,
+      "seedRateInQtPerHt": NextYearseedRateInQtPerHt,
+      "plannedSeedQuanDis": NextYearSeedQuanDis,
       "plannedSrr": plannSrr,
       "areaSownUnderCropInHa": areaSownUnderCropInHa,
       "seedRateAcheived": seedRateAcheived,
       "seedQuanDis": seedQuanDis,
-      "acheivedSrr": acheivedSrr,
+      "acheivedSrr": acheSrr,
     };
-    const route = `update-srr/${this.dataId}`;
-    this.zsrmServiceService.putRequestCreator(route, null, baseParam,).subscribe(data => {
-      if (data.Response.status_code === 200) {
-        this.is_update = true;
-        this.isShowTable = true;
-        Swal.fire({
-          title: '<p style="font-size:25px;">Data Has Been Successfully Updated.</p>',
-          icon: 'success',
-          confirmButtonText: 'OK',
-          confirmButtonColor: '#E97E15'
-        }).then(() => {
-          
-          this.submitted = false;
-          this.isShowTable=true;
-          this.isAddSelected = false;
-          this.getPageData();
-          // this.ngForm.controls['plannedAreaUnderCropInHa'].reset('');
-          // this.ngForm.controls['seedRateInQtPerHt'].reset('');
-          // this.ngForm.controls['plannedSeedQuanDis'].reset('');
-          // this.ngForm.controls['plannedSrr'].patchValue('');
-          // this.ngForm.controls['areaSownUnderCropInHa'].reset('');
-          // this.ngForm.controls['seedRateAcheived'].reset('');
-          // this.ngForm.controls['seedQuanDis'].reset('');
-          // this.ngForm.controls['acheivedSrr'].reset('');
-          // this.submitted = false;
-          
 
-        })
-      } else {
-        Swal.fire({
-          title: '<p style="font-size:25px;">An Error Occurred.</p>',
-          icon: 'error',
-          confirmButtonText: 'OK',
-          confirmButtonColor: '#E97E15'
-        });
-      }
+    const route = `update-srr/${this.dataId}`;
+
+    this.zsrmServiceService.putRequestCreator(route, null, baseParam)
+      .subscribe(res => {
+
+        if (res?.Response?.status_code === 200) {
+
+          Swal.fire({
+            title: '<p style="font-size:25px;">Data has been successfully updated.</p>',
+            icon: 'success',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#E97E15'
+          }).then(() => {
+            this.is_update = false;
+            this.getPageData();
+            this.resetCancelation();   // ✅ central reset
+            this.submitted = false;
+            this.isAddSelected = false;
+            this.isShowTable = true;
+            this.disableUpperSection = false;
+          });
+
+        } else {
+          this.showError();
+        }
+      }, () => {
+        this.showError();
+      });
+  }
+
+  private showError() {
+    Swal.fire({
+      title: '<p style="font-size:25px;">An error occurred.</p>',
+      icon: 'error',
+      confirmButtonText: 'OK',
+      confirmButtonColor: '#E97E15'
     });
   }
+
 }
 
 

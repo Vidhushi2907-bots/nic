@@ -19,7 +19,8 @@
                       <label for="year" class="left-heading required ">Year </label>
                     </div>
                     <div class="col-12 col-md-12 col-lg-12 col-lg-12 col-xl-12 pr-1">
-                      <select class=" form-control input-inventory" formControlName="year">
+                      <select class="form-control input-inventory" [ngClass]="disableUpperSection ? 'disableFiel':''"
+                        formControlName="year">
                         <option value="">Please Select Year</option>
                         <option *ngFor="let year of inventoryYearData" value="{{year.value}}">
                           <!-- {{ year.year }}-{{ ((year.year % 100) + 1) < 10 ? '0' : '' }}{{ (year.year % 100) + 1 }} -->
@@ -43,8 +44,9 @@
                     </div>
                     <div class="col-12 col-md-12 col-lg-12 col-xl-12">
                       <div ngbDropdown class="d-inline-block w-100">
-                        <button class="btn takeplacholder w-100 crop toggle-button input-inventory" id="crop"
-                          ngbDropdownToggle style="text-align: left;">
+                        <button class="btn takeplacholder w-100 crop toggle-button form-control input-inventory "
+                          id="crop" [ngClass]="disableUpperSection ? 'disableFiel':''" ngbDropdownToggle
+                          style="text-align: left;">
                           {{ selectCrop && (selectCrop.length > 30) ?
                           (selectCrop.substring(0,23)
                           + '...') : selectCrop ? selectCrop : 'Select Crop' }}
@@ -81,8 +83,9 @@
                       <div class="form-check form-check-inline">
                         <div class="row pl-lg-4">
                           <div class="col-lg-2">
-                            <input class="radio-button" id="hybrid" (click)="developedBy('Variety')" type="radio"
-                              formControlName="seed_type" value="Variety" />
+                            <input class="radio-button" id="hybrid" type="radio" formControlName="seed_type"
+                              value="Variety" [disabled]="disableUpperSection"
+                              (click)="!disableUpperSection && developedBy('Variety')" />
                           </div>
                           <div class="col-lg-9 col-11">
                             <label class="form-check-label font-size-18 radio-btn-class" for="hybrid">Variety</label>
@@ -93,7 +96,8 @@
                       <div class="form-check form-check-inline">
                         <div class="row pl-lg-4">
                           <div class="col-lg-2">
-                            <input class="radio-button" id="hybrid" (click)="developedBy('Hybrid')" type="radio"
+                            <input class="radio-button" id="hybrid" [disabled]="disableUpperSection"
+                              (click)="!disableUpperSection && developedBy('Hybrid')" type="radio"
                               formControlName="seed_type" value="Hybrid" />
                           </div>
                           <div class="col-lg-9 col-11">
@@ -146,7 +150,7 @@
                   </div>
 
                   <div class="col-sm-12 col-md-12 col-lg-4 pr-4">
-                     <span style="font-weight: bold; color: black;">{{ ngForm.controls['acheiveSrr'].value }}</span>
+                    <span style="font-weight: bold; color: black;">{{ ngForm.controls['srr'].value }}</span>
                   </div>
                 </div>
               </div>
@@ -157,7 +161,7 @@
                 <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 title-inventory pl-3 pb-2"
                   style="text-align: center; background-color:white ; font-size: 24px; font-weight: bold; border: 2px ; padding: 10px;margin-top: 10px;">
 
-                  Targets for Next Year <span style="color:rgba(255, 0, 0, 0.733)">{{ nextYear}}</span>
+                  Targets for Next Year <span style="color:#cc0e1e">{{ nextYear}}</span>
                 </div>
                 <div class="col-12 pt-4 px-4">
                   <div class="row">
@@ -167,11 +171,11 @@
                     </div>
 
                     <div class="col-sm-12 col-md-12 col-lg-4 pr-4">
-                      <input type="text" class="form-control input-format input-border not_date"
-                        formControlName="plannedAreaUnderCropInHa" (input)="validate($event)" />
+                      <input type="number" class="form-control input-format input-border not_date"
+                        formControlName="NextYearAreaUnderCropInHa" (input)="validate($event)" />
                       <div class="username errorMessage"
-                        *ngIf="submitted ||ngForm.controls['plannedAreaUnderCropInHa'].invalid && ngForm.controls['plannedAreaUnderCropInHa'].dirty || ngForm.controls['plannedAreaUnderCropInHa'].touched">
-                        <span *ngIf=" ngForm.controls['plannedAreaUnderCropInHa'].errors?.['required']">
+                        *ngIf="submitted ||ngForm.controls['NextYearAreaUnderCropInHa'].invalid && ngForm.controls['NextYearAreaUnderCropInHa'].dirty || ngForm.controls['NextYearAreaUnderCropInHa'].touched">
+                        <span *ngIf=" ngForm.controls['NextYearAreaUnderCropInHa'].errors?.['required']">
                           Please Enter value
                         </span>
 
@@ -182,18 +186,16 @@
 
                     </div>
 
-
-
                     <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                       <label for="" class="left-heading required">Seed Rate(in
                         Quintal/Hectares)</label>
                     </div>
                     <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
-                      <input type="text" class="form-control" formControlName="seedRateInQtPerHt"
-                        placeholder="Enter seedRateInQtPerHt" (input)="validate($event)" />
+                      <input type="number" class="form-control" formControlName="NextYearseedRateInQtPerHt"
+                        placeholder="Enter seed Rate" (input)="validate($event)" />
                       <div class="username errorMessage"
-                        *ngIf="submitted ||ngForm.controls['seedRateInQtPerHt'].invalid && ngForm.controls['seedRateInQtPerHt'].dirty || ngForm.controls['plannedAreaUnderCropInHa'].touched">
-                        <span *ngIf=" ngForm.controls['seedRateInQtPerHt'].errors?.['required']">
+                        *ngIf="submitted ||ngForm.controls['NextYearseedRateInQtPerHt'].invalid && ngForm.controls['NextYearseedRateInQtPerHt'].dirty || ngForm.controls['NextYearseedRateInQtPerHt'].touched">
+                        <span *ngIf=" ngForm.controls['NextYearseedRateInQtPerHt'].errors?.['required']">
                           Please Enter value
                         </span>
 
@@ -211,30 +213,22 @@
                     </div>
 
                     <div class="col-sm-12 col-md-12 col-lg-4 pr-4">
-                      <input type="text" class="form-control input-format input-border not_date"
-                        formControlName="plannedSeedQuanDis" (input)="validate($event)" />
+                      <input type="number" class="form-control input-format input-border not_date"
+                        formControlName="NextYearSeedQuanDis" (input)="validate($event)" />
                       <div class="username errorMessage"
-                        *ngIf="submitted ||ngForm.controls['seedRateInQtPerHt'].invalid && ngForm.controls['seedRateInQtPerHt'].dirty || ngForm.controls['plannedAreaUnderCropInHa'].touched">
-                        <span *ngIf=" ngForm.controls['seedRateInQtPerHt'].errors?.['required']">
+                        *ngIf="submitted ||ngForm.controls['NextYearSeedQuanDis'].invalid && ngForm.controls['NextYearSeedQuanDis'].dirty || ngForm.controls['NextYearSeedQuanDis'].touched">
+                        <span *ngIf=" ngForm.controls['NextYearSeedQuanDis'].errors?.['required']">
                           Please Enter value
                         </span>
-
                       </div>
-
-
-
-
                     </div>
-
-
-
                     <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                       <label for="" class="left-heading required"> Planned SRR(in
                         %)</label>
 
                     </div>
                     <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
-                      <span>{{ formatNumber(ngForm.controls['plannedSrr'].value) }}</span>
+                      <span>{{ ngForm.controls['NextYearSrr'].value }}</span>
 
 
                     </div>
@@ -245,7 +239,7 @@
                 <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 title-inventory pl-3 pb-2"
                   style="text-align: center; background-color:white ; font-size: 24px; font-weight: bold; border: 2px ; padding: 10px;">
 
-                  Achievement in Selected Year <span style="color:rgba(255, 0, 0, 0.733)">{{selectedYear}}</span>
+                  Achievement in Selected Year <span style="color:#cc0e1e">{{selectedYear}}</span>
                 </div>
                 <div class="row">
                   <!-- Target Section -->
@@ -408,20 +402,15 @@
                         <span class="d-block text-center">
                           {{ ngForm.controls['acheivePlannedSrr'].value }}
                         </span>
-
-
                       </div>
-
-
-
                       <div class="col-sm-12 col-md-12 col-lg-2 pl-3">
                         <label for="acheiveSeedRateInQtPerHt" class="left-heading required">
                           Achieved SRR (in %):
                         </label>
                       </div>
                       <div class="col-sm-12 col-lg-4 col-md-12 pr-4">
-                        <span >
-                          {{ formatNumber(ngForm.controls['acheivedSrr'].value) }}
+                        <span>
+                          {{ ngForm.controls['acheivedSrr'].value }}
                         </span>
                       </div>
 
@@ -434,25 +423,34 @@
 
                 <!-- button section -->
                 <div class="col-12 col-md-10 col-lg-10 pt-4 pb-2 buttons-phone col-xl-10">
-                  <button
-                    class="btn-inventory-cancel search d-inline-flex justify-content-center verticle-content-middle mb-3"
-                    style="border: 2px solid #B64B1D;" (click)="revertDataCancelation()">Cancel</button>
-                  <button
-                    class="search form-button btn-inventory ml-2 d-inline-flex justify-content-center verticle-content-middle mb-3"
-                    (click)="createAndSave()" style="border: 2px solid #B64B1D; "*ngIf="!is_update">Add</button>
 
-                  <button
+                  <button type="button"
+                    class="btn-inventory-cancel search d-inline-flex justify-content-center verticle-content-middle mb-3"
+                    style="border: 2px solid #B64B1D;" (click)="revertDataCancelation()">
+                    Cancel
+                  </button>
+
+                  <button type="button"
                     class="search form-button btn-inventory ml-2 d-inline-flex justify-content-center verticle-content-middle mb-3"
-                    (click)="updateForm()" *ngIf="is_update">Update</button>
+                    style="border: 2px solid #B64B1D;" (click)="createAndSave()" *ngIf="!is_update">
+                    Add
+                  </button>
+
+                  <button type="button"
+                    class="search form-button btn-inventory ml-2 d-inline-flex justify-content-center verticle-content-middle mb-3"
+                    (click)="updateForm()" *ngIf="is_update">
+                    Update
+                  </button>
 
                 </div>
+
               </div>
 
             </div>
           </div>
         </div>
 
-        <div class="col-12 col-md-12 col-lg-12 col-xl-12" *ngIf="isShowTable &&!isAddSelected">
+        <div class="col-12 col-md-12 col-lg-12 col-xl-12" *ngIf="isShowTable && !isAddSelected">
 
           <div class="row card-inventory form-group">
             <div class="col-12 col-md-12 col-lg-12 col-sm-12 col-xl-12">
@@ -468,33 +466,37 @@
                   style="text-align: right; font-weight: bold;">
                   (Agriculture Crops - in Qts., Horticulture Crops - in Kgs.)
                 </div>
-                <div class="row d-none d-md-flex data-row-header text-center">
+                <div class="row d-none d-md-flex data-row-header">
 
-                  <div class="col-md-1 py-2 d-flex align-items-center justify-content-center">
+                  <div
+                    class=" col-6 col-md-1 py-2 d-flex  verticle-content-middle align-items-center justify-content-center">
                     S.No
                   </div>
-                  <div class="col-md-2 py-2 d-flex align-items-center justify-content-center">
+                  <div
+                    class="col-6 col-md-2 py-2 d-flex verticle-content-middle align-items-center justify-content-center">
                     Crop Name
                   </div>
-                  <div class="col-md-1 py-2 d-flex align-items-center justify-content-center">
+                  <div
+                    class="col-6 col-md-1 py-2 d-flex verticle-content-middle align-items-center justify-content-center">
                     Seed Type
                   </div>
-
-
-
-                  <div class="col-md-1 py-2 d-flex align-items-center justify-content-center">
+                  <div
+                    class="col-6 col-md-1 py-2 d-flex verticle-content-middle align-items-center justify-content-center">
                     Min SRR
                   </div>
 
-                  <div class="col-md-3 py-2 d-flex align-items-center justify-content-center">
+                  <div
+                    class="col-6 col-md-3 py-2 d-flex verticle-content-middle align-items-center justify-content-center">
                     Next Year Targets
                   </div>
 
-                  <div class="col-md-3 py-2 d-flex align-items-center justify-content-center">
+                  <div
+                    class="col-6 col-md-3 py-2 d-flex verticle-content-middle align-items-center justify-content-center">
                     Current Year Achievement
                   </div>
 
-                  <div class="col-md-1 py-2 d-flex align-items-center justify-content-center">
+                  <div
+                    class=" col-6 col-md-1 py-2 d-flex verticle-content-middle align-items-center justify-content-center">
                     Actions
                   </div>
 
@@ -609,7 +611,11 @@
                 </div>
               </div>
 
-
+              <div *ngIf="(filterPaginateSearch.itemList.length< 1)" class="px-2 py-3 w-100" style="height: 50px;">
+                <div class="d-flex verticle-content-middle justify-content-center w-100">
+                  No Data Found.
+                </div>
+              </div>
 
             </div>
 

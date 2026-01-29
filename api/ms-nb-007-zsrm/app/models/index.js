@@ -179,37 +179,37 @@ db.zsrmReqQs.belongsTo(db.stateModel, {
     targetKey: 'state_code'
 });
 
-//---ZSRMQServiceDistWise--------------------------------
-db.zsrmReqQs.hasMany(db.zsrmReqQsDistWise, {
+// //---ZSRMQServiceDistWise--------------------------------
+// db.zsrmReqQs.hasMany(db.zsrmReqQsDistWise, {
 
-    foreignKey: 'zsrmreqqs_id',
-    targetKey: 'id'
-});
+//     foreignKey: 'zsrmreqqs_id',
+//     targetKey: 'id'
+// });
 
-db.zsrmReqQsDistWise.belongsTo(db.zsrmReqQs, {
-    foreignKey: 'zsrmreqqs_id',
-    targetKey: 'id'
-});
+// db.zsrmReqQsDistWise.belongsTo(db.zsrmReqQs, {
+//     foreignKey: 'zsrmreqqs_id',
+//     targetKey: 'id'
+// });
 
-db.districtModel.hasMany(db.zsrmReqQsDistWise, {
-    foreignKey: 'district_id',
-    targetKey: 'district_code'
-});
+// db.districtModel.hasMany(db.zsrmReqQsDistWise, {
+//     foreignKey: 'district_id',
+//     targetKey: 'district_code'
+// });
 
-db.zsrmReqQsDistWise.belongsTo(db.districtModel, {
-    foreignKey: 'district_id',
-    targetKey: 'district_code'
-});
+// db.zsrmReqQsDistWise.belongsTo(db.districtModel, {
+//     foreignKey: 'district_id',
+//     targetKey: 'district_code'
+// });
 
-db.userModel.hasMany(db.zsrmReqQsDistWise, {
-    foreignKey: 'user_id',
-    targetKey: 'id'
-});
+// db.userModel.hasMany(db.zsrmReqQsDistWise, {
+//     foreignKey: 'user_id',
+//     targetKey: 'id'
+// });
 
-db.zsrmReqQsDistWise.belongsTo(db.userModel, {
-    foreignKey: 'user_id',
-    targetKey: 'id'
-});
+// db.zsrmReqQsDistWise.belongsTo(db.userModel, {
+//     foreignKey: 'user_id',
+//     targetKey: 'id'
+// });
 
 
 

@@ -128,10 +128,10 @@ module.exports = (sql, Sequelize) => {
         allowNull: false,
       },
 
-      isFinalSubmitted: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
-      },
+      // isFinalSubmitted: {
+      //   type: Sequelize.BOOLEAN,
+      //   defaultValue: false,
+      // },
       is_finalised: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,

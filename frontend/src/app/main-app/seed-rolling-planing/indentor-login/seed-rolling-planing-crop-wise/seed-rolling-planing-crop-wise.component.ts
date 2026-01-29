@@ -976,10 +976,11 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
                   is_draft: true
                 });
                 // fg.disable();
+                 this.srpCropWiseFinal.clear();
+                 this.addToListData();
               });
             }
           });
-        this.addToListData();
       } else if (result.isDenied) {
         Swal.fire("Changes are not saved", "", "info");
       }

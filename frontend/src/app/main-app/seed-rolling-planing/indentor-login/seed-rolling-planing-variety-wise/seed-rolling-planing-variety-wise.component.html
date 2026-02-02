@@ -102,9 +102,7 @@
                 </div>
 
                 <!--third ui -->
-
-
-                <div class="col-12 col-md-12 col-lg-12 pt-0">
+                <div class="col-12 col-md-12 col-lg-12 pt-0" *ngIf="isFinalSubmitButtonHide">
                     <div class=" row card-inventory form-group">
                         <div class="col-12 col-md-12 col-lg-12 col-sm-12 col-xl-12">
                             <!-- Header Row -->
@@ -141,9 +139,7 @@
 
                                                     <!-- VARIETY NAME -->
                                                     <div class="col-md-2 py-2 " style="text-align: start;">
-                                                        <a href="javascript:void(0)"
-                                                            class="text-primary text-decoration-underline"
-                                                            (click)="viewVarietyDetail(data)">
+                                                        <a class="">
                                                             {{ data.get('variety_name')?.value }}
                                                         </a>
                                                     </div>
@@ -154,38 +150,35 @@
                                                         }}</div>
 
                                                     <!-- REQUIRED QUANTITY -->
-                                                      <!-- [ngClass]="{ 'row-locked': data.get('is_active')?.value === false }" -->
+                                                    <!-- [ngClass]="{ 'row-locked': data.get('is_active')?.value === false }" -->
                                                     <div class="col-md-2 py-2">
-                                                        <div class="bspc-row w-100 text-center"
-                                                          >
+                                                        <div class="bspc-row w-100 text-center">
                                                             <input type="number"
                                                                 class="form-control form-control-sm text-center"
                                                                 formControlName="Req_Qty_of_breeder_seed"
                                                                 (blur)="handleSeedInput(i)" placeholder="Enter Qty"
-                                                                [readonly]="isFinalSubmitButtonHide" />
+                                                                />
                                                         </div>
                                                     </div>
 
                                                     <!-- FOUNDATION SEED -->
-                                                      <!-- [ngClass]="{ 'row-locked': data.get('is_active')?.value === false }" -->
+                                                    <!-- [ngClass]="{ 'row-locked': data.get('is_active')?.value === false }" -->
                                                     <div class="col-md-2 py-2">
-                                                        <div class="bspc-row w-100 text-center"
-                                                           >
+                                                        <div class="bspc-row w-100 text-center">
                                                             <input type="number"
                                                                 class="form-control form-control-sm text-center"
-                                                                formControlName="foundation_seed" readonly
+                                                                formControlName="foundation_seed" 
                                                                 style="border:none; background:transparent;" />
                                                         </div>
                                                     </div>
 
                                                     <!-- BREEDER SEED -->
-                                                     <!-- [ngClass]="{ 'row-locked': data.get('is_active')?.value === false }" -->
+                                                    <!-- [ngClass]="{ 'row-locked': data.get('is_active')?.value === false }" -->
                                                     <div class="col-md-2 py-2">
-                                                        <div class="bspc-row w-100 text-center"
-                                                            >
+                                                        <div class="bspc-row w-100 text-center">
                                                             <input type="number"
                                                                 class="form-control form-control-sm text-center"
-                                                                formControlName="breeder_seed" readonly
+                                                                formControlName="breeder_seed" 
                                                                 style="border:none; background:transparent;" />
                                                         </div>
                                                     </div>
@@ -222,29 +215,197 @@
                 <div class="col-12 pt-2">
                     <div class="row justify-content-end">
 
-                        <div class="col-auto" *ngIf="!isFinalSubmitButtonHide">
-                            <button (click)="saveVariety('draft')"
+                        <div class="col-auto" >
+                            <button (click)="saveVariety('draft')" *ngIf="isFinalSubmitButtonHide"
                                 class="clear-form-button btn-inventory d-inline-flex justify-content-center align-items-center mb-3">
                                 <!-- Save as Draft -->
-                                 Add to list
-                            </button>
-                        </div>
-
-                        <div class="col-auto" *ngIf="!isFinalSubmitButtonHide">
-                            <button (click)="saveVariety('final')" [disabled]="crop_wise_json?.rem_req_seeds !== 0"
-                                class="clear-form-button btn-inventory d-inline-flex justify-content-center align-items-center mb-3">
-                               <!-- add to list -->
-                                <!-- Add to list -->
-                                Forward to PD / PC
-                                <!-- Submit -->
+                                Add to list
                             </button>
                         </div>
 
                     </div>
                 </div>
 
+                <!-- fourth ui -->
+                <ng-container>
+                    <!-- ui -->
+                    <!-- five ui tabular formate -->
+                    <div class="add-to-list-header" *ngIf="this.srpVarietyWiseFinal.length > 0">
+                        <span class="ml-0">
+                            Final Data For Submission
+                        </span>
+                    </div>
+
+                    <div class="col-12 col-md-12 col-lg-12 pt-0" *ngIf=" this.srpVarietyWiseFinal.length > 0 ">
+                        <div class="row card-inventory-white form-group">
+                            <div class="col-12">
+                                <!-- Header Row -->
+                                <div class="list-wrapper">
+                                    <div class="row d-none d-md-flex data-row-header-2">
+                                        <div class="col-6 col-md-1 d-flex align-items-center justify-content-center">
+                                            S/N
+                                        </div>
+                                        <div
+                                            class="col-6 col-md-2 py-2 d-flex flex-column align-items-center justify-content-center text-center">
+                                            Variety Name</div>
+
+                                        <div
+                                            class="col-6 col-md-2 py-2 d-flex align-items-center justify-content-center">
+                                            Notification Year
+                                        </div>
+                                        <div
+                                            class="col-6 col-md-2 py-2 d-flex align-items-center justify-content-center text-center">
+                                            Required Qty of Certified Seed (Qtls.)
+                                        </div>
+                                        <div
+                                            class="col-6 col-md-2 py-2 d-flex flex-column align-items-center justify-content-center text-center">
+                                            Foundation Seed (QHS.)<br />
+                                        </div>
+                                        <div
+                                            class="col-6 col-md-2 py-2 d-flex flex-column align-items-center justify-content-center text-center">
+                                            Breeder Seed (QHS.)<br />
+                                        </div>
+                                        <div
+                                            class="col-6 col-md-1 py-2 d-flex align-items-center justify-content-center">
+                                            Action
+                                        </div>
+                                    </div>
+
+                                    <!-- 🔹 Scrollable Container -->
+                                    <div
+                                        style="max-height: 350px; overflow-x: hidden; 
+                                            overflow-y: auto; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;">
+
+                                        <!-- Dynamic Rows -->
+                                        <div formArrayName="srpVarietyWiseFinal">
+                                            <div *ngFor="let fg of srpVarietyWiseFinal.controls; let i= index">
+                                                <div [formGroupName]="i" class="row data-row-1  py-1">
+                                                    <!-- your existing row content -->
+                                                    <!-- S/N -->
+                                                    <div
+                                                        class="col-6 col-md-1 py-1 d-flex align-items-center justify-content-center pb-0">
+                                                        <span>{{ i + 1 }}</span>
+                                                    </div>
+
+                                                    <!-- variety Name -->
+                                                    <div
+                                                        class="col-6 col-md-2 py-1 d-flex flex-column align-items-center justify-content-center text-center">
+                                                        <!-- <span *ngIf="!fg.get('is_final_submit')?.value; else link">
+                                                            {{ngForm.controls['srpVarietyWiseFinal']['controls'][i].controls['variety_name'].value}}
+                                                        </span>
+
+                                                        <ng-template #link>
+                                                            <a class="underline-link py-1"
+                                                                [routerLink]="['/seed-rolling-planing-variety-wise']"
+                                                                [queryParams]="{ id: fg.get('id')?.value }">
+                                                                {{ngForm.controls['srpVarietyWiseFinal']['controls'][i].controls['crop_name'].value}}
+                                                            </a>
+                                                        </ng-template> -->
+                                                        <!-- <div class="col-6 col-md-2 py-2 " style="text-align: start;"> -->
+                                                        <a href="javascript:void(0)"
+                                                            class="text-primary text-decoration-underline"
+                                                            (click)="viewVarietyDetail(ngForm.controls['srpVarietyWiseFinal']['controls'][i].controls['variety_code'].value)">
+                                                            <!-- (click)="viewVarietyDetail(data)" -->
+                                                            {{ngForm.controls['srpVarietyWiseFinal']['controls'][i].controls['variety_name'].value}}
+                                                        </a>
+                                                        <!-- </div> -->
+                                                    </div>
+
+
+                                                    <!-- Total Area -->
+                                                    <div
+                                                        class="col-6 col-md-2 py-1 d-flex align-items-center justify-content-center">
+                                                        <div class="w-fit-content form-group">
+                                                            <label class="d-md-none"><b>Notification Year(in Lakh
+                                                                    Ha):</b>&nbsp;</label>
+                                                            <span>
+                                                                {{ngForm.controls['srpVarietyWiseFinal']['controls'][i].controls['notification_year'].value}}</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div
+                                                        class="col-6 col-md-2 py-1 d-flex align-items-center justify-content-center">
+                                                        <div class="w-fit-content form-group">
+                                                            <label class="d-md-none"><b>Required Qty of Certified Seed
+                                                                    (Qtls.):</b>&nbsp;</label>
+                                                            <span>
+                                                                {{ngForm.controls['srpVarietyWiseFinal']['controls'][i].controls['required_qty_of_certified_seeds'].value}}</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- SRR Value -->
+                                                    <div
+                                                        class="col-6 col-md-2 py-1 d-flex align-items-center justify-content-center">
+                                                        <div class="w-fit-content form-group">
+                                                            <label class="d-md-none">
+                                                                <b>Foundation Seed (QHS.) </b>&nbsp;
+                                                            </label>
+                                                            <span>
+                                                                {{ngForm.controls['srpVarietyWiseFinal']['controls'][i].controls['foundation_seed'].value}}</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Qty of Seed Required -->
+                                                    <div
+                                                        class="col-6 col-md-2 py-1 d-flex align-items-center justify-content-center">
+                                                        <div class="w-fit-content  form-group">
+                                                            <label class="d-md-none">
+                                                                <b> Breeder Seed (QHS.) ({{
+                                                                    unitValue ? unitValue : '' }}):</b>
+                                                            </label>
+                                                            <span>
+                                                                {{ngForm.controls['srpVarietyWiseFinal']['controls'][i].controls['breeder_seed'].value}}</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div
+                                                        class="col-6 col-md-1 py-1 d-flex align-items-center justify-content-center crop-item">
+                                                        <button class="list-action-buttons"
+                                                            [class.disabled-btn]="fg.get('is_final_submit')?.value"
+                                                            [disabled]="fg.get('is_final_submit')?.value"
+                                                            (click)="removeData(fg.get('id')?.value)"><img
+                                                                src="assets/images/delete.svg"></button>
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                            </div>
+                                            <!-- Total area Calculated -->
+                                        </div>
+                                    </div>
+
+                                    <!-- No Data Message -->
+                                    <div *ngIf=" this.srpVarietyWiseFinal.length < 1 "
+                                        class="px-2 py-3 w-100 text-center" style="height: 50px;">
+                                        No Data Found.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 pt-2">
+                            <div class="row justify-content-end">
+                                <div class="col-auto">
+                                </div>
+                                <!-- *ngIf="isFinalSubmitButtonHide" -->
+                                <!-- [disabled]="isFinalSubmitButtonHide !== 0" -->
+
+                                <div class="col-12 pt-2">
+                                    <div class="row justify-content-end">
+                                        <div class="col-auto">
+                                        </div>
+                                        <div class="col-auto">
+                                            <button (click)="finalizeDataSubmit()" *ngIf="isFinalSubmitButtonHide"
+                                                class="final-submit-form-button btn-inventorys d-inline-flex justify-content-center align-items-center mb-3">
+                                                Forward to PD / PC
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
             </form>
         </div>
-
     </div>
 </div>

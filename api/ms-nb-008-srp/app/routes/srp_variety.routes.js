@@ -9,7 +9,10 @@ module.exports = app => {
     // app.delete(`${process.env.MICRO_SERVICE}/delete-variety`,auth, variety.deleteVariety);
     app.get(`${process.env.MICRO_SERVICE}/api/get-srp-variety-details`, variety.viewCropVariety)
  
+    // new api for srp - variety wise 
     app.post(`${process.env.MICRO_SERVICE}/api/add-srp-variety`, variety.addSrpVariety);
- 
+    app.post(`${process.env.MICRO_SERVICE}/api/add-to-list-variety-data`, auth, variety.addToListVarietyData);
+    app.get(`${process.env.MICRO_SERVICE}/api/add-to-list-variety-data-remove`, auth, variety.addToListVarietyDataRemove);
+    app.post(`${process.env.MICRO_SERVICE}/api/submit-for-filling-variety-data-forword`, auth, variety.submitForFillingVarietyDataForword);
  
 };

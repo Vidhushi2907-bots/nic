@@ -40,7 +40,8 @@ const crypto = require("crypto");
 const https = require("https");
 const Sequelize = require('sequelize');
  
- 
+const { Op, literal, Model, NOW } = require("sequelize");
+
 class VarietyController {
   //rupa code
   // static viewCropVariety = async (req, res) => {
@@ -255,7 +256,15 @@ class VarietyController {
       const whereCond = {
         crop_code: getCropCode.crop_code
       };
- 
+      let existCropData = await db.srpVarietyModel.findAll(
+        {
+          attributes: ['variety_code'],
+          where: {srp_crop_wise_id:srp_crop_wise_id},
+          raw: true
+        }
+      )
+      const existCropCodes = existCropData.map(item => item.variety_code);
+  if (existCropCodes && existCropCodes.length) whereCond.variety_code = { [Op.notIn]: existCropCodes };
       const srpWhereCond = {
         srp_crop_wise_id
       };
@@ -294,12 +303,12 @@ class VarietyController {
         ],
  
         order: [
-          [
-            { model: db.srpVarietyModel, as: "seed_rolling_plan_variety_wises" },
-            "is_draft",
-            "ASC"
-          ],
-          ["variety_code", "ASC"]
+          // [
+          //   { model: db.srpVarietyModel, as: "seed_rolling_plan_variety_wises" },
+          //   "is_draft",
+          //   "ASC"
+          // ],
+          ["variety_name", "ASC"]
         ]
       });
  
@@ -486,7 +495,98 @@ class VarietyController {
       return response(res, status.DATA_NOT_AVAILABLE, 500, error.message);
     }
   };
- 
+
+  static addToListVarietyData = async (req, res) => {
+    try {
+      const user_id = req.body?.loginedUserid?.id
+      const { srp_crop_wise_id } = req.body.search;
+      // let groupCode;
+      // if(group_code) groupCode = {group_code:group_code}
+      const addToListData = await db.srpVarietyModel.findAll({
+        include: [
+          // {
+          //   model: db.cropModel,
+          //   attributes: []
+          // },
+           {
+            model: db.varietyModel,
+            attributes: []
+          }
+        ],
+        where: { srp_crop_wise_id:srp_crop_wise_id },
+        attributes: [
+          "*", 
+          // [sequelize.col('m_crop.crop_name'), 'crop_name'],
+          [sequelize.col('m_crop_variety.variety_name'), 'variety_name']
+        ],
+        raw: true,
+        order: [
+          ['is_final_submit', 'ASC'], // false first
+          [sequelize.col('m_crop_variety.variety_name'), 'ASC'] // name ascending
+        ],
+      });
+      if (addToListData && addToListData.length) {
+        return response(res, status.DATA_AVAILABLE, 200, addToListData);
+      } else {
+        return response(res, status.DATA_NOT_AVAILABLE, 201, []);
+      }
+    } catch (error) {
+      console.log('error', error);
+      return response(res, status.UNEXPECTED_ERROR, 501, []);
+    }
+  }
+
+  static addToListVarietyDataRemove = async (req, res) => {
+    try {
+      const id = Number(req.query.id);
+      const deleted = await db.srpVarietyModel.destroy({
+        where: { id: id }
+      });
+
+      if (!deleted) {
+        return response(res, status.DATA_NOT_FOUND, 201, []);
+      }
+      return response(res, status.DATA_DELETED, 200, []);
+    } catch (error) {
+      console.log('error', error);
+      return response(res, status.UNEXPECTED_ERROR, 501, []);
+    }
+  }
+
+  static submitForFillingVarietyDataForword = async (req, res) => {
+    try {
+      const { ids } = req.body; // [1,2,3,4]
+
+      if (!Array.isArray(ids) || !ids.length) {
+        return res.status(400).json({
+          success: false,
+          message: 'Valid ids array required'
+        });
+      }
+
+      const updated = await db.srpVarietyModel.update(
+        {
+          is_final_submit: true,
+          is_draft: true
+        },
+        {
+          where: {
+            id: ids // Sequelize auto IN clause
+          }
+        }
+      );
+      res.json({
+        success: true,
+        message: 'Final submit done',
+        updatedCount: updated[0]
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
  
 }
 module.exports = VarietyController

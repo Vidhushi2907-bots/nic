@@ -15,6 +15,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { SeedRollingPlanningService } from 'src/app/services/seed-rolling-plan/seed-rolling-planning.service';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { formatDate } from '@angular/common';
+import { ApiResponse } from 'src/app/model/api-response.model';
 
 @Component({
   selector: 'app-seed-rolling-planing-variety-wise',
@@ -98,7 +99,7 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
 
   constructor(private breeder: BreederService, private fb: FormBuilder, private route: ActivatedRoute, private srpService: SeedRollingPlanningService, private service: SeedServiceService, private router: Router
   ) {
-    // this.createForm();
+    this.createForm();
     this.bspcData = this.breeder.redirectData;
     if (this.bspcData && this.bspcData !== undefined && this.bspcData != null) {
       if (this.bspcData.year && this.bspcData.total_area && this.bspcData.crop_code) {
@@ -107,6 +108,8 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
       }
     }
   }
+  // ----------- Form Setup ------------
+
 
   ngOnInit(): void {
 
@@ -118,24 +121,17 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
 
       if (this.srp_crop_wise_id) {
         this.getCropDetailsById(Number(this.srp_crop_wise_id));
-
+        this.addToListData();
         this.getVarietyDetails(this.srp_crop_wise_id, 'draft');
       }
       // Wait for API response → then auto reload if needed
-      setTimeout(() => {
-        if (this.isFinalSubmitButtonHide) {
-          this.getVarietyDetails(this.srp_crop_wise_id, 'submit');
-        }
-      }, 100);
+      // setTimeout(() => {
+      //   if (this.isFinalSubmitButtonHide) {
+      //     this.getVarietyDetails(this.srp_crop_wise_id, 'submit');
+      //   }
+      // }, 100);
     });
 
-    // ----------- Form Setup ------------
-    this.ngForm = this.fb.group({
-      srp_crop_wise_id: [''], // static or dynamic
-      action: [''],
-      bspc: this.fb.array([]),
-      global_search: ['']
-    });
 
     this.initializeFormArray();
     // Global search filter listener
@@ -144,11 +140,31 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
     });
 
   }
+  createForm() {
+    this.ngForm = this.fb.group({
+      srp_crop_wise_id: [''], // static or dynamic
+      action: [''],
+      bspc: this.fb.array([]),
+      srpVarietyWiseFinal: this.fb.array([]),
+      global_search: ['']
+    });
 
+    // this.ngForm.controls['season'].disable();
+
+    // // ✅ Sirf year select hone par season enable hoga
+    // this.ngForm.controls['year'].valueChanges.subscribe(newvalue => {
+
+    // });
+  }
   // GETTER
   get bspc(): FormArray {
     return this.ngForm.get('bspc') as FormArray;
   }
+
+  get srpVarietyWiseFinal(): FormArray {
+    return this.ngForm.get('srpVarietyWiseFinal') as FormArray;
+  }
+
 
   initializeFormArray() {
     this.filteredBspc.forEach(item => {
@@ -160,6 +176,22 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
         is_active: [false]
       }));
     });
+  }
+
+
+  srpCropWiseFinalArray(): FormGroup {
+    return this.fb.group({
+      variety_name: [''],
+      variety_code: [''],
+      notification_year: [''],
+      required_qty_of_certified_seeds: [''],
+      foundation_seed: [''],
+      breeder_seed: [''],
+      id: [''],
+      is_active: [''],
+      is_draft: [''],
+      is_final_submit: []
+    })
   }
 
   applyVarietySearch(searchText: string) {
@@ -289,7 +321,7 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
           const isFinal = dataArr.some(x => x.is_final_submit === true);
 
           // ⭐ SET BUTTON HIDE FROM API
-          this.isFinalSubmitButtonHide = isFinal;
+          // this.isFinalSubmitButtonHide = isFinal;
 
           if (isFinal) {
             // API rule → show only active rows
@@ -353,6 +385,7 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
 
   saveVariety(type: 'draft' | 'final') {
     const apiUrl = 'add-srp-variety';
+    
     const bspcArray = this.ngForm.get('bspc') as FormArray;
 
     if (!bspcArray || bspcArray.length === 0) {
@@ -410,7 +443,8 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
             Swal.fire('Saved as Draft!', '', 'success').then(() => {
               this.isFinalSubmit = false;
               this.getVarietyDetails(this.srp_crop_wise_id, 'draft');
-
+              this.srpVarietyWiseFinal.clear();
+              this.addToListData();
               this.ngForm.get('global_search')?.reset();
 
             });
@@ -500,7 +534,7 @@ ${variety_wise
                 confirmButtonText: 'OK',
                 confirmButtonColor: '#E97E15',
               }).then(() => {
-                this.isFinalSubmitButtonHide = true;
+                // this.isFinalSubmitButtonHide = true;
                 this.ngForm.get('global_search')?.reset();
                 this.getVarietyDetails(this.srp_crop_wise_id, 'submit');
               });
@@ -642,7 +676,9 @@ ${variety_wise
   }
 
   calculateTotalSeedRequired() {
-    const bspcArray = this.ngForm.get('bspc') as FormArray;
+
+    const bspcArray =  this.ngForm.get('bspc') as FormArray; 
+    // this.ngForm.get('bspc') as FormArray;
     if (!bspcArray || !this.crop_wise_json) return { gridTotal: 0, remaining: 0 };
 
     let gridTotal = 0;
@@ -664,7 +700,10 @@ ${variety_wise
       ...this.crop_wise_json,
       rem_req_seeds: remaining
     };
-
+  
+    if(remaining){
+      this.isFinalSubmitButtonHide = true
+    }
     return { gridTotal, remaining };
   }
 
@@ -746,19 +785,21 @@ ${variety_wise
   }
 
   viewVarietyDetail(data: FormGroup) {
-    const varietyCode =
-      data.get('variety_code')?.value ||
-      data.get('variety_id')?.value ||
-      data.get('code')?.value;
-
+    console.log('data =====',data);
+    const varietyCode = data
+      // data.get('variety_code')?.value ||
+      // data.get('variety_id')?.value ||
+      // data.get('code')?.value;
+    
+    console.log('varietyCode=======',varietyCode);
     if (!varietyCode) {
       Swal.fire("Variety code missing in row");
       return;
     }
-    const cropCode =
-      data.get('crop_code')?.value ||
-      data.get('code')?.value ||
-      null;
+    // const cropCode =
+    //   data.get('crop_code')?.value ||
+    //   data.get('code')?.value ||
+    //   null;
 
     const payload = { search: { variety_code: varietyCode } };
 
@@ -777,7 +818,7 @@ ${variety_wise
 
         // ✔ API gives data directly
         const dataRes = res.EncryptedResponse.data;
-        dataRes.crop_code = dataRes.crop_code || cropCode || '--';
+        // dataRes.crop_code = dataRes.crop_code || cropCode || '--';
         dataRes.crop_name_hindi = dataRes.crop_name_hindi || '--';
 
         // --------------------------------
@@ -910,7 +951,119 @@ font-weight: 600;
 `;
     document.head.appendChild(style);
   };
+  //  addSrpData() {
+  //     this.srpVarietyWiseFinal.push(this.srpCropWiseFinalArray());
+  //   }
+  async addToListData() {
+    try {
+      let route = "add-to-list-variety-data";
+      let param = {
+        "search": {
+          "srp_crop_wise_id": this.srp_crop_wise_id,
+        }
+      }
 
+      this.srpService.postRequestCreator(route, null, param).subscribe(res => {
+        let addToListData = [];
+        this.srpVarietyWiseFinal.clear(); // important
+        if (res.EncryptedResponse.status_code === 200) {
+          addToListData = res.EncryptedResponse.data
+          this.srpVarietyWiseFinal.clear(); // important
+          this.isFinalSubmitButtonHide = addToListData.some(item => !item.is_final_submit);
+          addToListData.forEach(item => {
+            this.srpVarietyWiseFinal.push(
+              this.fb.group({
+                variety_name: [item.variety_name || 'NA'],
+                variety_code: [item.variety_code || 'NA'],
+                notification_year: [item.notification_year || 'NA'],
+                required_qty_of_certified_seeds: [item.required_qty_of_certified_seeds  || 'NA'],
+                foundation_seed: [item.foundation_seed  || 'NA'],
+                breeder_seed: [item.breeder_seed  || 'NA'],
+                id: [item.id  || 'NA'],
+                srp_crop_wise_id: [item.srp_crop_wise_id  || 'NA'],
+                is_final_submit:[item.is_final_submit]
+              })
+            );
+          });
+        }
+      })
+      // console.log("hiiii", this.ngForm.controls["srpCropWiseFinal"]["controls"]);
+    } catch (error) {
+      // console.log(error);
+    }
+  }
+  removeData(id) {
+    let route = "add-to-list-variety-data-remove";
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Deleted!",
+          text: "Your file has been deleted.",
+          icon: "success"
+        });
+        this.srpService.getRequestCreatorNew(route + '?' + 'id' + '=' + id).subscribe((res: ApiResponse) => {
+          if (res.EncryptedResponse.status_code == 200) {
+            this.addToListData();
+            this.srpVarietyWiseFinal.clear();
+            this.getVarietyDetails(this.srp_crop_wise_id, 'draft');
+          }
+        })
+      }
+      //  this.getPageData()
+    
+    });
+  }
+
+  finalizeDataSubmit() {
+
+    Swal.fire({
+      title: "Do you want to save the changes?",
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: "Save",
+      denyButtonText: `Don't save`
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire("Saved!", "", "success");
+        let route = "submit-for-filling-variety-data-forword";
+        const ids = this.srpVarietyWiseFinal.controls
+          .filter(fg => fg.get('id')?.value)
+          .map(fg => fg.get('id')?.value);
+
+        if (!ids.length) return;
+
+        const finalData = {
+          ids // [1,2,3,4]  
+        };
+        this.srpService.postRequestCreator(route, null, finalData)
+          .subscribe({
+            next: () => {
+              this.srpVarietyWiseFinal.controls.forEach(fg => {
+                fg.patchValue({
+                  is_final_submit: true,
+                  is_draft: true
+                });
+                // fg.disable();
+                this.srpVarietyWiseFinal.clear();
+                this.addToListData();
+                this.getVarietyDetails(this.srp_crop_wise_id, 'draft');
+              });
+            }
+          });
+      } else if (result.isDenied) {
+        Swal.fire("Changes are not saved", "", "info");
+      }
+    });
+
+  }
 }
 
 

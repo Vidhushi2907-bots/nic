@@ -121,7 +121,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
     this.activeRoute.paramMap.subscribe(params => {
       const isLockedParam = params.get('isLocked'); // 'true' | 'false'
       const isLocked = isLockedParam === 'true';    // boolean
-      console.log(isLocked, 'IS LOCKED');
+      // console.log(isLocked, 'IS LOCKED');
       if (isLocked) {
         this.ngForm.patchValue({
           year: year,
@@ -240,9 +240,9 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
         ctrl.get('seed_rate')?.value,
         ctrl.get('is_active')?.value ? 1 : 0
       ];
-      console.log(values.some(v =>
-        String(v || '').toLowerCase().includes(searchText)
-      ), "value.................................")
+      // console.log(values.some(v =>
+      //   String(v || '').toLowerCase().includes(searchText)
+      // ), "value.................................")
       return values.some(v =>
         String(v || '').toLowerCase().includes(searchText)
       );
@@ -257,9 +257,9 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
         ctrl.get('seed_rate')?.value,
         ctrl.get('is_active')?.value ? 1 : 0
       ];
-      console.log(values.some(v =>
-        String(v || '').toLowerCase().includes(searchText)
-      ), "value.................................")
+      // console.log(values.some(v =>
+      //   String(v || '').toLowerCase().includes(searchText)
+      // ), "value.................................")
       return values.some(v =>
         String(v || '').toLowerCase().includes(searchText)
       );
@@ -300,14 +300,14 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
           // Optional: sort years descending
           this.inventoryYearData.sort((a: any, b: any) => b.year - a.year);
 
-          console.log('✅ Year list loaded:', this.inventoryYearData);
+          // console.log('✅ Year list loaded:', this.inventoryYearData);
         } else {
-          console.warn('⚠️ No valid data received in EncryptedResponse');
+          // console.warn('⚠️ No valid data received in EncryptedResponse');
           this.inventoryYearData = [];
         }
       },
       error: (err) => {
-        console.error('❌ Error fetching years:', err);
+        // console.error('❌ Error fetching years:', err);
       },
     });
   }
@@ -339,7 +339,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
   onRowChange() {
 
     this.isDataChanged = true;
-    console.log("isDataChanged........", this.isDataChanged)
+    // console.log("isDataChanged........", this.isDataChanged)
   }
 
   get srpCropWise(): FormArray {
@@ -407,10 +407,10 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
     }
 
     const payload = { action: "draft", cropData };
-    console.log("Payload Sent:", payload);
+    // console.log("Payload Sent:", payload);
     this.srpService.postRequestCreator(apiUrl, null, payload).subscribe({
       next: (data: any) => {
-        console.log("API Response:", data);
+        // console.log("API Response:", data);
         if (data?.EncryptedResponse?.status_code === 200) {
           Swal.fire({
             title: '<p style="font-size:25px;">Data Add to List successfully.</p>',
@@ -510,7 +510,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
 
             this.disableField = isFinalSubmit;
             this.isFinalSubmitButtonHide = isFinalSubmit;
-            console.log('isFinalSubmit ',isFinalSubmit)
+            // console.log('isFinalSubmit ',isFinalSubmit)
             const srpCropWiseArray = this.ngForm.get('srpCropWise') as FormArray;
 
             if (srpCropWiseArray) {
@@ -665,7 +665,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
 
             this.srpService.postRequestCreator(apiUrl, null, payload).subscribe({
               next: (data: any) => {
-                console.log("🔹 Final Submit API Response:", data);
+                // console.log("🔹 Final Submit API Response:", data);
                 this.isSubmitting = false;
 
                 if (
@@ -733,7 +733,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
   srrValidation(event: any, index: any) {
     const bspcArray = this.ngForm.get('srpCropWise') as FormArray;
     const srrControl = bspcArray.at(index).get('srr');
-    console.log(srrControl, "step:1")
+    // console.log(srrControl, "step:1")
     const input = event.target as HTMLInputElement;
     const currentValue = input.value + event.key;
     const regex = /^[0-9]+(\.[0-9]{0,2})?$/;
@@ -767,10 +767,10 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
     const total_area = Number(rowGroup.get('total_area')?.value || 0);
     const srr_value = Number(rowGroup.get('srr')?.value || 0);
 
-    console.log(seed_rate, total_area, srr_value, "seed_rate * total_area * (srr_value / 100)");
+    // console.log(seed_rate, total_area, srr_value, "seed_rate * total_area * (srr_value / 100)");
 
     let total = seed_rate * total_area * (srr_value / 100);
-    console.log(total, "total")
+    // console.log(total, "total")
     rowGroup.get('total_required')
       ?.setValue(total.toFixed(2), { emitEvent: false });
     // rowGroup.get('total_required')?.valueChanges.subscribe(value => {
@@ -842,7 +842,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
   }
 
   finalSubmit() {
-    console.log("final submit");
+    // console.log("final submit");
   }
 
   capitalizeWords(str) {
@@ -909,9 +909,9 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
           });
         }
       })
-      console.log("hiiii", this.ngForm.controls["srpCropWiseFinal"]["controls"]);
+      // console.log("hiiii", this.ngForm.controls["srpCropWiseFinal"]["controls"]);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   }
 

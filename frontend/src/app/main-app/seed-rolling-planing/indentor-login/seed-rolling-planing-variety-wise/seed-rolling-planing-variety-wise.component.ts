@@ -96,6 +96,7 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
     { name: "Notification Number", dbColumnName: "notification_number", width: 20 },
   ];
 
+  finalTotal: any;
 
   constructor(private breeder: BreederService, private fb: FormBuilder, private route: ActivatedRoute, private srpService: SeedRollingPlanningService, private service: SeedServiceService, private router: Router
   ) {
@@ -385,7 +386,7 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
 
   saveVariety(type: 'draft' | 'final') {
     const apiUrl = 'add-srp-variety';
-    
+
     const bspcArray = this.ngForm.get('bspc') as FormArray;
 
     if (!bspcArray || bspcArray.length === 0) {
@@ -677,7 +678,7 @@ ${variety_wise
 
   calculateTotalSeedRequired() {
 
-    const bspcArray =  this.ngForm.get('bspc') as FormArray; 
+    const bspcArray = this.ngForm.get('bspc') as FormArray;
     // this.ngForm.get('bspc') as FormArray;
     if (!bspcArray || !this.crop_wise_json) return { gridTotal: 0, remaining: 0 };
 
@@ -693,17 +694,24 @@ ${variety_wise
     });
 
     const totalRequired = Number(this.crop_wise_json.total_required) || 0;
+    let remaining = 0;
+    if (this.finalTotal !== '' || this.finalTotal !== undefined || this.finalTotal !== null) {
+      remaining = Math.max(totalRequired - this.finalTotal, 0);
+    } else {
+      remaining = Math.max(totalRequired - gridTotal, 0);
+    }
 
-    const remaining = Math.max(totalRequired - gridTotal, 0);
+    if (remaining == 0) {
+      this.isFinalSubmitButtonHide = true
+    }
+    // remaining = Math.max(totalRequired - gridTotal, 0);
 
     this.crop_wise_json = {
       ...this.crop_wise_json,
       rem_req_seeds: remaining
     };
-  
-    if(remaining){
-      this.isFinalSubmitButtonHide = true
-    }
+
+
     return { gridTotal, remaining };
   }
 
@@ -785,13 +793,13 @@ ${variety_wise
   }
 
   viewVarietyDetail(data: FormGroup) {
-    console.log('data =====',data);
+    console.log('data =====', data);
     const varietyCode = data
-      // data.get('variety_code')?.value ||
-      // data.get('variety_id')?.value ||
-      // data.get('code')?.value;
-    
-    console.log('varietyCode=======',varietyCode);
+    // data.get('variety_code')?.value ||
+    // data.get('variety_id')?.value ||
+    // data.get('code')?.value;
+
+    console.log('varietyCode=======', varietyCode);
     if (!varietyCode) {
       Swal.fire("Variety code missing in row");
       return;
@@ -969,22 +977,26 @@ font-weight: 600;
         if (res.EncryptedResponse.status_code === 200) {
           addToListData = res.EncryptedResponse.data
           this.srpVarietyWiseFinal.clear(); // important
+          let totalRemaoning = 0;
           this.isFinalSubmitButtonHide = addToListData.some(item => !item.is_final_submit);
           addToListData.forEach(item => {
+            totalRemaoning += item.required_qty_of_certified_seeds
             this.srpVarietyWiseFinal.push(
               this.fb.group({
                 variety_name: [item.variety_name || 'NA'],
                 variety_code: [item.variety_code || 'NA'],
                 notification_year: [item.notification_year || 'NA'],
-                required_qty_of_certified_seeds: [item.required_qty_of_certified_seeds  || 'NA'],
-                foundation_seed: [item.foundation_seed  || 'NA'],
-                breeder_seed: [item.breeder_seed  || 'NA'],
-                id: [item.id  || 'NA'],
-                srp_crop_wise_id: [item.srp_crop_wise_id  || 'NA'],
-                is_final_submit:[item.is_final_submit]
+                required_qty_of_certified_seeds: [item.required_qty_of_certified_seeds || 'NA'],
+                foundation_seed: [item.foundation_seed || 'NA'],
+                breeder_seed: [item.breeder_seed || 'NA'],
+                id: [item.id || 'NA'],
+                srp_crop_wise_id: [item.srp_crop_wise_id || 'NA'],
+                is_final_submit: [item.is_final_submit]
               })
             );
           });
+          this.finalTotal = totalRemaoning;
+          console.log("isues", this.finalTotal);
         }
       })
       // console.log("hiiii", this.ngForm.controls["srpCropWiseFinal"]["controls"]);
@@ -1018,7 +1030,7 @@ font-weight: 600;
         })
       }
       //  this.getPageData()
-    
+
     });
   }
 

@@ -698,8 +698,13 @@ background-color: #e9ecef; /* light grey background */
     font-weight: 500;
     display: inline-block;
 }
- 
- 
+
+/* for checkbox */
+ .crop-item input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  cursor: pointer;
+}
  
  
  

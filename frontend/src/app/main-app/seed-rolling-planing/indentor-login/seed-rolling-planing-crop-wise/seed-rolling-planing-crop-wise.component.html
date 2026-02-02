@@ -288,17 +288,17 @@
                       <!-- Crop Name -->
                       <div
                         class=" col-6 col-md-2 py-3 d-flex flex-column align-items-center justify-content-center text-center">
-                        <span *ngIf="!fg.get('is_final_submit')?.value; else link">
+                        <span >
                           {{ fg.get('crop_name')?.value}}
                         </span>
 
-                        <ng-template #link>
+                        <!-- <ng-template #link>
                           <a class="underline-link" [routerLink]="['/seed-rolling-planing-variety-wise']"
                             [queryParams]="{ id: fg.get('id')?.value }">
 
                             {{ fg.get('crop_name')?.value }}
                           </a>
-                        </ng-template>
+                        </ng-template> -->
                       </div>
 
 
@@ -306,32 +306,23 @@
                       <div class="col-6 col-md-2 py-2 d-flex align-items-center justify-content-center">
                         <div class="w-fit-content form-group">
                           <label class="d-md-none"><b>Total Area (in Lakh Ha):</b>&nbsp;</label>
-                          <span *ngIf="isFinalSubmitButtonHide">{{ fg.get('total_area')?.value
-                            }}</span>
-                          <input type="number" formControlName="total_area" (keypress)="checkDecimal($event)"
+                          <!-- <span *ngIf="isFinalSubmitButtonHide">{{ fg.get('total_area')?.value
+                            }}</span> -->
+                          <input type="number" class="form-control target-input-field" formControlName="total_area" (keypress)="checkDecimal($event)"
                             (input)="calculateTotalSeed(fg)" (input)="onRowChange()"
-                            [disabled]="fg.get('is_final_submit')?.value" *ngIf="!isFinalSubmitButtonHide"
-                            [readonly]="fg.get('id')?.value && !fg.get('is_active')?.value" [ngClass]="
-                                (fg.get('id')?.value && !fg.get('is_active')?.value)
-                                  ? 'readOnlyInput form-control target-input-field'
-                                    : 'form-control target-input-field'
-                          " />
+                           />
                         </div>
                       </div>
 
                       <div class="col-6 col-md-2 py-2 d-flex align-items-center justify-content-center">
                         <div class="w-fit-content form-group">
                           <label class="d-md-none"><b>Seed Rate/Ha (Quintal):</b>&nbsp;</label>
-                          <span *ngIf="isFinalSubmitButtonHide">{{ fg.get('seed_rate')?.value
-                            }}</span>
+                          <!-- <span *ngIf="isFinalSubmitButtonHide">{{ fg.get('seed_rate')?.value
+                            }}</span> -->
                           <input type="number" class="form-control target-input-field" (keypress)="checkDecimal($event)"
                             (keypress)="checkLength($event, 10)" formControlName="seed_rate"
-                            *ngIf="!isFinalSubmitButtonHide" (input)="calculateTotalSeed(fg)" (input)="onRowChange()"
-                            [readonly]="fg.get('id')?.value && !fg.get('is_active')?.value" [ngClass]="
-                                    (fg.get('id')?.value && !fg.get('is_active')?.value)
-                                      ? 'readOnlyInput form-control target-input-field'
-                                        : 'form-control target-input-field'
-                              " />
+                           (input)="calculateTotalSeed(fg)" (input)="onRowChange()" 
+                           />
                         </div>
                       </div>
 
@@ -341,17 +332,12 @@
                           <label class="d-md-none">
                             <b>SRR </b>&nbsp;
                           </label>
-                          <span *ngIf="isFinalSubmitButtonHide">{{ fg.get('srr')?.value
-                            }}</span>
+                          <!-- <span *ngIf="isFinalSubmitButtonHide">{{ fg.get('srr')?.value
+                            }}</span> -->
                           <input type="number" class="form-control target-input-field" (keypress)="checkDecimal($event)"
                             (keypress)="checkLength($event, 10)" (input)="onRowChange()"
-                            (input)="calculateTotalSeed(fg)" formControlName="srr" *ngIf="!isFinalSubmitButtonHide"
-                            (input)="srrValidation($event,i)"
-                            [readonly]="fg.get('id')?.value && !fg.get('is_active')?.value" [ngClass]="
-                                  (fg.get('id')?.value && !fg.get('is_active')?.value)
-                                    ? 'readOnlyInput form-control target-input-field'
-                                      : 'form-control target-input-field'
-                            " />
+                            (input)="calculateTotalSeed(fg)" formControlName="srr"
+                            (input)="srrValidation($event,i)"/>
 
                         </div>
                       </div>
@@ -404,13 +390,14 @@
           <div *ngIf="isCrop" class="col-12 pt-2">
             <div class="row justify-content-end">
               <div class="col-auto">
-                <button (click)="revertDataCancelation()" *ngIf="!isFinalSubmitButtonHide"
+                <!-- <button (click)="revertDataCancelation()" *ngIf="!isFinalSubmitButtonHide"
                   class="clear-form-button btn-inventory d-inline-flex justify-content-center align-items-center mb-3'">
                   Cancel
-                </button>
+                </button> -->
               </div>
+              <!-- *ngIf="!isFinalSubmitButtonHide" -->
               <div class="col-auto">
-                <button (click)="saveAsDraft()" *ngIf="!isFinalSubmitButtonHide"
+                <button (click)="saveAsDraft()" 
                   class="clear-form-button btn-inventory d-inline-flex justify-content-center align-items-center mb-3">
                   <!-- Save -->
                   Add to the List

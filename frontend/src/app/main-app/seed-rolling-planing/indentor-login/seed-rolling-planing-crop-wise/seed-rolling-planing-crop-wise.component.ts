@@ -419,10 +419,10 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
             confirmButtonColor: '#B64B1D',
           }).then((result) => {
             if (result.isConfirmed) {
-              this.isDataChanged = false;
-              this.getPageData();
+              this.isDataChanged = true;
               this.srpCropWiseFinal.clear();
               this.addToListData();
+              this.getPageData();
               this.ngForm.get('global_search')?.reset();
             }
           });
@@ -476,21 +476,21 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
       }
 
       this.isCrop = true;
-      if (this.isDataChanged) {
-        const confirmChange = await Swal.fire({
-          toast: false,
-          icon: "warning",
-          title: "Your data has not been saved. Changing the crop group will reset the data. Do you want to continue?",
-          position: "center",
-          showCancelButton: true,
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
-        });
+      // if (this.isDataChanged) {
+      //   const confirmChange = await Swal.fire({
+      //     toast: false,
+      //     icon: "warning",
+      //     title: "Your data has not been saved. Changing the crop group will reset the data. Do you want to continue?",
+      //     position: "center",
+      //     showCancelButton: true,
+      //     confirmButtonText: 'OK',
+      //     cancelButtonText: 'Cancel',
+      //   });
 
-        if (!confirmChange.isConfirmed) {
-          return;
-        }
-      }
+      //   if (!confirmChange.isConfirmed) {
+      //     return;
+      //   }
+      // }
 
       this.isDataChanged = false;
       let apiUrl = `get-srp-crop-wise?year=${year}&season=${season}`;
@@ -510,6 +510,7 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
 
             this.disableField = isFinalSubmit;
             this.isFinalSubmitButtonHide = isFinalSubmit;
+            console.log('isFinalSubmit ',isFinalSubmit)
             const srpCropWiseArray = this.ngForm.get('srpCropWise') as FormArray;
 
             if (srpCropWiseArray) {
@@ -682,8 +683,9 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
                     if (result.isConfirmed) {
                       this.isFinalSubmitButtonHide = true
 
-                      this.isDataChanged = false;
+                      // this.isDataChanged = false;
                       this.getPageData();
+                      this.addToListData();
                       this.getCroupCroupList(year, season);
                       this.ngForm.get('global_search')?.reset();
                     }
@@ -934,15 +936,14 @@ export class SeedRollingPlaningCropWiseComponent implements OnInit {
           text: "Your file has been deleted.",
           icon: "success"
         });
-        this.srpCropWiseFinal.clear();
         this.srpService.getRequestCreatorNew(route + '?' + 'id' + '=' + id).subscribe((res: ApiResponse) => {
          if(res.EncryptedResponse.status_code==200){
           this.addToListData();
           this.srpCropWiseFinal.clear();
-          this.getPageData()
          }
         })
       }
+       this.getPageData()
     });
   }
 

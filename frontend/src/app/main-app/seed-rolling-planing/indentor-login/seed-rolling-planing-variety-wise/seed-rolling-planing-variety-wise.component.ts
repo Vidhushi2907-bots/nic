@@ -157,7 +157,7 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
         required_qty_of_certified_seeds: [0],
         foundation_seed: [0],
         breeder_seed: [0],
-        is_active: [true]
+        is_active: [false]
       }));
     });
   }
@@ -270,7 +270,7 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
               foundation_seed: saved.foundation_seed || 0,
               breeder_seed: saved.breeder_seed || 0,
 
-              is_active: saved.is_active ?? true,
+              is_active: saved.is_active ?? false,
               is_final_submit: saved.is_final_submit === true,
               srp_crop_wise_id: saved.srp_crop_wise_id || null,
               is_draft: saved?.is_draft ?? null
@@ -536,6 +536,7 @@ ${variety_wise
 
     const totalRequired = Number(this.crop_wise_json.total_required) || 0;
     const currentValue = Number(control.get('Req_Qty_of_breeder_seed')?.value) || 0;
+    const isActive = control.get('is_active');
 
     // What grid total will become after this input
     const gridTotalAfterInput = gridTotal; // gridTotal already includes current row's value because calc() reads all rows
@@ -554,13 +555,18 @@ ${variety_wise
       control.get('Req_Qty_of_breeder_seed')?.setValue(0, { emitEvent: false });
       control.get('foundation_seed')?.setValue(0, { emitEvent: false });
       control.get('breeder_seed')?.setValue(0, { emitEvent: false });
-    
+
       // Recalculate after correction
       this.calculateTotalSeedRequired();
 
       return;
     }
-
+    // AUTO CHECK / UNCHECK BASED ON QTY
+    if (currentValue > 0) {
+      isActive?.setValue(true, { emitEvent: false });
+    } else {
+      isActive?.setValue(false, { emitEvent: false });
+    }
     // Normal flow → live update always
     this.calculateTotalSeedRequired();
   }

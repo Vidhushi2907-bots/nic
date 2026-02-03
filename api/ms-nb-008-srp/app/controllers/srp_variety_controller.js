@@ -386,9 +386,9 @@ class VarietyController {
       if (data) {
     const yearData = await db.srpYearModel.findOne({
       where: { year: data.year},
-      attributes: ['year_range']
+      attributes: ['year']
     });
-    data.year = yearData ? yearData.year_range : null;
+    data.year = yearData ? yearData.year : null;
 
         response(res, status.DATA_AVAILABLE, 200, data);
       

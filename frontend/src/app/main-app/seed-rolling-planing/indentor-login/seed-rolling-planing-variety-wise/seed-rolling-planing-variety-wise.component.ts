@@ -74,6 +74,7 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
   disableField = false;
   isFinalSubmitButtonHide: boolean;
   isDraftMode = false;
+  autoSearchTimeout: any;
 
   groupColumns = [
     { name: "SN", isIndex: true, width: 10 },
@@ -96,7 +97,9 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
     { name: "Notification Number", dbColumnName: "notification_number", width: 20 },
   ];
 
-  finalTotal: any;
+  finalTotal: any = 0;
+  yearRangeFoundation: any;
+  yearRangeBreeder: any;
 
   constructor(private breeder: BreederService, private fb: FormBuilder, private route: ActivatedRoute, private srpService: SeedRollingPlanningService, private service: SeedServiceService, private router: Router
   ) {
@@ -108,6 +111,9 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
         this.ngForm.controls['total_area'].patchValue(this.bspcData.total_area);
       }
     }
+      this.ngForm.get('global_search')?.valueChanges.subscribe(() => {
+      this.triggerAutoSearch();
+    })  
   }
   // ----------- Form Setup ------------
 
@@ -224,7 +230,9 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
       next: (res: any) => {
 
         const item = res?.EncryptedResponse?.data;
-
+        console.log('item====', item);
+        this.yearRangeFoundation = (item.year - 1) + '-' + ((item.year - 2000))
+        this.yearRangeBreeder = (item.year - 2) + '-' + ((item.year - 2000) - 1)
         if (!item) {
           this.crop_wise_json = null;
           return;
@@ -247,7 +255,7 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
           crop_name: item['m_crop.crop_name'] || item.crop_name || '',
           total_area: Number(item.total_area) || 0,
           total_required: totalRequired,
-          rem_req_seeds: totalRequired
+          rem_req_seeds: totalRequired - this.finalTotal
         };
 
         this.calculateTotalSeedRequired();
@@ -385,6 +393,20 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
   }
 
   saveVariety(type: 'draft' | 'final') {
+     
+    //  this.remainingAfterFinal === 0
+    // console.log('final submit',this.finalTotal)
+    // console.log('toatl reguired',Number(this.crop_wise_json?.total_required));
+    // return;
+    if(this.finalTotal == Number(this.crop_wise_json?.total_required)){
+      Swal.fire({
+        icon: 'warning',
+        title: 'Limit Exceeded',
+        text: `You cannot enter more! Required Qty can't be greater than Total Seeds.`,
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
     const apiUrl = 'add-srp-variety';
 
     const bspcArray = this.ngForm.get('bspc') as FormArray;
@@ -430,7 +452,7 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
     // ===========================
     if (type === 'draft') {
       Swal.fire({
-        title: 'Save as Draft?',
+        title: 'Data Add to List?',
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'Yes',
@@ -441,7 +463,7 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
 
         this.srpService.postRequestCreator(apiUrl, null, payload).subscribe({
           next: () => {
-            Swal.fire('Saved as Draft!', '', 'success').then(() => {
+            Swal.fire('Data Add To List Successfully', '', 'success').then(() => {
               this.isFinalSubmit = false;
               this.getVarietyDetails(this.srp_crop_wise_id, 'draft');
               this.srpVarietyWiseFinal.clear();
@@ -700,10 +722,14 @@ ${variety_wise
     } else {
       remaining = Math.max(totalRequired - gridTotal, 0);
     }
+    // if (remaining === 0 || isNaN(remaining)) {
+    //   alert("hii")
+    //   this.isFinalSubmitButtonHide = true;
+    // } else {
+    //   alert("bye")
+    //   this.isFinalSubmitButtonHide = false
+    // }
 
-    if (remaining == 0) {
-      this.isFinalSubmitButtonHide = true
-    }
     // remaining = Math.max(totalRequired - gridTotal, 0);
 
     this.crop_wise_json = {
@@ -746,6 +772,13 @@ ${variety_wise
     this.calculateTotalSeedRequired();
   }
 
+    async triggerAutoSearch() {
+    clearTimeout(this.autoSearchTimeout);
+    this.autoSearchTimeout = setTimeout(() => {
+      this.applyFilter(this.ngForm.get('global_search').value)
+    }, 400); // delay 0.4 sec
+  }
+
   applyFilter(searchText: string) {
     const bspcArray = this.ngForm.get('bspc') as FormArray;
     if (!bspcArray) return;
@@ -755,6 +788,7 @@ ${variety_wise
     // If empty search → show all rows
     if (!searchText || !searchText.toString().trim()) {
       this.filteredBspc = allRows;
+       this.addToListData();
       return;
     }
     console.log(this.filteredBspc, "this.filtered")
@@ -788,6 +822,23 @@ ${variety_wise
         reqQty.includes(lower) ||
         foundationSeed.includes(lower) ||
         breederSeed.includes(lower)
+      );
+    });
+
+     this.srpVarietyWiseFinal.controls = this.srpVarietyWiseFinal.controls.filter(ctrl => {
+      const values = [
+        ctrl.get('variety_name')?.value,
+        ctrl.get('variety_code')?.value,
+        ctrl.get('required_qty_of_certified_seeds')?.value,
+        ctrl.get('foundation_seed')?.value,
+        ctrl.get('breeder_seed')?.value,
+        ctrl.get('notification_year')?.value
+      ];
+      // console.log(values.some(v =>
+      //   String(v || '').toLowerCase().includes(searchText)
+      // ), "value.................................")
+      return values.some(v =>
+        String(v || '').toLowerCase().includes(searchText)
       );
     });
   }
@@ -979,6 +1030,7 @@ font-weight: 600;
           this.srpVarietyWiseFinal.clear(); // important
           let totalRemaoning = 0;
           this.isFinalSubmitButtonHide = addToListData.some(item => !item.is_final_submit);
+          
           addToListData.forEach(item => {
             totalRemaoning += item.required_qty_of_certified_seeds
             this.srpVarietyWiseFinal.push(
@@ -996,7 +1048,11 @@ font-weight: 600;
             );
           });
           this.finalTotal = totalRemaoning;
-          console.log("isues", this.finalTotal);
+          console.log("finalTotal111", this.finalTotal);
+        }else{
+          if(!res.EncryptedResponse.data.length){
+            this.finalTotal = 0
+          }
         }
       })
       // console.log("hiiii", this.ngForm.controls["srpCropWiseFinal"]["controls"]);
@@ -1074,8 +1130,19 @@ font-weight: 600;
         Swal.fire("Changes are not saved", "", "info");
       }
     });
-
   }
+
+  get remainingAfterFinal(): number {
+    const total = Number(this.crop_wise_json?.total_required) || 0;
+    const used = Number(this.finalTotal) || 0;
+    // console.log('this.hideRemaining======',this.hideRemaining)
+    return total - used;
+  }
+
+  get hideRemaining(): boolean {
+    return this.remainingAfterFinal === 0;
+  }
+
 }
 
 

@@ -335,7 +335,7 @@
                                                             <label class="d-md-none"><b>Required Qty of Certified Seed
                                                                     (Qt.):</b>&nbsp;</label>
                                                             <span>
-                                                                {{ngForm.controls['srpVarietyWiseFinal']['controls'][i].controls['required_qty_of_certified_seeds'].value}}</span>
+                                                                {{(ngForm.controls['srpVarietyWiseFinal']['controls'][i].controls['required_qty_of_certified_seeds'].value | number:'1.2-2') }}</span>
                                                         </div>
                                                     </div>
 
@@ -347,7 +347,7 @@
                                                                 <b>Foundation Seed (Qt.) </b>&nbsp;
                                                             </label>
                                                             <span>
-                                                                {{ngForm.controls['srpVarietyWiseFinal']['controls'][i].controls['foundation_seed'].value}}</span>
+                                                                {{ngForm.controls['srpVarietyWiseFinal']['controls'][i].controls['foundation_seed'].value | number:'1.2-2'}}</span>
                                                         </div>
                                                     </div>
 
@@ -360,7 +360,7 @@
                                                                     unitValue ? unitValue : '' }}):</b>
                                                             </label>
                                                             <span>
-                                                                {{ngForm.controls['srpVarietyWiseFinal']['controls'][i].controls['breeder_seed'].value}}</span>
+                                                                {{(ngForm.controls['srpVarietyWiseFinal']['controls'][i].controls['breeder_seed'].value | number:'1.2-2')||'NA'}}</span>
                                                         </div>
                                                     </div>
 

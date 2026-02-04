@@ -72,7 +72,7 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
   isLoading = true;
   isSubmitting = false;
   disableField = false;
-  isFinalSubmitButtonHide: boolean;
+  isFinalSubmitButtonHide: boolean = true;
   isDraftMode = false;
   autoSearchTimeout: any;
 
@@ -111,9 +111,9 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
         this.ngForm.controls['total_area'].patchValue(this.bspcData.total_area);
       }
     }
-      this.ngForm.get('global_search')?.valueChanges.subscribe(() => {
+    this.ngForm.get('global_search')?.valueChanges.subscribe(() => {
       this.triggerAutoSearch();
-    })  
+    })
   }
   // ----------- Form Setup ------------
 
@@ -393,12 +393,19 @@ export class SeedRollingPlaningVarietyWiseComponent implements OnInit {
   }
 
   saveVariety(type: 'draft' | 'final') {
-     
+
     //  this.remainingAfterFinal === 0
-    // console.log('final submit',this.finalTotal)
-    // console.log('toatl reguired',Number(this.crop_wise_json?.total_required));
-    // return;
-    if(this.finalTotal == Number(this.crop_wise_json?.total_required)){
+    console.log('final submit', this.finalTotal)
+    console.log('toatl reguired', Number(this.crop_wise_json?.total_required));
+
+    const bspcArray1 = this.ngForm.get('bspc') as FormArray;
+    const totalBreederSeed = bspcArray1.controls.reduce((sum, ctrl) => {
+      const value = Number(ctrl.get('Req_Qty_of_breeder_seed')?.value);
+      return sum + (isNaN(value) ? 0 : value);
+    }, 0);
+
+    let totalValue = (totalBreederSeed ||0)+(this.finalTotal||0)
+    if (totalValue > Number(this.crop_wise_json?.total_required)) {
       Swal.fire({
         icon: 'warning',
         title: 'Limit Exceeded',
@@ -592,7 +599,7 @@ ${variety_wise
     const { gridTotal } = this.calculateTotalSeedRequired();
 
     const totalRequired = Number(this.crop_wise_json.total_required) || 0;
-    const currentValue = Number(control.get('Req_Qty_of_breeder_seed')?.value) || 0;
+    const currentValue = (Number(control.get('Req_Qty_of_breeder_seed')?.value) || 0) + (this.finalTotal || 0)
     const isActive = control.get('is_active');
 
     // What grid total will become after this input
@@ -772,7 +779,7 @@ ${variety_wise
     this.calculateTotalSeedRequired();
   }
 
-    async triggerAutoSearch() {
+  async triggerAutoSearch() {
     clearTimeout(this.autoSearchTimeout);
     this.autoSearchTimeout = setTimeout(() => {
       this.applyFilter(this.ngForm.get('global_search').value)
@@ -788,7 +795,7 @@ ${variety_wise
     // If empty search → show all rows
     if (!searchText || !searchText.toString().trim()) {
       this.filteredBspc = allRows;
-       this.addToListData();
+      this.addToListData();
       return;
     }
     console.log(this.filteredBspc, "this.filtered")
@@ -825,7 +832,7 @@ ${variety_wise
       );
     });
 
-     this.srpVarietyWiseFinal.controls = this.srpVarietyWiseFinal.controls.filter(ctrl => {
+    this.srpVarietyWiseFinal.controls = this.srpVarietyWiseFinal.controls.filter(ctrl => {
       const values = [
         ctrl.get('variety_name')?.value,
         ctrl.get('variety_code')?.value,
@@ -1030,7 +1037,7 @@ font-weight: 600;
           this.srpVarietyWiseFinal.clear(); // important
           let totalRemaoning = 0;
           this.isFinalSubmitButtonHide = addToListData.some(item => !item.is_final_submit);
-          
+
           addToListData.forEach(item => {
             totalRemaoning += item.required_qty_of_certified_seeds
             this.srpVarietyWiseFinal.push(
@@ -1049,8 +1056,8 @@ font-weight: 600;
           });
           this.finalTotal = totalRemaoning;
           console.log("finalTotal111", this.finalTotal);
-        }else{
-          if(!res.EncryptedResponse.data.length){
+        } else {
+          if (!res.EncryptedResponse.data.length) {
             this.finalTotal = 0
           }
         }

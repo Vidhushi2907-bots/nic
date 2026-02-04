@@ -10,13 +10,30 @@ const srpYearWise = db.srpYearModel;
 const season = db.seasonModel;
 require('dotenv').config()
 const Token = db.tokens;
+const { Op, literal, Model, NOW } = require("sequelize");
 
 class MasterController {
 
     //view Year
     static viewYear = async (req, res) => {
         try {
-            const data = await db.srpYearModel.findAll();
+            // const data = await db.srpYearModel.findAll();
+            const currentYear = new Date().getFullYear();
+            const fromYear = currentYear + 1;   // change as per rule
+            const toYear = currentYear + 7;
+            const data = await db.mFinYearModel.findAll(
+                {
+                    attributes: ['id', 'year', 'is_active', [db.sequelize.col('fin_year'), 'year_range']],
+                    raw: true,
+                    where: {
+                        is_active: 1,
+                        [Op.and]: db.sequelize.where(
+                            db.sequelize.cast(db.sequelize.col('year'), 'INTEGER'),
+                            { [Op.between]: [fromYear, toYear] }
+                        )
+                    }
+                }
+            );
 
             if (data && data.length > 0) {
                 response(res, status.DATA_AVAILABLE, 200, data);
@@ -29,7 +46,7 @@ class MasterController {
             response(res, status.DATA_NOT_AVAILABLE, 500);
         }
     };
-    
+
     //Update Year 
     static editYear = async (req, res) => {
         try {
@@ -112,7 +129,7 @@ class MasterController {
         try {
             const { year } = req.query; // you can find by ID from URL param
 
-            const yearData = await srpYearWise.findOne({ where: { year:year } });
+            const yearData = await srpYearWise.findOne({ where: { year: year } });
 
             if (!yearData) {
                 return response(res, status.DATA_NOT_FOUND, 404, null);
@@ -170,7 +187,7 @@ class MasterController {
 
             // Update record
             const [updatedCount] = await db.seasonModel.update(
-                { season,season_code },
+                { season, season_code },
                 { where: { id } }
             );
 
@@ -231,7 +248,7 @@ class MasterController {
             response(res, status.DATA_AVAILABLE, 200, yearData);
         } catch (error) {
             console.error(error);
-            rresponse(res, status.DATA_NOT_AVAILABLE, 500,[]);
+            rresponse(res, status.DATA_NOT_AVAILABLE, 500, []);
         }
     };
 
@@ -243,7 +260,7 @@ class MasterController {
             const seasonData = await db.seasonModel.findOne({ where: { id } });
 
             if (!seasonData) {
-               return response(res, status.DATA_NOT_FOUND, 404, null);
+                return response(res, status.DATA_NOT_FOUND, 404, null);
             }
 
             const data = await db.seasonModel.destroy({ where: { id } });
@@ -251,7 +268,7 @@ class MasterController {
             response(res, status.DATA_DELETED, 200, data);
         } catch (error) {
             console.error(error);
-            response(res, status.DATA_NOT_AVAILABLE, 500,[]);
+            response(res, status.DATA_NOT_AVAILABLE, 500, []);
         }
     };
 

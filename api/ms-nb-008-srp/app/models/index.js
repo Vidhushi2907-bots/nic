@@ -140,6 +140,9 @@ db.srpStateReplanningReplaceVaritiesModel = require('./srp_state_replanning_repl
 db.srpStateReplanningNewVarietiesModel = require('./srp_replanning_new_varieties.model.js')(sequelize, Sequelize);
 db.srpAssignSpaModel = require('./srp_assign_spa.model.js')(sequelize, Sequelize);
 db.srpCropVarietyFinalModel = require('./srop_crop_variety_final.model.js')(sequelize, Sequelize);
+db.mFinYearModel = require('./m_fin_year.model.js')(sequelize, Sequelize);
+
+
 // Here
 // table first
 //table second
